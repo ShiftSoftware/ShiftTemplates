@@ -1,0 +1,15 @@
+﻿@using ShiftSoftware.ShiftIdentity.Blazor
+@using ShiftSoftware.ShiftIdentity.Core
+@using ShiftSoftware.ShiftIdentity.Dashboard.Blazor
+
+<CascadingAuthenticationState>
+    <DefaultApp AppTitle="Stock Plus Plus"
+                AppAssembly="@typeof(App).Assembly"
+                IdentityHostingType="ShiftIdentityHostingTypes.Internal"
+                AdditionalAssemblies="new[] {typeof(ShiftIdentityBlazorMaker).Assembly, typeof(ShiftIdentityDashboarBlazorMaker).Assembly}">
+    
+        <NavMenuTemplate Context="NavMenu">
+            <NavMenu isDrawerOpen="@NavMenu.IsOpen" />
+        </NavMenuTemplate>
+    </DefaultApp>
+ </CascadingAuthenticationState>

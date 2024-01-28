@@ -1,0 +1,15 @@
+﻿{
+  "$schema": "https://json.schemastore.org/ide.host",
+  "order": 100,
+  "icon": "icon.png",
+  "symbolInfo": [
+    {
+      "id": "addFunctions",
+      "isVisible": true
+    },
+    {
+      "id": "addTest",
+      "isVisible": true
+    }
+  ]
+}

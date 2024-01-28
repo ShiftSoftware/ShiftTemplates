@@ -1,0 +1,104 @@
+﻿{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Shift Software",
+  "classifications": [ "Shift Software", "Web" ],
+  "identity": "ShiftSoftware.ShiftTemplates",
+  "name": "Shift Framework Project",
+  "shortName": "shift",
+  "sourceName": "StockPlusPlus",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "guids": [
+    "{55183F24-9642-44F3-B930-D547980F3E97}",
+    "{2B356D62-C41F-4575-A67D-2A10EF32D348}",
+    "{5E6AAA85-E011-43A6-A15A-A139F5F5E7F8}",
+    "{656427A0-3E14-4C43-B69B-0F259EDE18F5}",
+    "{D781393E-1509-4ABC-BEA2-404A3F829548}",
+    "{FDF7449B-ED4F-44C7-8B2A-956CF45E337D}"
+  ],
+  "primaryOutputs": [
+    {
+      "path": "StockPlusPlus.API\\StockPlusPlus.API.csproj"
+    },
+    {
+      "path": "StockPlusPlus.Data\\StockPlusPlus.Data.csproj"
+    },
+    {
+      "path": "StockPlusPlus.Shared\\StockPlusPlus.Shared.csproj"
+    },
+    {
+      "path": "StockPlusPlus.Web\\StockPlusPlus.Web.csproj"
+    },
+    {
+      "path": "StockPlusPlus.Functions\\StockPlusPlus.Functions.csproj"
+    },
+    {
+      "path": "StockPlusPlus.Test\\StockPlusPlus.Test.csproj"
+    }
+  ],
+  "sources": [
+    {
+      "exclude": [
+        "**/[Bb]in/**",
+        "**/[Oo]bj/**",
+        ".template.config/**/*",
+        "**/*.filelist",
+        "**/*.user",
+        "**/*.lock.json",
+        "**/.git/**",
+        "**/.github/**",
+        "**/.vs/**",
+        "**/.gitignore",
+        "**/.gitattributes",
+        "ImportAndReferenceAll.bat",
+        "RemoveAll.bat",
+        "ShiftFrameworkGlobalSettings.props"
+      ],
+      "modifiers": [
+        {
+          "exclude": "**/StockPlusPlus.Functions/**",
+          "condition": "(!addFunctions)"
+        },
+        {
+          "exclude": "**/StockPlusPlus.Test/**",
+          "condition": "(!addTest)"
+        }
+      ]
+    }
+  ],
+  "symbols": {
+    "addFunctions": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Add functions project",
+      "displayName": "Add Functions",
+      "isRequired": false,
+      "defaultValue": "false",
+      "isEnabled": true
+    },
+    "addTest": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Add Test project",
+      "displayName": "Add Test",
+      "isRequired": false,
+      "defaultValue": "false",
+      "isEnabled": true
+    },
+    "removeReferences": {
+      "type": "generated",
+      "generator": "constant",
+      "datatype": "bool",
+      "description": "Remove references",
+      "parameters": { "value": "true" }
+    },
+    "frameworkVersion": {
+      "type": "bind",
+      "binding": "msbuild:ShiftFrameworkVersion",
+      "description": "Remove references",
+      "replaces": "$(ShiftFrameworkVersion)"
+    }
+  }
+}

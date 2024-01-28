@@ -1,0 +1,30 @@
+﻿@using StockPlusPlus.Web.Pages.Product.Brand
+@using StockPlusPlus.Web.Pages.Product.ProductCategory
+@using StockPlusPlus.Web.Pages.Product.Product
+
+<MudNavMenu>
+
+    <AuthorizedMudNavGroup Title="Products" Icon="@Icons.Material.Filled.Book" HideExpandIcon="!isDrawerOpen" TypeAuthActions="new List<ShiftSoftware.TypeAuth.Core.Actions.Action> {
+        StockPlusPlus.Shared.ActionTrees.StockActionTrees.Brand,
+        StockPlusPlus.Shared.ActionTrees.StockActionTrees.ProductCategory,
+    }">
+        <AuthorizedMudNavLink Href="@($"/{nameof(BrandList)}")"
+                              TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockActionTrees.Brand"
+                              Match="NavLinkMatch.All"
+                              Icon="@Icons.Material.Outlined.Bookmarks">Brands</AuthorizedMudNavLink>
+
+        <AuthorizedMudNavLink Href="@($"/{nameof(ProductCategoryList)}")"
+                              TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockActionTrees.ProductCategory"
+                              Match="NavLinkMatch.All"
+                              Icon="@Icons.Material.Outlined.Discount">Categories</AuthorizedMudNavLink>
+
+        <AuthorizedMudNavLink Href="@($"/{nameof(ProductList)}")"
+                              TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockActionTrees.Product"
+                              Match="NavLinkMatch.All"
+                              Icon="@Icons.Material.Outlined.Category">Products</AuthorizedMudNavLink>
+    </AuthorizedMudNavGroup>
+</MudNavMenu>
+
+@code {
+    [Parameter] public bool isDrawerOpen { get; set; }
+}

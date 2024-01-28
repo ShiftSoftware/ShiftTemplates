@@ -1,0 +1,15 @@
+{
+  "IsEncrypted": false,
+  "ConnectionStrings": {
+    "SQLServer": "Server=localhost\\sqlexpress;Initial Catalog=StockPlusPlus;Persist Security Info=True;Integrated Security=SSPI;TrustServerCertificate=True;"
+  },
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
+  },
+  "CosmosDb": {
+    "Enabled": false,
+    "ConnectionString": "",
+    "DefaultDatabaseName": "test"
+  }
+}

@@ -1,0 +1,85 @@
+﻿@attribute [Authorize]
+@attribute [Route($"/{nameof(ProductList)}")]
+
+@using StockPlusPlus.Shared.DTOs.Product.Brand;
+@using StockPlusPlus.Shared.DTOs.Product.Product
+@using System.Linq.Expressions;
+@using StockPlusPlus.Shared.DTOs.Product.ProductCategory;
+@using StockPlusPlus.Web.Pages.Product.Brand;
+@using StockPlusPlus.Web.Pages.Product.ProductCategory;
+
+<ShiftList EntitySet="Product"
+            Title="Product List"
+            T="ProductListDTO"
+            Dense
+            FilterString="@Filters"
+            ComponentType="typeof(ProductForm)"
+            ShowIDColumn="true"
+            TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockActionTrees.Product"
+            AddDialogParameters="AddDialogParameters"
+            EnableExport>
+
+        <PropertyColumn Property="x => x.Name" Title="Name" />
+        <PropertyColumn Format="F" Property="x => x.LastSaveDate.DateTime" Title="SaveDate" />
+
+        <PropertyColumn Format="F" Property="x => x.ReleaseDate.DateTime" Title="Release Date">
+            <CellTemplate>
+            @if (context?.Item?.ReleaseDate.DateTime > DateTimeOffset.MinValue)
+            {
+                @context.Item.ReleaseDate.DateTime
+            }
+        </CellTemplate>
+    </PropertyColumn>
+
+    <ButtonColumn ComponentType="typeof(BrandForm)" KeyPropertyName="@nameof(ProductListDTO.BrandID)" Property="x => x.Brand" Title="Brand">
+        <ButtonTemplate>
+            <MudChip Style="cursor: pointer;" Icon="@Icons.Material.Filled.BrandingWatermark" Variant="Variant.Outlined">@context</MudChip>
+        </ButtonTemplate>
+    </ButtonColumn>
+
+    <ForeignColumn IsButtonColumn
+                ComponentType="typeof(ProductCategoryForm)"
+                Property="x => x.ProductCategoryID"
+                Title="Category"
+                T="ProductListDTO"
+                TEntity="ProductCategoryListDTO"
+                TProperty="string"
+                EntitySet="ProductCategory"
+                OpenMode="ModalOpenMode.NewTab" />
+    </ShiftList>
+
+ @code {
+
+    public Dictionary<string, string> AddDialogParameters = new();
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? ProductCategoryID { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? BrandID { get; set; }
+
+    public string? Filters;
+
+    protected override void OnInitialized()
+    {
+        var filter = new ODataFilter();
+
+        if (!string.IsNullOrWhiteSpace(ProductCategoryID))
+        {
+            AddDialogParameters[nameof(ProductForm.ProductCategoryID)] = ProductCategoryID;
+
+            filter.Add(nameof(ProductListDTO.ProductCategoryID), ODataOperator.Equal, ProductCategoryID);
+        }
+
+        if (!string.IsNullOrWhiteSpace(BrandID))
+        {
+            AddDialogParameters[nameof(ProductForm.BrandID)] = BrandID;
+
+            filter.Add(nameof(ProductListDTO.BrandID), ODataOperator.Equal, BrandID);
+        }
+
+        Filters = filter.ToString();
+    }
+}
