@@ -25,7 +25,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\StockPlusPlus.API\StockPlusPlus.API.csproj" />
 		<!--#if(removeReferences == true)-->
-		<ProjectReference Include="..\..\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools.csproj" Condition="Exists('..\..\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
+		<ProjectReference Include="..\..\..\..\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools.csproj" Condition="Exists('..\..\..\..\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<!--#endif -->
 	</ItemGroup>
 

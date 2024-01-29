@@ -17,6 +17,7 @@ dotnet sln remove ..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj
 dotnet sln remove ..\ShiftIdentity\ShiftIdentity.Core\ShiftIdentity.Core.csproj
 dotnet sln remove ..\ShiftIdentity\ShiftIdentity.AspNetCore\ShiftIdentity.AspNetCore.csproj
 dotnet sln remove ..\ShiftIdentity\ShiftIdentity.Blazor\ShiftIdentity.Blazor.csproj
+dotnet sln remove ..\ShiftIdentity\ShiftIdentity.Data\ShiftIdentity.Data.csproj
 dotnet sln remove ..\ShiftIdentity\ShiftIdentity.Dashboard.AspNetCore\ShiftIdentity.Dashboard.AspNetCore.csproj
 dotnet sln remove ..\ShiftIdentity\ShiftIdentity.Dashboard.Blazor\ShiftIdentity.Dashboard.Blazor.csproj
 dotnet sln remove ..\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools.csproj
