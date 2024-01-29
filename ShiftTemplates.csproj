@@ -1,25 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <!-- The package metadata. Fill in the properties marked as TODO below -->
-    <!-- Follow the instructions on https://learn.microsoft.com/en-us/nuget/create-packages/package-authoring-best-practices -->
-    <PackageId>ShiftSoftware.ShiftTemplates</PackageId>
-    <PackageVersion>1.0</PackageVersion>
-    <Title>Shift Software Tempaltes</Title>
-    <Authors>Shift Software, Sarmad Ahmed</Authors>
-    <Description>Shift Software's Shift Framework tempaltes</Description>
-    <PackageTags>Web, Shift Software</PackageTags>
-    <PackageProjectUrl>https://github.com/ShiftSoftware/ShiftTemplates</PackageProjectUrl>
+	<Import Project="..\..\ShiftFrameworkGlobalSettings.props" Condition="Exists('..\..\ShiftFrameworkGlobalSettings.props')" />
 
-    <!-- Keep package type as 'Template' to show the package as a template package on nuget.org and make your template available in dotnet new search.-->
-    <PackageType>Template</PackageType>
-    <TargetFramework>net8.0</TargetFramework>
-    <IncludeContentInPack>true</IncludeContentInPack>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <ContentTargetFolders>content</ContentTargetFolders>
-    <NoWarn>$(NoWarn);NU5128</NoWarn>
-    <NoDefaultExcludes>true</NoDefaultExcludes>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<!-- The package metadata. Fill in the properties marked as TODO below -->
+		<!-- Follow the instructions on https://learn.microsoft.com/en-us/nuget/create-packages/package-authoring-best-practices -->
+		<PackageId>ShiftSoftware.ShiftTemplates</PackageId>
+		<Product>ShiftSoftware.ShiftTemplates</Product>
+		<AssemblyName>ShiftSoftware.ShiftTemplates</AssemblyName>
+
+		<PackageVersion>$(ShiftFrameworkVersion)</PackageVersion>
+		<Title>Shift Software Tempaltes</Title>
+		<Authors>Shift Software, Sarmad Ahmed</Authors>
+		<Description>Shift Software's Shift Framework tempaltes</Description>
+		<PackageTags>Web, Shift Software</PackageTags>
+		<PackageProjectUrl>https://github.com/ShiftSoftware/ShiftTemplates</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/ShiftSoftware/ShiftTemplates</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageIcon>icon.png</PackageIcon>
+
+		<!-- Keep package type as 'Template' to show the package as a template package on nuget.org and make your template available in dotnet new search.-->
+		<PackageType>Template</PackageType>
+		<TargetFramework>net8.0</TargetFramework>
+		<IncludeContentInPack>true</IncludeContentInPack>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<ContentTargetFolders>content</ContentTargetFolders>
+		<NoWarn>$(NoWarn);NU5128</NoWarn>
+		<NoDefaultExcludes>true</NoDefaultExcludes>
+
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+	</PropertyGroup>
 
   <PropertyGroup>
     <LocalizeTemplates>false</LocalizeTemplates>
@@ -34,8 +43,9 @@
     <Compile Remove="**\*" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="" />
-  </ItemGroup>
 
+	<ItemGroup>
+		<None Include="Images\icon.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+	
 </Project>
