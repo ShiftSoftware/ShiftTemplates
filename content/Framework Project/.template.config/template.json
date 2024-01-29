@@ -95,10 +95,14 @@
       "parameters": { "value": "true" }
     },
     "frameworkVersion": {
-      "type": "bind",
-      "binding": "msbuild:ShiftFrameworkVersion",
+      "type": "generated",
       "description": "Remove references",
-      "replaces": "$(ShiftFrameworkVersion)"
+      "replaces": "$(ShiftFrameworkVersion)",
+      "parameters": {
+        "value": "2024.01.11.1"
+      },
+      "datatype": "string",
+      "generator": "constant"
     }
   }
 }
