@@ -99,7 +99,7 @@
       "description": "Remove references",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2024.01.11.1"
+        "value": "2024.01.29.1"
       },
       "datatype": "string",
       "generator": "constant"
