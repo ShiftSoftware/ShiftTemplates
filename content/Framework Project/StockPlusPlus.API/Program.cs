@@ -10,10 +10,7 @@ using Microsoft.Extensions.Azure;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
-using StockPlusPlus.Data.Entities.Product;
 using AutoMapper;
-using StockPlusPlus.Shared.DTOs.Product.ProductCategory;
-using System.Text.Json;
 using ShiftSoftware.ShiftIdentity.Core.Entities;
 using ShiftSoftware.ShiftIdentity.Core.ReplicationModels;
 using ShiftSoftware.ShiftEntity.Model.Enums;
@@ -158,14 +155,15 @@ builder.Services.AddTypeAuth((o) =>
     o.AddActionTree<StockPlusPlus.Shared.ActionTrees.StockActionTrees>();
 });
 
-#if DEBUG
-builder.Services.AddRazorPages();
-builder.Services.AddAzureClients(clientBuilder =>
+if (builder.Environment.IsDevelopment())
 {
-    clientBuilder.AddBlobServiceClient(builder.Configuration["StorageConnectionString:blob"]!, preferMsi: true);
-    clientBuilder.AddQueueServiceClient(builder.Configuration["StorageConnectionString:queue"]!, preferMsi: true);
-});
-#endif
+    builder.Services.AddRazorPages();
+    builder.Services.AddAzureClients(clientBuilder =>
+    {
+        clientBuilder.AddBlobServiceClient(builder.Configuration["StorageConnectionString:blob"]!, preferMsi: true);
+        clientBuilder.AddQueueServiceClient(builder.Configuration["StorageConnectionString:queue"]!, preferMsi: true);
+    });
+}
 
 var app = builder.Build();
 
@@ -205,28 +203,20 @@ app.UseRequestLocalization(options =>
     options.ApplyCurrentCultureToResponseHeaders = true;
 });
 
-#if DEBUG
-
-app.UseBlazorFrameworkFiles();
-app.UseStaticFiles();
-
-#endif
-
 app.MapControllers();
 
 app.UseCors(x => x.WithOrigins("*").AllowAnyMethod().AllowAnyHeader());
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseBlazorFrameworkFiles();
+    app.UseStaticFiles();
+
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.MapRazorPages();
+    app.MapFallbackToFile("index.html");
 }
-
-#if DEBUG
-
-app.MapRazorPages();
-app.MapFallbackToFile("index.html");
-
-#endif
 
 app.Run();
