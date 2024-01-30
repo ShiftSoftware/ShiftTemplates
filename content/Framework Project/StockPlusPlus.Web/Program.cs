@@ -46,13 +46,13 @@ builder.Services.AddShiftBlazor(config =>
     //config.SyncfusionLicense = builder.Configuration.GetValue<string>("SyncfusionLicense");
 });
 
-builder.Services.AddShiftIdentity("stock-plus-plus-dev", baseUrl, baseUrl);
+builder.Services.AddShiftIdentity("StockPlusPlus-Dev", baseUrl, baseUrl);
 
 builder.Services.AddShiftIdentityDashboardBlazor(x =>
 {
     x.ShiftIdentityHostingType = ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.Internal;
     x.LogoPath = "/img/shift-full.png";
-    x.Title = "Stock Plus Plus";
+    x.Title = "StockPlusPlus";
     x.DynamicTypeAuthActionExpander = async () =>
     {
         //var httpService = builder.Services.BuildServiceProvider().GetRequiredService<HttpService>();
@@ -63,9 +63,11 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
 
         //ToDoActions.DataLevelAccess.Statuses.Expand(Enum.GetValues<ToDo.Shared.Enums.ToDoStatus>().Select(x => new KeyValuePair<string, string>(((int)x).ToString(), x.Describe())).ToList());
     };
-    x.AddCompanyBranchCustomField("Username", "User Name")
-        .AddCompanyBranchCustomField("Password", true)
-        .AddCompanyCustomField("AutolineLink","Autoline Link");
+
+
+    x.AddCompanyCustomField("SomeExternalLink", "Some External Link")
+    .AddCompanyBranchCustomField("Username", "User Name")
+    .AddCompanyBranchCustomField("Password", true);
 });
 
 builder.Services.AddTypeAuth(x =>
