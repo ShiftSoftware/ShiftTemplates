@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using ShiftSoftware.Azure.Functions.AspNetCore.Authorization.Extensions;
 using StockPlusPlus.Data;
 using StockPlusPlus.Data.Repositories.Product;
+using StockPlusPlus.Functions;
 using System.Text;
 
 var host = new HostBuilder()
@@ -53,7 +54,7 @@ var host = new HostBuilder()
     {
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
-        
+        services.AddScoped(x => new TestOptions("Nahro"));
         services
         .AddShiftEntity(x =>
         {
