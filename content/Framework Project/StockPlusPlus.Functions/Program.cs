@@ -1,14 +1,48 @@
 ﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using StockPlusPlus.Data.Repositories.Product;
+using Microsoft.IdentityModel.Tokens;
+using ShiftSoftware.Azure.Functions.AspNetCore.Authorization.Extensions;
 using StockPlusPlus.Data;
-using System.Configuration;
-using Microsoft.Extensions.Configuration;
+using StockPlusPlus.Data.Repositories.Product;
+using System.Text;
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWorkerDefaults()
+    .ConfigureFunctionsWorkerDefaults(x =>
+    {
+        x.AddAuthentication().AddJwtBearer(
+            new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = true,
+                ValidIssuer = "StockPlusPlus",
+                RequireExpirationTime = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("one-two-three-four-five-six-seven-eight.one-two-three-four-five-six-seven-eight")),
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
+                LifetimeValidator = (DateTime? notBefore, DateTime? expires, SecurityToken securityToken,
+                                     TokenValidationParameters validationParameters) =>
+                {
+                    bool result = false;
+                    var now = DateTime.UtcNow;
+
+                    if (notBefore != null && now < notBefore)
+                        result = false;
+
+                    if (expires != null)
+                        result = expires > now;
+
+                    if (!result)
+                        throw new SecurityTokenExpiredException("Token expired");
+
+                    return result;
+                }
+            }
+        );
+    })
     .ConfigureAppConfiguration(builder =>
     {
         builder.AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)

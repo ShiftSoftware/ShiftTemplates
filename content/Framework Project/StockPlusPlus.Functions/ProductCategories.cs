@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ namespace StockPlusPlus.Functions
         }
 
         [Function("ProductCategories")]
+        [Authorize]
         public async Task<HttpResponseData> Get(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestData req)
         {
