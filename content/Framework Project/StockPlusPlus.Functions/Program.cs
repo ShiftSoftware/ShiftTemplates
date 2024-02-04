@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using ShiftSoftware.Azure.Functions.AspNetCore.Authorization.Extensions;
+using ShiftSoftware.ShiftIdentity.Core;
+using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using StockPlusPlus.Data;
 using StockPlusPlus.Data.Repositories.Product;
 using StockPlusPlus.Functions;
@@ -54,7 +56,6 @@ var host = new HostBuilder()
     {
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
-        services.AddScoped(x => new TestOptions("Nahro"));
         services
         .AddShiftEntity(x =>
         {
@@ -71,6 +72,13 @@ var host = new HostBuilder()
             .AddScoped<ProductRepository>();
 
         services.AddShiftEntityCosmosDbReplication();
+
+        services.AddTypeAuth((o) =>
+        {
+            o.AddActionTree<ShiftIdentityActions>();
+            o.AddActionTree<StockPlusPlus.Shared.ActionTrees.SystemActionTrees>();
+            o.AddActionTree<StockPlusPlus.Shared.ActionTrees.StockActionTrees>();
+        });
     })
     .Build();
 

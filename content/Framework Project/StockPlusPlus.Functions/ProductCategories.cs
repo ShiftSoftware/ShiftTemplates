@@ -2,7 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.EntityFrameworkCore;
+using ShiftSoftware.TypeAuth.AspNetCore;
+using ShiftSoftware.TypeAuth.Core;
 using StockPlusPlus.Data.Repositories.Product;
+using StockPlusPlus.Shared.ActionTrees;
 using System.Net;
 
 namespace StockPlusPlus.Functions
@@ -16,7 +19,7 @@ namespace StockPlusPlus.Functions
         }
 
         [Function("ProductCategories")]
-        [Test]
+        [TypeAuth(typeof(StockActionTrees), nameof(StockActionTrees.ProductCategory), Access.Read)]
         public async Task<HttpResponseData> Get(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestData req)
         {
