@@ -96,10 +96,20 @@
     },
     "frameworkVersion": {
       "type": "generated",
-      "description": "Remove references",
+      "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2024.02.06.1"
+        "value": "2024.02.06.2"
+      },
+      "datatype": "string",
+      "generator": "constant"
+    },
+    "azureFunctionsAspNetCoreAuthorizationVersion": {
+      "type": "generated",
+      "description": "Replace AzureFunctionsAspNetCoreAuthorization Version",
+      "replaces": "$(AzureFunctionsAspNetCoreAuthorization)",
+      "parameters": {
+        "value": "0.0.2"
       },
       "datatype": "string",
       "generator": "constant"
