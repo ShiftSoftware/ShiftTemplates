@@ -3,48 +3,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
-using ShiftSoftware.Azure.Functions.AspNetCore.Authorization.Extensions;
+using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using StockPlusPlus.Data;
 using StockPlusPlus.Data.Repositories.Product;
-using StockPlusPlus.Functions;
-using System.Text;
+using System.Security.Claims;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults(x =>
     {
-        x.AddAuthentication().AddJwtBearer(
-            new TokenValidationParameters
-            {
-                ValidateAudience = false,
-                ValidateIssuer = true,
-                ValidIssuer = "StockPlusPlus",
-                RequireExpirationTime = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("one-two-three-four-five-six-seven-eight.one-two-three-four-five-six-seven-eight")),
-                ValidateIssuerSigningKey = true,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero,
-                LifetimeValidator = (DateTime? notBefore, DateTime? expires, SecurityToken securityToken,
-                                     TokenValidationParameters validationParameters) =>
-                {
-                    bool result = false;
-                    var now = DateTime.UtcNow;
+        var issuer= "StockPlusPlus";
+        var key = "one-two-three-four-five-six-seven-eight.one-two-three-four-five-six-seven-eight";
 
-                    if (notBefore != null && now < notBefore)
-                        result = false;
-
-                    if (expires != null)
-                        result = expires > now;
-
-                    if (!result)
-                        throw new SecurityTokenExpiredException("Token expired");
-
-                    return result;
-                }
-            }
-        );
+        x.AddShiftIdentity(issuer, key);
     })
     .ConfigureAppConfiguration(builder =>
     {
@@ -78,6 +50,12 @@ var host = new HostBuilder()
             o.AddActionTree<ShiftIdentityActions>();
             o.AddActionTree<StockPlusPlus.Shared.ActionTrees.SystemActionTrees>();
             o.AddActionTree<StockPlusPlus.Shared.ActionTrees.StockActionTrees>();
+        });
+
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("Test", policy => policy.RequireClaim(ClaimTypes.Name, "SuperUser2"));
+            options.AddPolicy("Test2", policy => policy.RequireClaim(ClaimTypes.Name, "SuperUser"));
         });
     })
     .Build();

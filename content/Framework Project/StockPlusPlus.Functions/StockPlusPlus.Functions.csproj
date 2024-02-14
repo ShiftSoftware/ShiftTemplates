@@ -4,7 +4,7 @@
 	<!--#endif -->
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<AzureFunctionsVersion>v4</AzureFunctionsVersion>
 		<!--<_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>-->
 		<UserSecretsId>1fad2a95-8f41-4ec1-bbd2-f40a3c3f86ac</UserSecretsId>
@@ -19,7 +19,6 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.EFCore" Version="$(ShiftFrameworkVersion)" />
-		<PackageReference Include="ShiftSoftware.Azure.Functions.AspNetCore.Authorization" Version="$(AzureFunctionsAspNetCoreAuthorization)" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -30,6 +29,7 @@
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="1.1.0" />
 
 		<PackageReference Include="ShiftSoftware.TypeAuth.AspNetCore" Version="$(ShiftFrameworkVersion)" Condition="!Exists('..\..\..\..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj')" />
+		<PackageReference Include="ShiftSoftware.ShiftIdentity.AspNetCore" Version="$(ShiftFrameworkVersion)" Condition="!Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.AspNetCore\ShiftIdentity.AspNetCore.csproj')" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -37,7 +37,7 @@
 		<!--#if(removeReferences == true)-->
 		<ProjectReference Include="..\..\..\..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj" Condition="Exists('..\..\..\..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj')" />
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.EFCore\ShiftEntity.EFCore.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.EFCore\ShiftEntity.EFCore.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
-		<ProjectReference Include="..\..\..\..\AzureFunctionsAspNetCoreAuthorization\ShiftSoftware.Azure.Functions.AspNetCore.Authorization\ShiftSoftware.Azure.Functions.AspNetCore.Authorization.csproj" Condition="Exists('..\..\..\..\AzureFunctionsAspNetCoreAuthorization\ShiftSoftware.Azure.Functions.AspNetCore.Authorization\ShiftSoftware.Azure.Functions.AspNetCore.Authorization.csproj') And '$(ImportShiftFrameworkProjects)'=='true'"/>
+		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.AspNetCore\ShiftIdentity.AspNetCore.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.AspNetCore\ShiftIdentity.AspNetCore.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<!--#endif -->
 	</ItemGroup>
 
