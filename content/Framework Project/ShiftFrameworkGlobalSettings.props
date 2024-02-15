@@ -2,6 +2,6 @@
 	<PropertyGroup>
 		<ImportShiftFrameworkProjects>true</ImportShiftFrameworkProjects>
 		<ShiftFrameworkVersion>2024.02.15.1</ShiftFrameworkVersion>
-		<AzureFunctionsAspNetCoreAuthorization>0.0.3</AzureFunctionsAspNetCoreAuthorization>
+		<AzureFunctionsAspNetCoreAuthorization>0.0.4</AzureFunctionsAspNetCoreAuthorization>
 	</PropertyGroup>
 </Project>

@@ -109,7 +109,7 @@
       "description": "Replace AzureFunctionsAspNetCoreAuthorization Version",
       "replaces": "$(AzureFunctionsAspNetCoreAuthorization)",
       "parameters": {
-        "value": "0.0.3"
+        "value": "0.0.4"
       },
       "datatype": "string",
       "generator": "constant"
