@@ -169,6 +169,15 @@ var app = builder.Build();
 
 //app.AddFakeIdentityEndPoints();
 
+if (builder.Environment.IsDevelopment())
+{
+    var scope = app.Services.CreateScope();
+
+    var db = scope.ServiceProvider.GetRequiredService<DB>();
+
+    await db.Database.EnsureCreatedAsync();
+}
+
 if (app.Environment.EnvironmentName != "Test")
 {
     await app.SeedDBAsync("SuperUser", "OneTwo", new ShiftSoftware.ShiftIdentity.Data.DBSeedOptions
