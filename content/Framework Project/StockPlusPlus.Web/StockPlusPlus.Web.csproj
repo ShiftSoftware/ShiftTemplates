@@ -3,6 +3,9 @@
 	<Import Project="..\ShiftFrameworkGlobalSettings.props" />
 	<!--#endif -->
 	<PropertyGroup>
+		<!--#if(removeReferences == true)-->
+		<DefineConstants>includeSampleApp</DefineConstants>
+		<!--#endif -->
 		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>

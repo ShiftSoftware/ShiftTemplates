@@ -45,7 +45,6 @@ builder.Services.AddShiftBlazor(config =>
                .AddLanguage("en-US", "English RTL", true)
                .AddLanguage("ku-IQ", "Kurdish", true);
     };
-    //config.SyncfusionLicense = builder.Configuration.GetValue<string>("SyncfusionLicense");
 });
 
 builder.Services.AddShiftIdentity("StockPlusPlus-Dev", baseUrl, baseUrl);

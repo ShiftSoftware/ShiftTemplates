@@ -40,12 +40,12 @@ var host = new HostBuilder()
             x.AddAutoMapper(typeof(ShiftSoftware.ShiftIdentity.Data.Marker).Assembly);
         })
             .RegisterShiftEntityEfCoreTriggers()
-            .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")));
+            .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")!));
 
 #if (includeSampleApp)
-            services.AddScoped<ProductCategoryRepository>()
-            .AddScoped<BrandRepository>()
-            .AddScoped<ProductRepository>();
+        services.AddScoped<ProductCategoryRepository>()
+        .AddScoped<BrandRepository>()
+        .AddScoped<ProductRepository>();
 #endif
 
         services.AddShiftEntityCosmosDbReplication();

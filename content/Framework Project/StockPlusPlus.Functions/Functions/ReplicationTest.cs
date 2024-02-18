@@ -8,16 +8,16 @@ using ShiftSoftware.ShiftIdentity.Core.Entities;
 using ShiftSoftware.ShiftIdentity.Core.ReplicationModels;
 using StockPlusPlus.Data;
 
-namespace StockPlusPlus.Functions;
+namespace StockPlusPlus.Functions.Functions;
 
-public class Test
+public class ReplicationTest
 {
     private readonly CosmosDBReplication replication;
     private readonly IConfiguration config;
     private readonly IMapper mapper;
     private readonly DB db;
 
-    public Test(CosmosDBReplication replication,
+    public ReplicationTest(CosmosDBReplication replication,
         IConfiguration config,
         IMapper mapper,
         DB db)
@@ -36,18 +36,18 @@ public class Test
         var databaseId = config.GetValue<string>("CosmosDb:DefaultDatabaseName");
 
         await replication.SetUp<DB, Region>(connectionString, databaseId)
-            .Replicate<RegionModel>("Regions", x => this.mapper.Map<RegionModel>(x))
+            .Replicate("Regions", x => mapper.Map<RegionModel>(x))
             .UpdatePropertyReference<RegionModel, CompanyBranchModel>("CompanyBranches", x => x.City.Region,
             (q, e) => q.Where(x => x.City.Region.id == e.ID.ToString() && x.ItemType == "Branch"),
             (q, r) => q.Where(x => x.City.Region.id == r.RowID.ToString() && x.ItemType == "Branch"))
             .RunAsync();
 
         await replication.SetUp<DB, CompanyBranch>(connectionString, databaseId, q => q.Include(x => x.Region).Include(x => x.Company))
-            .Replicate("CompanyBranches", x => this.mapper.Map<CompanyBranchModel>(x))
+            .Replicate("CompanyBranches", x => mapper.Map<CompanyBranchModel>(x))
             .RunAsync();
 
         await replication.SetUp<DB, Service>(connectionString, databaseId)
-            .Replicate("Services", x => this.mapper.Map<ServiceModel>(x))
+            .Replicate("Services", x => mapper.Map<ServiceModel>(x))
             .UpdateReference<CompanyBranchServiceModel>("CompanyBranches",
             (q, e) =>
             {
@@ -58,11 +58,11 @@ public class Test
             .RunAsync(false, true);
 
         await replication.SetUp<DB, CompanyBranchService>(connectionString, databaseId, x => x.Include(i => i.Service))
-            .Replicate("CompanyBranches", x => this.mapper.Map<CompanyBranchServiceModel>(x))
+            .Replicate("CompanyBranches", x => mapper.Map<CompanyBranchServiceModel>(x))
             .RunAsync();
 
         await replication.SetUp<DB, Company>(connectionString, databaseId)
-            .Replicate("Companies", x => this.mapper.Map<CompanyModel>(x))
+            .Replicate("Companies", x => mapper.Map<CompanyModel>(x))
             .UpdatePropertyReference<CompanyModel, CompanyBranchModel>("CompanyBranches", x => x.Company,
             (q, e) => q.Where(x => x.Company.id == e.ID.ToString()),
             (q, r) => q.Where(x => x.Company.id == r.RowID.ToString()))
@@ -79,19 +79,19 @@ public class Test
         return req.CreateResponse(System.Net.HttpStatusCode.OK);
     }
 
-    private async Task<IEnumerable<TResult>> Query<TResult>(Func<IQueryable<CompanyBranch>,IQueryable<TResult>> query)
+    private async Task<IEnumerable<TResult>> Query<TResult>(Func<IQueryable<CompanyBranch>, IQueryable<TResult>> query)
     {
         //var braches = await this.db.CompanyBranches
         //    .ProjectTo<CompanyBranchModel>(this.mapper.ConfigurationProvider)
         //    .ToListAsync();
 
-        var q = this.db.CompanyBranches.AsQueryable();
+        var q = db.CompanyBranches.AsQueryable();
 
         IQueryable<TResult> q2 = default;
 
         if (query is not null)
             q2 = query(q);
-        
+
         var braches = await q2
             .ToListAsync();
 

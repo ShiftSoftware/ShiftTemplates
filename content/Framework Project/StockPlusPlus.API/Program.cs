@@ -6,7 +6,6 @@ using StockPlusPlus.Data;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 using ShiftSoftware.ShiftEntity.Web.Services;
-using Microsoft.Extensions.Azure;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
@@ -160,11 +159,6 @@ builder.Services.AddTypeAuth((o) =>
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddRazorPages();
-    builder.Services.AddAzureClients(clientBuilder =>
-    {
-        clientBuilder.AddBlobServiceClient(builder.Configuration["StorageConnectionString:blob"]!, preferMsi: true);
-        clientBuilder.AddQueueServiceClient(builder.Configuration["StorageConnectionString:queue"]!, preferMsi: true);
-    });
 }
 
 var app = builder.Build();

@@ -4,6 +4,9 @@
 	<!--#endif -->
 
 	<PropertyGroup>
+		<!--#if(removeReferences == true)-->
+		<DefineConstants>includeSampleApp</DefineConstants>
+		<!--#endif -->
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
