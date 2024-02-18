@@ -1,9 +1,10 @@
-﻿@using StockPlusPlus.Web.Pages.Product.Brand
+﻿@*#if (includeSampleApp)*@
+@using StockPlusPlus.Web.Pages.Product.Brand
 @using StockPlusPlus.Web.Pages.Product.ProductCategory
 @using StockPlusPlus.Web.Pages.Product.Product
-
+@*#endif*@
 <MudNavMenu>
-
+    @*#if (includeSampleApp)*@
     <AuthorizedMudNavGroup Title="Products" Icon="@Icons.Material.Filled.Book" HideExpandIcon="!isDrawerOpen" TypeAuthActions="new List<ShiftSoftware.TypeAuth.Core.Actions.Action> {
         StockPlusPlus.Shared.ActionTrees.StockActionTrees.Brand,
         StockPlusPlus.Shared.ActionTrees.StockActionTrees.ProductCategory,
@@ -23,6 +24,7 @@
                               Match="NavLinkMatch.All"
                               Icon="@Icons.Material.Outlined.Category">Products</AuthorizedMudNavLink>
     </AuthorizedMudNavGroup>
+    @*#endif*@
 </MudNavMenu>
 
 @code {

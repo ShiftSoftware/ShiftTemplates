@@ -58,6 +58,33 @@
       ],
       "modifiers": [
         {
+          "exclude": [
+            "**/StockPlusPlus.API/Controllers/*/**",
+            "**/StockPlusPlus.API/Controllers/*.cs",
+            "**/StockPlusPlus.Data/AutoMapperProfiles/*/**",
+            "**/StockPlusPlus.Data/AutoMapperProfiles/*.cs",
+            "**/StockPlusPlus.Data/Entities/*/**",
+            "**/StockPlusPlus.Data/Entities/*.cs",
+            "**/StockPlusPlus.Data/ReplicationModels/*/**",
+            "**/StockPlusPlus.Data/ReplicationModels/*.cs",
+            "**/StockPlusPlus.Data/Repositories/*/**",
+            "**/StockPlusPlus.Data/Repositories/*.cs",
+            "**/StockPlusPlus.Functions/Functions/*/**",
+            "**/StockPlusPlus.Functions/Functions/*.cs",
+            "**/StockPlusPlus.Shared/ActionTrees/*/**",
+            "**/StockPlusPlus.Shared/ActionTrees/*.cs",
+            "**/StockPlusPlus.Shared/DTOs/*/**",
+            "**/StockPlusPlus.Shared/DTOs/*.cs",
+            "**/StockPlusPlus.Shared/Enums/*/**",
+            "**/StockPlusPlus.Shared/Enums/*.cs",
+            "**/StockPlusPlus.Test/Tests/*/**",
+            "**/StockPlusPlus.Test/Tests/*.cs",
+            "**/StockPlusPlus.Web/Pages/*/**",
+            "**/StockPlusPlus.Web/Pages/*.razor"
+          ],
+          "condition": "(!includeSampleApp)"
+        },
+        {
           "exclude": "**/StockPlusPlus.Functions/**",
           "condition": "(!addFunctions)"
         },
@@ -69,6 +96,15 @@
     }
   ],
   "symbols": {
+    "includeSampleApp": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "A Simple Product Listing Application will be included.",
+      "displayName": "Include Sample App",
+      "isRequired": true,
+      "defaultValue": "true",
+      "isEnabled": true
+    },
     "addFunctions": {
       "type": "parameter",
       "datatype": "bool",

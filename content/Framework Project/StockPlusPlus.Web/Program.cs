@@ -7,9 +7,11 @@ using ShiftSoftware.ShiftIdentity.Blazor.Extensions;
 using ShiftSoftware.ShiftIdentity.Blazor.Handlers;
 using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
 using ShiftSoftware.TypeAuth.Blazor.Extensions;
-using StockPlusPlus.Shared.ActionTrees;
 using StockPlusPlus.Web;
 using System.Globalization;
+#if (includeSampleApp)
+using StockPlusPlus.Shared.ActionTrees;
+#endif
 
 [assembly: RootNamespace("StockPlusPlus.Web")]
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -73,8 +75,10 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
 builder.Services.AddTypeAuth(x =>
     x
     .AddActionTree<ShiftSoftware.ShiftIdentity.Core.ShiftIdentityActions>()
+#if (includeSampleApp)
     .AddActionTree<StockActionTrees>()
     .AddActionTree<SystemActionTrees>()
+#endif
 );
 
 var host = builder.Build();

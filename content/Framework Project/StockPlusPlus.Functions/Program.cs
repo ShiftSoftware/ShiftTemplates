@@ -7,7 +7,9 @@ using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using StockPlusPlus.Data;
+#if (includeSampleApp)
 using StockPlusPlus.Data.Repositories.Product;
+#endif
 using System.Security.Claims;
 
 var host = new HostBuilder()
@@ -38,10 +40,13 @@ var host = new HostBuilder()
             x.AddAutoMapper(typeof(ShiftSoftware.ShiftIdentity.Data.Marker).Assembly);
         })
             .RegisterShiftEntityEfCoreTriggers()
-            .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")))
-            .AddScoped<ProductCategoryRepository>()
+            .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")));
+
+#if (includeSampleApp)
+            services.AddScoped<ProductCategoryRepository>()
             .AddScoped<BrandRepository>()
             .AddScoped<ProductRepository>();
+#endif
 
         services.AddShiftEntityCosmosDbReplication();
 

@@ -151,8 +151,10 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddTypeAuth((o) =>
 {
     o.AddActionTree<ShiftIdentityActions>();
+#if (includeSampleApp)
     o.AddActionTree<StockPlusPlus.Shared.ActionTrees.SystemActionTrees>();
     o.AddActionTree<StockPlusPlus.Shared.ActionTrees.StockActionTrees>();
+#endif
 });
 
 if (builder.Environment.IsDevelopment())

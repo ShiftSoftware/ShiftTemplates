@@ -4,6 +4,10 @@
   "icon": "icon.png",
   "symbolInfo": [
     {
+      "id": "includeSampleApp",
+      "isVisible": true
+    },
+    {
       "id": "addFunctions",
       "isVisible": true
     },

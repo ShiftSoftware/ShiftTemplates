@@ -2,7 +2,9 @@
 using ShiftSoftware.ShiftFrameworkTestingTools;
 using StockPlusPlus.API;
 using StockPlusPlus.Data;
+#if (includeSampleApp)
 using StockPlusPlus.Shared.ActionTrees;
+#endif
 
 namespace StockPlusPlus.Test;
 
@@ -17,7 +19,9 @@ public class CustomWebApplicationFactory : ShiftCustomWebApplicationFactory<WebM
             TokenIssuerSettingKey = "Settings:TokenSettings:Issuer",
             TypeAuthActions = new List<Type>()
             {
+#if (includeSampleApp)
                 typeof(StockActionTrees)
+#endif
             }
         })
     { }

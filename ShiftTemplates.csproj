@@ -43,6 +43,21 @@
     <Compile Remove="**\*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="content\framework project\stockplusplus.api\controllers\.keep" />
+    <None Remove="content\Framework Project\StockPlusPlus.Data\AutoMapperProfiles\.keep" />
+    <None Remove="content\Framework Project\StockPlusPlus.Data\Entities\.keep" />
+    <None Remove="content\Framework Project\StockPlusPlus.Data\Migrations\.keep" />
+    <None Remove="content\Framework Project\StockPlusPlus.Data\ReplicationModels\.keep" />
+    <None Remove="content\Framework Project\StockPlusPlus.Data\Repositories\.keep" />
+    <None Remove="content\Framework Project\StockPlusPlus.Functions\Functions\.keep" />
+    <None Remove="content\Framework Project\StockPlusPlus.Shared\ActionTrees\.keep" />
+    <None Remove="content\Framework Project\StockPlusPlus.Shared\DTOs\.keep" />
+    <None Remove="content\Framework Project\StockPlusPlus.Shared\Enums\.keep" />
+    <None Remove="content\Framework Project\StockPlusPlus.Test\Tests\.keep" />
+    <None Remove="content\Framework Project\StockPlusPlus.Web\Pages\.keep" />
+  </ItemGroup>
+
 
 	<ItemGroup>
 		<None Include="Images\icon.png" Pack="true" PackagePath="\" />
