@@ -61,6 +61,8 @@
           "exclude": [
             "**/StockPlusPlus.API/Controllers/*/**",
             "**/StockPlusPlus.API/Controllers/*.cs",
+            "**/StockPlusPlus.API/Reports/*/**",
+            "**/StockPlusPlus.API/Reports/*.frx",
             "**/StockPlusPlus.Data/AutoMapperProfiles/*/**",
             "**/StockPlusPlus.Data/AutoMapperProfiles/*.cs",
             "**/StockPlusPlus.Data/Entities/*/**",
