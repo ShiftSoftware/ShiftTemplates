@@ -166,7 +166,7 @@
       "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2024.02.15.1"
+        "value": "2024.02.18.1"
       },
       "datatype": "string",
       "generator": "constant"
