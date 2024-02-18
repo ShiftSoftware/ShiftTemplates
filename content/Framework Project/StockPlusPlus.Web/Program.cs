@@ -9,7 +9,11 @@ using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
 using ShiftSoftware.TypeAuth.Blazor.Extensions;
 using StockPlusPlus.Web;
 using System.Globalization;
+using System.Net.Http.Json;
 #if (includeSampleApp)
+using ShiftSoftware.ShiftEntity.Model.Dtos;
+using StockPlusPlus.Shared.DTOs.Product.Brand;
+using StockPlusPlus.Shared.DTOs.Product.ProductCategory;
 using StockPlusPlus.Shared.ActionTrees;
 #endif
 
@@ -56,19 +60,29 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
     x.Title = "StockPlusPlus";
     x.DynamicTypeAuthActionExpander = async () =>
     {
-        //var httpService = builder.Services.BuildServiceProvider().GetRequiredService<HttpService>();
+#if (includeSampleApp)
+        var httpService = builder.Services.BuildServiceProvider().GetRequiredService<HttpClient>();
 
-        //var projects = await httpService.GetAsync<ODataDTO<ProjectListDTO>>("/odata/project");
+        ODataDTO<BrandListDTO>? brands = null!;
+        ODataDTO<ProductCategoryListDTO>? categories = null!;
 
-        //ToDoActions.DataLevelAccess.Projects.Expand(projects.Data!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
+        await Task.WhenAll(new List<Task>
+        {
+            Task.Run(async () => { brands = await httpService.GetFromJsonAsync<ODataDTO<BrandListDTO>>("/odata/Brand"); }),
+            Task.Run(async () => { categories = await httpService.GetFromJsonAsync<ODataDTO<ProductCategoryListDTO>>("/odata/ProductCategory"); })
+        });
 
-        //ToDoActions.DataLevelAccess.Statuses.Expand(Enum.GetValues<ToDo.Shared.Enums.ToDoStatus>().Select(x => new KeyValuePair<string, string>(((int)x).ToString(), x.Describe())).ToList());
+        StockActionTrees.DataLevelAccess.Brand.Expand(brands!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
+
+        StockActionTrees.DataLevelAccess.ProductCategory.Expand(categories!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
+#endif
     };
 
-
+#if (includeSampleApp)
     x.AddCompanyCustomField("SomeExternalLink", "Some External Link")
     .AddCompanyBranchCustomField("Username", "User Name")
     .AddCompanyBranchCustomField("Password", true);
+#endif
 });
 
 builder.Services.AddTypeAuth(x =>
