@@ -1,18 +1,23 @@
 using Microsoft.EntityFrameworkCore;
-using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
-using ShiftSoftware.ShiftIdentity.AspNetCore;
 using ShiftSoftware.ShiftIdentity.Core;
 using StockPlusPlus.Data;
-using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 using ShiftSoftware.ShiftEntity.Web.Services;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+#if (internalShiftIdentityHosting)
 using AutoMapper;
-using ShiftSoftware.ShiftIdentity.Core.Entities;
+using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftIdentity.Core.ReplicationModels;
+using ShiftSoftware.ShiftIdentity.Core.Entities;
+using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
+using ShiftSoftware.ShiftIdentity.AspNetCore;
 using ShiftSoftware.ShiftEntity.Model.Enums;
+#endif
+#if (externalShiftIdentityHosting)
+using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
+#endif
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +35,7 @@ var cosmosConnectionString = builder.Configuration.GetValue<string>("CosmosDb:Co
 
 if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
 {
+#if (internalShiftIdentityHosting)
     builder.Services.AddShiftEntityCosmosDbReplicationTrigger(x =>
     {
         string databaseId = "test";
@@ -71,6 +77,7 @@ if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
         x.SetUpReplication<DB, CompanyBranchService>(cosmosConnectionString, databaseId)
             .Replicate<CompanyBranchServiceModel>("CompanyBranches", x => x.id, x => x.BranchID, x => x.ItemType);
     });
+#endif
 }
 
 var mvcBuilder = builder.Services
@@ -97,12 +104,14 @@ mvcBuilder.AddShiftEntityWeb(x =>
     builder.Configuration.Bind("AzureStorageAccounts", azureStorageAccounts);
 
     x.AddAzureStorage(azureStorageAccounts.ToArray());
-
+#if (internalShiftIdentityHosting)
     x.AddShiftIdentityAutoMapper();
+#endif
 });
 
 mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!, builder.Configuration.GetValue<string>("Settings:TokenSettings:Key")!);
 
+#if (internalShiftIdentityHosting)
 mvcBuilder.AddShiftIdentityDashboard<DB>(
     new ShiftIdentityConfiguration
     {
@@ -134,13 +143,62 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
         },
     }
 );
-
+#endif
 mvcBuilder.AddShiftEntityOdata(x =>
 {
     x.DefaultOptions();
     x.RegisterAllDTOs(typeof(StockPlusPlus.Shared.Marker).Assembly);
+#if (internalShiftIdentityHosting)
     x.RegisterShiftIdentityDashboardEntitySets();
+#endif
 });
+
+#if (externalShiftIdentityHosting)
+if (builder.Environment.IsDevelopment())
+{
+    mvcBuilder.AddFakeIdentityEndPoints(
+        new TokenSettingsModel
+        {
+            Issuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!,
+            Key = builder.Configuration.GetValue<string>("Settings:TokenSettings:Key")!,
+            ExpireSeconds = 10000000
+        }, new ShiftSoftware.ShiftIdentity.Core.DTOs.TokenUserDataDTO
+        {
+            FullName = "Test",
+            ID = "1",
+            Username = "test"
+        },
+        new ShiftSoftware.ShiftIdentity.Core.DTOs.App.AppDTO
+        {
+            AppId = "StockPlusPlus-Dev",
+            DisplayName = "StockPlusPlus Dev",
+            RedirectUri = "http://localhost:5069/Auth/Token"
+        },
+        "OneTwo",
+#if (includeSampleApp)
+        new string[]
+         {
+        """
+            {
+                "ShiftIdentityActions": ['r','w','d','m'],
+                "SystemActionTrees": ['r','w','d','m'],
+                "StockActionTrees": ['r','w','d','m']
+            }
+        """
+         }
+#else
+new string[]
+     {
+        """
+            {
+                "ShiftIdentityActions": ['r','w','d','m']
+            }
+        """
+     }
+#endif
+        );
+}
+#endif
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -163,8 +221,9 @@ if (builder.Environment.IsDevelopment())
 
 var app = builder.Build();
 
-//app.AddFakeIdentityEndPoints();
-
+#if (externalShiftIdentityHosting)
+app.AddFakeIdentityEndPoints();
+#endif
 if (builder.Environment.IsDevelopment())
 {
     var scope = app.Services.CreateScope();
@@ -176,6 +235,7 @@ if (builder.Environment.IsDevelopment())
 
 if (app.Environment.EnvironmentName != "Test")
 {
+#if (internalShiftIdentityHosting)
     await app.SeedDBAsync("SuperUser", "OneTwo", new ShiftSoftware.ShiftIdentity.Data.DBSeedOptions
     {
         RegionExternalId = "1",
@@ -189,7 +249,7 @@ if (app.Environment.EnvironmentName != "Test")
         CompanyBranchExternalId = "-11",
         CompanyBranchShortCode = "SFT-EBL"
     });
-
+#endif
 }
 
 var supportedCultures = new List<CultureInfo>

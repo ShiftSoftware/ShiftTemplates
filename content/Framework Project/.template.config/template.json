@@ -107,6 +107,35 @@
       "defaultValue": "true",
       "isEnabled": true
     },
+    "shiftIdentityHostingType": {
+      "type": "parameter",
+      "datatype": "choice",
+      "displayName": "Shift Identity Hosting Type",
+      "description": "Internal: The Generated App Contains Identity related Database Tables, Endpoints, and the Dashboard.\r\n\r\nExternal: Identity related database tables, endpoints, and the Dashboard is not included. It assumes you have an external Shift Identity App to connect to.",
+      "isRequired": true,
+      "choices": [
+        {
+          "choice": "Internal",
+          "displayName": "Internal",
+          "description": "The Generated App Contains Identity related Database Tables, Endpoints, and the Dashboard"
+        },
+        {
+          "choice": "External",
+          "displayName": "External",
+          "description": "Identity related database tables, endpoints, and the Dashboard is not included. It assumes you have an external Shift Identity App to connect to."
+        }
+      ],
+      "defaultValue": "Internal",
+      "isEnabled": true
+    },
+    "internalShiftIdentityHosting": {
+      "type": "computed",
+      "value": "(shiftIdentityHostingType == Internal)"
+    },
+    "externalShiftIdentityHosting": {
+      "type": "computed",
+      "value": "(shiftIdentityHostingType == External)"
+    },
     "addFunctions": {
       "type": "parameter",
       "datatype": "bool",

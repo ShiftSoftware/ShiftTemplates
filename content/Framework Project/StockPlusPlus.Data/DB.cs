@@ -1,6 +1,11 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+#if (internalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.Data;
+#elif (externalShiftIdentityHosting)
+using ShiftSoftware.ShiftEntity.EFCore;
+#endif
+
 #if (includeSampleApp)
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Data.Entities.Product;
@@ -8,7 +13,11 @@ using StockPlusPlus.Data.Entities.Product;
 
 namespace StockPlusPlus.Data;
 
+#if (internalShiftIdentityHosting)
 public class DB : ShiftIdentityDbContext
+#elif (externalShiftIdentityHosting)
+public class DB : ShiftDbContext
+#endif
 {
     public DB(DbContextOptions option) : base(option)
     {

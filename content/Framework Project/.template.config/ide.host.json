@@ -8,6 +8,10 @@
       "isVisible": true
     },
     {
+      "id": "shiftIdentityHostingType",
+      "isVisible": true
+    },
+    {
       "id": "addFunctions",
       "isVisible": true
     },

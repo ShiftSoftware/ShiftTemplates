@@ -5,7 +5,7 @@
 
 	<PropertyGroup>
 		<!--#if(removeReferences == true)-->
-		<DefineConstants>includeSampleApp</DefineConstants>
+		<DefineConstants>includeSampleApp;internalShiftIdentityHosting</DefineConstants>
 		<!--#endif -->
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -28,6 +28,11 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.EFCore" Version="$(ShiftFrameworkVersion)" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.Print" Version="$(ShiftFrameworkVersion)" />
+		<!--#if(internalShiftIdentityHosting)-->
 		<PackageReference Include="ShiftSoftware.ShiftIdentity.Data" Version="$(ShiftFrameworkVersion)" />
+		<!--#endif -->
+		<!--#if(externalShiftIdentityHosting)-->
+		<PackageReference Include="ShiftSoftware.ShiftIdentity.Core" Version="$(ShiftFrameworkVersion)" />
+		<!--#endif -->
 	</ItemGroup>
 </Project>

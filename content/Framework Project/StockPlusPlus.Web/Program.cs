@@ -5,16 +5,20 @@ using ShiftSoftware.ShiftBlazor.Extensions;
 using ShiftSoftware.ShiftBlazor.Services;
 using ShiftSoftware.ShiftIdentity.Blazor.Extensions;
 using ShiftSoftware.ShiftIdentity.Blazor.Handlers;
-using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
 using ShiftSoftware.TypeAuth.Blazor.Extensions;
 using StockPlusPlus.Web;
 using System.Globalization;
-using System.Net.Http.Json;
+#if (internalShiftIdentityHosting)
+using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
+#endif
 #if (includeSampleApp)
+using StockPlusPlus.Shared.ActionTrees;
+#endif
+#if (includeSampleApp && internalShiftIdentityHosting)
+using System.Net.Http.Json;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Shared.DTOs.Product.Brand;
 using StockPlusPlus.Shared.DTOs.Product.ProductCategory;
-using StockPlusPlus.Shared.ActionTrees;
 #endif
 
 [assembly: RootNamespace("StockPlusPlus.Web")]
@@ -43,7 +47,9 @@ builder.Services.AddShiftBlazor(config =>
         options.ApiPath = "/api";
         options.ODataPath = "/odata";
         options.UserListEndpoint = baseUrl.AddUrlPath("odata/IdentityPublicUser");
+#if (internalShiftIdentityHosting)
         options.AdditionalAssemblies = new[] { typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly };
+#endif
         options.AddLanguage("en-US", "English")
                .AddLanguage("ar-IQ", "Arabic", true)
                .AddLanguage("en-US", "English RTL", true)
@@ -53,9 +59,10 @@ builder.Services.AddShiftBlazor(config =>
 
 builder.Services.AddShiftIdentity("StockPlusPlus-Dev", baseUrl, baseUrl);
 
+#if (internalShiftIdentityHosting)
 builder.Services.AddShiftIdentityDashboardBlazor(x =>
 {
-    x.ShiftIdentityHostingType = ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.Internal;
+    x.ShiftIdentityHostingType = ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.External;
     x.LogoPath = "/img/shift-full.png";
     x.Title = "StockPlusPlus";
     x.DynamicTypeAuthActionExpander = async () =>
@@ -84,6 +91,7 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
     .AddCompanyBranchCustomField("Password", true);
 #endif
 });
+#endif
 
 builder.Services.AddTypeAuth(x =>
     x

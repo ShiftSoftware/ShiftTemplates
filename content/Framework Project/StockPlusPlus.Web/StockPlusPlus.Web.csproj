@@ -4,7 +4,7 @@
 	<!--#endif -->
 	<PropertyGroup>
 		<!--#if(removeReferences == true)-->
-		<DefineConstants>includeSampleApp</DefineConstants>
+		<DefineConstants>includeSampleApp;internalShiftIdentityHosting</DefineConstants>
 		<!--#endif -->
 		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
@@ -17,7 +17,9 @@
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.13" PrivateAssets="all" />
 		<PackageReference Include="ShiftSoftware.ShiftBlazor" Version="$(ShiftFrameworkVersion)" />
 		<PackageReference Include="ShiftSoftware.ShiftIdentity.Blazor" Version="$(ShiftFrameworkVersion)" />
+		<!--#if(internalShiftIdentityHosting)-->
 		<PackageReference Include="ShiftSoftware.ShiftIdentity.Dashboard.Blazor" Version="$(ShiftFrameworkVersion)" />
+		<!--#endif -->
 	</ItemGroup>
 
 	<ItemGroup>

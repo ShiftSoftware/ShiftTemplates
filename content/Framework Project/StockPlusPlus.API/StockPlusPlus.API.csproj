@@ -4,7 +4,7 @@
 	<!--#endif -->
 	<PropertyGroup>
 		<!--#if(removeReferences == true)-->
-		<DefineConstants>includeSampleApp</DefineConstants>
+		<DefineConstants>includeSampleApp;internalShiftIdentityHosting</DefineConstants>
 		<!--#endif -->
 		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
@@ -21,7 +21,12 @@
 		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.3" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.Web" Version="$(ShiftFrameworkVersion)" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.Print" Version="$(ShiftFrameworkVersion)" />
+		<!--#if(internalShiftIdentityHosting)-->
 		<PackageReference Include="ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore" Version="$(ShiftFrameworkVersion)" />
+		<!--#endif -->
+		<!--#if(externalShiftIdentityHosting)-->
+		<PackageReference Include="ShiftSoftware.ShiftIdentity.AspNetCore" Version="$(ShiftFrameworkVersion)" />
+		<!--#endif -->
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 	</ItemGroup>
 
