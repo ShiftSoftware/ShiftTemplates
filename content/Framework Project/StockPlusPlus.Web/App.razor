@@ -1,31 +1,14 @@
 ﻿@using ShiftSoftware.ShiftIdentity.Blazor
 @using ShiftSoftware.ShiftIdentity.Core
 
-@*#if (internalShiftIdentityHosting)*@
-@using ShiftSoftware.ShiftIdentity.Dashboard.Blazor
-@*#endif*@
-
 <CascadingAuthenticationState>
-    @*#if (internalShiftIdentityHosting)*@
     <DefaultApp AppTitle="StockPlusPlus"
                 AppAssembly="@typeof(App).Assembly"
-                IdentityHostingType="ShiftIdentityHostingTypes.Internal"
-                AdditionalAssemblies="new[] {typeof(ShiftIdentityBlazorMaker).Assembly, typeof(ShiftIdentityDashboarBlazorMaker).Assembly}">
-    
-        <NavMenuTemplate Context="NavMenu">
-            <NavMenu isDrawerOpen="@NavMenu.IsOpen" />
-        </NavMenuTemplate>
-    </DefaultApp>
-    @*#endif*@
-    @*#if (externalShiftIdentityHosting)*@
-    <DefaultApp AppTitle="StockPlusPlus"
-                AppAssembly="@typeof(App).Assembly"
-                IdentityHostingType="ShiftIdentityHostingTypes.External"
-                AdditionalAssemblies="new[] {typeof(ShiftIdentityBlazorMaker).Assembly}">
+                IdentityHostingType="shiftIdentityHostingTypes"
+                AdditionalAssemblies="additionalAssemblies">
 
         <NavMenuTemplate Context="NavMenu">
             <NavMenu isDrawerOpen="@NavMenu.IsOpen" />
         </NavMenuTemplate>
     </DefaultApp>
-    @*#endif*@
- </CascadingAuthenticationState>
+</CascadingAuthenticationState>

@@ -79,22 +79,22 @@ public class ReplicationTest
         return req.CreateResponse(System.Net.HttpStatusCode.OK);
     }
 
-    private async Task<IEnumerable<TResult>> Query<TResult>(Func<IQueryable<CompanyBranch>, IQueryable<TResult>> query)
-    {
-        //var braches = await this.db.CompanyBranches
-        //    .ProjectTo<CompanyBranchModel>(this.mapper.ConfigurationProvider)
-        //    .ToListAsync();
+    //private async Task<IEnumerable<TResult>> Query<TResult>(Func<IQueryable<CompanyBranch>, IQueryable<TResult>> query)
+    //{
+    //    //var braches = await this.db.CompanyBranches
+    //    //    .ProjectTo<CompanyBranchModel>(this.mapper.ConfigurationProvider)
+    //    //    .ToListAsync();
 
-        var q = db.CompanyBranches.AsQueryable();
+    //    var q = db.CompanyBranches.AsQueryable();
 
-        IQueryable<TResult> q2 = default;
+    //    IQueryable<TResult> q2 = default;
 
-        if (query is not null)
-            q2 = query(q);
+    //    if (query is not null)
+    //        q2 = query(q);
 
-        var braches = await q2
-            .ToListAsync();
+    //    var braches = await q2
+    //        .ToListAsync();
 
-        return braches;
-    }
+    //    return braches;
+    //}
 }
