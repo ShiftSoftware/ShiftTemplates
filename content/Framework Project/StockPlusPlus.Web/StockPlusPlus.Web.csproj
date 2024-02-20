@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
-	<!--#if(removeReferences == true)-->
+	<!--#if shiftFrameworkDevelopmentMode-->
 	<Import Project="..\ShiftFrameworkGlobalSettings.props" />
 	<!--#endif -->
 	<PropertyGroup>
@@ -21,7 +21,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\StockPlusPlus.Shared\StockPlusPlus.Shared.csproj" />
-		<!--#if(removeReferences == true)-->
+		<!--#if shiftFrameworkDevelopmentMode-->
 		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.Blazor\ShiftIdentity.Dashboard.Blazor.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.Blazor\ShiftIdentity.Dashboard.Blazor.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Blazor\ShiftIdentity.Blazor.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Blazor\ShiftIdentity.Blazor.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftBlazor\ShiftBlazor\ShiftBlazor.csproj" Condition="Exists('..\..\..\..\ShiftBlazor\ShiftBlazor\ShiftBlazor.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />

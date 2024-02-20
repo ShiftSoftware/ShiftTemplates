@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-	<!--#if(removeReferences == true)-->
+	<!--#if shiftFrameworkDevelopmentMode-->
 	<Import Project="..\ShiftFrameworkGlobalSettings.props" />
 	<!--#endif -->
 	<PropertyGroup>
@@ -30,7 +30,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\StockPlusPlus.Data\StockPlusPlus.Data.csproj" />
 		<ProjectReference Include="..\StockPlusPlus.Web\StockPlusPlus.Web.csproj" />
-		<!--#if(removeReferences == true)-->
+		<!--#if shiftFrameworkDevelopmentMode-->
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Web\ShiftEntity.Web.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.Web\ShiftEntity.Web.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Print\ShiftEntity.Print.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.Print\ShiftEntity.Print.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.AspNetCore\ShiftIdentity.Dashboard.AspNetCore.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.AspNetCore\ShiftIdentity.Dashboard.AspNetCore.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />

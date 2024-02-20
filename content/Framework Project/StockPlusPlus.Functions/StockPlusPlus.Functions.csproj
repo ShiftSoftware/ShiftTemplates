@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<!--#if(removeReferences == true)-->
+	<!--#if shiftFrameworkDevelopmentMode-->
 	<Import Project="..\ShiftFrameworkGlobalSettings.props" />
 	<!--#endif -->
 
@@ -34,7 +34,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\StockPlusPlus.Data\StockPlusPlus.Data.csproj" />
-		<!--#if(removeReferences == true)-->
+		<!--#if shiftFrameworkDevelopmentMode-->
 		<ProjectReference Include="..\..\..\..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj" Condition="Exists('..\..\..\..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj')" />
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.EFCore\ShiftEntity.EFCore.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.EFCore\ShiftEntity.EFCore.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.AspNetCore\ShiftIdentity.AspNetCore.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.AspNetCore\ShiftIdentity.AspNetCore.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />

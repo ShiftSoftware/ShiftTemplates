@@ -154,19 +154,12 @@
       "defaultValue": "false",
       "isEnabled": true
     },
-    "removeReferences": {
-      "type": "generated",
-      "generator": "constant",
-      "datatype": "bool",
-      "description": "Remove references",
-      "parameters": { "value": "true" }
-    },
     "frameworkVersion": {
       "type": "generated",
       "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2024.02.18.1"
+        "value": "2024.02.20.1"
       },
       "datatype": "string",
       "generator": "constant"

@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<!--#if(removeReferences == true)-->
+	<!--#if shiftFrameworkDevelopmentMode-->
 	<Import Project="..\ShiftFrameworkGlobalSettings.props" />
 	<!--#endif -->
 
@@ -24,7 +24,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\StockPlusPlus.API\StockPlusPlus.API.csproj" />
-		<!--#if(removeReferences == true)-->
+		<!--#if shiftFrameworkDevelopmentMode-->
 		<ProjectReference Include="..\..\..\..\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools.csproj" Condition="Exists('..\..\..\..\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<!--#endif -->
 	</ItemGroup>
