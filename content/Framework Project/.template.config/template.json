@@ -167,8 +167,8 @@
     "externalShiftIdentityApi": {
       "type": "parameter",
       "datatype": "text",
-      "description": "External ShiftIdentity Api",
-      "displayName": "External ShiftIdentity Api",
+      "displayName": "External ShiftIdentity Api (Leave empty if using Internal ShiftIdentity)",
+      "description": "Base URL of the External ShiftIdentity API. e.g., http://localhost:5069",
       "isRequired": false,
       "defaultValue": "",
       "isEnabled": true,
@@ -182,8 +182,8 @@
     "externalShiftIdentityFrontEnd": {
       "type": "parameter",
       "datatype": "text",
-      "description": "External ShiftIdentity Front-End",
-      "displayName": "External ShiftIdentity Front-End",
+      "displayName": "External ShiftIdentity Front-End (Leave empty if using Internal ShiftIdentity)",
+      "description": "Base URL of the External ShiftIdentity Front-End. e.g., http://localhost:5069",
       "isRequired": false,
       "defaultValue": "",
       "isEnabled": true,
