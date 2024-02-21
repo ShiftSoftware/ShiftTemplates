@@ -1,5 +1,4 @@
 ﻿
-using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using System.Text.Json.Serialization;
@@ -15,4 +14,7 @@ public class BrandListDTO : ShiftEntityListDTO
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
     public string? Code { get; set; }
+
+    [ShiftSoftware.ShiftEntity.Model.HashIds.UserHashIdConverter]
+    public string? CreatedByUserID { get; set; }
 }

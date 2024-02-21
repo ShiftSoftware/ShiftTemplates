@@ -2,6 +2,7 @@
 @attribute [Route($"/{nameof(BrandList)}")]
 
 @using StockPlusPlus.Shared.DTOs.Product.Brand
+@using ShiftSoftware.ShiftIdentity.Core.DTOs.User
 
 <ShiftList EntitySet="Brand"
            Title="Brand List"
@@ -15,4 +16,11 @@
 
     <ButtonColumn Property="x => x.Name" Title="Name" />
 
+    <ForeignColumn Property="x => x.CreatedByUserID"
+                   Title="Created By"
+                   T="BrandListDTO"
+                   TEntity="UserListDTO"
+                   TProperty="string"
+                   BaseUrlKey="ShiftIdentityApi"
+                   EntitySet="IdentityUser" />
 </ShiftList>

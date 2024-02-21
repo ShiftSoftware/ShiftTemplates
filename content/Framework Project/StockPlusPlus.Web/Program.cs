@@ -39,14 +39,23 @@ builder.Services.AddScoped(sp =>
 
 var baseUrl = builder.Configuration!.GetValue<string>("BaseURL")!;
 
+var shiftIdentityApiURL = builder.Configuration!.GetValue<string>("ShiftIdentityApi")!;
+
+var shiftIdentityFrontEndURL = builder.Configuration!.GetValue<string>("ShiftIdentityFrontEnd")!;
+
+
 builder.Services.AddShiftBlazor(config =>
 {
     config.ShiftConfiguration = options =>
     {
         options.BaseAddress = baseUrl!;
+        options.ExternalAddresses = new Dictionary<string, string?>
+        {
+            ["ShiftIdentityApi"] = shiftIdentityApiURL
+        };
         options.ApiPath = "/api";
         options.ODataPath = "/odata";
-        options.UserListEndpoint = baseUrl.AddUrlPath("odata/IdentityPublicUser");
+        options.UserListEndpoint = shiftIdentityApiURL.AddUrlPath("IdentityPublicUser");
 #if (internalShiftIdentityHosting)
         options.AdditionalAssemblies = new[] { typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly };
 #endif
@@ -57,7 +66,7 @@ builder.Services.AddShiftBlazor(config =>
     };
 });
 
-builder.Services.AddShiftIdentity("StockPlusPlus-Dev", baseUrl, baseUrl);
+builder.Services.AddShiftIdentity("StockPlusPlus-Dev", shiftIdentityApiURL, shiftIdentityFrontEndURL);
 
 #if (internalShiftIdentityHosting)
 builder.Services.AddShiftIdentityDashboardBlazor(x =>
