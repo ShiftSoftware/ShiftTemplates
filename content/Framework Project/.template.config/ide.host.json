@@ -12,6 +12,14 @@
       "isVisible": true
     },
     {
+      "id": "externalShiftIdentityApi",
+      "isVisible": true
+    },
+    {
+      "id": "externalShiftIdentityFrontEnd",
+      "isVisible": true
+    },
+    {
       "id": "addFunctions",
       "isVisible": true
     },

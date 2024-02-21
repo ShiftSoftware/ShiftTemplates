@@ -186,6 +186,74 @@
       "type": "computed",
       "value": "(shiftIdentityHostingType == External)"
     },
+    "externalShiftIdentityApi": {
+      "type": "parameter",
+      "datatype": "text",
+      "description": "External ShiftIdentity Api",
+      "displayName": "External ShiftIdentity Api",
+      "isRequired": false,
+      "defaultValue": "",
+      "isEnabled": true
+    },
+    "externalShiftIdentityFrontEnd": {
+      "type": "parameter",
+      "datatype": "text",
+      "description": "External ShiftIdentity Front-End",
+      "displayName": "External ShiftIdentity Front-End",
+      "isRequired": false,
+      "defaultValue": "",
+      "isEnabled": true
+    },
+    "externalShiftIdentityApiSetting": {
+      "type": "generated",
+      "generator": "join",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "const",
+            "value": "\"ShiftIdentityApi\": "
+          },
+          {
+            "type": "const",
+            "value": "\""
+          },
+          {
+            "type": "ref",
+            "value": "externalShiftIdentityApi"
+          },
+          {
+            "type": "const",
+            "value": "\""
+          }
+        ]
+      },
+      "replaces": "\"ShiftIdentityApi\": \"http://localhost:5069\""
+    },
+    "externalShiftIdentityFrontEndSetting": {
+      "type": "generated",
+      "generator": "join",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "const",
+            "value": "\"ShiftIdentityFrontEnd\": "
+          },
+          {
+            "type": "const",
+            "value": "\""
+          },
+          {
+            "type": "ref",
+            "value": "externalShiftIdentityFrontEnd"
+          },
+          {
+            "type": "const",
+            "value": "\""
+          }
+        ]
+      },
+      "replaces": "\"ShiftIdentityFrontEnd\": \"http://localhost:5069\""
+    },
     "addFunctions": {
       "type": "parameter",
       "datatype": "bool",
