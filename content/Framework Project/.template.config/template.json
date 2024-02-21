@@ -98,6 +98,56 @@
     }
   ],
   "symbols": {
+    "aspNetCorePort": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "low": 5000,
+        "high": 5300
+      }
+    },
+    "azureFunctionPort": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "low": 7000,
+        "high": 7300
+      }
+    },
+    "aspNetCoreApplicationUrl": {
+      "type": "generated",
+      "generator": "join",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "const",
+            "value": "http://localhost:"
+          },
+          {
+            "type": "ref",
+            "value": "aspNetCorePort"
+          }
+        ]
+      },
+      "replaces": "http://localhost:5069"
+    },
+    "azureFunctionCommandLineArgs": {
+      "type": "generated",
+      "generator": "join",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "const",
+            "value": "--port "
+          },
+          {
+            "type": "ref",
+            "value": "azureFunctionPort"
+          }
+        ]
+      },
+      "replaces": "--port 7143"
+    },
     "includeSampleApp": {
       "type": "parameter",
       "datatype": "bool",
@@ -175,4 +225,4 @@
       "generator": "constant"
     }
   }
-}
+  }
