@@ -104,7 +104,13 @@
       "parameters": {
         "low": 5000,
         "high": 5300
-      }
+      },
+      "replaces": "5069",
+      "onlyIf": [
+        {
+          "after": "localhost:"
+        }
+      ]
     },
     "azureFunctionPort": {
       "type": "generated",
@@ -112,41 +118,13 @@
       "parameters": {
         "low": 7000,
         "high": 7300
-      }
-    },
-    "aspNetCoreApplicationUrl": {
-      "type": "generated",
-      "generator": "join",
-      "parameters": {
-        "symbols": [
-          {
-            "type": "const",
-            "value": "http://localhost:"
-          },
-          {
-            "type": "ref",
-            "value": "aspNetCorePort"
-          }
-        ]
       },
-      "replaces": "http://localhost:5069"
-    },
-    "azureFunctionCommandLineArgs": {
-      "type": "generated",
-      "generator": "join",
-      "parameters": {
-        "symbols": [
-          {
-            "type": "const",
-            "value": "--port "
-          },
-          {
-            "type": "ref",
-            "value": "azureFunctionPort"
-          }
-        ]
-      },
-      "replaces": "--port 7143"
+      "replaces": "7143",
+      "onlyIf": [
+        {
+          "after": "--port "
+        }
+      ]
     },
     "includeSampleApp": {
       "type": "parameter",
@@ -293,4 +271,4 @@
       "generator": "constant"
     }
   }
-  }
+}
