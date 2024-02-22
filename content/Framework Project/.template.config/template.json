@@ -225,7 +225,7 @@
     "azureFunctionsAspNetCoreAuthorizationVersion": {
       "type": "generated",
       "description": "Replace AzureFunctionsAspNetCoreAuthorization Version",
-      "replaces": "$(AzureFunctionsAspNetCoreAuthorization)",
+      "replaces": "$(AzureFunctionsAspNetCoreAuthorizationVersion)",
       "parameters": {
         "value": "0.0.4"
       },
