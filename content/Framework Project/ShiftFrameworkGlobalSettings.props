@@ -3,6 +3,7 @@
 		<DefineConstants>shiftFrameworkDevelopmentMode;includeSampleApp;internalShiftIdentityHosting</DefineConstants>
 		<ImportShiftFrameworkProjects>true</ImportShiftFrameworkProjects>
 		<ShiftFrameworkVersion>0</ShiftFrameworkVersion>
+		<TypeAuthVersion>0</TypeAuthVersion>
 		<AzureFunctionsAspNetCoreAuthorizationVersion>0</AzureFunctionsAspNetCoreAuthorizationVersion>
 	</PropertyGroup>
 </Project>

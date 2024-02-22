@@ -231,6 +231,16 @@
       },
       "datatype": "string",
       "generator": "constant"
+    },
+    "typeAuthVersion": {
+      "type": "generated",
+      "description": "Replace TypeAuth Version",
+      "replaces": "$(TypeAuthVersion)",
+      "parameters": {
+        "value": "1.5.0"
+      },
+      "datatype": "string",
+      "generator": "constant"
     }
   }
 }

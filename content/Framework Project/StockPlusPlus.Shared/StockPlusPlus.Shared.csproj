@@ -13,7 +13,7 @@
 	<ItemGroup>
 		<PackageReference Include="ShiftSoftware.ShiftEntity.CosmosDbReplication" Version="$(ShiftFrameworkVersion)" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.Model" Version="$(ShiftFrameworkVersion)" />
-		<PackageReference Include="ShiftSoftware.TypeAuth.Core" Version="$(ShiftFrameworkVersion)" />
+		<PackageReference Include="ShiftSoftware.TypeAuth.Core" Version="$(TypeAuthVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>
