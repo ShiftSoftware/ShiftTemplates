@@ -15,8 +15,8 @@ using System.Security.Claims;
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults(x =>
     {
-        var issuer= "StockPlusPlus";
-        var key = "one-two-three-four-five-six-seven-eight.one-two-three-four-five-six-seven-eight";
+        var issuer= "Please-Change-This-Issuer";
+        var key = "Please-Change-This-Key:one-two-three-four-five-six-seven-eight.one-two-three-four-five-six-seven-eight";
 
         x.AddShiftIdentity(issuer, key);
     })
@@ -34,10 +34,6 @@ var host = new HostBuilder()
         .AddShiftEntity(x =>
         {
             x.HashId.RegisterHashId(false);
-
-            x.AddAutoMapper(typeof(ShiftSoftware.ShiftEntity.EFCore.AutoMapperProfiles.DefaultMappings).Assembly);
-            x.AddAutoMapper(typeof(StockPlusPlus.Data.Marker).Assembly);
-            x.AddAutoMapper(typeof(ShiftSoftware.ShiftIdentity.Data.Marker).Assembly);
         })
             .RegisterShiftEntityEfCoreTriggers()
             .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")!));
