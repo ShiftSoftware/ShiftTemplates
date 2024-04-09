@@ -54,7 +54,8 @@
         "**/.gitattributes",
         "ImportAndReferenceAll.bat",
         "RemoveAll.bat",
-        "ShiftFrameworkGlobalSettings.props"
+        "ShiftFrameworkGlobalSettings.props",
+        "**/StockPlusPlus.Data/Migrations/*.cs"
       ],
       "modifiers": [
         {

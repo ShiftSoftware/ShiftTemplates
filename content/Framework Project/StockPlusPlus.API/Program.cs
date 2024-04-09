@@ -224,14 +224,14 @@ var app = builder.Build();
 #if (externalShiftIdentityHosting)
 app.AddFakeIdentityEndPoints();
 #endif
-if (builder.Environment.IsDevelopment())
-{
-    var scope = app.Services.CreateScope();
+//if (builder.Environment.IsDevelopment())
+//{
+//    var scope = app.Services.CreateScope();
 
-    var db = scope.ServiceProvider.GetRequiredService<DB>();
+//    var db = scope.ServiceProvider.GetRequiredService<DB>();
 
-    await db.Database.EnsureCreatedAsync();
-}
+//    await db.Database.EnsureCreatedAsync();
+//}
 
 if (app.Environment.EnvironmentName != "Test")
 {
