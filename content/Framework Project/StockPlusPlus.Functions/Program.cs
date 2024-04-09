@@ -49,8 +49,10 @@ var host = new HostBuilder()
         services.AddTypeAuth((o) =>
         {
             o.AddActionTree<ShiftIdentityActions>();
+#if (includeSampleApp)
             o.AddActionTree<StockPlusPlus.Shared.ActionTrees.SystemActionTrees>();
             o.AddActionTree<StockPlusPlus.Shared.ActionTrees.StockActionTrees>();
+#endif
         });
 
         services.AddAuthorization(options =>
