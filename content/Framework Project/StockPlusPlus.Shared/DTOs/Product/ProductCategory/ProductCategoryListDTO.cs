@@ -1,5 +1,6 @@
 ﻿
 using ShiftSoftware.ShiftEntity.Core;
+using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Shared.Enums.Product;
@@ -8,7 +9,7 @@ using System.Text.Json.Serialization;
 namespace StockPlusPlus.Shared.DTOs.Product.ProductCategory;
 
 [ShiftEntityKeyAndName(nameof(ID), nameof(Name))]
-public class ProductCategoryListDTO : ShiftEntityListDTO
+public class ProductCategoryListDTO : ShiftEntityListDTO, IHasBrandForeignColumn<ProductCategoryListDTO>
 {
     [_ProductCategoryHashId]
     public override string? ID { get; set; }
@@ -20,4 +21,7 @@ public class ProductCategoryListDTO : ShiftEntityListDTO
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public TrackingMethod? TrackingMethod { get; set; }
+
+    [ShiftSoftware.ShiftEntity.Model.HashIds.BrandHashIdConverter]
+    public string? BrandID { get; set; }
 }
