@@ -1,4 +1,5 @@
 ﻿
+using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Shared.DTOs.Product.ProductCategory;
@@ -7,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace StockPlusPlus.Shared.DTOs.Product.Product;
 
-public class ProductListDTO : ShiftEntityListDTO
+public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO>
 {
     [_ProductHashId]
     public override string? ID { get; set; }
@@ -28,4 +29,5 @@ public class ProductListDTO : ShiftEntityListDTO
     public TrackingMethod TrackingMethod { get; set; }
     public DateTimeOffset ReleaseDate { get; set; }
     public DateTimeOffset LastSaveDate { get; set; }
+    public bool IsDraft { get; set; }
 }

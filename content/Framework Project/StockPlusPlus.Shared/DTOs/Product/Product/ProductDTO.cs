@@ -1,4 +1,5 @@
 ﻿
+using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Shared.DTOs.Product.ProductCategory;
 using StockPlusPlus.Shared.Enums.Product;
@@ -6,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace StockPlusPlus.Shared.DTOs.Product.Product;
 
-public class ProductDTO : ShiftEntityViewAndUpsertDTO
+public class ProductDTO : ShiftEntityViewAndUpsertDTO, IHasDraftCheckBox<ProductDTO>
 {
     [_ProductHashId]
     public override string? ID { get; set; }
@@ -22,4 +23,5 @@ public class ProductDTO : ShiftEntityViewAndUpsertDTO
     public DateTimeOffset? ReleaseDate { get; set; }
 
     public ShiftEntitySelectDTO? CountryOfOrigin { get; set; } = default!;
+    public bool? IsDraft { get; set; }
 }
