@@ -1,11 +1,11 @@
 ﻿@attribute [Route($"/{nameof(ProductForm)}/{{Key?}}")]
 
 @using StockPlusPlus.Shared.DTOs.Product.Product
-@using StockPlusPlus.Shared.DTOs.Product.Brand
+@using StockPlusPlus.Shared.DTOs.Product.ProductBrand
 @using StockPlusPlus.Shared.DTOs.Product.ProductCategory
 @using StockPlusPlus.Shared.DTOs
 
-@using Pages.Product.Brand
+@using Pages.Product.ProductBrand
 @using Pages.Product.ProductCategory
 @using Pages.Country
 
@@ -31,13 +31,13 @@
                          For="() => TheItem.ReleaseDate" />
 
     <ShiftAutocompleteWithQuickAdd Label="Brand"
-                                   @bind-Value="TheItem.Brand"
-                                   TEntitySet="BrandListDTO"
-                                   EntitySet="Brand"
-                                   TQuickAdd="BrandDTO"
-                                   QuickAddComponentType="typeof(BrandForm)"
-                                   QuickAddParameterName="@nameof(BrandForm.BrandName)"
-                                   For="() => TheItem.Brand" />
+                                   @bind-Value="TheItem.ProductBrand"
+                                   TEntitySet="ProductBrandListDTO"
+                                   EntitySet="ProductBrand"
+                                   TQuickAdd="ProductBrandDTO"
+                                   QuickAddComponentType="typeof(ProductBrandForm)"
+                                   QuickAddParameterName="@nameof(ProductBrandForm.BrandName)"
+                                   For="() => TheItem.ProductBrand" />
 
     <ShiftAutocompleteWithQuickAdd Label="ProductCategory"
                                    @bind-Value="TheItem.ProductCategory"
@@ -66,7 +66,7 @@
     public string? ProductCategoryID { get; set; }
 
     [Parameter]
-    public string? BrandID { get; set; }
+    public string? ProductBrandID { get; set; }
 
     protected override void OnInitialized()
     {
@@ -75,9 +75,9 @@
             TheItem.ProductCategory = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO { Value = ProductCategoryID };
         }
 
-        if (!string.IsNullOrWhiteSpace(BrandID))
+        if (!string.IsNullOrWhiteSpace(ProductBrandID))
         {
-            TheItem.Brand = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO { Value = BrandID };
+            TheItem.ProductBrand = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO { Value = ProductBrandID };
         }
     }
 }

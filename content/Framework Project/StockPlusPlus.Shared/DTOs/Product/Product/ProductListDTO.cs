@@ -14,7 +14,7 @@ public class ProductListDTO : ShiftEntityListDTO
     public string Name { get; set; } = default!;
 
     [JsonConverter(typeof(LocalizedTextJsonConverter))]
-    public string? Brand { get; set; }
+    public string? ProductBrand { get; set; }
 
     [JsonConverter(typeof(LocalizedTextJsonConverter))]
     public string? Category { get; set; }
@@ -22,7 +22,7 @@ public class ProductListDTO : ShiftEntityListDTO
     [_ProductCategoryHashId]
     public string? ProductCategoryID { get; set; }
 
-    public string? BrandID { get; set; }
+    public string? ProductBrandID { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public TrackingMethod TrackingMethod { get; set; }

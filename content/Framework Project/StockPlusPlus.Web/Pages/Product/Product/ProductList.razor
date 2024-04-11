@@ -1,11 +1,11 @@
 ﻿@attribute [Authorize]
 @attribute [Route($"/{nameof(ProductList)}")]
 
-@using StockPlusPlus.Shared.DTOs.Product.Brand;
+@using StockPlusPlus.Shared.DTOs.Product.ProductBrand;
 @using StockPlusPlus.Shared.DTOs.Product.Product
 @using System.Linq.Expressions;
 @using StockPlusPlus.Shared.DTOs.Product.ProductCategory;
-@using StockPlusPlus.Web.Pages.Product.Brand;
+@using StockPlusPlus.Web.Pages.Product.ProductBrand;
 @using StockPlusPlus.Web.Pages.Product.ProductCategory;
 
 <ShiftList EntitySet="Product"
@@ -18,9 +18,9 @@
             AddDialogParameters="AddDialogParameters"
             EnableExport>
 
-    @if (BrandID != null)
+    @if (ProductBrandID != null)
     {
-        <FilterComponent Property="x => x.BrandID" Operator="ODataOperator.Equal" Value="BrandID" />
+        <FilterComponent Property="x => x.ProductBrandID" Operator="ODataOperator.Equal" Value="ProductBrandID" />
     }
 
     @if (ProductCategoryID != null)
@@ -40,7 +40,7 @@
         </CellTemplate>
     </PropertyColumn>
 
-    <ButtonColumn ComponentType="typeof(BrandForm)" KeyPropertyName="@nameof(ProductListDTO.BrandID)" Property="x => x.Brand" Title="Brand">
+    <ButtonColumn ComponentType="typeof(ProductBrandForm)" KeyPropertyName="@nameof(ProductListDTO.ProductBrandID)" Property="x => x.ProductBrand" Title="Brand">
         <ButtonTemplate>
             <MudChip Style="cursor: pointer;" Icon="@Icons.Material.Filled.BrandingWatermark" Variant="Variant.Outlined">@context</MudChip>
         </ButtonTemplate>
@@ -67,7 +67,7 @@
 
     [Parameter]
     [SupplyParameterFromQuery]
-    public string? BrandID { get; set; }
+    public string? ProductBrandID { get; set; }
 
     public string? Filters;
 
@@ -78,9 +78,9 @@
             AddDialogParameters[nameof(ProductForm.ProductCategoryID)] = ProductCategoryID;
         }
 
-        if (!string.IsNullOrWhiteSpace(BrandID))
+        if (!string.IsNullOrWhiteSpace(ProductBrandID))
         {
-            AddDialogParameters[nameof(ProductForm.BrandID)] = BrandID;
+            AddDialogParameters[nameof(ProductForm.ProductBrandID)] = ProductBrandID;
         }
     }
 }

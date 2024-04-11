@@ -3,10 +3,10 @@ using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using System.Text.Json.Serialization;
 
-namespace StockPlusPlus.Shared.DTOs.Product.Brand;
+namespace StockPlusPlus.Shared.DTOs.Product.ProductBrand;
 
 [ShiftEntityKeyAndName(nameof(ID), nameof(Name))]
-public class BrandListDTO : ShiftEntityListDTO
+public class ProductBrandListDTO : ShiftEntityListDTO
 {
     public override string? ID { get; set; }
 

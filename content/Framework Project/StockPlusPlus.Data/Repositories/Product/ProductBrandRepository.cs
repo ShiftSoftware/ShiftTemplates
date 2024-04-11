@@ -1,13 +1,13 @@
 ﻿
 using ShiftSoftware.ShiftEntity.EFCore;
 using StockPlusPlus.Data.Entities.Product;
-using StockPlusPlus.Shared.DTOs.Product.Brand;
+using StockPlusPlus.Shared.DTOs.Product.ProductBrand;
 
 namespace StockPlusPlus.Data.Repositories.Product;
 
-public class BrandRepository : ShiftRepository<DB, Entities.Product.Brand, BrandListDTO, BrandDTO>
+public class ProductBrandRepository : ShiftRepository<DB, Entities.Product.ProductBrand, ProductBrandListDTO, ProductBrandDTO>
 {
-    public BrandRepository(DB db) : base(db)
+    public ProductBrandRepository(DB db) : base(db)
     {
     }
 
@@ -18,7 +18,7 @@ public class BrandRepository : ShiftRepository<DB, Entities.Product.Brand, Brand
     /// <param name="showDeletedRows"></param>
     /// <param name="queryable"></param>
     /// <returns></returns>
-    public override IQueryable<BrandListDTO> OdataList(bool showDeletedRows = false, IQueryable<Brand>? queryable = null)
+    public override IQueryable<ProductBrandListDTO> OdataList(bool showDeletedRows = false, IQueryable<ProductBrand>? queryable = null)
     {
         return base.OdataList(showDeletedRows, queryable);
     }
@@ -29,7 +29,7 @@ public class BrandRepository : ShiftRepository<DB, Entities.Product.Brand, Brand
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
-    public override ValueTask<BrandDTO> ViewAsync(Brand entity)
+    public override ValueTask<ProductBrandDTO> ViewAsync(ProductBrand entity)
     {
         //Do something here
         return base.ViewAsync(entity);

@@ -5,17 +5,17 @@ using ShiftSoftware.ShiftEntity.Web;
 using StockPlusPlus.Data.Entities.Product;
 using StockPlusPlus.Data.Repositories.Product;
 using StockPlusPlus.Shared.ActionTrees;
-using StockPlusPlus.Shared.DTOs.Product.Brand;
+using StockPlusPlus.Shared.DTOs.Product.ProductBrand;
 
 namespace StockPlusPlus.API.Controllers.Product;
 
 [Route("api/[controller]")]
-public class BrandController : ShiftEntitySecureControllerAsync<BrandRepository, Data.Entities.Product.Brand, BrandListDTO, BrandDTO>
+public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBrandRepository, Data.Entities.Product.ProductBrand, ProductBrandListDTO, ProductBrandDTO>
 {
-    private readonly BrandRepository brandRepository;
+    private readonly ProductBrandRepository brandRepository;
     private readonly ProductCategoryRepository productCategoryRepository;
-    public BrandController(BrandRepository brandRepository, ProductCategoryRepository productCategoryRepository) : base(StockActionTrees.Brand, x =>
-        x.FilterBy(x => x.ID, StockActionTrees.DataLevelAccess.Brand)
+    public ProductBrandController(ProductBrandRepository brandRepository, ProductCategoryRepository productCategoryRepository) : base(StockActionTrees.ProductBrand, x =>
+        x.FilterBy(x => x.ID, StockActionTrees.DataLevelAccess.ProductBrand)
         .IncludeCreatedByCurrentUser(x => x.CreatedByUserID)
     )
     {
@@ -33,8 +33,8 @@ public class BrandController : ShiftEntitySecureControllerAsync<BrandRepository,
     public async Task<IActionResult> TestInsertAndView()
     {
         var createdBrand = await this.brandRepository.UpsertAsync(
-            entity: new Brand(),
-            dto: new BrandDTO { Name = "One" },
+            entity: new ProductBrand(),
+            dto: new ProductBrandDTO { Name = "One" },
             actionType: ShiftSoftware.ShiftEntity.Core.ActionTypes.Insert,
             userId: null
         );
@@ -57,7 +57,7 @@ public class BrandController : ShiftEntitySecureControllerAsync<BrandRepository,
     {
         var updatedBrand = await this.brandRepository.UpsertAsync(
             entity: await this.brandRepository.FindAsync(1),
-            dto: new BrandDTO { ID = "1", Name = "Updated" },
+            dto: new ProductBrandDTO { ID = "1", Name = "Updated" },
             actionType: ShiftSoftware.ShiftEntity.Core.ActionTypes.Update,
             userId: null
         );

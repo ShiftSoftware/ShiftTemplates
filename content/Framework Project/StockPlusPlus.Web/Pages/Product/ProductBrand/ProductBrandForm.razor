@@ -1,16 +1,16 @@
-﻿@attribute [Route($"/{nameof(BrandForm)}/{{Key?}}")]
+﻿@attribute [Route($"/{nameof(ProductBrandForm)}/{{Key?}}")]
 
-@using StockPlusPlus.Shared.DTOs.Product.Brand
+@using StockPlusPlus.Shared.DTOs.Product.ProductBrand
 @using StockPlusPlus.Shared.Enums.Product
 
-@inherits ShiftForm<BrandForm, BrandDTO>
+@inherits ShiftForm<ProductBrandForm, ProductBrandDTO>
 
 <ShiftEntityForm @bind-Mode="Mode"
                  @bind-Value="TheItem"
                  @ref="FormContainer"
-                 Action="Brand"
-                 Title="Brand"
-                 TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockActionTrees.Brand"
+                 Action="ProductBrand"
+                 Title="ProductBrand"
+                 TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockActionTrees.ProductBrand"
                  @bind-Key="@Key">
 
     <LocalizedTextField @bind-Value="TheItem.Name"
@@ -27,7 +27,7 @@
         <br />
         <br />
 
-        <StockPlusPlus.Web.Pages.Product.Product.ProductList BrandID="@TheItem.ID" />
+        <StockPlusPlus.Web.Pages.Product.Product.ProductList ProductBrandID="@TheItem.ID" />
     }
 </ShiftEntityForm>
 

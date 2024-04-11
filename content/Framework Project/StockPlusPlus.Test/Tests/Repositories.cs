@@ -12,7 +12,7 @@ public class Repositories
     private readonly CustomWebApplicationFactory factory;
     private readonly ITestOutputHelper output;
 
-    private readonly BrandRepository brandRepository;
+    private readonly ProductBrandRepository brandRepository;
     private readonly ProductCategoryRepository productCategoryRepository;
     private readonly ProductRepository productRepository;
 
@@ -21,7 +21,7 @@ public class Repositories
         this.factory = factory;
         this.output = output;
 
-        this.brandRepository = factory.Services.GetRequiredService<BrandRepository>();
+        this.brandRepository = factory.Services.GetRequiredService<ProductBrandRepository>();
         this.productCategoryRepository = factory.Services.GetRequiredService<ProductCategoryRepository>();
         this.productRepository = factory.Services.GetRequiredService<ProductRepository>();
     }
@@ -29,7 +29,7 @@ public class Repositories
     [Fact]
     public async Task ProductRepository()
     {
-        var brand = new Brand { Name = "Brand One" };
+        var brand = new ProductBrand { Name = "Brand One" };
 
         brandRepository.Add(brand);
 
@@ -52,7 +52,7 @@ public class Repositories
         var product = new Product
         {
             Name = "Product One",
-            Brand = foundBrand,
+            ProductBrand = foundBrand,
             ProductCategory = productCategory
         };
 
@@ -70,7 +70,7 @@ public class Repositories
 
         Assert.Equal(foundProduct.Name, viewedProduct.Name); 
 
-        Assert.Equal(foundProduct.Brand!.Name, brand.Name);
+        Assert.Equal(foundProduct.ProductBrand!.Name, brand.Name);
 
         //Product Repository does not include the product category
         Assert.Null(foundProduct.ProductCategory);

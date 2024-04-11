@@ -2,9 +2,9 @@
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using System.ComponentModel.DataAnnotations;
 
-namespace StockPlusPlus.Shared.DTOs.Product.Brand;
+namespace StockPlusPlus.Shared.DTOs.Product.ProductBrand;
 
-public class BrandDTO : ShiftEntityViewAndUpsertDTO
+public class ProductBrandDTO : ShiftEntityViewAndUpsertDTO
 {
     public override string? ID { get; set; }
 

@@ -10,7 +10,7 @@ public class ProductRepository : ShiftRepository<DB, Entities.Product.Product, P
     public ProductRepository(DB db) :
         base(db,
                 x => x.IncludeRelatedEntitiesWithFindAsync(
-                    y => y.Include(z => z.Brand),
+                    y => y.Include(z => z.ProductBrand),
                     y => y.Include(z => z.CountryOfOrigin)
                 ))
     {

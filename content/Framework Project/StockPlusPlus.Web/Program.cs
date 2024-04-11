@@ -17,7 +17,7 @@ using StockPlusPlus.Shared.ActionTrees;
 #if (includeSampleApp && internalShiftIdentityHosting)
 using System.Net.Http.Json;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
-using StockPlusPlus.Shared.DTOs.Product.Brand;
+using StockPlusPlus.Shared.DTOs.Product.ProductBrand;
 using StockPlusPlus.Shared.DTOs.Product.ProductCategory;
 #endif
 
@@ -81,16 +81,16 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
 #if (includeSampleApp)
         var httpService = builder.Services.BuildServiceProvider().GetRequiredService<HttpClient>();
 
-        ODataDTO<BrandListDTO>? brands = null!;
+        ODataDTO<ProductBrandListDTO>? brands = null!;
         ODataDTO<ProductCategoryListDTO>? categories = null!;
 
         await Task.WhenAll(new List<Task>
         {
-            Task.Run(async () => { brands = await httpService.GetFromJsonAsync<ODataDTO<BrandListDTO>>("/odata/Brand"); }),
+            Task.Run(async () => { brands = await httpService.GetFromJsonAsync<ODataDTO<ProductBrandListDTO>>("/odata/Brand"); }),
             Task.Run(async () => { categories = await httpService.GetFromJsonAsync<ODataDTO<ProductCategoryListDTO>>("/odata/ProductCategory"); })
         });
 
-        StockActionTrees.DataLevelAccess.Brand.Expand(brands!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
+        StockActionTrees.DataLevelAccess.ProductBrand.Expand(brands!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
 
         StockActionTrees.DataLevelAccess.ProductCategory.Expand(categories!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
 #endif

@@ -18,7 +18,7 @@ public class ProductDTO : ShiftEntityViewAndUpsertDTO
     [_ProductCategoryHashId]
     public ShiftEntitySelectDTO ProductCategory { get; set; } = default!;
 
-    public ShiftEntitySelectDTO Brand { get; set; } = default!;
+    public ShiftEntitySelectDTO ProductBrand { get; set; } = default!;
     public DateTimeOffset? ReleaseDate { get; set; }
 
     public ShiftEntitySelectDTO? CountryOfOrigin { get; set; } = default!;

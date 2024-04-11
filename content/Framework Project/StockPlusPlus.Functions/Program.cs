@@ -40,7 +40,7 @@ var host = new HostBuilder()
 
 #if (includeSampleApp)
         services.AddScoped<ProductCategoryRepository>()
-        .AddScoped<BrandRepository>()
+        .AddScoped<ProductBrandRepository>()
         .AddScoped<ProductRepository>();
 #endif
 

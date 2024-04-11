@@ -16,12 +16,12 @@ public class Product : ShiftEntity<Product>
 
     public long ProductCategoryID { get; set; }
 
-    public long BrandID { get; set; }
+    public long ProductBrandID { get; set; }
     public long? CountryOfOriginID { get; set; }
 
     public virtual ProductCategory? ProductCategory { get; set; }
 
-    public virtual Brand? Brand { get; set; }
+    public virtual ProductBrand? ProductBrand { get; set; }
     public virtual Country? CountryOfOrigin { get; set; }
 
     public DateTimeOffset? ReleaseDate { get; set; }

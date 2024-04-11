@@ -39,7 +39,7 @@ public class Product : Profile
         //        );
 
         CreateMap<Entities.Product.Product, ProductListDTO>()
-            .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Brand == null ? null : src.Brand.Name))
+            .ForMember(dest => dest.ProductBrand, opt => opt.MapFrom(src => src.ProductBrand == null ? null : src.ProductBrand.Name))
             .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.ProductCategory == null ? null : src.ProductCategory.Name));
 
         CreateMap<Entities.Product.Product, ProductModel>();
