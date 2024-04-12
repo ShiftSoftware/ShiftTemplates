@@ -33,7 +33,7 @@ steps:
  - script: git clone https://github.com/ShiftSoftware/TypeAuth.git ../TypeAuth
    displayName: 'Clone TypeAuth'
 
- - script: git clone https://github.com/ShiftSoftware/AzureFunctionsAspNetCoreAuthorization.git ../../../AzureFunctionsAspNetCoreAuthorization
+ - script: git clone https://github.com/ShiftSoftware/AzureFunctionsAspNetCoreAuthorization.git ../AzureFunctionsAspNetCoreAuthorization
    displayName: 'Clone AzureFunctionsAspNetCoreAuthorization'
 
  - task: PowerShell@2
