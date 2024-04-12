@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\ShiftFrameworkGlobalSettings.props" Condition="Exists('..\ShiftFrameworkGlobalSettings.props')" />
+	<Import Project="ShiftFrameworkGlobalSettings.props"  Condition="Exists('ShiftFrameworkGlobalSettings.props')" />
 
 	<PropertyGroup>
 		<!-- The package metadata. Fill in the properties marked as TODO below -->
