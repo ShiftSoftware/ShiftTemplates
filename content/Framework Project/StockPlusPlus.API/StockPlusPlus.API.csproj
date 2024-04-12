@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 	<!--#if shiftFrameworkDevelopmentMode-->
-	<Import Project="..\ShiftFrameworkGlobalSettings.props" />
+	<Import Project="..\..\..\ShiftFrameworkGlobalSettings.props" />
 	<!--#endif -->
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>

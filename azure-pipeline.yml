@@ -1,0 +1,137 @@
+trigger:
+ branches:
+    include:
+    - master
+ tags:
+    include:
+    - release*
+
+pool:
+  vmImage: ubuntu-latest
+  
+variables:
+- group: pipeline
+
+steps:
+
+ - checkout: self
+   submodules: true
+   persistCredentials: true
+
+ - script: git clone https://github.com/ShiftSoftware/ShiftEntity.git ../ShiftEntity
+   displayName: 'Clone ShiftEntity'
+
+ - script: git clone https://github.com/ShiftSoftware/ShiftBlazor.git ../ShiftBlazor
+   displayName: 'Clone Blazor'
+
+ - script: git clone https://github.com/ShiftSoftware/ShiftFrameworkTestingTools.git ../ShiftFrameworkTestingTools
+   displayName: 'Clone ShiftFrameworkTestingTools'
+
+ - script: git clone https://github.com/ShiftSoftware/ShiftIdentity.git ../ShiftIdentity
+   displayName: 'Clone ShiftIdentity'
+
+ - script: git clone https://github.com/ShiftSoftware/TypeAuth.git ../TypeAuth
+   displayName: 'Clone TypeAuth'
+
+ - script: git clone https://github.com/ShiftSoftware/AzureFunctionsAspNetCoreAuthorization.git ../../../AzureFunctionsAspNetCoreAuthorization
+   displayName: 'Clone AzureFunctionsAspNetCoreAuthorization'
+
+ - task: PowerShell@2
+   displayName: 'Replace Package Versions in template.json'
+   inputs:
+    filePath: 'template-versions.ps1'
+
+ - script: dotnet build --configuration release
+   displayName: 'Build All Projects'
+
+ - script: dotnet pack ../ShiftFrameworkTestingTools/ShiftFrameworkTestingTools --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftFrameworkTestingTools'
+
+ - script: dotnet pack ../ShiftIdentity/ShiftIdentity.AspNetCore --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftIdentity.AspNetCore'
+
+ - script: dotnet pack ../ShiftIdentity/ShiftIdentity.Data --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftIdentity.Data'
+
+ - script: dotnet pack ../ShiftIdentity/ShiftIdentity.Blazor --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftIdentity.Blazor'
+
+ - script: dotnet pack ../ShiftIdentity/ShiftIdentity.Core --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftIdentity.Core'
+
+ - script: dotnet pack ../ShiftIdentity/ShiftIdentity.Dashboard.AspNetCore --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftIdentity.Dashboard.AspNetCore'
+
+ - script: dotnet pack ../ShiftIdentity/ShiftIdentity.Dashboard.Blazor --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftIdentity.Dashboard.Blazor'
+
+ - script: dotnet pack ../ShiftEntity/ShiftEntity.Core --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftEntity.Core'
+
+ - script: dotnet pack ../ShiftEntity/ShiftEntity.CosmosDbReplication --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftEntity.CosmosDbReplication'
+
+ - script: dotnet pack ../ShiftEntity/ShiftEntity.EFCore --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftEntity.EFCore'
+
+ - script: dotnet pack ../ShiftEntity/ShiftEntity.Model --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftEntity.Model'
+
+ - script: dotnet pack ../ShiftEntity/ShiftEntity.Web --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftEntity.Web'
+
+ - script: dotnet pack ../ShiftEntity/ShiftEntity.Print --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftEntity.Print'
+
+ - script: dotnet pack ../ShiftBlazor/ShiftBlazor --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftBlazor'
+
+ - script: dotnet pack ../ShiftTemplates --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   displayName: 'pack ShiftTemplates'
+
+ - script: dotnet test ../TypeAuth/TypeAuth.Core.Tests
+   displayName: 'Test TypeAuth.Core'
+
+ - script: dotnet test ../TypeAuth/TypeAuth.AspNetCore.Tests
+   displayName: 'Test TypeAuth.AspNetCore'
+
+ - script: dotnet pack ../TypeAuth/TypeAuth.Core --configuration Release --output $(Build.ArtifactStagingDirectory)/TypeAuth
+   displayName: 'pack TypeAuth.Core'
+
+ - script: dotnet pack ../TypeAuth/TypeAuth.Blazor --configuration Release --output $(Build.ArtifactStagingDirectory)/TypeAuth
+   displayName: 'pack TypeAuth.Blazor'
+
+ - script: dotnet pack ../TypeAuth/TypeAuth.AspNetCore --configuration Release --output $(Build.ArtifactStagingDirectory)/TypeAuth
+   displayName: 'pack TypeAuth.AspNetCore'
+
+ - task: FuncToolsInstaller@0
+   inputs:
+    version: 'latest'
+
+ - script: dotnet test ../AzureFunctionsAspNetCoreAuthorization/Tests
+   displayName: 'Test Azure Functions AspNetCore Authorization'
+
+ - script: dotnet pack ../AzureFunctionsAspNetCoreAuthorization/ShiftSoftware.Azure.Functions.AspNetCore.Authorization --configuration Release --output $(Build.ArtifactStagingDirectory)/AzureFunctionsAspNetCoreAuthorization
+   displayName: 'pack Azure Functions AspNetCore Authorization'
+
+ - task: NuGetToolInstaller@1
+   inputs:
+    versionSpec: '6.9.1'
+
+ - task: NuGetCommand@2
+   displayName: 'Push TypeAuth Packages' 
+   inputs:
+    command: 'custom'
+    arguments: 'push "$(Build.ArtifactStagingDirectory)/TypeAuth/**/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey $(ShiftSoftwareNugetApiKey) -SkipDuplicate'
+
+ - task: NuGetCommand@2
+   displayName: 'Push Azure Functions AspNetCore Authorization' 
+   inputs:
+    command: 'custom'
+    arguments: 'push "$(Build.ArtifactStagingDirectory)/AzureFunctionsAspNetCoreAuthorization/**/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey $(ShiftSoftwareNugetApiKey) -SkipDuplicate'
+
+ - task: NuGetCommand@2
+   displayName: 'Push Framework Packages' 
+   inputs:
+    command: 'custom'
+    arguments: 'push "$(Build.ArtifactStagingDirectory)/Framework/**/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey $(ShiftSoftwareNugetApiKey) -SkipDuplicate'
