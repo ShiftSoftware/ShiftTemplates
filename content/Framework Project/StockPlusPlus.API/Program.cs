@@ -6,6 +6,8 @@ using ShiftSoftware.ShiftEntity.Web.Services;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using StockPlusPlus.API.Services;
+
 #if (internalShiftIdentityHosting)
 using AutoMapper;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
@@ -30,6 +32,8 @@ Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
 builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
 
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
+
+builder.Services.AddScoped<ISendEmailVerification, SendEmailService>();
 
 var cosmosConnectionString = builder.Configuration.GetValue<string>("CosmosDb:ConnectionString")!;
 
@@ -141,6 +145,11 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
             UserIdsSalt = "k02iUHSb2ier9fiui02349AbfJEI",
             UserIdsMinHashLength = 5
         },
+        SASToken= new SASTokenModel
+        {
+            ExpireInSeconds = 3600,
+            Key = "One-Two-Three-Four-Five",
+        }
     }
 );
 #endif
