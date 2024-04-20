@@ -86,7 +86,7 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
 
         await Task.WhenAll(new List<Task>
         {
-            Task.Run(async () => { brands = await httpService.GetFromJsonAsync<ODataDTO<ProductBrandListDTO>>("/odata/IdentityBrand"); }),
+            Task.Run(async () => { brands = await httpService.GetFromJsonAsync<ODataDTO<ProductBrandListDTO>>("/odata/ProductBrand"); }),
             Task.Run(async () => { categories = await httpService.GetFromJsonAsync<ODataDTO<ProductCategoryListDTO>>("/odata/ProductCategory"); })
         });
 
