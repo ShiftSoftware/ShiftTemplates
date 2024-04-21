@@ -13,7 +13,7 @@ public class ProductController : ShiftEntitySecureControllerAsync<ProductReposit
     public ProductController() : base(StockActionTrees.Product, x =>
     {
         x.FilterBy(x => x.ID, StockActionTrees.DataLevelAccess.ProductCategory)
-        .DecodeHashId<_ProductCategoryHashId>()
+        .DecodeHashId<ProductCategoryListDTO>()
         .IncludeCreatedByCurrentUser(x => x.CreatedByUserID);
 
         x.FilterBy(x => x.ID, StockActionTrees.DataLevelAccess.ProductBrand)

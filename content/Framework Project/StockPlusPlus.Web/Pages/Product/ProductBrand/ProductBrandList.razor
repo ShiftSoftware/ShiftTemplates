@@ -9,7 +9,7 @@
            T="ProductBrandListDTO"
            Dense
            DisableActionColumn
-           ComponentType="typeof(ProductBrandForm)"
+            ComponentType="typeof(ProductBrandForm)"
             ShowIDColumn="true"
             TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockActionTrees.ProductBrand"
            EnableExport>
@@ -23,4 +23,12 @@
                    TProperty="string"
                    BaseUrlKey="ShiftIdentityApi"
                    EntitySet="IdentityUser" />
+
+    <ForeignColumn Property="x => x.UserGroupID"
+                   Title="Assigned Group"
+                   T="ProductBrandListDTO"
+                   TEntity="ShiftSoftware.ShiftIdentity.Core.DTOs.UserGroup.UserGroupListDTO"
+                   TProperty="string"
+                   BaseUrlKey="ShiftIdentityApi"
+                   EntitySet="IdentityUserGroup" />
 </ShiftList>

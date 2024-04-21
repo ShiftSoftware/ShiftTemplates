@@ -11,4 +11,6 @@ public class ProductBrand : ShiftEntity<ProductBrand>
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
     public string? Code { get; set; }
+
+    public long? UserGroupID { get; set; }
 }

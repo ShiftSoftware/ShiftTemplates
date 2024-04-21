@@ -22,6 +22,12 @@
     @bind-Value="TheItem.Name"
     For="@(() => TheItem.Name)" /> *@
 
+    <ShiftAutocomplete Label="Assigned Group"
+                       @bind-Value="TheItem.UserGroup"
+                       TEntitySet="ShiftSoftware.ShiftIdentity.Core.DTOs.UserGroup.UserGroupListDTO"
+                       EntitySet="IdentityUserGroup"
+                       For="() => TheItem.UserGroup" />
+
     @if (Mode == FormModes.View)
     {
         <br />

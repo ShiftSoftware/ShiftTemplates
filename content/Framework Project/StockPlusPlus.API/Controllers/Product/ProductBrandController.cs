@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShiftSoftware.ShiftEntity.Web;
+using ShiftSoftware.ShiftIdentity.Core.DTOs.UserGroup;
 using StockPlusPlus.Data.Entities.Product;
 using StockPlusPlus.Data.Repositories.Product;
 using StockPlusPlus.Shared.ActionTrees;
@@ -15,8 +16,14 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
     private readonly ProductBrandRepository brandRepository;
     private readonly ProductCategoryRepository productCategoryRepository;
     public ProductBrandController(ProductBrandRepository brandRepository, ProductCategoryRepository productCategoryRepository) : base(StockActionTrees.ProductBrand, x =>
+    {
         x.FilterBy(x => x.ID, StockActionTrees.DataLevelAccess.ProductBrand)
-        .IncludeCreatedByCurrentUser(x => x.CreatedByUserID)
+        .IncludeCreatedByCurrentUser(x => x.CreatedByUserID);
+
+        x.FilterBy(x => x.UserGroupID, ShiftSoftware.ShiftEntity.Core.Constants.UserGroupIdsClaim)
+        .IncludeNulls()
+        .DecodeHashId<UserGroupListDTO>();
+    }
     )
     {
         this.brandRepository = brandRepository;

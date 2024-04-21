@@ -12,4 +12,7 @@ public class ProductBrandDTO : ShiftEntityViewAndUpsertDTO
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
     public string? Code { get; set; }
+
+    [ShiftSoftware.ShiftEntity.Model.HashIds.UserGroupHashIdConverter]
+    public ShiftEntitySelectDTO? UserGroup { get; set; }
 }

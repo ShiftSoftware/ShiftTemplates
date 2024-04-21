@@ -17,7 +17,7 @@ public class ProductCategoryController : ShiftEntitySecureControllerAsync<Produc
 
     public ProductCategoryController(ProductCategoryRepository repository, IConfiguration configuration) : base(StockActionTrees.ProductCategory, x =>
         x.FilterBy(x => x.ID, StockActionTrees.DataLevelAccess.ProductCategory)
-        .DecodeHashId<_ProductCategoryHashId>()
+        .DecodeHashId<ProductCategoryListDTO>()
         .IncludeCreatedByCurrentUser(x => x.CreatedByUserID)
     )
     {
