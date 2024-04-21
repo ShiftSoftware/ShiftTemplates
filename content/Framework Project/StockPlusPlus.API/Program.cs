@@ -34,6 +34,7 @@ builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Ass
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
 
 builder.Services.AddScoped<ISendEmailVerification, SendEmailService>();
+builder.Services.AddScoped<ISendEmailResetPassword, SendEmailService>();
 
 var cosmosConnectionString = builder.Configuration.GetValue<string>("CosmosDb:ConnectionString")!;
 
