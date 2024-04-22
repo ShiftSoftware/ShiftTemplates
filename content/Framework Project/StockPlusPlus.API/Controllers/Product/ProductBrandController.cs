@@ -19,10 +19,6 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
     {
         x.FilterBy(x => x.ID, StockActionTrees.DataLevelAccess.ProductBrand)
         .IncludeCreatedByCurrentUser(x => x.CreatedByUserID);
-
-        x.FilterBy(x => x.UserGroupID, ShiftSoftware.ShiftEntity.Core.Constants.UserGroupIdsClaim)
-        .IncludeNulls()
-        .DecodeHashId<UserGroupListDTO>();
     }
     )
     {
