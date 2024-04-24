@@ -148,7 +148,7 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
         },
         SASToken= new SASTokenModel
         {
-            ExpireInSeconds = 3600,
+            ExpiresInSeconds = 3600,
             Key = "One-Two-Three-Four-Five",
         }
     }
