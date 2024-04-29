@@ -42,48 +42,63 @@ steps:
    displayName: 'Build All Projects'
 
  - script: dotnet pack ../ShiftFrameworkTestingTools/ShiftFrameworkTestingTools --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftFrameworkTestingTools'
 
  - script: dotnet pack ../ShiftIdentity/ShiftIdentity.AspNetCore --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftIdentity.AspNetCore'
 
  - script: dotnet pack ../ShiftIdentity/ShiftIdentity.Data --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftIdentity.Data'
 
  - script: dotnet pack ../ShiftIdentity/ShiftIdentity.Blazor --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftIdentity.Blazor'
 
  - script: dotnet pack ../ShiftIdentity/ShiftIdentity.Core --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftIdentity.Core'
 
  - script: dotnet pack ../ShiftIdentity/ShiftIdentity.Dashboard.AspNetCore --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftIdentity.Dashboard.AspNetCore'
 
  - script: dotnet pack ../ShiftIdentity/ShiftIdentity.Dashboard.Blazor --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftIdentity.Dashboard.Blazor'
 
  - script: dotnet pack ../ShiftEntity/ShiftEntity.Core --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftEntity.Core'
 
  - script: dotnet pack ../ShiftEntity/ShiftEntity.CosmosDbReplication --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftEntity.CosmosDbReplication'
 
  - script: dotnet pack ../ShiftEntity/ShiftEntity.EFCore --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftEntity.EFCore'
 
  - script: dotnet pack ../ShiftEntity/ShiftEntity.Model --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftEntity.Model'
 
  - script: dotnet pack ../ShiftEntity/ShiftEntity.Web --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftEntity.Web'
 
  - script: dotnet pack ../ShiftEntity/ShiftEntity.Print --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftEntity.Print'
 
  - script: dotnet pack ../ShiftBlazor/ShiftBlazor --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftBlazor'
 
  - script: dotnet pack ShiftTemplates.csproj --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftTemplates'
 
  - script: dotnet test ../TypeAuth/TypeAuth.Core.Tests
@@ -95,7 +110,7 @@ steps:
    displayName: 'Test TypeAuth.AspNetCore'
 
  - script: dotnet pack ../TypeAuth/TypeAuth.Core --configuration Release --output $(Build.ArtifactStagingDirectory)/TypeAuth
-   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-typeauth')) 
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-typeauth'))
    displayName: 'pack TypeAuth.Core'
 
  - script: dotnet pack ../TypeAuth/TypeAuth.Blazor --configuration Release --output $(Build.ArtifactStagingDirectory)/TypeAuth
@@ -138,7 +153,8 @@ steps:
     arguments: 'push "$(Build.ArtifactStagingDirectory)/AzureFunctionsAspNetCoreAuthorization/**/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey $(ShiftSoftwareNugetApiKey) -SkipDuplicate'
 
  - task: NuGetCommand@2
-   displayName: 'Push Framework Packages' 
+   displayName: 'Push Framework Packages'
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework'))
    inputs:
     command: 'custom'
     arguments: 'push "$(Build.ArtifactStagingDirectory)/Framework/**/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey $(ShiftSoftwareNugetApiKey) -SkipDuplicate'
