@@ -102,13 +102,16 @@ steps:
    displayName: 'pack TypeAuth.AspNetCore'
 
  - task: FuncToolsInstaller@0
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-aspNetCore-authorization')) 
    inputs:
     version: 'latest'
 
  - script: dotnet test ../AzureFunctionsAspNetCoreAuthorization/Tests
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-aspNetCore-authorization'))
    displayName: 'Test Azure Functions AspNetCore Authorization'
 
  - script: dotnet pack ../AzureFunctionsAspNetCoreAuthorization/ShiftSoftware.Azure.Functions.AspNetCore.Authorization --configuration Release --output $(Build.ArtifactStagingDirectory)/AzureFunctionsAspNetCoreAuthorization
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-aspNetCore-authorization'))
    displayName: 'pack Azure Functions AspNetCore Authorization'
 
  - task: NuGetToolInstaller@1
@@ -123,6 +126,7 @@ steps:
 
  - task: NuGetCommand@2
    displayName: 'Push Azure Functions AspNetCore Authorization' 
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-aspNetCore-authorization'))
    inputs:
     command: 'custom'
     arguments: 'push "$(Build.ArtifactStagingDirectory)/AzureFunctionsAspNetCoreAuthorization/**/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey $(ShiftSoftwareNugetApiKey) -SkipDuplicate'
