@@ -87,22 +87,27 @@ steps:
    displayName: 'pack ShiftTemplates'
 
  - script: dotnet test ../TypeAuth/TypeAuth.Core.Tests
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-typeauth'))
    displayName: 'Test TypeAuth.Core'
 
  - script: dotnet test ../TypeAuth/TypeAuth.AspNetCore.Tests
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-typeauth')) 
    displayName: 'Test TypeAuth.AspNetCore'
 
  - script: dotnet pack ../TypeAuth/TypeAuth.Core --configuration Release --output $(Build.ArtifactStagingDirectory)/TypeAuth
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-typeauth')) 
    displayName: 'pack TypeAuth.Core'
 
  - script: dotnet pack ../TypeAuth/TypeAuth.Blazor --configuration Release --output $(Build.ArtifactStagingDirectory)/TypeAuth
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-typeauth')) 
    displayName: 'pack TypeAuth.Blazor'
 
  - script: dotnet pack ../TypeAuth/TypeAuth.AspNetCore --configuration Release --output $(Build.ArtifactStagingDirectory)/TypeAuth
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-typeauth')) 
    displayName: 'pack TypeAuth.AspNetCore'
 
  - task: FuncToolsInstaller@0
-   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-aspNetCore-authorization')) 
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-aspNetCore-authorization'))
    inputs:
     version: 'latest'
 
@@ -120,6 +125,7 @@ steps:
 
  - task: NuGetCommand@2
    displayName: 'Push TypeAuth Packages' 
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-typeauth'))
    inputs:
     command: 'custom'
     arguments: 'push "$(Build.ArtifactStagingDirectory)/TypeAuth/**/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey $(ShiftSoftwareNugetApiKey) -SkipDuplicate'
