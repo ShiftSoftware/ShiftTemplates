@@ -53,7 +53,7 @@ if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
                 var mapper = e.Services.GetRequiredService<IMapper>();
                 return mapper.Map<ServiceModel>(e.Entity);
             })
-            .UpdateReference<CompanyBranchServiceModel>("CompanyBranches",
+            .UpdateReference<CompanyBranchSubItemModel>("CompanyBranches",
                 (q, e) => q.Where(x => x.id == e.Entity.ID.ToString() && x.ItemType == "Service"));
 
         x.SetUpReplication<DB, Region>(cosmosConnectionString, databaseId)
@@ -80,7 +80,7 @@ if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
             (q, e) => q.Where(x => x.Company.id == e.Entity.ID.ToString()));
 
         x.SetUpReplication<DB, CompanyBranchService>(cosmosConnectionString, databaseId)
-            .Replicate<CompanyBranchServiceModel>("CompanyBranches", x => x.id, x => x.BranchID, x => x.ItemType);
+            .Replicate<CompanyBranchSubItemModel>("CompanyBranches", x => x.id, x => x.BranchID, x => x.ItemType);
     });
 #endif
 }
