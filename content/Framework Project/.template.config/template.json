@@ -8,7 +8,7 @@
   "sourceName": "StockPlusPlus",
   "tags": {
     "language": "C#",
-    "type": "project"
+    "type": "solution"
   },
   "guids": [
     "{55183F24-9642-44F3-B930-D547980F3E97}",
