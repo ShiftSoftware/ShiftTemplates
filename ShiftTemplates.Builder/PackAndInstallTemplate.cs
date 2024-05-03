@@ -6,29 +6,28 @@ public class PackAndInstallTemplate
 {
     public void PackAndInstall()
     {
-        this.Pack();
+        var projectPath = Tools.GetProjectPath();
+
+        this.Pack(projectPath);
 
         this.UnInstallTemplate();
 
-        this.InstallTemplate();
+        this.InstallTemplate(projectPath);
     }
 
-    private void Pack()
+    private void Pack(string projectPath)
     {
         Console.WriteLine();
         Console.WriteLine("---------------------------------------------------------------------");
 
-        var tempalteProjectPath = "../../../../ShiftTemplates.csproj";
-
-        var fullPath = System.IO.Path.GetFullPath(tempalteProjectPath);
-
+        var fullPath = System.IO.Path.GetFullPath(@$"{projectPath}\ShiftTemplates.csproj");
 
         Console.WriteLine("Installing the Template");
         Console.WriteLine();
         Console.WriteLine();
 
 
-        Process process = Process.Start("dotnet", $"pack {fullPath} --no-build --configuration Release --output ../../../bin/packed");
+        Process process = Process.Start("dotnet", @$"pack {fullPath} --no-build --configuration Release --no-build --output {projectPath}\bin\packed");
         //wait for the above process to complete before writing to console
         process.WaitForExit(-1);
 
@@ -43,8 +42,6 @@ public class PackAndInstallTemplate
         Console.WriteLine();
         Console.WriteLine();
 
-        var packagePath = System.IO.Directory.GetFiles("../../../bin/packed").FirstOrDefault();
-
         Process process = Process.Start("dotnet", $"new uninstall ShiftSoftware.ShiftTemplates");
         //wait for the above process to complete before writing to console
         process.WaitForExit(-1);
@@ -54,14 +51,13 @@ public class PackAndInstallTemplate
         Console.WriteLine("---------------------------------------------------------------------");
     }
 
-    private void InstallTemplate()
+    private void InstallTemplate(string projectPath)
     {
         Console.WriteLine("Installing the Template");
         Console.WriteLine();
         Console.WriteLine();
 
-
-        var packagePath = System.IO.Directory.GetFiles("../../../bin/packed").FirstOrDefault();
+        var packagePath = System.IO.Directory.GetFiles(@$"{projectPath}\bin\packed").FirstOrDefault();
 
         Process process = Process.Start("dotnet", $"new install {packagePath} --force");
         //wait for the above process to complete before writing to console

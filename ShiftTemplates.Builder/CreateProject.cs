@@ -13,7 +13,7 @@ public  class CreateProject
         Console.WriteLine();
         Console.WriteLine();
 
-        var path = "../../../../TestProject";
+        var path = @$"{Tools.GetProjectPath()}\TestProject";
 
         var fullPath = System.IO.Path.GetFullPath(path);
 

@@ -2,11 +2,17 @@
 
 new UpdateTemplateVersions().Update();
 
-new PackAndInstallTemplate().PackAndInstall();
+if (!args.Contains("--skip-template-install"))
+{
+    new PackAndInstallTemplate().PackAndInstall();
+}
 
-new CreateProject().Create(
-    includeSampleApp: true,
-    identityType: "Internal",
-    addFunctions: true,
-    addTest: true
-);
+if (!args.Contains("--skip-project"))
+{
+    new CreateProject().Create(
+        includeSampleApp: true,
+        identityType: "Internal",
+        addFunctions: true,
+        addTest: true
+    );
+}
