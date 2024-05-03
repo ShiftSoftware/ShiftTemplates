@@ -33,11 +33,6 @@ steps:
  - script: git clone https://github.com/ShiftSoftware/AzureFunctionsAspNetCoreAuthorization.git ../AzureFunctionsAspNetCoreAuthorization
    displayName: 'Clone AzureFunctionsAspNetCoreAuthorization'
 
- - task: PowerShell@2
-   displayName: 'Replace Package Versions in template.json'
-   inputs:
-    filePath: 'template-versions.ps1'
-
  - script: dotnet build --configuration release
    displayName: 'Build All Projects'
 
