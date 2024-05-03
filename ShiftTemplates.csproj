@@ -32,6 +32,7 @@
 
   <PropertyGroup>
     <LocalizeTemplates>false</LocalizeTemplates>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>
