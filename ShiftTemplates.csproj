@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="ShiftFrameworkGlobalSettings.props"  Condition="Exists('ShiftFrameworkGlobalSettings.props')" />
+	<Import Project="ShiftFrameworkGlobalSettings.props" Condition="Exists('ShiftFrameworkGlobalSettings.props')" />
 
 	<PropertyGroup>
 		<!-- The package metadata. Fill in the properties marked as TODO below -->
@@ -62,5 +62,10 @@
 	<ItemGroup>
 		<None Include="Images\icon.png" Pack="true" PackagePath="\" />
 	</ItemGroup>
+
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="call dotnet run --project .\ShiftTemplates.Builder --skip-project --skip-template-install" />
+	</Target>
 	
 </Project>
