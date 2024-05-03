@@ -12,12 +12,6 @@ public class UpdateTemplateVersions
 
         var projectPath = Tools.GetProjectPath();
 
-        Console.WriteLine();
-        Console.Write($"Project Path is: {projectPath}");
-
-        Console.WriteLine();
-        Console.WriteLine();
-
         var xmlPath = $"{projectPath}/ShiftFrameworkGlobalSettings.props";
         var xmlContent = File.ReadAllText(xmlPath);
 
@@ -43,7 +37,7 @@ public class UpdateTemplateVersions
         
 
         // Define template JSON path
-        var templateJsonPath = @$"{projectPath}\content\Framework Project\.template.config\template.json";
+        var templateJsonPath = $"{projectPath}/content/Framework Project/.template.config/template.json";
 
         // Read and parse template JSON content
         var templateJsonContent = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(templateJsonPath));

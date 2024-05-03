@@ -20,14 +20,14 @@ public class PackAndInstallTemplate
         Console.WriteLine();
         Console.WriteLine("---------------------------------------------------------------------");
 
-        var fullPath = System.IO.Path.GetFullPath(@$"{projectPath}\ShiftTemplates.csproj");
+        var fullPath = System.IO.Path.GetFullPath($"{projectPath}/ShiftTemplates.csproj");
 
         Console.WriteLine("Installing the Template");
         Console.WriteLine();
         Console.WriteLine();
 
 
-        Process process = Process.Start("dotnet", @$"pack {fullPath} --no-build --configuration Release --no-build --output {projectPath}\bin\packed");
+        Process process = Process.Start("dotnet", $"pack {fullPath} --no-build --configuration Release --no-build --output {projectPath}/bin/packed");
         //wait for the above process to complete before writing to console
         process.WaitForExit(-1);
 
@@ -57,7 +57,7 @@ public class PackAndInstallTemplate
         Console.WriteLine();
         Console.WriteLine();
 
-        var packagePath = System.IO.Directory.GetFiles(@$"{projectPath}\bin\packed").FirstOrDefault();
+        var packagePath = System.IO.Directory.GetFiles($"{projectPath}/bin/packed").FirstOrDefault();
 
         Process process = Process.Start("dotnet", $"new install {packagePath} --force");
         //wait for the above process to complete before writing to console
