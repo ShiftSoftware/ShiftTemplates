@@ -55,7 +55,9 @@
         "ImportAndReferenceAll.bat",
         "RemoveAll.bat",
         "ShiftFrameworkGlobalSettings.props",
-        "**/StockPlusPlus.Data/Migrations/*.cs"
+        "**/StockPlusPlus.Data/Migrations/*.cs",
+        "ShiftTemplates.Builder",
+        "TestProject"
       ],
       "modifiers": [
         {
@@ -94,11 +96,19 @@
         {
           "exclude": "**/StockPlusPlus.Test/**",
           "condition": "(!addTest)"
+        },
+        {
+          "exclude": "**/StockPlusPlus.sln",
+          "condition": "(HostIdentifier == vs)"
         }
       ]
     }
   ],
   "symbols": {
+    "HostIdentifier": {
+      "type": "bind",
+      "binding": "host:HostIdentifier"
+    },
     "aspNetCorePort": {
       "type": "generated",
       "generator": "port",
