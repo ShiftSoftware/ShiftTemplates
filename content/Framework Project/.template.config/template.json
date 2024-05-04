@@ -1,7 +1,10 @@
-﻿{
+{
   "$schema": "http://json.schemastore.org/template",
   "author": "Shift Software",
-  "classifications": [ "Shift Software", "Web" ],
+  "classifications": [
+    "Shift Software",
+    "Web"
+  ],
   "identity": "ShiftSoftware.ShiftTemplates",
   "name": "Shift Framework Project",
   "shortName": "shift",
@@ -186,7 +189,7 @@
       "replaces": "http://localhost:5069",
       "onlyIf": [
         {
-          "after": "\"ShiftIdentityApi\": \""
+          "after": "\u0022ShiftIdentityApi\u0022: \u0022"
         }
       ]
     },
@@ -201,7 +204,7 @@
       "replaces": "http://localhost:5069",
       "onlyIf": [
         {
-          "after": "\"ShiftIdentityFrontEnd\": \""
+          "after": "\u0022ShiftIdentityFrontEnd\u0022: \u0022"
         }
       ]
     },
@@ -228,7 +231,7 @@
       "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2024.02.20.1"
+        "value": "2024.05.04.2"
       },
       "datatype": "string",
       "generator": "constant"
@@ -238,7 +241,7 @@
       "description": "Replace AzureFunctionsAspNetCoreAuthorization Version",
       "replaces": "$(AzureFunctionsAspNetCoreAuthorizationVersion)",
       "parameters": {
-        "value": "0.0.4"
+        "value": "0.0.8"
       },
       "datatype": "string",
       "generator": "constant"
@@ -248,7 +251,7 @@
       "description": "Replace TypeAuth Version",
       "replaces": "$(TypeAuthVersion)",
       "parameters": {
-        "value": "1.5.0"
+        "value": "1.5.3"
       },
       "datatype": "string",
       "generator": "constant"
