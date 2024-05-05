@@ -4,7 +4,7 @@ namespace ShiftTemplates.Builder;
 
 public  class CreateProject
 {
-    public void Create(bool includeSampleApp, string identityType, bool addTest = false, bool addFunctions = false)
+    public CreateProject Create(bool includeSampleApp, string identityType, bool addTest = false, bool addFunctions = false, bool launch = false)
     {
         Console.WriteLine();
         Console.WriteLine("---------------------------------------------------------------------");
@@ -23,13 +23,20 @@ public  class CreateProject
         Process process = Process.Start("dotnet", $"new shift --includeSampleApp {includeSampleApp} --shiftIdentityHostingType {identityType} --addTest {addTest} --addFunctions {addFunctions} -n Test --output {fullPath}");
         //wait for the above process to complete before writing to console
         process.WaitForExit(-1);
-         
-        //open the solution in Visual Studio
-        Process.Start("cmd", $"/c start {fullPath}/Test.sln");
+
+        if (launch)
+        {
+            //open the solution in Visual Studio
+            var launchProcess = Process.Start("cmd", $"/c start {fullPath}/Test.sln");
+
+            launchProcess.WaitForExit(-1);
+        }
 
 
         Console.WriteLine();
         Console.WriteLine();
         Console.WriteLine("---------------------------------------------------------------------");
+
+        return this;
     }
 }

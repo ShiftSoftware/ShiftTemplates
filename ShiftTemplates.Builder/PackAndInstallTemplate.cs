@@ -26,6 +26,8 @@ public class PackAndInstallTemplate
         Console.WriteLine();
         Console.WriteLine();
 
+        if (Directory.Exists($"{projectPath}/bin/packed"))
+            Directory.Delete($"{projectPath}/bin/packed", true);
 
         Process process = Process.Start("dotnet", $"pack {fullPath} --no-build --configuration Release --no-build --output {projectPath}/bin/packed");
         //wait for the above process to complete before writing to console

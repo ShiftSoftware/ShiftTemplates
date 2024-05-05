@@ -13,6 +13,12 @@ if (!args.Contains("--skip-project"))
         includeSampleApp: true,
         identityType: "Internal",
         addFunctions: true,
-        addTest: true
+        addTest: true,
+        launch: false
     );
+}
+
+if (!args.Contains("--skip-project"))
+{
+    new CreateShiftEntity().Create();
 }
