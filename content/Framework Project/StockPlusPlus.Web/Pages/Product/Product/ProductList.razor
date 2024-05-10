@@ -42,7 +42,7 @@
 
     <ButtonColumn ComponentType="typeof(ProductBrandForm)" KeyPropertyName="@nameof(ProductListDTO.ProductBrandID)" Property="x => x.ProductBrand" Title="Brand">
         <ButtonTemplate>
-            <MudChip Style="cursor: pointer;" Icon="@Icons.Material.Filled.BrandingWatermark" Variant="Variant.Outlined">@context</MudChip>
+            <MudChip T="string" Style="cursor: pointer;" Icon="@Icons.Material.Filled.BrandingWatermark" Variant="Variant.Outlined">@context</MudChip>
         </ButtonTemplate>
     </ButtonColumn>
 
