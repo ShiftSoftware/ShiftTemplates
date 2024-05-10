@@ -18,6 +18,6 @@ public class ProductBrandListDTO : ShiftEntityListDTO
     [ShiftSoftware.ShiftEntity.Model.HashIds.UserHashIdConverter]
     public string? CreatedByUserID { get; set; }
 
-    [ShiftSoftware.ShiftEntity.Model.HashIds.UserGroupHashIdConverter]
-    public string? UserGroupID { get; set; }
+    [ShiftSoftware.ShiftEntity.Model.HashIds.TeamHashIdConverter]
+    public string? TeamID { get; set; }
 }

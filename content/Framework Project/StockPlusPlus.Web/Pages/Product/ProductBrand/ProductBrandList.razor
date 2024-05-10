@@ -24,11 +24,11 @@
                    BaseUrlKey="ShiftIdentityApi"
                    EntitySet="IdentityUser" />
 
-    <ForeignColumn Property="x => x.UserGroupID"
+    <ForeignColumn Property="x => x.TeamID"
                    Title="Assigned Group"
                    T="ProductBrandListDTO"
-                   TEntity="ShiftSoftware.ShiftIdentity.Core.DTOs.UserGroup.UserGroupListDTO"
+                   TEntity="ShiftSoftware.ShiftIdentity.Core.DTOs.Team.TeamListDTO"
                    TProperty="string"
                    BaseUrlKey="ShiftIdentityApi"
-                   EntitySet="IdentityUserGroup" />
+                   EntitySet="IdentityTeam" />
 </ShiftList>
