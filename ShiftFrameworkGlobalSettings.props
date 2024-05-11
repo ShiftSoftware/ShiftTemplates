@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<DefineConstants>shiftFrameworkDevelopmentMode;includeSampleApp;internalShiftIdentityHosting</DefineConstants>
 		<ImportShiftFrameworkProjects>true</ImportShiftFrameworkProjects>
-		<ShiftFrameworkVersion>2024.05.10.1</ShiftFrameworkVersion>
+		<ShiftFrameworkVersion>2024.05.12.1</ShiftFrameworkVersion>
 		<TypeAuthVersion>1.5.5</TypeAuthVersion>
 		<AzureFunctionsAspNetCoreAuthorizationVersion>0.0.9</AzureFunctionsAspNetCoreAuthorizationVersion>
 	</PropertyGroup>
