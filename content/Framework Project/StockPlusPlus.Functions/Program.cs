@@ -13,7 +13,7 @@ using StockPlusPlus.Data.Repositories.Product;
 using System.Security.Claims;
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWorkerDefaults(x =>
+    .ConfigureFunctionsWebApplication(x =>
     {
         var issuer= "Please-Change-This-Issuer";
         var key = "Please-Change-This-Key:one-two-three-four-five-six-seven-eight.one-two-three-four-five-six-seven-eight";
