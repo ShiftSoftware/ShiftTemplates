@@ -7,6 +7,8 @@ using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using StockPlusPlus.API.Services;
+using Microsoft.Azure.Cosmos;
+
 
 #if (internalShiftIdentityHosting)
 using AutoMapper;
@@ -41,40 +43,43 @@ var cosmosConnectionString = builder.Configuration.GetValue<string>("CosmosDb:Co
 if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
 {
 #if (internalShiftIdentityHosting)
+    builder.Services.AddSingleton(new CosmosClient(cosmosConnectionString));
+
     builder.Services.AddShiftEntityCosmosDbReplicationTrigger(x =>
     {
         string databaseId = "test";
+        var client = x.Services.GetRequiredService<CosmosClient>();
 
-        x.SetUpReplication<DB, Service>(cosmosConnectionString, databaseId, null, false)
+        x.SetUpReplication<DB, Service>(client, databaseId, null, false)
             .Replicate<ServiceModel>(ReplicationConfiguration.ServiceContainerName, x => x.id)
             .UpdateReference<CompanyBranchSubItemModel>(ReplicationConfiguration.CompanyBranchContainerName,
                 (q, e) => q.Where(x => x.ItemType == CompanyBranchContainerItemTypes.Service && x.id == e.Entity.ID.ToString()));
 
-        x.SetUpReplication<DB, CompanyBranchService>(cosmosConnectionString, databaseId, null, false)
+        x.SetUpReplication<DB, CompanyBranchService>(client, databaseId, null, false)
             .Replicate<CompanyBranchSubItemModel>(ReplicationConfiguration.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
 
-        x.SetUpReplication<DB, CompanyBranchDepartment>(cosmosConnectionString, databaseId, null, false)
+        x.SetUpReplication<DB, CompanyBranchDepartment>(client, databaseId, null, false)
             .Replicate<CompanyBranchSubItemModel>(ReplicationConfiguration.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
 
-        x.SetUpReplication<DB, Department>(cosmosConnectionString, databaseId, null, false)
+        x.SetUpReplication<DB, Department>(client, databaseId, null, false)
             .Replicate<DepartmentModel>(ReplicationConfiguration.DepartmentContainerName, x => x.id)
             .UpdateReference<CompanyBranchSubItemModel>(ReplicationConfiguration.CompanyBranchContainerName,
                 (q, e) => q.Where(x => x.ItemType == CompanyBranchContainerItemTypes.Department && x.id == e.Entity.ID.ToString()));
 
-        x.SetUpReplication<DB, Brand>(cosmosConnectionString, databaseId, null, false)
+        x.SetUpReplication<DB, Brand>(client, databaseId, null, false)
             .Replicate<BrandModel>("Brands", x => x.id)
             .UpdateReference<CompanyBranchSubItemModel>(ReplicationConfiguration.CompanyBranchContainerName,
                 (q, e) => q.Where(x => x.id == e.Entity.ID.ToString() && x.ItemType == CompanyBranchContainerItemTypes.Brand));
 
-        x.SetUpReplication<DB, CompanyBranchBrand>(cosmosConnectionString, databaseId)
+        x.SetUpReplication<DB, CompanyBranchBrand>(client, databaseId)
             .Replicate<CompanyBranchSubItemModel>(ReplicationConfiguration.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
 
-        x.SetUpReplication<DB, Region>(cosmosConnectionString, databaseId)
+        x.SetUpReplication<DB, Region>(client, databaseId)
             .Replicate<RegionModel>("Regions", x => x.id, x => x.RegionID, x => x.ItemType)
             .UpdatePropertyReference<RegionModel, CompanyBranchModel>("CompanyBranches", x => x.City.Region,
             (q, e) => q.Where(x => x.City.Region.id == e.Entity.ID.ToString() && x.ItemType == "Branch"));
 
-        x.SetUpReplication<DB, City>(cosmosConnectionString, databaseId)
+        x.SetUpReplication<DB, City>(client, databaseId)
             .Replicate<CityModel>("Regions", x => x.id, x => x.RegionID, x => x.ItemType,
             e =>
             {
@@ -84,10 +89,10 @@ if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
             .UpdatePropertyReference<CityCompanyBranchModel, CompanyBranchModel>("CompanyBranches", x => x.City,
             (q, e) => q.Where(x => x.City.id == e.Entity.ID.ToString() && x.ItemType == "Branch"));
 
-        x.SetUpReplication<DB, CompanyBranch>(cosmosConnectionString, databaseId)
+        x.SetUpReplication<DB, CompanyBranch>(client, databaseId)
             .Replicate<CompanyBranchModel>("CompanyBranches", x => x.id, x => x.BranchID, x => x.ItemType);
 
-        x.SetUpReplication<DB, Company>(cosmosConnectionString, databaseId)
+        x.SetUpReplication<DB, Company>(client, databaseId)
             .Replicate<CompanyModel>("Companies", x=> x.id)
             .UpdatePropertyReference<CompanyModel, CompanyBranchModel>("CompanyBranches", x => x.Company,
             (q, e) => q.Where(x => x.Company.id == e.Entity.ID.ToString()));
