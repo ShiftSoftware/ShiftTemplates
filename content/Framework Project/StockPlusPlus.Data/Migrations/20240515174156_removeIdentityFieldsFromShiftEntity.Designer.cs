@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockPlusPlus.Data;
 
@@ -11,9 +12,11 @@ using StockPlusPlus.Data;
 namespace StockPlusPlus.Data.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20240515174156_removeIdentityFieldsFromShiftEntity")]
+    partial class removeIdentityFieldsFromShiftEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -318,7 +321,7 @@ namespace StockPlusPlus.Data.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("PeriodStart");
 
-                    b.Property<long?>("RegionID")
+                    b.Property<long>("RegionID")
                         .HasColumnType("bigint");
 
                     b.HasKey("ID");
@@ -1582,7 +1585,9 @@ namespace StockPlusPlus.Data.Migrations
                 {
                     b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.Region", "Region")
                         .WithMany()
-                        .HasForeignKey("RegionID");
+                        .HasForeignKey("RegionID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Region");
                 });

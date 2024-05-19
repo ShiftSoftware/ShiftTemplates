@@ -7,7 +7,8 @@ namespace StockPlusPlus.Data.Entities.Product;
 
 [TemporalShiftEntity]
 [ShiftEntityKeyAndName(nameof(ID), nameof(Name))]
-public class ProductCategory : ShiftEntity<ProductCategory>, IEntityHasBrand<ProductCategory>
+public class ProductCategory : ShiftEntity<ProductCategory>,
+    IEntityHasBrand<ProductCategory>, IEntityHasRegion<ProductCategory>, IEntityHasCompany<ProductCategory>, IEntityHasCompanyBranch<ProductCategory>
 {
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
@@ -16,4 +17,7 @@ public class ProductCategory : ShiftEntity<ProductCategory>, IEntityHasBrand<Pro
     public TrackingMethod? TrackingMethod { get; set; }
 
     public long? BrandID { get; set; }
+    public long? RegionID { get; set; }
+    public long? CompanyID { get; set; }
+    public long? CompanyBranchID { get; set; }
 }

@@ -2,14 +2,13 @@
 
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.Core.Flags;
-using ShiftSoftware.ShiftEntity.Model.Replication;
-using StockPlusPlus.Data.ReplicationModels;
 using StockPlusPlus.Shared.Enums.Product;
 
 namespace StockPlusPlus.Data.Entities.Product;
 
 [TemporalShiftEntity]
-public class Product : ShiftEntity<Product>, IEntityHasDraft<Product>
+public class Product : ShiftEntity<Product>, 
+    IEntityHasDraft<Product>, IEntityHasRegion<Product>, IEntityHasCompany<Product>, IEntityHasCompanyBranch<Product>
 {
     public string Name { get; set; } = default!;
 
@@ -27,4 +26,7 @@ public class Product : ShiftEntity<Product>, IEntityHasDraft<Product>
 
     public DateTimeOffset? ReleaseDate { get; set; }
     public bool IsDraft { get; set; }
+    public long? RegionID { get; set; }
+    public long? CompanyID { get; set; }
+    public long? CompanyBranchID { get; set; }
 }
