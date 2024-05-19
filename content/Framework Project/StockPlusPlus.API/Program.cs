@@ -165,6 +165,20 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
         {
             ExpiresInSeconds = 3600,
             Key = "One-Two-Three-Four-Five",
+        },
+        ShiftIdentityFeatureLocking = new ShiftIdentityFeatureLocking
+        {
+            RegionFeatureIsLocked = false,
+            CityFeatureIsLocked = false,
+            BrandFeatureIsLocked = false,
+            DepartmentFeatureIsLocked = false,
+            ServiceFeatureIsLocked = false,
+            CompanyFeatureIsLocked = false,
+            CompanyBranchFeatureIsLocked = false,
+            AppFeatureIsLocked = false,
+            AccessTreeFeatureIsLocked = false,
+            UserFeatureIsLocked = false,
+            TeamFeatureIsLocked = false,
         }
     }
 );
