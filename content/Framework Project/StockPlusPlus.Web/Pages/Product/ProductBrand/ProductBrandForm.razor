@@ -17,11 +17,6 @@
                         For="() => TheItem.Name"
                         Label="Name" />
 
-    @* <MudTextFieldExtended OnlyValidateIfDirty="true"
-    Label="Name"
-    @bind-Value="TheItem.Name"
-    For="@(() => TheItem.Name)" /> *@
-
     <ShiftAutocomplete Label="Assigned Team"
                        @bind-Value="TheItem.Team"
                        TEntitySet="ShiftSoftware.ShiftIdentity.Core.DTOs.Team.TeamListDTO"

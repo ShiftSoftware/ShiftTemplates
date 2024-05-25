@@ -9,7 +9,7 @@ namespace StockPlusPlus.Shared.DTOs.Product.ProductBrand;
 public class ProductBrandListDTO : ShiftEntityListDTO
 {
     public override string? ID { get; set; }
-
+#if (includeItemTemplateContent)
     [JsonConverter(typeof(LocalizedTextJsonConverter))]
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
@@ -20,4 +20,5 @@ public class ProductBrandListDTO : ShiftEntityListDTO
 
     [ShiftSoftware.ShiftEntity.Model.HashIds.TeamHashIdConverter]
     public string? TeamID { get; set; }
+#endif
 }

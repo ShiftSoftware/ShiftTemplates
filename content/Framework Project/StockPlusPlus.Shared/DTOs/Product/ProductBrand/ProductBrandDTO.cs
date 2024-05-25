@@ -7,7 +7,7 @@ namespace StockPlusPlus.Shared.DTOs.Product.ProductBrand;
 public class ProductBrandDTO : ShiftEntityViewAndUpsertDTO
 {
     public override string? ID { get; set; }
-
+#if (includeItemTemplateContent)
     [Required]
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
@@ -15,4 +15,5 @@ public class ProductBrandDTO : ShiftEntityViewAndUpsertDTO
 
     [ShiftSoftware.ShiftEntity.Model.HashIds.TeamHashIdConverter]
     public ShiftEntitySelectDTO? Team { get; set; }
+#endif
 }

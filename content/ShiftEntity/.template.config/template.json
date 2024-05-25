@@ -10,38 +10,41 @@
     "type": "item"
   },
   "symbols": {
-    "SolutionName": {
+    "solution": {
+      "displayName": "Solution Name",
       "type": "parameter",
-      "description": "The name of the template.",
+      "description": "The name of the Solution.",
       "datatype": "text",
       "isRequired": true,
       "fileRename": "TheSolutionName"
     }
+    //"entity": {
+    //  "displayName": "Entity Name",
+    //  "type": "parameter",
+    //  "description": "The name of the Entity.",
+    //  "datatype": "text",
+    //  "isRequired": true,
+    //  "fileRename": "TheEntity"
+    //}
   },
-  "sourceName": "{{ClassName}}.cs",
-
-  //"primaryOutputs": [
-  //  {
-  //    "path": "Data/ShiftEntity.cs"
-  //  }
-  //],
-  //"sources": [
-  //  {
-  //    "include": "ShiftEntity.cs"
-  //  }
-  //  //,{
-  //  //  "target": "Controllers",
-  //  //  "include": "ShiftEntityController.cs"
-  //  //}
-  //]
+  "sourceName": "ProductBrand",
   "sources": [
     {
-      "target": "",
+      "source": "../",
+      "exclude": [
+        "ShiftEntity/**",
+        "Framework Project/**"
+      ]
+    },
+    {
+      "source": "../",
+      "include": [
+        "Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductBrand/ProductBrandDTO.cs",
+        "Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductBrand/ProductBrandListDTO.cs"
+      ],
       "rename": {
-        "ShiftEntity.cs": "TheSolutionName.Data/Entities/ShiftEntity.cs",
-        "ShiftEntityController.cs": "TheSolutionName.API/Controllers/ShiftEntityController.cs",
-        "ShiftEntityDTO.cs": "TheSolutionName.Shared/DTOs/ShiftEntity/ShiftEntityDTO.cs",
-        "ShiftEntityListDTO.cs": "TheSolutionName.Shared/DTOs/ShiftEntity/ShiftEntityListDTO.cs"
+        "Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductBrand/ProductBrandDTO.cs": "TheSolutionName.Shared/DTOs/ProductBrandDTO.cs",
+        "Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductBrand/ProductBrandListDTO.cs": "TheSolutionName.Shared/DTOs/ProductBrandListDTO.cs"
       }
     }
   ]

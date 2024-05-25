@@ -10,7 +10,7 @@ if (!args.Contains("--skip-template-install"))
 if (!args.Contains("--skip-project"))
 {
     new CreateProject().Create(
-        includeSampleApp: true,
+        includeSampleApp: false,
         identityType: "Internal",
         addFunctions: true,
         addTest: true,
