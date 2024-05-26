@@ -6,11 +6,11 @@ using ShiftSoftware.ShiftEntity.Web.Services;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
-using StockPlusPlus.API.Services;
 using Microsoft.Azure.Cosmos;
 
 
 #if (internalShiftIdentityHosting)
+using StockPlusPlus.API.Services;
 using AutoMapper;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftIdentity.Core.ReplicationModels;
@@ -34,9 +34,6 @@ Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
 builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
 
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
-
-builder.Services.AddScoped<ISendEmailVerification, SendEmailService>();
-builder.Services.AddScoped<ISendEmailResetPassword, SendEmailService>();
 
 var cosmosConnectionString = builder.Configuration.GetValue<string>("CosmosDb:ConnectionString")!;
 
@@ -132,6 +129,10 @@ mvcBuilder.AddShiftEntityWeb(x =>
 mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!, builder.Configuration.GetValue<string>("Settings:TokenSettings:Key")!);
 
 #if (internalShiftIdentityHosting)
+
+builder.Services.AddScoped<ISendEmailVerification, SendEmailService>();
+builder.Services.AddScoped<ISendEmailResetPassword, SendEmailService>();
+
 mvcBuilder.AddShiftIdentityDashboard<DB>(
     new ShiftIdentityConfiguration
     {
