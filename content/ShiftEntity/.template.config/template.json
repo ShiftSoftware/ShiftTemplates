@@ -16,16 +16,9 @@
       "description": "The name of the Solution.",
       "datatype": "text",
       "isRequired": true,
-      "fileRename": "TheSolutionName"
+      "fileRename": "TheSolutionName",
+      "replaces": "StockPlusPlus"
     }
-    //"entity": {
-    //  "displayName": "Entity Name",
-    //  "type": "parameter",
-    //  "description": "The name of the Entity.",
-    //  "datatype": "text",
-    //  "isRequired": true,
-    //  "fileRename": "TheEntity"
-    //}
   },
   "sourceName": "ProductBrand",
   "sources": [
@@ -39,12 +32,12 @@
     {
       "source": "../",
       "include": [
-        "Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductBrand/ProductBrandDTO.cs",
-        "Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductBrand/ProductBrandListDTO.cs"
+        "Framework Project/StockPlusPlus.Shared/DTOs/ProductBrand/ProductBrandDTO.cs",
+        "Framework Project/StockPlusPlus.Shared/DTOs/ProductBrand/ProductBrandListDTO.cs"
       ],
       "rename": {
-        "Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductBrand/ProductBrandDTO.cs": "TheSolutionName.Shared/DTOs/ProductBrandDTO.cs",
-        "Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductBrand/ProductBrandListDTO.cs": "TheSolutionName.Shared/DTOs/ProductBrandListDTO.cs"
+        "Framework Project/StockPlusPlus.Shared/DTOs/ProductBrand/ProductBrandDTO.cs": "TheSolutionName.Shared/DTOs/ProductBrand/ProductBrandDTO.cs",
+        "Framework Project/StockPlusPlus.Shared/DTOs/ProductBrand/ProductBrandListDTO.cs": "TheSolutionName.Shared/DTOs/ProductBrand/ProductBrandListDTO.cs"
       }
     }
   ]

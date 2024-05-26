@@ -93,6 +93,12 @@
           "condition": "(!includeSampleApp)"
         },
         {
+          "exclude": [
+            "**/StockPlusPlus.API/Services/SendEmailService.cs"
+          ],
+          "condition": "(!internalShiftIdentityHosting)"
+        },
+        {
           "exclude": "**/StockPlusPlus.Functions/**",
           "condition": "(!addFunctions)"
         },
@@ -231,7 +237,7 @@
       "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2024.05.21.1"
+        "value": "2024.05.26.1"
       },
       "datatype": "string",
       "generator": "constant"
@@ -251,7 +257,7 @@
       "description": "Replace TypeAuth Version",
       "replaces": "$(TypeAuthVersion)",
       "parameters": {
-        "value": "1.5.5"
+        "value": "1.5.6"
       },
       "datatype": "string",
       "generator": "constant"

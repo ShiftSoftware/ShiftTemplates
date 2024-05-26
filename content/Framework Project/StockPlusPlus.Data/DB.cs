@@ -8,7 +8,6 @@ using ShiftSoftware.ShiftEntity.EFCore;
 
 #if (includeSampleApp)
 using StockPlusPlus.Data.Entities;
-using StockPlusPlus.Data.Entities.Product;
 #endif
 
 namespace StockPlusPlus.Data;
