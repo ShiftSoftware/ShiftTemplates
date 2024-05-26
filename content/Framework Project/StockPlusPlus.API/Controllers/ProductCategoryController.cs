@@ -7,7 +7,7 @@ using StockPlusPlus.Shared.DTOs.ProductCategory;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace StockPlusPlus.API.Controllers.Product;
+namespace StockPlusPlus.API.Controllers;
 
 [Route("api/[controller]")]
 public class ProductCategoryController : ShiftEntitySecureControllerAsync<ProductCategoryRepository, Data.Entities.Product.ProductCategory, ProductCategoryListDTO, ProductCategoryDTO>
