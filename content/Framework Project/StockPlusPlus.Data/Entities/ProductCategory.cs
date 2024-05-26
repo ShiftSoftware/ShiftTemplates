@@ -1,7 +1,7 @@
 ﻿using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model;
-using StockPlusPlus.Shared.Enums.Product;
+using StockPlusPlus.Shared.Enums;
 
 namespace StockPlusPlus.Data.Entities;
 

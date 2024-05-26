@@ -1,7 +1,7 @@
 ﻿
 using System.ComponentModel;
 
-namespace StockPlusPlus.Shared.Enums.Product;
+namespace StockPlusPlus.Shared.Enums;
 
 public enum TrackingMethod
 {

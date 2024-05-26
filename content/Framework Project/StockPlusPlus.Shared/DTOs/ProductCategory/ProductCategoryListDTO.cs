@@ -1,7 +1,7 @@
 ﻿using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
-using StockPlusPlus.Shared.Enums.Product;
+using StockPlusPlus.Shared.Enums;
 using System.Text.Json.Serialization;
 
 namespace StockPlusPlus.Shared.DTOs.ProductCategory;

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
-using StockPlusPlus.Shared.Enums.Product;
+using StockPlusPlus.Shared.Enums;
 
 namespace StockPlusPlus.Data.ReplicationModels;
 
