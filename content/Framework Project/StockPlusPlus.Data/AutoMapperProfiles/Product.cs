@@ -4,7 +4,7 @@ using AutoMapper;
 using StockPlusPlus.Data.ReplicationModels;
 using StockPlusPlus.Shared.DTOs.Product;
 
-namespace StockPlusPlus.Data.AutoMapperProfiles.Product;
+namespace StockPlusPlus.Data.AutoMapperProfiles;
 
 public class Product : Profile
 {
@@ -38,10 +38,10 @@ public class Product : Profile
         //            opt => opt.MapFrom(src => src.CountryOfOrigin == null ? new Nullable<long>() : src.CountryOfOrigin.Value.ToLong())
         //        );
 
-        CreateMap<Entities.Product.Product, ProductListDTO>()
+        CreateMap<Entities.Product, ProductListDTO>()
             .ForMember(dest => dest.ProductBrand, opt => opt.MapFrom(src => src.ProductBrand == null ? null : src.ProductBrand.Name))
             .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.ProductCategory == null ? null : src.ProductCategory.Name));
 
-        CreateMap<Entities.Product.Product, ProductModel>();
+        CreateMap<Entities.Product, ProductModel>();
     }
 }

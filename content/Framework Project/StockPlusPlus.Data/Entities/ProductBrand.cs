@@ -3,11 +3,11 @@ using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model;
 
-namespace StockPlusPlus.Data.Entities.Product;
+namespace StockPlusPlus.Data.Entities;
 
 [TemporalShiftEntity]
 [ShiftEntityKeyAndName(nameof(ID), nameof(Name))]
-public class ProductBrand : ShiftEntity<ProductBrand>, 
+public class ProductBrand : ShiftEntity<ProductBrand>,
     IEntityHasTeam<ProductBrand>, IEntityHasRegion<ProductBrand>, IEntityHasCompany<ProductBrand>, IEntityHasCompanyBranch<ProductBrand>
 {
     public string Name { get; set; } = default!;

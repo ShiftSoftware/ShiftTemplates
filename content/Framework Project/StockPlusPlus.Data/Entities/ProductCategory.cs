@@ -3,7 +3,7 @@ using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model;
 using StockPlusPlus.Shared.Enums.Product;
 
-namespace StockPlusPlus.Data.Entities.Product;
+namespace StockPlusPlus.Data.Entities;
 
 [TemporalShiftEntity]
 [ShiftEntityKeyAndName(nameof(ID), nameof(Name))]

@@ -3,13 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using ShiftEntity.Print;
 using ShiftSoftware.ShiftEntity.EFCore;
 using ShiftSoftware.ShiftEntity.Model.HashIds;
-using StockPlusPlus.Data.Entities.Product;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.Enums.Product;
 
-namespace StockPlusPlus.Data.Repositories.Product;
+namespace StockPlusPlus.Data.Repositories;
 
-public class ProductCategoryRepository : ShiftRepository<DB, ProductCategory, ProductCategoryListDTO, ProductCategoryDTO>
+public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCategory, ProductCategoryListDTO, ProductCategoryDTO>
 {
     public ProductCategoryRepository(DB db) : base(db)
     {
@@ -19,7 +18,7 @@ public class ProductCategoryRepository : ShiftRepository<DB, ProductCategory, Pr
     {
         var longId = ShiftEntityHashIdService.Decode<ProductCategoryDTO>(id);
 
-        var item = (await this.FindAsync(longId))!;
+        var item = (await FindAsync(longId))!;
 
         //Data source fo Fast Report
         var category = new
@@ -30,7 +29,7 @@ public class ProductCategoryRepository : ShiftRepository<DB, ProductCategory, Pr
         };
 
         var otherCategories = await
-            this.GetIQueryable()
+            GetIQueryable()
             .Where(x => x.ID != longId)
             .Select(x => new
             {

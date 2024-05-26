@@ -1,14 +1,11 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.EntityFrameworkCore;
-using ShiftSoftware.Azure.Functions.AspNetCore.Authorization.Extensions;
 using ShiftSoftware.TypeAuth.AspNetCore;
 using ShiftSoftware.TypeAuth.Core;
-using StockPlusPlus.Data.Repositories.Product;
+using StockPlusPlus.Data.Repositories;
 using StockPlusPlus.Shared.ActionTrees;
 using System.Net;
-using System.Security.Claims;
 
 namespace StockPlusPlus.Functions
 {
@@ -35,7 +32,7 @@ namespace StockPlusPlus.Functions
 
             var allProductCategories = await this.productCategoryRepository.OdataList().ToArrayAsync();
 
-            Data.Entities.Product.ProductCategory? productCategory = null;
+            Data.Entities.ProductCategory? productCategory = null;
 
             if (allProductCategories.Count() > 0)
             { 

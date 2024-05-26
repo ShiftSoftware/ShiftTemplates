@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ShiftSoftware.ShiftFrameworkTestingTools;
-using StockPlusPlus.Data.Entities.Product;
-using StockPlusPlus.Data.Repositories.Product;
+using StockPlusPlus.Data.Entities;
+using StockPlusPlus.Data.Repositories;
 
 namespace StockPlusPlus.Test.Tests;
 

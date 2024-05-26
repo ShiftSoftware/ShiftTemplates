@@ -4,10 +4,10 @@ using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.Core.Flags;
 using StockPlusPlus.Shared.Enums.Product;
 
-namespace StockPlusPlus.Data.Entities.Product;
+namespace StockPlusPlus.Data.Entities;
 
 [TemporalShiftEntity]
-public class Product : ShiftEntity<Product>, 
+public class Product : ShiftEntity<Product>,
     IEntityHasDraft<Product>, IEntityHasRegion<Product>, IEntityHasCompany<Product>, IEntityHasCompanyBranch<Product>
 {
     public string Name { get; set; } = default!;

@@ -1,17 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ShiftSoftware.ShiftEntity.Web;
-using ShiftSoftware.ShiftIdentity.Core.DTOs.Team;
-using StockPlusPlus.Data.Entities.Product;
-using StockPlusPlus.Data.Repositories.Product;
+using StockPlusPlus.Data.Repositories;
 using StockPlusPlus.Shared.ActionTrees;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 
 namespace StockPlusPlus.API.Controllers;
 
 [Route("api/[controller]")]
-public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBrandRepository, ProductBrand, ProductBrandListDTO, ProductBrandDTO>
+public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBrandRepository, Data.Entities.ProductBrand, ProductBrandListDTO, ProductBrandDTO>
 {
     private readonly ProductBrandRepository brandRepository;
     private readonly ProductCategoryRepository productCategoryRepository;
@@ -36,7 +33,7 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
     public async Task<IActionResult> TestInsertAndView()
     {
         var createdBrand = await brandRepository.UpsertAsync(
-            entity: new ProductBrand(),
+            entity: new Data.Entities.ProductBrand(),
             dto: new ProductBrandDTO { Name = "One" },
             actionType: ShiftSoftware.ShiftEntity.Core.ActionTypes.Insert,
             userId: null

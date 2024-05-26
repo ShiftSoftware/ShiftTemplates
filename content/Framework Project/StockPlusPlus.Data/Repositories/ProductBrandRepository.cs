@@ -1,11 +1,11 @@
 ﻿
 using ShiftSoftware.ShiftEntity.EFCore;
-using StockPlusPlus.Data.Entities.Product;
+using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 
-namespace StockPlusPlus.Data.Repositories.Product;
+namespace StockPlusPlus.Data.Repositories;
 
-public class ProductBrandRepository : ShiftRepository<DB, Entities.Product.ProductBrand, ProductBrandListDTO, ProductBrandDTO>
+public class ProductBrandRepository : ShiftRepository<DB, Entities.ProductBrand, ProductBrandListDTO, ProductBrandDTO>
 {
     public ProductBrandRepository(DB db) : base(db)
     {
