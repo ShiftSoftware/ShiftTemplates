@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ShiftSoftware.ShiftEntity.Web;
 using StockPlusPlus.Data.Repositories.Product;
 using StockPlusPlus.Shared.ActionTrees;
-using StockPlusPlus.Shared.DTOs.Product.ProductCategory;
+using StockPlusPlus.Shared.DTOs.ProductCategory;
 using System.Security.Cryptography;
 using System.Text;
 

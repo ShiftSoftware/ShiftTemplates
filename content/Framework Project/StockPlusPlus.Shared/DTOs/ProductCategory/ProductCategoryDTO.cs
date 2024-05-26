@@ -6,7 +6,7 @@ using StockPlusPlus.Shared.Enums.Product;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace StockPlusPlus.Shared.DTOs.Product.ProductCategory;
+namespace StockPlusPlus.Shared.DTOs.ProductCategory;
 
 public class ProductCategoryDTO : ShiftEntityViewAndUpsertDTO, IHasBrandSelection<ProductCategoryDTO>
 {

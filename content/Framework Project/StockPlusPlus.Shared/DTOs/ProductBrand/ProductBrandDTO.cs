@@ -2,7 +2,7 @@
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using System.ComponentModel.DataAnnotations;
 
-namespace StockPlusPlus.Shared.DTOs.Product.ProductBrand;
+namespace StockPlusPlus.Shared.DTOs.ProductBrand;
 
 public class ProductBrandDTO : ShiftEntityViewAndUpsertDTO
 {

@@ -4,7 +4,7 @@ using ShiftEntity.Print;
 using ShiftSoftware.ShiftEntity.EFCore;
 using ShiftSoftware.ShiftEntity.Model.HashIds;
 using StockPlusPlus.Data.Entities.Product;
-using StockPlusPlus.Shared.DTOs.Product.ProductCategory;
+using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.Enums.Product;
 
 namespace StockPlusPlus.Data.Repositories.Product;

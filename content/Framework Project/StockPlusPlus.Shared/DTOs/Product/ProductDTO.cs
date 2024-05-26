@@ -1,11 +1,11 @@
 ﻿
 using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
-using StockPlusPlus.Shared.DTOs.Product.ProductCategory;
+using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.Enums.Product;
 using System.Text.Json.Serialization;
 
-namespace StockPlusPlus.Shared.DTOs.Product.Product;
+namespace StockPlusPlus.Shared.DTOs.Product;
 
 public class ProductDTO : ShiftEntityViewAndUpsertDTO, IHasDraftCheckBox<ProductDTO>
 {

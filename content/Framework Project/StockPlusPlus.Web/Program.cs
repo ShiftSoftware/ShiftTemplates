@@ -17,8 +17,8 @@ using StockPlusPlus.Shared.ActionTrees;
 #if (includeSampleApp && internalShiftIdentityHosting)
 using System.Net.Http.Json;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
-using StockPlusPlus.Shared.DTOs.Product.ProductBrand;
-using StockPlusPlus.Shared.DTOs.Product.ProductCategory;
+using StockPlusPlus.Shared.DTOs.ProductCategory;
+using StockPlusPlus.Shared.DTOs.ProductBrand;
 #endif
 
 [assembly: RootNamespace("StockPlusPlus.Web")]

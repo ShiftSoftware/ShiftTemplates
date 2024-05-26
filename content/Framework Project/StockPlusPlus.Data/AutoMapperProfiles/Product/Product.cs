@@ -2,7 +2,7 @@
 
 using AutoMapper;
 using StockPlusPlus.Data.ReplicationModels;
-using StockPlusPlus.Shared.DTOs.Product.Product;
+using StockPlusPlus.Shared.DTOs.Product;
 
 namespace StockPlusPlus.Data.AutoMapperProfiles.Product;
 

@@ -2,8 +2,8 @@
 using ShiftSoftware.ShiftEntity.Web;
 using StockPlusPlus.Data.Repositories.Product;
 using StockPlusPlus.Shared.ActionTrees;
-using StockPlusPlus.Shared.DTOs.Product.Product;
-using StockPlusPlus.Shared.DTOs.Product.ProductCategory;
+using StockPlusPlus.Shared.DTOs.Product;
+using StockPlusPlus.Shared.DTOs.ProductCategory;
 
 namespace StockPlusPlus.API.Controllers.Product;
 

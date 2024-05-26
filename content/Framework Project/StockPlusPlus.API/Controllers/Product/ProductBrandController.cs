@@ -6,7 +6,7 @@ using ShiftSoftware.ShiftIdentity.Core.DTOs.Team;
 using StockPlusPlus.Data.Entities.Product;
 using StockPlusPlus.Data.Repositories.Product;
 using StockPlusPlus.Shared.ActionTrees;
-using StockPlusPlus.Shared.DTOs.Product.ProductBrand;
+using StockPlusPlus.Shared.DTOs.ProductBrand;
 
 namespace StockPlusPlus.API.Controllers.Product;
 
