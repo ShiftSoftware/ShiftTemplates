@@ -8,6 +8,8 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using StockPlusPlus.API.Services;
 using Microsoft.Azure.Cosmos;
+using StockPlusPlus.Shared.DTOs.Service;
+
 
 
 #if (internalShiftIdentityHosting)
@@ -39,12 +41,13 @@ builder.Services.AddScoped<ISendEmailVerification, SendEmailService>();
 builder.Services.AddScoped<ISendEmailResetPassword, SendEmailService>();
 
 var cosmosConnectionString = builder.Configuration.GetValue<string>("CosmosDb:ConnectionString")!;
+if(!string.IsNullOrWhiteSpace(cosmosConnectionString))
+    builder.Services.AddSingleton(new CosmosClient(cosmosConnectionString));
+
 
 if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
 {
 #if (internalShiftIdentityHosting)
-    builder.Services.AddSingleton(new CosmosClient(cosmosConnectionString));
-
     builder.Services.AddShiftEntityCosmosDbReplicationTrigger(x =>
     {
         string databaseId = "test";
@@ -187,6 +190,7 @@ mvcBuilder.AddShiftEntityOdata(x =>
 {
     x.DefaultOptions();
     x.RegisterAllDTOs(typeof(StockPlusPlus.Shared.Marker).Assembly);
+    x.OdataEntitySet<ServiceListDTO>("Service");
 #if (internalShiftIdentityHosting)
     x.RegisterShiftIdentityDashboardEntitySets();
 #endif

@@ -1,7 +1,9 @@
 ﻿@*#if (includeSampleApp)*@
+@using ShiftSoftware.ShiftIdentity.Core
 @using StockPlusPlus.Web.Pages.Product.ProductBrand
 @using StockPlusPlus.Web.Pages.Product.ProductCategory
 @using StockPlusPlus.Web.Pages.Product.Product
+@using StockPlusPlus.Web.Pages.Service
 @*#endif*@
 <MudNavMenu>
     @*#if (includeSampleApp)*@
@@ -25,6 +27,10 @@
                               Icon="@Icons.Material.Outlined.Category">Products</AuthorizedMudNavLink>
     </AuthorizedMudNavGroup>
     @*#endif*@
+    <AuthorizedMudNavLink Href="@($"{nameof(ServiceList)}")"
+                          Match="NavLinkMatch.All"
+                          Icon="@Icons.Material.Outlined.Checklist"
+                          TypeAuthAction="ShiftIdentityActions.Services">Services</AuthorizedMudNavLink>
 </MudNavMenu>
 
 @code {
