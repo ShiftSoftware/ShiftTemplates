@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ShiftSoftware.ShiftEntity.Functions.Extensions;
 using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
@@ -20,6 +21,7 @@ var host = new HostBuilder()
         var key = "Please-Change-This-Key:one-two-three-four-five-six-seven-eight.one-two-three-four-five-six-seven-eight";
 
         x.AddShiftIdentity(issuer, key);
+        x.AddGoogleReCaptcha("");
     })
     .ConfigureAppConfiguration(builder =>
     {
@@ -61,6 +63,8 @@ var host = new HostBuilder()
             options.AddPolicy("Test", policy => policy.RequireClaim(ClaimTypes.Name, "SuperUser2"));
             options.AddPolicy("Test2", policy => policy.RequireClaim(ClaimTypes.Name, "SuperUser"));
         });
+
+        services.AddHttpClient();
     })
     .Build();
 

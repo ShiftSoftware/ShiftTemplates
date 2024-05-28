@@ -23,7 +23,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.22.0" />
-		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.1.0" />
+		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.2.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.17.2" />
 		<PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.22.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="1.2.0" />
@@ -33,6 +33,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Functions\ShiftEntity.Functions.csproj" />
 		<ProjectReference Include="..\StockPlusPlus.Data\StockPlusPlus.Data.csproj" />
 		<!--#if shiftFrameworkDevelopmentMode-->
 		<ProjectReference Include="..\..\..\..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj" Condition="Exists('..\..\..\..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj')" />
