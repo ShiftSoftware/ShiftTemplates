@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.EntityFrameworkCore;
+using ShiftSoftware.ShiftEntity.Functions.ReCaptcha;
 using ShiftSoftware.TypeAuth.AspNetCore;
 using ShiftSoftware.TypeAuth.Core;
 using StockPlusPlus.Data.Repositories;
@@ -22,14 +25,9 @@ namespace StockPlusPlus.Functions
 
         [Function("ProductCategories")]
         [TypeAuth(typeof(StockActionTrees), nameof(StockActionTrees.ProductCategory), Access.Read)]
-        public async Task<HttpResponseData> Get(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequestData req)
+        public async Task<IActionResult> Get(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req)
         {
-            var claims = req.GetUser();
-
-            Console.WriteLine("Name: " + claims?.Identity?.Name);
-            Console.WriteLine("Can Write: " + this.typeAuth.CanWrite(StockActionTrees.ProductCategory));
-
             var allProductCategories = await this.productCategoryRepository.OdataList().ToArrayAsync();
 
             Data.Entities.ProductCategory? productCategory = null;
@@ -40,20 +38,11 @@ namespace StockPlusPlus.Functions
                 productCategory = await this.productCategoryRepository.FindAsync(productCategoryId);
             }
 
-            string responseMessage = System.Text.Json.JsonSerializer.Serialize(new
+            return new OkObjectResult(new
             {
                 AllProducts = allProductCategories,
                 FirstProductCategory = productCategory is null ? null : await this.productCategoryRepository.ViewAsync(productCategory)
             });
-
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            await response.WriteAsJsonAsync(new
-            {
-                AllProducts = allProductCategories,
-                FirstProductCategory = productCategory is null ? null : await this.productCategoryRepository.ViewAsync(productCategory)
-            });
-
-            return response;
         }
     }
 }
