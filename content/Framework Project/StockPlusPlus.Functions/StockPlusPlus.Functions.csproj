@@ -30,13 +30,14 @@
 
 		<PackageReference Include="ShiftSoftware.TypeAuth.AspNetCore" Version="$(TypeAuthVersion)" Condition="!Exists('..\..\..\..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj')" />
 		<PackageReference Include="ShiftSoftware.ShiftIdentity.AspNetCore" Version="$(ShiftFrameworkVersion)" Condition="!Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.AspNetCore\ShiftIdentity.AspNetCore.csproj')" />
+		<PackageReference Include="ShiftSoftware.ShiftEntity.Functions" Version="$(ShiftFrameworkVersion)" Condition="!Exists('..\..\..\..\ShiftEntity\ShiftEntity.Functions\ShiftEntity.Functions.csproj')"  />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Functions\ShiftEntity.Functions.csproj" />
 		<ProjectReference Include="..\StockPlusPlus.Data\StockPlusPlus.Data.csproj" />
 		<!--#if shiftFrameworkDevelopmentMode-->
 		<ProjectReference Include="..\..\..\..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj" Condition="Exists('..\..\..\..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj')" />
+		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Functions\ShiftEntity.Functions.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.Functions\ShiftEntity.Functions.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.EFCore\ShiftEntity.EFCore.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.EFCore\ShiftEntity.EFCore.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.AspNetCore\ShiftIdentity.AspNetCore.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.AspNetCore\ShiftIdentity.AspNetCore.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<!--#endif -->
