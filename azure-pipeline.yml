@@ -88,6 +88,10 @@ steps:
    condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftEntity.Print'
 
+ - script: dotnet pack ../ShiftEntity/ShiftEntity.Functions --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
+   displayName: 'pack ShiftEntity.Functions'
+
  - script: dotnet pack ../ShiftBlazor/ShiftBlazor --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
    condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
    displayName: 'pack ShiftBlazor'
