@@ -1,15 +1,22 @@
 ﻿
 using ShiftSoftware.ShiftEntity.Core;
+#if (includeItemTemplateContent)
 using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model;
+#endif
 
 namespace StockPlusPlus.Data.Entities;
 
 [TemporalShiftEntity]
+#if (includeItemTemplateContent)
 [ShiftEntityKeyAndName(nameof(ID), nameof(Name))]
-public class ProductBrand : ShiftEntity<ProductBrand>,
-    IEntityHasTeam<ProductBrand>, IEntityHasRegion<ProductBrand>, IEntityHasCompany<ProductBrand>, IEntityHasCompanyBranch<ProductBrand>
+#endif
+public class ProductBrand : ShiftEntity<ProductBrand>
+#if (includeItemTemplateContent)
+    ,IEntityHasTeam<ProductBrand>, IEntityHasRegion<ProductBrand>, IEntityHasCompany<ProductBrand>, IEntityHasCompanyBranch<ProductBrand>
+#endif
 {
+#if (includeItemTemplateContent)
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
     public string? Code { get; set; }
@@ -19,4 +26,5 @@ public class ProductBrand : ShiftEntity<ProductBrand>,
     public long? RegionID { get; set; }
     public long? CompanyID { get; set; }
     public long? CompanyBranchID { get; set; }
+#endif
 }
