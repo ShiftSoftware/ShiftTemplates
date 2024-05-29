@@ -1,7 +1,9 @@
 ﻿
-using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
+#if (includeItemTemplateContent)
+using ShiftSoftware.ShiftEntity.Model;
 using System.Text.Json.Serialization;
+#endif
 
 namespace StockPlusPlus.Shared.DTOs.ProductBrand;
 #if (includeItemTemplateContent)

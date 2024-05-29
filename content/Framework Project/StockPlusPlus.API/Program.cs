@@ -7,9 +7,9 @@ using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Azure.Cosmos;
+#if (includeSampleApp)
 using StockPlusPlus.Shared.DTOs.Service;
-
-
+#endif
 
 #if (internalShiftIdentityHosting)
 using StockPlusPlus.API.Services;
@@ -191,7 +191,9 @@ mvcBuilder.AddShiftEntityOdata(x =>
 {
     x.DefaultOptions();
     x.RegisterAllDTOs(typeof(StockPlusPlus.Shared.Marker).Assembly);
+    #if (includeSampleApp)
     x.OdataEntitySet<ServiceListDTO>("Service");
+    #endif
 #if (internalShiftIdentityHosting)
     x.RegisterShiftIdentityDashboardEntitySets();
 #endif

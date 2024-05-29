@@ -1,6 +1,8 @@
 ﻿
 using ShiftSoftware.ShiftEntity.Model.Dtos;
+#if (includeItemTemplateContent)
 using System.ComponentModel.DataAnnotations;
+#endif
 
 namespace StockPlusPlus.Shared.DTOs.ProductBrand;
 
