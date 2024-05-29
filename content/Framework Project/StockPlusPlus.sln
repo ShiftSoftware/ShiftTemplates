@@ -72,7 +72,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzureFunctionsAspNetCoreAut
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftSoftware.Azure.Functions.AspNetCore.Authorization", "..\..\..\AzureFunctionsAspNetCoreAuthorization\ShiftSoftware.Azure.Functions.AspNetCore.Authorization\ShiftSoftware.Azure.Functions.AspNetCore.Authorization.csproj", "{5C7A1141-89EB-473A-8595-C6C8DBF7F233}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftEntity.Functions", "..\..\..\ShiftEntity\ShiftEntity.Functions\ShiftEntity.Functions.csproj", "{E46AC440-55EA-42C0-8A5D-79FD476D06A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftEntity.Functions", "..\..\..\ShiftEntity\ShiftEntity.Functions\ShiftEntity.Functions.csproj", "{5B117C1F-88F6-4B06-9ADE-C39A47EFAF58}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -176,10 +176,10 @@ Global
 		{5C7A1141-89EB-473A-8595-C6C8DBF7F233}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C7A1141-89EB-473A-8595-C6C8DBF7F233}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C7A1141-89EB-473A-8595-C6C8DBF7F233}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E46AC440-55EA-42C0-8A5D-79FD476D06A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E46AC440-55EA-42C0-8A5D-79FD476D06A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E46AC440-55EA-42C0-8A5D-79FD476D06A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E46AC440-55EA-42C0-8A5D-79FD476D06A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B117C1F-88F6-4B06-9ADE-C39A47EFAF58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B117C1F-88F6-4B06-9ADE-C39A47EFAF58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B117C1F-88F6-4B06-9ADE-C39A47EFAF58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B117C1F-88F6-4B06-9ADE-C39A47EFAF58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -209,7 +209,7 @@ Global
 		{0F5B91B4-C98B-4A74-BDE1-1CE7B84D4693} = {CCFF169C-5913-4709-B3A9-CC543DB7E1FD}
 		{271A2AA2-3F44-4050-8A2C-92B2E4D6D1FF} = {6B5137B3-F21C-483E-B131-54706EE91D55}
 		{5C7A1141-89EB-473A-8595-C6C8DBF7F233} = {271A2AA2-3F44-4050-8A2C-92B2E4D6D1FF}
-		{E46AC440-55EA-42C0-8A5D-79FD476D06A0} = {221AA4A6-F48E-4605-90FC-ACCE31C9397D}
+		{5B117C1F-88F6-4B06-9ADE-C39A47EFAF58} = {221AA4A6-F48E-4605-90FC-ACCE31C9397D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C409BB4-536D-4DA4-8127-17F75A5B4330}
