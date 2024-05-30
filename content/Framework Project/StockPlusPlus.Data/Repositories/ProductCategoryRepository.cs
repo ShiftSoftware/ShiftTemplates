@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ShiftEntity.Print;
 using ShiftSoftware.ShiftEntity.EFCore;
 using ShiftSoftware.ShiftEntity.Model.HashIds;
+using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.Enums;
 

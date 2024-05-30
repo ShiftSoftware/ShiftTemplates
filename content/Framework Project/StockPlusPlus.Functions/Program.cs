@@ -8,6 +8,7 @@ using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using StockPlusPlus.Data;
+using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Repositories;
 
 #if (includeSampleApp)

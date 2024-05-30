@@ -1,5 +1,6 @@
 ﻿
 using ShiftSoftware.ShiftEntity.EFCore;
+using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 
 namespace StockPlusPlus.Data.Repositories;

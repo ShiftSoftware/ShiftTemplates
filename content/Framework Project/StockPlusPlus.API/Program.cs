@@ -20,6 +20,7 @@ using ShiftSoftware.ShiftIdentity.Core.Entities;
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
 using ShiftSoftware.ShiftIdentity.AspNetCore;
 using ShiftSoftware.ShiftEntity.Model.Enums;
+using StockPlusPlus.Data.DbContext;
 #endif
 #if (externalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;

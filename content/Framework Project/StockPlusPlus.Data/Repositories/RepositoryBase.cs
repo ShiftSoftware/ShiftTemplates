@@ -2,6 +2,7 @@
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
+using StockPlusPlus.Data.DbContext;
 
 namespace StockPlusPlus.Data.Repositories;
 

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockPlusPlus.Data;
+using StockPlusPlus.Data.DbContext;
 
 #nullable disable
 

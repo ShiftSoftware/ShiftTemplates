@@ -10,12 +10,12 @@ using ShiftSoftware.ShiftEntity.EFCore;
 using StockPlusPlus.Data.Entities;
 #endif
 
-namespace StockPlusPlus.Data;
+namespace StockPlusPlus.Data.DbContext;
 
 #if (internalShiftIdentityHosting)
-public class DB : ShiftIdentityDbContext
+public partial class DB : ShiftIdentityDbContext
 #elif (externalShiftIdentityHosting)
-public class DB : ShiftDbContext
+public partial class DB : ShiftDbContext
 #endif
 {
     public DB(DbContextOptions option) : base(option)

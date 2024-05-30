@@ -2,6 +2,8 @@
 using ShiftSoftware.ShiftFrameworkTestingTools;
 using StockPlusPlus.API;
 using StockPlusPlus.Data;
+using StockPlusPlus.Data.DbContext;
+
 #if (includeSampleApp)
 using StockPlusPlus.Shared.ActionTrees;
 #endif
