@@ -36,14 +36,18 @@
         "Framework Project/StockPlusPlus.Shared/DTOs/ProductBrand/ProductBrandListDTO.cs",
 
         "Framework Project/StockPlusPlus.Data/Entities/ProductBrand.cs",
-        "Framework Project/StockPlusPlus.Data/Repositories/ProductBrandRepository.cs"
+        "Framework Project/StockPlusPlus.Data/Repositories/ProductBrandRepository.cs",
+
+        "ShiftEntity/ProductBrand.cs"
       ],
       "rename": {
         "Framework Project/StockPlusPlus.Shared/DTOs/ProductBrand/ProductBrandDTO.cs": "TheSolutionName.Shared/DTOs/ProductBrand/ProductBrandDTO.cs",
         "Framework Project/StockPlusPlus.Shared/DTOs/ProductBrand/ProductBrandListDTO.cs": "TheSolutionName.Shared/DTOs/ProductBrand/ProductBrandListDTO.cs",
 
         "Framework Project/StockPlusPlus.Data/Entities/ProductBrand.cs": "TheSolutionName.Data/Entities/ProductBrand.cs",
-        "Framework Project/StockPlusPlus.Data/Repositories/ProductBrandRepository.cs": "TheSolutionName.Data/Repositories/ProductBrandRepository.cs"
+        "Framework Project/StockPlusPlus.Data/Repositories/ProductBrandRepository.cs": "TheSolutionName.Data/Repositories/ProductBrandRepository.cs",
+
+        "ShiftEntity/ProductBrand.cs": "TheSolutionName.Data/DBContext/ProductBrand.cs"
       }
     }
   ]
