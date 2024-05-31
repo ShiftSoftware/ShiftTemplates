@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockPlusPlus.API", "StockPlusPlus.API\StockPlusPlus.API.csproj", "{55183F24-9642-44F3-B930-D547980F3E97}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockPlusPlus.Shared", "StockPlusPlus.Shared\StockPlusPlus.Shared.csproj", "{5E6AAA85-E011-43A6-A15A-A139F5F5E7F8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockPlusPlus.Data", "StockPlusPlus.Data\StockPlusPlus.Data.csproj", "{2B356D62-C41F-4575-A67D-2A10EF32D348}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockPlusPlus.API", "StockPlusPlus.API\StockPlusPlus.API.csproj", "{55183F24-9642-44F3-B930-D547980F3E97}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockPlusPlus.Web", "StockPlusPlus.Web\StockPlusPlus.Web.csproj", "{656427A0-3E14-4C43-B69B-0F259EDE18F5}"
 EndProject
