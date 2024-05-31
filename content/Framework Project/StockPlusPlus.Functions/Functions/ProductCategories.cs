@@ -24,7 +24,7 @@ namespace StockPlusPlus.Functions
         }
 
         [Function("ProductCategories")]
-        [TypeAuth(typeof(StockActionTrees), nameof(StockActionTrees.ProductCategory), Access.Read)]
+        [TypeAuth(typeof(StockPlusPlusActionTree), nameof(StockPlusPlusActionTree.ProductCategory), Access.Read)]
         public async Task<IActionResult> Get(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req)
         {

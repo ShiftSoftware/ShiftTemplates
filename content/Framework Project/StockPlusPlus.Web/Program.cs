@@ -90,9 +90,9 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
             Task.Run(async () => { categories = await httpService.GetFromJsonAsync<ODataDTO<ProductCategoryListDTO>>("/odata/ProductCategory"); })
         });
 
-        StockActionTrees.DataLevelAccess.ProductBrand.Expand(brands!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
+        StockPlusPlusActionTree.DataLevelAccess.ProductBrand.Expand(brands!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
 
-        StockActionTrees.DataLevelAccess.ProductCategory.Expand(categories!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
+        StockPlusPlusActionTree.DataLevelAccess.ProductCategory.Expand(categories!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
 #endif
     };
 
@@ -108,7 +108,7 @@ builder.Services.AddTypeAuth(x =>
     x
     .AddActionTree<ShiftSoftware.ShiftIdentity.Core.ShiftIdentityActions>()
 #if (includeSampleApp)
-    .AddActionTree<StockActionTrees>()
+    .AddActionTree<StockPlusPlusActionTree>()
     .AddActionTree<SystemActionTrees>()
 #endif
 );

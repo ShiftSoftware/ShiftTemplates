@@ -8,21 +8,21 @@
 <MudNavMenu>
     @*#if (includeSampleApp)*@
     <AuthorizedMudNavGroup Title="Products" Icon="@Icons.Material.Filled.Book" HideExpandIcon="!isDrawerOpen" TypeAuthActions="new List<ShiftSoftware.TypeAuth.Core.Actions.Action> {
-        StockPlusPlus.Shared.ActionTrees.StockActionTrees.ProductBrand,
-        StockPlusPlus.Shared.ActionTrees.StockActionTrees.ProductCategory,
+        StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand,
+        StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory,
     }">
         <AuthorizedMudNavLink Href="@($"/{nameof(ProductBrandList)}")"
-                              TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockActionTrees.ProductBrand"
+                              TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
                               Match="NavLinkMatch.All"
                               Icon="@Icons.Material.Outlined.Bookmarks">Brands</AuthorizedMudNavLink>
 
         <AuthorizedMudNavLink Href="@($"/{nameof(ProductCategoryList)}")"
-                              TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockActionTrees.ProductCategory"
+                              TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory"
                               Match="NavLinkMatch.All"
                               Icon="@Icons.Material.Outlined.Discount">Categories</AuthorizedMudNavLink>
 
         <AuthorizedMudNavLink Href="@($"/{nameof(ProductList)}")"
-                              TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockActionTrees.Product"
+                              TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Product"
                               Match="NavLinkMatch.All"
                               Icon="@Icons.Material.Outlined.Category">Products</AuthorizedMudNavLink>
     </AuthorizedMudNavGroup>

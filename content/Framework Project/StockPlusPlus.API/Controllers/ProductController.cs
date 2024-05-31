@@ -10,13 +10,13 @@ namespace StockPlusPlus.API.Controllers;
 [Route("api/[controller]")]
 public class ProductController : ShiftEntitySecureControllerAsync<ProductRepository, Data.Entities.Product, ProductListDTO, ProductDTO>
 {
-    public ProductController() : base(StockActionTrees.Product, x =>
+    public ProductController() : base(StockPlusPlusActionTree.Product, x =>
     {
-        x.FilterBy(x => x.ID, StockActionTrees.DataLevelAccess.ProductCategory)
+        x.FilterBy(x => x.ID, StockPlusPlusActionTree.DataLevelAccess.ProductCategory)
         .DecodeHashId<ProductCategoryListDTO>()
         .IncludeCreatedByCurrentUser(x => x.CreatedByUserID);
 
-        x.FilterBy(x => x.ID, StockActionTrees.DataLevelAccess.ProductBrand)
+        x.FilterBy(x => x.ID, StockPlusPlusActionTree.DataLevelAccess.ProductBrand)
         .IncludeCreatedByCurrentUser(x => x.CreatedByUserID);
     }
     )

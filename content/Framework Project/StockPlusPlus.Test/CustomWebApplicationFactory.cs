@@ -22,7 +22,7 @@ public class CustomWebApplicationFactory : ShiftCustomWebApplicationFactory<WebM
             TypeAuthActions = new List<Type>()
             {
 #if (includeSampleApp)
-                typeof(StockActionTrees)
+                typeof(StockPlusPlusActionTree)
 #endif
             }
         })

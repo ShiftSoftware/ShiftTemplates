@@ -56,7 +56,7 @@ var host = new HostBuilder()
             o.AddActionTree<ShiftIdentityActions>();
 #if (includeSampleApp)
             o.AddActionTree<StockPlusPlus.Shared.ActionTrees.SystemActionTrees>();
-            o.AddActionTree<StockPlusPlus.Shared.ActionTrees.StockActionTrees>();
+            o.AddActionTree<StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree>();
 #endif
         });
 

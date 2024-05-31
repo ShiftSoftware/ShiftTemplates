@@ -12,9 +12,9 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
 {
     private readonly ProductBrandRepository brandRepository;
     private readonly ProductCategoryRepository productCategoryRepository;
-    public ProductBrandController(ProductBrandRepository brandRepository, ProductCategoryRepository productCategoryRepository) : base(StockActionTrees.ProductBrand, x =>
+    public ProductBrandController(ProductBrandRepository brandRepository, ProductCategoryRepository productCategoryRepository) : base(StockPlusPlusActionTree.ProductBrand, x =>
     {
-        x.FilterBy(x => x.ID, StockActionTrees.DataLevelAccess.ProductBrand)
+        x.FilterBy(x => x.ID, StockPlusPlusActionTree.DataLevelAccess.ProductBrand)
         .IncludeCreatedByCurrentUser(x => x.CreatedByUserID);
     }
     )

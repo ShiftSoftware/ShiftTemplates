@@ -9,7 +9,7 @@ namespace StockPlusPlus.API.Controllers;
 [Route("api/[controller]")]
 public class CountryController : ShiftEntitySecureControllerAsync<CountryRepository, Data.Entities.Country, CountryDTO, CountryDTO>
 {
-    public CountryController() : base(StockActionTrees.Country)
+    public CountryController() : base(StockPlusPlusActionTree.Country)
     {
     }
 }

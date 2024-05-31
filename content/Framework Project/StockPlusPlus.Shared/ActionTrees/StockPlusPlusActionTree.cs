@@ -4,9 +4,10 @@ using ShiftSoftware.TypeAuth.Core.Actions;
 
 namespace StockPlusPlus.Shared.ActionTrees;
 
-[ActionTree("Stock", "Stock")]
-public class StockActionTrees
+[ActionTree("StockPlusPlus Actions", "StockPlusPlus Actions")]
+public class StockPlusPlusActionTree
 {
+#if (includeSampleApp)
     public readonly static ReadWriteDeleteAction ProductBrand = new("Brand");
     public readonly static ReadWriteDeleteAction ProductCategory = new("Product Category");
     public readonly static ReadWriteDeleteAction Product = new("Product");
@@ -19,4 +20,5 @@ public class StockActionTrees
         public readonly static DynamicReadWriteDeleteAction ProductBrand = new("Brand"); 
         public readonly static DynamicReadWriteDeleteAction ProductCategory = new("Product Category"); 
     }
+#endif
 }
