@@ -1,15 +1,18 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShiftSoftware.ShiftEntity.Web;
 using StockPlusPlus.Data.Repositories;
-using StockPlusPlus.Shared.ActionTrees;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
+#if (includeItemTemplateContent)
+using Microsoft.AspNetCore.Authorization;
+using StockPlusPlus.Shared.ActionTrees;
+#endif
 
 namespace StockPlusPlus.API.Controllers;
 
 [Route("api/[controller]")]
 public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBrandRepository, Data.Entities.ProductBrand, ProductBrandListDTO, ProductBrandDTO>
 {
+#if (includeItemTemplateContent)
     private readonly ProductBrandRepository brandRepository;
     private readonly ProductCategoryRepository productCategoryRepository;
     public ProductBrandController(ProductBrandRepository brandRepository, ProductCategoryRepository productCategoryRepository) : base(StockPlusPlusActionTree.ProductBrand, x =>
@@ -22,7 +25,13 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
         this.brandRepository = brandRepository;
         this.productCategoryRepository = productCategoryRepository;
     }
+#else
+    public ProductBrandController() : base(default!)
+    {
 
+    }
+#endif
+#if (includeItemTemplateContent)
     /// <summary>
     /// Added as a sample code For Documentation Only
     /// </summary>
@@ -87,4 +96,5 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
 
         return Ok(await brandRepository.ViewAsync(deletedBrand));
     }
+#endif
 }
