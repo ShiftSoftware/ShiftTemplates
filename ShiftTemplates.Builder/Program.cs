@@ -1,6 +1,9 @@
 ﻿using ShiftTemplates.Builder;
 
-new UpdateTemplateVersions().Update();
+if (args.Contains("--update-template-versions"))
+{
+    new UpdateTemplateVersions().Update();
+}
 
 if (!args.Contains("--skip-template-install"))
 {

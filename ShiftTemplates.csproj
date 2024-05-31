@@ -64,8 +64,8 @@
 	</ItemGroup>
 
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="dotnet run --project ShiftTemplates.Builder --skip-project --skip-template-install" />
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'!='DEBUG'">
+	  <Exec Command="dotnet run --project ShiftTemplates.Builder --skip-project --skip-template-install --update-template-versions" />
 	</Target>
 	
 </Project>

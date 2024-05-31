@@ -236,7 +236,7 @@
       "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2024.05.29.1"
+        "value": "To be set by ShiftTemplates.Builder build on release mode"
       },
       "datatype": "string",
       "generator": "constant"
@@ -246,7 +246,7 @@
       "description": "Replace AzureFunctionsAspNetCoreAuthorization Version",
       "replaces": "$(AzureFunctionsAspNetCoreAuthorizationVersion)",
       "parameters": {
-        "value": "0.0.9"
+        "value": "To be set by ShiftTemplates.Builder build on release mode"
       },
       "datatype": "string",
       "generator": "constant"
@@ -256,7 +256,7 @@
       "description": "Replace TypeAuth Version",
       "replaces": "$(TypeAuthVersion)",
       "parameters": {
-        "value": "1.5.6"
+        "value": "To be set by ShiftTemplates.Builder build on release mode"
       },
       "datatype": "string",
       "generator": "constant"
