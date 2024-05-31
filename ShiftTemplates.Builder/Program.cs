@@ -17,7 +17,7 @@ if (!args.Contains("--skip-project"))
         identityType: "Internal",
         addFunctions: true,
         addTest: true,
-        launch: false
+        launch: true
     );
 }
 
