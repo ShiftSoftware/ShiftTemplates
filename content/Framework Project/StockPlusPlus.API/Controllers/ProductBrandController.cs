@@ -26,7 +26,7 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
         this.productCategoryRepository = productCategoryRepository;
     }
 #else
-    public ProductBrandController() : base(default!)
+    public ProductBrandController() : base(null)
     {
 
     }

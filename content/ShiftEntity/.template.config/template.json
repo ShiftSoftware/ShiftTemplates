@@ -18,6 +18,15 @@
       "isRequired": true,
       "fileRename": "TheSolutionName",
       "replaces": "StockPlusPlus"
+    },
+    "typeAuthAction": {
+      "type": "generated",
+      "generator": "constant",
+      "datatype": "text",
+      "replaces": "StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand",
+      "parameters": {
+        "value": "null"
+      }
     }
   },
   "sourceName": "ProductBrand",
@@ -40,7 +49,10 @@
 
         "ShiftEntity/ProductBrand.cs",
 
-        "Framework Project/StockPlusPlus.API/Controllers/ProductBrandController.cs"
+        "Framework Project/StockPlusPlus.API/Controllers/ProductBrandController.cs",
+
+        "Framework Project/StockPlusPlus.Web/Pages/ProductBrand/ProductBrandForm.razor",
+        "Framework Project/StockPlusPlus.Web/Pages/ProductBrand/ProductBrandList.razor"
       ],
       "rename": {
         "Framework Project/StockPlusPlus.Shared/DTOs/ProductBrand/ProductBrandDTO.cs": "TheSolutionName.Shared/DTOs/ProductBrand/ProductBrandDTO.cs",
@@ -51,7 +63,10 @@
 
         "ShiftEntity/ProductBrand.cs": "TheSolutionName.Data/DBContext/ProductBrand.cs",
 
-        "Framework Project/StockPlusPlus.API/Controllers/ProductBrandController.cs": "TheSolutionName.API/Controllers/ProductBrandController.cs"
+        "Framework Project/StockPlusPlus.API/Controllers/ProductBrandController.cs": "TheSolutionName.API/Controllers/ProductBrandController.cs",
+
+        "Framework Project/StockPlusPlus.Web/Pages/ProductBrand/ProductBrandForm.razor": "TheSolutionName.Web/Pages/ProductBrand/ProductBrandForm.razor",
+        "Framework Project/StockPlusPlus.Web/Pages/ProductBrand/ProductBrandList.razor": "TheSolutionName.Web/Pages/ProductBrand/ProductBrandList.razor"
       }
     }
   ]

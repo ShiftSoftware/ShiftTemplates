@@ -1,7 +1,9 @@
 ﻿@attribute [Route($"/{nameof(ProductBrandForm)}/{{Key?}}")]
 
 @using StockPlusPlus.Shared.DTOs.ProductBrand
+@*#if (includeItemTemplateContent)*@
 @using StockPlusPlus.Shared.Enums
+@*#endif*@
 
 @inherits ShiftForm<ProductBrandForm, ProductBrandDTO>
 
@@ -12,7 +14,7 @@
                  Title="ProductBrand"
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
                  @bind-Key="@Key">
-
+    @*#if (includeItemTemplateContent)*@
     <LocalizedTextField @bind-Value="TheItem.Name"
                         For="() => TheItem.Name"
                         Label="Name" />
@@ -30,9 +32,10 @@
 
         <StockPlusPlus.Web.Pages.Product.Product.ProductList ProductBrandID="@TheItem.ID" />
     }
+    @*#endif*@
 </ShiftEntityForm>
 
-
+@*#if (includeItemTemplateContent)*@
 @code {
     [Parameter]
     public string? BrandName { get; set; }
@@ -45,3 +48,4 @@
         }
     }
 }
+@*#endif*@

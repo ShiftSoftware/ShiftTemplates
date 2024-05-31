@@ -13,7 +13,7 @@
             ShowIDColumn="true"
             TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
            EnableExport>
-
+    @*#if (includeItemTemplateContent)*@
     <ButtonColumn Property="x => x.Name" Title="Name" />
 
     <ForeignColumn Property="x => x.CreatedByUserID"
@@ -31,4 +31,5 @@
                    TProperty="string"
                    BaseUrlKey="ShiftIdentityApi"
                    EntitySet="IdentityTeam" />
+    @*#endif*@
 </ShiftList>
