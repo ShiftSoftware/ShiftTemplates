@@ -296,6 +296,8 @@ if (app.Environment.EnvironmentName != "Test")
         CompanyBranchExternalId = "-11",
         CompanyBranchShortCode = "SFT-EBL"
     });
+
+    await app.SetFullAccessAsync("t1", "t3");
 #endif
 }
 
