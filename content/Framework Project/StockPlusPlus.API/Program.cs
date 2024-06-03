@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ShiftSoftware.ShiftIdentity.Core;
-using StockPlusPlus.Data;
+using StockPlusPlus.Data.DbContext;
 using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 using ShiftSoftware.ShiftEntity.Web.Services;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
