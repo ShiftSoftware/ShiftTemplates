@@ -24,7 +24,7 @@ var host = new HostBuilder()
 
         x.AddShiftIdentity(issuer, key);
         x.AddGoogleReCaptcha("");
-        x.RequireValidModels();
+        x.RequireValidModels(true);
     })
     .ConfigureAppConfiguration(builder =>
     {
