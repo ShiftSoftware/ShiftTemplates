@@ -269,7 +269,10 @@ if (builder.Environment.IsDevelopment())
 var app = builder.Build();
 
 #if (externalShiftIdentityHosting)
-app.AddFakeIdentityEndPoints();
+if (builder.Environment.IsDevelopment())
+{
+    app.AddFakeIdentityEndPoints();
+}
 #endif
 //if (builder.Environment.IsDevelopment())
 //{
