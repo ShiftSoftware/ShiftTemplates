@@ -13,7 +13,7 @@ namespace StockPlusPlus.Data.Entities;
 #endif
 public class ProductBrand : ShiftEntity<ProductBrand>
 #if (includeItemTemplateContent)
-    ,IEntityHasTeam<ProductBrand>, IEntityHasRegion<ProductBrand>, IEntityHasCompany<ProductBrand>, IEntityHasCompanyBranch<ProductBrand>
+    ,IEntityHasTeam<ProductBrand>, IEntityHasRegion<ProductBrand>, IEntityHasCompany<ProductBrand>, IEntityHasCompanyBranch<ProductBrand>, IEntityHasIdempotencyKey<ProductBrand>
 #endif
 {
 #if (includeItemTemplateContent)
@@ -26,5 +26,6 @@ public class ProductBrand : ShiftEntity<ProductBrand>
     public long? RegionID { get; set; }
     public long? CompanyID { get; set; }
     public long? CompanyBranchID { get; set; }
+    public Guid? IdempotencyKey { get; set; }
 #endif
 }

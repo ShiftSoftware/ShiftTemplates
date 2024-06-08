@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockPlusPlus.Data.DbContext;
 
@@ -11,9 +12,11 @@ using StockPlusPlus.Data.DbContext;
 namespace StockPlusPlus.Data.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20240608132531_addIdempotencyKeyToProductBrand")]
+    partial class addIdempotencyKeyToProductBrand
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1365,9 +1368,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long?>("CreatedByUserID")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid?>("IdempotencyKey")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1415,10 +1415,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("CountryOfOriginID");
-
-                    b.HasIndex("IdempotencyKey")
-                        .IsUnique()
-                        .HasFilter("IdempotencyKey IS NOT NULL");
 
                     b.HasIndex("ProductBrandID");
 
@@ -1550,9 +1546,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("IdempotencyKey")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1589,10 +1582,6 @@ namespace StockPlusPlus.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("IdempotencyKey")
-                        .IsUnique()
-                        .HasFilter("IdempotencyKey IS NOT NULL");
 
                     b.ToTable("ProductCategories");
 
