@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -36,10 +37,16 @@ public class Function
 public class LoginDTO
 {
     [Required]
-    [MaxLength(10)]
+    [MaxLength(5)]
     public string Username { get; set; }
 
-    [Required]
-    [MinLength(3)]
     public string Password { get; set; }
+}
+
+public class LoginValidator : AbstractValidator<LoginDTO>
+{
+    public LoginValidator()
+    {
+        RuleFor(x => x.Password).NotEmpty().MinimumLength(3).Equal(nameof(LoginDTO.Username));
+    }
 }
