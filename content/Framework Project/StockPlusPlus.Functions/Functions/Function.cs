@@ -47,6 +47,6 @@ public class LoginValidator : AbstractValidator<LoginDTO>
 {
     public LoginValidator()
     {
-        RuleFor(x => x.Password).NotEmpty().MinimumLength(3).Equal(nameof(LoginDTO.Username));
+        RuleFor(x => x.Password).NotEmpty().MinimumLength(3).Equal(x=> x.Username);
     }
 }
