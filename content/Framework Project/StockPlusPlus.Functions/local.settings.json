@@ -11,5 +11,14 @@
     "Enabled": false,
     "ConnectionString": "",
     "DefaultDatabaseName": "test"
+  },
+  "FirebaseAppCheck": {
+    "ProjectNumber": "905344726828",
+    "ServiceAccount": ""
+  },
+  "HMS": {
+    "ClientID": "",
+    "ClientSecret": "",
+    "AppID": ""
   }
 }

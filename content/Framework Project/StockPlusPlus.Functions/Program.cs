@@ -18,13 +18,21 @@ using StockPlusPlus.Data.Repositories;
 using System.Security.Claims;
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWebApplication(x =>
+    .ConfigureFunctionsWebApplication((h, x) =>
     {
         var issuer= "Please-Change-This-Issuer";
         var key = "Please-Change-This-Key:one-two-three-four-five-six-seven-eight.one-two-three-four-five-six-seven-eight";
 
         x.AddShiftIdentity(issuer, key);
         x.AddGoogleReCaptcha("");
+
+        x.AddFirebaseAppCheck(
+           h.Configuration.GetValue<string>("FirebaseAppCheck:ProjectNumber")!,
+           h.Configuration.GetValue<string>("FirebaseAppCheck:ServiceAccount")!,
+           h.Configuration.GetValue<string>("HMS:ClientID")!,
+           h.Configuration.GetValue<string>("HMS:ClientSecret")!,
+           h.Configuration.GetValue<string>("HMS:AppId")!);
+
         x.RequireValidModels(true);
     })
     .ConfigureAppConfiguration(builder =>
