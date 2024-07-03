@@ -21,4 +21,6 @@ public class ProductCategory : ShiftEntity<ProductCategory>,
     public long? CompanyID { get; set; }
     public long? CompanyBranchID { get; set; }
     public Guid? IdempotencyKey { get; set; }
+
+    public virtual ICollection<Product> Products { get; set; } = new HashSet<Product>();
 }
