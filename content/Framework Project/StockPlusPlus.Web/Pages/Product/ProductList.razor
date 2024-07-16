@@ -1,6 +1,7 @@
 ﻿@attribute [Authorize]
 @attribute [Route($"/{nameof(ProductList)}")]
 
+@using ShiftSoftware.ShiftIdentity.Core.DTOs.City
 @using StockPlusPlus.Shared.DTOs.ProductBrand;
 @using StockPlusPlus.Shared.DTOs.Product
 @using System.Linq.Expressions;
@@ -55,6 +56,13 @@
                 TProperty="string"
                 EntitySet="ProductCategory"
                 OpenMode="ModalOpenMode.NewTab" />
+
+    <ForeignColumn Property="x => x.CityID"
+                   Title="City"
+                   T="ProductListDTO"
+                   TEntity="CityListDTO"
+                   TProperty="string"
+                   EntitySet="IdentityCity" />
     </ShiftList>
 
  @code {

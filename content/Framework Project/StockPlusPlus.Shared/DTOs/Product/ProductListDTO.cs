@@ -2,6 +2,7 @@
 using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
+using ShiftSoftware.ShiftEntity.Model.HashIds;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.Enums;
 using System.Text.Json.Serialization;
@@ -30,4 +31,7 @@ public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO
     public DateTimeOffset ReleaseDate { get; set; }
     public DateTimeOffset LastSaveDate { get; set; }
     public bool IsDraft { get; set; }
+
+    [CityHashIdConverter]
+    public string? CityID { get; set; }
 }
