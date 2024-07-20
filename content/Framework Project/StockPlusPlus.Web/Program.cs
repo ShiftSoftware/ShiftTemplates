@@ -98,6 +98,7 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
 
 #if (includeSampleApp)
     x.AddCompanyCustomField("SomeExternalLink", "Some External Link")
+    .AddCompanyCustomField("Password", "Password", true)
     .AddCompanyBranchCustomField("Username", "User Name")
     .AddCompanyBranchCustomField("Password", true);
 #endif
