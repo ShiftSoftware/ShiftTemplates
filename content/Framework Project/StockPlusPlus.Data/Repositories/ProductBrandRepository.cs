@@ -14,12 +14,11 @@ public class ProductBrandRepository : ShiftRepository<DB, Entities.ProductBrand,
     /// <summary>
     /// Implemented only to show that default methods can be overriden
     /// </summary>
-    /// <param name="showDeletedRows"></param>
     /// <param name="queryable"></param>
     /// <returns></returns>
-    public override IQueryable<ProductBrandListDTO> OdataList(bool showDeletedRows = false, IQueryable<Entities.ProductBrand>? queryable = null)
+    public override IQueryable<ProductBrandListDTO> OdataList(IQueryable<Entities.ProductBrand>? queryable = null)
     {
-        return base.OdataList(showDeletedRows, queryable);
+        return base.OdataList(queryable);
     }
 
 
