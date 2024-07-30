@@ -1,51 +1,13 @@
 ﻿@attribute [Route($"/{nameof(ProductBrandForm)}/{{Key?}}")]
 
-@using StockPlusPlus.Shared.DTOs.ProductBrand
-@*#if (includeItemTemplateContent)*@
-@using StockPlusPlus.Shared.Enums
-@*#endif*@
-
-@inherits ShiftForm<ProductBrandForm, ProductBrandDTO>
-
-<ShiftEntityForm @bind-Mode="Mode"
-                 @bind-Value="TheItem"
-                 @ref="FormContainer"
-                 Action="ProductBrand"
-                 Title="ProductBrand"
-                 TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
-                 @bind-Key="@Key">
-    @*#if (includeItemTemplateContent)*@
-    <LocalizedTextField @bind-Value="TheItem.Name"
-                        For="() => TheItem.Name"
-                        Label="Name" />
-
-    <ShiftAutocomplete Label="Assigned Team"
-                       @bind-Value="TheItem.Team"
-                       TEntitySet="ShiftSoftware.ShiftIdentity.Core.DTOs.Team.TeamListDTO"
-                       EntitySet="IdentityTeam"
-                       For="() => TheItem.Team" />
-
-    @if (Mode == FormModes.View)
-    {
-        <br />
-        <br />
-
-        <StockPlusPlus.Web.Pages.Product.Product.ProductList ProductBrandID="@TheItem.ID" />
-    }
-    @*#endif*@
-</ShiftEntityForm>
+<StockPlusPlus.WebComponents.Pages.ProductBrand.ProductBrandForm Key="@Key" BrandName="@BrandName"/>
 
 @*#if (includeItemTemplateContent)*@
 @code {
     [Parameter]
-    public string? BrandName { get; set; }
+    public string? Key { get; set; }
 
-    protected override void OnInitialized()
-    {
-        if (!string.IsNullOrWhiteSpace(BrandName))
-        {
-            TheItem.Name = BrandName;
-        }
-    }
+    [Parameter]
+    public string? BrandName { get; set; }
 }
 @*#endif*@

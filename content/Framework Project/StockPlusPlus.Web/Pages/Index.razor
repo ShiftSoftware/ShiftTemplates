@@ -1,46 +1,6 @@
 ﻿@page "/"
 @attribute [Authorize]
-@using ShiftSoftware.ShiftEntity.Model.Dtos
-@inject HttpClient Http
-@inject ODataQuery OData
-@inject ShiftModal ShiftModal
 
 <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Reverse>
-
-    <div class="clock">
-        <div class="week-name">
-            @Date.ToString("dddd")
-        </div>
-
-        <div class="date">
-            @Date.ToString("d MMMM yyyy")
-        </div>
-    </div>
+    <DateBig/>
 </MudStack>
-
-<style>
-    .clock {
-        border-left: 4px solid red;
-        padding: 8px 10px;
-        text-align: center;
-        display: inline-block;
-    }
-
-    .week-name {
-        font-size: 64px;
-        font-weight: bold;
-    }
-
-    .date {
-        font-size: 32px;
-    }
-</style>
-
-@code {
-    private DateTime Date = DateTime.Now;
-
-    public void OpenForm<T>(string id) where T : ComponentBase
-    {
-        _ = ShiftModal.Open<T>(id, ModalOpenMode.Popup);
-    }
-}

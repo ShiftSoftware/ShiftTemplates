@@ -21,6 +21,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\StockPlusPlus.Shared\StockPlusPlus.Shared.csproj" />
+		<ProjectReference Include="..\StockPlusPlus.WebComponents\StockPlusPlus.WebComponents.csproj" />
 		<!--#if shiftFrameworkDevelopmentMode-->
 		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.Blazor\ShiftIdentity.Dashboard.Blazor.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.Blazor\ShiftIdentity.Dashboard.Blazor.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Blazor\ShiftIdentity.Blazor.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Blazor\ShiftIdentity.Blazor.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />

@@ -1,0 +1,15 @@
+﻿@using StockPlusPlus.Shared.DTOs.Service
+
+<ShiftList EntitySet="Service"
+           Title="Service List"
+           T="ServiceListDTO"
+           Dense
+           DisableActionColumn
+           DisableAdd
+           ShowIDColumn="true"
+           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
+           EnableExport>
+
+    <PropertyColumn Property="x => x.Name" Title="Name" />
+
+</ShiftList>
