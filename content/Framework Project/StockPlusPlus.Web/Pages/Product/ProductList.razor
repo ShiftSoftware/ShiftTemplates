@@ -1,9 +1,74 @@
 ﻿@attribute [Authorize]
 @attribute [Route($"/{nameof(ProductList)}")]
 
-<StockPlusPlus.WebComponents.Pages.Product.ProductList ProductBrandID="@ProductBrandID" ProductCategoryID="@ProductCategoryID"/>
+@using ShiftSoftware.ShiftIdentity.Core.DTOs.City
+@using StockPlusPlus.Shared.DTOs.ProductBrand;
+@using StockPlusPlus.Shared.DTOs.Product
+@using System.Linq.Expressions;
+@using StockPlusPlus.Shared.DTOs.ProductCategory;
+@using StockPlusPlus.Web.Pages.ProductBrand;
+@using StockPlusPlus.Web.Pages.ProductCategory;
+
+<ShiftList EntitySet="Product"
+            Title="Product List"
+            T="ProductListDTO"
+            Dense
+            ComponentType="typeof(ProductForm)"
+            ShowIDColumn="true"
+            TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Product"
+            AddDialogParameters="AddDialogParameters"
+            EnableExport>
+
+    @if (ProductBrandID != null)
+    {
+        <FilterComponent Property="x => x.ProductBrandID" Operator="ODataOperator.Equal" Value="ProductBrandID" />
+    }
+
+    @if (ProductCategoryID != null)
+    {
+        <FilterComponent Property="x => x.ProductCategoryID" Operator="ODataOperator.Equal" Value="ProductCategoryID" />
+    }
+
+    <PropertyColumn Property="x => x.Name" Title="Name" />
+    <PropertyColumn Format="F" Property="x => x.LastSaveDate.DateTime" Title="SaveDate" />
+
+    <PropertyColumn Format="F" Property="x => x.ReleaseDate.DateTime" Title="Release Date">
+        <CellTemplate>
+            @if (context?.Item?.ReleaseDate.DateTime > DateTimeOffset.MinValue)
+            {
+                @context.Item.ReleaseDate.DateTime
+            }
+        </CellTemplate>
+    </PropertyColumn>
+
+    <ButtonColumn ComponentType="typeof(ProductBrandForm)" KeyPropertyName="@nameof(ProductListDTO.ProductBrandID)" Property="x => x.ProductBrand" Title="Brand">
+        <ButtonTemplate>
+            <MudChip T="string" Style="cursor: pointer;" Icon="@Icons.Material.Filled.BrandingWatermark" Variant="Variant.Outlined">@context</MudChip>
+        </ButtonTemplate>
+    </ButtonColumn>
+
+    <ForeignColumn IsButtonColumn
+                ComponentType="typeof(ProductCategoryForm)"
+                Property="x => x.ProductCategoryID"
+                Title="Category"
+                T="ProductListDTO"
+                TEntity="ProductCategoryListDTO"
+                TProperty="string"
+                EntitySet="ProductCategory"
+                OpenMode="ModalOpenMode.NewTab" />
+
+    <ForeignColumn Property="x => x.CityID"
+                   Title="City"
+                   T="ProductListDTO"
+                   TEntity="CityListDTO"
+                   TProperty="string"
+                   EntitySet="IdentityCity" />
+    </ShiftList>
 
  @code {
+
+    public Dictionary<string, string> AddDialogParameters = new();
+
     [Parameter]
     [SupplyParameterFromQuery]
     public string? ProductCategoryID { get; set; }
@@ -12,4 +77,18 @@
     [SupplyParameterFromQuery]
     public string? ProductBrandID { get; set; }
 
+    public string? Filters;
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrWhiteSpace(ProductCategoryID))
+        {
+            AddDialogParameters[nameof(ProductForm.ProductCategoryID)] = ProductCategoryID;
+        }
+
+        if (!string.IsNullOrWhiteSpace(ProductBrandID))
+        {
+            AddDialogParameters[nameof(ProductForm.ProductBrandID)] = ProductBrandID;
+        }
+    }
 }

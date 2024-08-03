@@ -1,11 +1,73 @@
 ﻿@attribute [Route($"/{nameof(ProductCategoryForm)}/{{Key?}}")]
 
-<StockPlusPlus.WebComponents.Pages.ProductCategory.ProductCategoryForm Key="@Key" ProductCategoryName="@ProductCategoryName"/>
+@using StockPlusPlus.Shared.DTOs.ProductCategory
+@using StockPlusPlus.Shared.Enums
+
+@inherits ShiftForm<ProductCategoryForm, ProductCategoryDTO>
+
+<ShiftEntityForm @bind-Mode="Mode"
+                 @bind-Value="TheItem"
+                 @ref="FormContainer"
+                 ShowPrint
+                 Action="ProductCategory"
+                 Title="Product Category"
+                 TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory"
+                 @bind-Key="@Key">
+
+    <LocalizedTextField @bind-Value="TheItem.Name"
+                        For="() => TheItem.Name"
+                        Label="Name" />
+
+    <MudTextFieldExtended OnlyValidateIfDirty="true"
+                          Label="Description"
+                          @bind-Value="TheItem.Description"
+                          For="@(() => TheItem.Description)" />
+
+    <MudTextFieldExtended OnlyValidateIfDirty="true"
+                          Label="Code"
+                          @bind-Value="TheItem.Code"
+                          For="@(() => TheItem.Code)" />
+
+    <FileUploader Url="/file/upload"
+                  ShowThumbnail="true"
+                  Label="Attachments"
+                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.SystemActionTrees.UploadFiles"
+                  For="() => TheItem.Photos"
+                  AcceptImages="true"
+                  @bind-Values="TheItem.Photos" />
+
+    <MudSelectExtended OnlyValidateIfDirty="true"
+                       T="TrackingMethod"
+                       Label="Tracking Method"
+                       AnchorOrigin="Origin.BottomCenter"
+                       @bind-Value="TheItem.TrackingMethod"
+                       For="@(() => TheItem.TrackingMethod)">
+
+        @foreach (var x in Enum.GetValues<TrackingMethod>())
+        {
+            <MudSelectItem Value="@x">@x.Describe()</MudSelectItem>
+        }
+    </MudSelectExtended>
+
+    @if (Mode == FormModes.View)
+    {
+        <br />
+        <br />
+
+        <ProductList ProductCategoryID="@TheItem.ID" />
+    }
+</ShiftEntityForm>
+
 
 @code {
     [Parameter]
-    public string? Key { get; set; }
-
-    [Parameter]
     public string? ProductCategoryName { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrWhiteSpace(ProductCategoryName))
+        {
+            TheItem.Name = ProductCategoryName;
+        }
+    }
 }

@@ -1,4 +1,17 @@
-﻿@attribute [Authorize]
+﻿@using StockPlusPlus.Shared.DTOs.Service
+@attribute [Authorize]
 @attribute [Route($"/{nameof(ServiceList)}")]
 
-<StockPlusPlus.WebComponents.Pages.Service.ServiceList/>
+<ShiftList EntitySet="Service"
+           Title="Service List"
+           T="ServiceListDTO"
+           Dense
+           DisableActionColumn
+           DisableAdd
+           ShowIDColumn="true"
+           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
+           EnableExport>
+
+    <PropertyColumn Property="x => x.Name" Title="Name" />
+
+</ShiftList>
