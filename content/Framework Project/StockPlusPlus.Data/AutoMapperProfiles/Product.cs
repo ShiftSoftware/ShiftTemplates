@@ -43,5 +43,11 @@ public class Product : Profile
             .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.ProductCategory == null ? null : src.ProductCategory.Name));
 
         CreateMap<Entities.Product, ProductModel>();
+
+        //When a custom mapping is written, the default mapping is not applied. So we need to call the default mapping methods.
+        CreateMap<Entities.Product, ProductDTO>()
+            .DefaultEntityToDtoAfterMap()
+            .ReverseMap()
+            .DefaultDtoToEntityAfterMap();
     }
 }
