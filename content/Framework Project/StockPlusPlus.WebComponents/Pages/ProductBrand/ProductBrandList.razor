@@ -1,7 +1,4 @@
-﻿@attribute [Authorize]
-@attribute [Route($"/{nameof(ProductBrandList)}")]
-
-@using StockPlusPlus.Shared.DTOs.ProductBrand
+﻿@using StockPlusPlus.Shared.DTOs.ProductBrand
 @using ShiftSoftware.ShiftIdentity.Core.DTOs.User
 
 <ShiftList EntitySet="ProductBrand"
@@ -9,9 +6,9 @@
            T="ProductBrandListDTO"
            Dense
            DisableActionColumn
-           ComponentType="typeof(ProductBrandForm)"
-           ShowIDColumn="true"
-           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
+            ComponentType="typeof(ProductBrandForm)"
+            ShowIDColumn="true"
+            TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
            EnableExport>
     @*#if (includeItemTemplateContent)*@
     <ButtonColumn Property="x => x.Name" Title="Name" />

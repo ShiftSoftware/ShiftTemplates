@@ -1,7 +1,4 @@
-﻿@attribute [Authorize]
-@attribute [Route($"/{nameof(ProductCategoryList)}")]
-
-@using StockPlusPlus.Shared.DTOs.ProductCategory
+﻿@using StockPlusPlus.Shared.DTOs.ProductCategory
 
 <ShiftList EntitySet="ProductCategory"
            Title="Product Category List"
@@ -14,5 +11,5 @@
            EnableExport>
     <ButtonColumn Property="x => x.Name" Title="Name" />
 
-    <PropertyColumn Title="Tracking Method" Property="x=> x.TrackingMethod!.Describe()" />
+    <PropertyColumn Title="Tracking Method" Property="x=> x.TrackingMethod!.Describe()"/>
 </ShiftList>

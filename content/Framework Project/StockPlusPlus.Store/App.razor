@@ -1,0 +1,14 @@
+﻿@using ShiftSoftware.ShiftIdentity.Blazor
+@using ShiftSoftware.ShiftIdentity.Core
+
+<CascadingAuthenticationState>
+    <DefaultApp AppTitle="Store App"
+                AppAssembly="@typeof(App).Assembly"
+                IdentityHostingType="shiftIdentityHostingTypes"
+                AdditionalAssemblies="additionalAssemblies">
+
+        <NavMenuTemplate Context="NavMenu">
+            <NavMenu isDrawerOpen="@NavMenu.IsOpen" />
+        </NavMenuTemplate>
+    </DefaultApp>
+</CascadingAuthenticationState>

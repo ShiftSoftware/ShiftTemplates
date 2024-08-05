@@ -39,7 +39,7 @@ builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Ass
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
 
 var cosmosConnectionString = builder.Configuration.GetValue<string>("CosmosDb:ConnectionString")!;
-if(!string.IsNullOrWhiteSpace(cosmosConnectionString))
+if (!string.IsNullOrWhiteSpace(cosmosConnectionString))
     builder.Services.AddSingleton(new CosmosClient(cosmosConnectionString));
 
 
@@ -130,7 +130,7 @@ mvcBuilder.AddShiftEntityWeb(x =>
 #endif
 });
 
-mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!, builder.Configuration.GetValue<string>("Settings:TokenSettings:Key")!);
+mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!, builder.Configuration.GetValue<string>("Settings:TokenSettings:PublicKey")!);
 
 #if (internalShiftIdentityHosting)
 
@@ -145,7 +145,7 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
         {
             ExpireSeconds = 60000,
             Issuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!,
-            Key = builder.Configuration.GetValue<string>("Settings:TokenSettings:Key")!,
+            RSAPrivateKeyBase64 = builder.Configuration.GetValue<string>("Settings:TokenSettings:PrivateKey")!,
         },
         Security = new SecuritySettingsModel
         {
@@ -153,12 +153,12 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
             LoginAttemptsForLockDown = 1000000,
             RequirePasswordChange = false
         },
-        RefreshToken = new TokenSettingsModel
+        RefreshToken = new RefreshTokenSettingsModel
         {
             Audience = "stock-plus-plus",
             ExpireSeconds = 100000,
             Issuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!,
-            Key = builder.Configuration.GetValue<string>("Settings:TokenSettings:Key")!,
+            Key = builder.Configuration.GetValue<string>("Settings:TokenSettings:RefreshTokenKey")!,
         },
         HashIdSettings = new HashIdSettings
         {
@@ -192,9 +192,9 @@ mvcBuilder.AddShiftEntityOdata(x =>
 {
     x.DefaultOptions();
     x.RegisterAllDTOs(typeof(StockPlusPlus.Shared.Marker).Assembly);
-    #if (includeSampleApp)
+#if (includeSampleApp)
     x.OdataEntitySet<ServiceListDTO>("Service");
-    #endif
+#endif
 #if (internalShiftIdentityHosting)
     x.RegisterShiftIdentityDashboardEntitySets();
 #endif
@@ -207,7 +207,7 @@ if (builder.Environment.IsDevelopment())
         new TokenSettingsModel
         {
             Issuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!,
-            Key = builder.Configuration.GetValue<string>("Settings:TokenSettings:Key")!,
+            RSAPrivateKeyBase64 = builder.Configuration.GetValue<string>("Settings:TokenSettings:PrivateKey")!,
             ExpireSeconds = 10000000
         }, new ShiftSoftware.ShiftIdentity.Core.DTOs.TokenUserDataDTO
         {
@@ -227,9 +227,9 @@ if (builder.Environment.IsDevelopment())
          {
         """
             {
-                "ShiftIdentityActions": ['r','w','d','m'],
-                "SystemActionTrees": ['r','w','d','m'],
-                "StockActionTrees": ['r','w','d','m']
+                "ShiftIdentityActions":[1,2,3,4],
+                "SystemActionTrees":[1,2,3,4],
+                "StockPlusPlusActionTree":[1,2,3,4]
             }
         """
          }
