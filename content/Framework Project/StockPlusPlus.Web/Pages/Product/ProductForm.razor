@@ -58,6 +58,23 @@
                                    QuickAddParameterName="@nameof(CountryForm.Name)"
                                    For="()=> TheItem.CountryOfOrigin" />
 
+    <ShiftAutocomplete Label="Company"
+                       TEntitySet="ShiftSoftware.ShiftIdentity.Core.DTOs.Company.CompanyListDTO"
+                       EntitySet="IdentityCompany"
+                       For="() => TheItem.Company"
+                       @bind-Value="TheItem.Company" />
+
+    <ShiftAutocomplete Label="Branch"
+                       TEntitySet="ShiftSoftware.ShiftIdentity.Core.DTOs.CompanyBranch.CompanyBranchListDTO"
+                       EntitySet="IdentityCompanyBranch"
+                       For="() => TheItem.CompanyBranch"
+                       Disabled="@(TheItem.Company == null)"
+                       Filter='x => x.Add(f => {
+                            f.Field = nameof(ShiftSoftware.ShiftIdentity.Core.DTOs.CompanyBranch.CompanyBranchListDTO.CompanyId);
+                            f.Value = (TheItem?.Company?.Data as ShiftSoftware.ShiftIdentity.Core.DTOs.Company.CompanyListDTO)?.ID;
+                        })'
+                       @bind-Value="TheItem.CompanyBranch" />
+
 </ShiftEntityForm>
 
 
