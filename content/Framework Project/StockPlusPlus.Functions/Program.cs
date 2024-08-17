@@ -11,6 +11,8 @@ using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using StockPlusPlus.Data.DbContext;
 #if (includeSampleApp)
 using StockPlusPlus.Data.Repositories;
+using StockPlusPlus.Functions;
+
 #endif
 
 #if (includeSampleApp)
@@ -45,20 +47,25 @@ var host = new HostBuilder()
     {
         services.AddValidatorsFromAssemblyContaining<Program>();
 
+        services.AddSingleton<OpenApiConfigurationOptions>();
+
+        services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
+
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
         services
         .AddShiftEntity(x =>
         {
+            x.AddDataAssembly(typeof(StockPlusPlus.Data.Marker).Assembly);
             x.HashId.RegisterHashId(false);
         })
-            .RegisterShiftEntityEfCoreTriggers()
-            .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")!));
+        .RegisterShiftEntityEfCoreTriggers()
+        .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")!));
 
 #if (includeSampleApp)
-        services.AddScoped<ProductCategoryRepository>()
-        .AddScoped<ProductBrandRepository>()
-        .AddScoped<ProductRepository>();
+        //services.AddScoped<ProductCategoryRepository>()
+        //.AddScoped<ProductBrandRepository>()
+        //.AddScoped<ProductRepository>();
 #endif
 
         services.AddShiftEntityCosmosDbReplication();
