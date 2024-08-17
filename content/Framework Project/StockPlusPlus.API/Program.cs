@@ -114,6 +114,7 @@ builder.Services.AddShiftEntityPrint(x =>
 
 mvcBuilder.AddShiftEntityWeb(x =>
 {
+    x.AddDataAssembly(typeof(StockPlusPlus.Data.Marker).Assembly);
     x.WrapValidationErrorResponseWithShiftEntityResponse(true);
     x.AddAutoMapper(typeof(StockPlusPlus.Data.Marker).Assembly);
 
