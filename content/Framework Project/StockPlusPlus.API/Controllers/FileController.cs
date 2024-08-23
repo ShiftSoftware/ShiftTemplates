@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ShiftSoftware.ShiftEntity.Core.Services;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
-using System.Drawing;
 using ShiftSoftware.TypeAuth.AspNetCore;
 using ShiftSoftware.TypeAuth.Core;
-using ShiftSoftware.ShiftEntity.Core.Services;
 using StockPlusPlus.Shared.ActionTrees;
+using System.Drawing;
 
 namespace StockPlusPlus.API.Controllers
 {
@@ -85,6 +85,26 @@ namespace StockPlusPlus.API.Controllers
             {
                 res.Message = new Message { Title = "Could not parse image" };
             }
+
+            return Ok(res);
+        }
+
+        [HttpPost("generate-file-upload-sas")]
+        [TypeAuth(typeof(SystemActionTrees), nameof(SystemActionTrees.UploadFiles), Access.Write)]
+        public  ActionResult<ShiftEntityResponse<List<ShiftFileDTO>>> GenerateFileUploadSAS([FromBody] List<ShiftFileDTO> files)
+        {
+            var res = new ShiftEntityResponse<List<ShiftFileDTO>>();
+
+            foreach (var file in files)
+            {
+                var AccountName = file.AccountName ?? azureStorageService.GetDefaultAccountName();
+
+                var ContainerName = file.ContainerName ?? azureStorageService.GetDefaultContainerName(AccountName);
+
+                file.Url = this.azureStorageService.GetSignedURL(file.Blob!, ContainerName, AccountName);
+            }
+
+            res.Entity = files;
 
             return Ok(res);
         }
