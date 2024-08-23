@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Storage.Sas;
+using Microsoft.AspNetCore.Mvc;
 using ShiftSoftware.ShiftEntity.Core.Services;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
@@ -91,9 +92,11 @@ namespace StockPlusPlus.API.Controllers
 
         [HttpPost("generate-file-upload-sas")]
         [TypeAuth(typeof(SystemActionTrees), nameof(SystemActionTrees.UploadFiles), Access.Write)]
-        public  ActionResult<ShiftEntityResponse<List<ShiftFileDTO>>> GenerateFileUploadSAS([FromBody] List<ShiftFileDTO> files)
+        public  ActionResult<ShiftEntityResponse<List<KeyValuePair<string, string>>>> GenerateFileUploadSAS([FromBody] List<ShiftFileDTO> files)
         {
-            var res = new ShiftEntityResponse<List<ShiftFileDTO>>();
+            var res = new ShiftEntityResponse<List<KeyValuePair<string, string>>>();
+
+            var fileSAS = new List<KeyValuePair<string, string>>();
 
             foreach (var file in files)
             {
@@ -101,10 +104,13 @@ namespace StockPlusPlus.API.Controllers
 
                 var ContainerName = file.ContainerName ?? azureStorageService.GetDefaultContainerName(AccountName);
 
-                file.Url = this.azureStorageService.GetSignedURL(file.Blob!, ContainerName, AccountName);
+                fileSAS.Add(new KeyValuePair<string, string>(
+                    file.Name!,
+                    this.azureStorageService.GetSignedURL(file.Blob!, BlobSasPermissions.All | BlobSasPermissions.Read, ContainerName, AccountName, 60))
+                );
             }
 
-            res.Entity = files;
+            res.Entity = fileSAS;
 
             return Ok(res);
         }
