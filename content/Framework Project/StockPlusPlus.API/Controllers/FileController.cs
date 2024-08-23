@@ -7,6 +7,7 @@ using ShiftSoftware.TypeAuth.AspNetCore;
 using ShiftSoftware.TypeAuth.Core;
 using StockPlusPlus.Shared.ActionTrees;
 using System.Drawing;
+using System.Text.Json;
 
 namespace StockPlusPlus.API.Controllers
 {
@@ -92,11 +93,9 @@ namespace StockPlusPlus.API.Controllers
 
         [HttpPost("generate-file-upload-sas")]
         [TypeAuth(typeof(SystemActionTrees), nameof(SystemActionTrees.UploadFiles), Access.Write)]
-        public  ActionResult<ShiftEntityResponse<List<KeyValuePair<string, string>>>> GenerateFileUploadSAS([FromBody] List<ShiftFileDTO> files)
+        public ActionResult<ShiftEntityResponse<List<ShiftFileDTO>>> GenerateFileUploadSAS([FromBody] List<ShiftFileDTO> files)
         {
-            var res = new ShiftEntityResponse<List<KeyValuePair<string, string>>>();
-
-            var fileSAS = new List<KeyValuePair<string, string>>();
+            var res = new ShiftEntityResponse<List<ShiftFileDTO>>();
 
             foreach (var file in files)
             {
@@ -104,15 +103,16 @@ namespace StockPlusPlus.API.Controllers
 
                 var ContainerName = file.ContainerName ?? azureStorageService.GetDefaultContainerName(AccountName);
 
-                fileSAS.Add(new KeyValuePair<string, string>(
-                    file.Name!,
-                    this.azureStorageService.GetSignedURL(file.Blob!, BlobSasPermissions.All | BlobSasPermissions.Read, ContainerName, AccountName, 60))
-                );
+                file.Url = this.azureStorageService.GetSignedURL(file.Blob!, BlobSasPermissions.Write | BlobSasPermissions.Read, ContainerName, AccountName, 60);
             }
 
-            res.Entity = fileSAS;
+            res.Entity = files;
 
-            return Ok(res);
+            return new ContentResult()
+            {
+                Content = JsonSerializer.Serialize(res, new JsonSerializerOptions { }),
+                ContentType = "application/json"
+            };
         }
     }
 }
