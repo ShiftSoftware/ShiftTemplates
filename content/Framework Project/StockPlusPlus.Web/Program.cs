@@ -56,7 +56,7 @@ builder.Services.AddShiftBlazor(config =>
             ["ShiftIdentityApi"] = shiftIdentityApiURL
         };
         options.ApiPath = "/api";
-        options.ODataPath = "/odata";
+        //options.ODataPath = "/odata";
         options.UserListEndpoint = shiftIdentityApiURL.AddUrlPath("IdentityPublicUser");
 #if (internalShiftIdentityHosting)
         options.AdditionalAssemblies = new[] { typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly };
@@ -86,8 +86,8 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
 
         await Task.WhenAll(new List<Task>
         {
-            Task.Run(async () => { brands = await httpService.GetFromJsonAsync<ODataDTO<ProductBrandListDTO>>("/odata/ProductBrand"); }),
-            Task.Run(async () => { categories = await httpService.GetFromJsonAsync<ODataDTO<ProductCategoryListDTO>>("/odata/ProductCategory"); })
+            Task.Run(async () => { brands = await httpService.GetFromJsonAsync<ODataDTO<ProductBrandListDTO>>("/api/ProductBrand"); }),
+            Task.Run(async () => { categories = await httpService.GetFromJsonAsync<ODataDTO<ProductCategoryListDTO>>("/api/ProductCategory"); })
         });
 
         StockPlusPlusActionTree.DataLevelAccess.ProductBrand.Expand(brands!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());

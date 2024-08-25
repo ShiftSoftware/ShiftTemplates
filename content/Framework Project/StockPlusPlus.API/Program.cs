@@ -189,17 +189,17 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
     }
 );
 #endif
-mvcBuilder.AddShiftEntityOdata(x =>
-{
-    x.DefaultOptions();
-    x.RegisterAllDTOs(typeof(StockPlusPlus.Shared.Marker).Assembly);
-#if (includeSampleApp)
-    x.OdataEntitySet<ServiceListDTO>("Service");
-#endif
-#if (internalShiftIdentityHosting)
-    x.RegisterShiftIdentityDashboardEntitySets();
-#endif
-});
+//mvcBuilder.AddShiftEntityOdata(x =>
+//{
+//    x.DefaultOptions();
+//    x.RegisterAllDTOs(typeof(StockPlusPlus.Shared.Marker).Assembly);
+//#if (includeSampleApp)
+//    x.OdataEntitySet<ServiceListDTO>("Service");
+//#endif
+//#if (internalShiftIdentityHosting)
+//    x.RegisterShiftIdentityDashboardEntitySets();
+//#endif
+//});
 
 #if (externalShiftIdentityHosting)
 if (builder.Environment.IsDevelopment())
