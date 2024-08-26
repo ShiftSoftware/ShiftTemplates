@@ -28,10 +28,9 @@
                           @bind-Value="TheItem.Code"
                           For="@(() => TheItem.Code)" />
 
-    <FileUploader Url="/file/generate-file-upload-sas"
-                  ShowThumbnail="true"
+    <FileUploader ShowThumbnail="true"
                   Label="Attachments"
-                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.SystemActionTrees.UploadFiles"
+                  TypeAuthAction="ShiftSoftware.ShiftEntity.Core.AzureStorageActionTree.UploadFiles"
                   For="() => TheItem.Photos"
                   AcceptImages="true"
                   @bind-Values="TheItem.Photos" />

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.Functions.Extensions;
 using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 using ShiftSoftware.ShiftIdentity.Core;
@@ -73,8 +74,8 @@ var host = new HostBuilder()
         services.AddTypeAuth((o) =>
         {
             o.AddActionTree<ShiftIdentityActions>();
+            o.AddActionTree<AzureStorageActionTree>();
 #if (includeSampleApp)
-            o.AddActionTree<StockPlusPlus.Shared.ActionTrees.SystemActionTrees>();
             o.AddActionTree<StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree>();
 #endif
         });

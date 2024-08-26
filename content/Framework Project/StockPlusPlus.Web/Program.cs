@@ -108,9 +108,9 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
 builder.Services.AddTypeAuth(x =>
     x
     .AddActionTree<ShiftSoftware.ShiftIdentity.Core.ShiftIdentityActions>()
+    .AddActionTree<ShiftSoftware.ShiftEntity.Core.AzureStorageActionTree>()
 #if (includeSampleApp)
     .AddActionTree<StockPlusPlusActionTree>()
-    .AddActionTree<SystemActionTrees>()
 #endif
 );
 

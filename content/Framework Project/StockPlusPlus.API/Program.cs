@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ShiftSoftware.ShiftIdentity.Core;
 using StockPlusPlus.Data.DbContext;
-using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 using ShiftSoftware.ShiftEntity.Web.Services;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using System.Globalization;
@@ -256,8 +255,8 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddTypeAuth((o) =>
 {
     o.AddActionTree<ShiftIdentityActions>();
+    o.AddActionTree<ShiftSoftware.ShiftEntity.Core.AzureStorageActionTree>();
 #if (includeSampleApp)
-    o.AddActionTree<StockPlusPlus.Shared.ActionTrees.SystemActionTrees>();
     o.AddActionTree<StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree>();
 #endif
 });
