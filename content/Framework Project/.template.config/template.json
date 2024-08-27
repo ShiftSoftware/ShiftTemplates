@@ -86,8 +86,7 @@
             "**/StockPlusPlus.Shared/Enums/*.cs",
             "**/StockPlusPlus.Test/Tests/*/**",
             "**/StockPlusPlus.Test/Tests/*.cs",
-            "**/StockPlusPlus.Web/Pages/*/**",
-            "**/StockPlusPlus.Web/Pages/*.razor"
+            "**/StockPlusPlus.Web/Pages/*/**"
           ],
           "condition": "(!includeSampleApp)"
         },
@@ -239,7 +238,7 @@
       "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2024.8.22.1"
+        "value": "2024.8.27.1"
       },
       "datatype": "string",
       "generator": "constant"
