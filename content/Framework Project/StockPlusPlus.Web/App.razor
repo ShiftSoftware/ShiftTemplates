@@ -7,8 +7,8 @@
                 IdentityHostingType="shiftIdentityHostingTypes"
                 AdditionalAssemblies="additionalAssemblies">
 
-        <NavMenuTemplate Context="NavMenu">
-            <NavMenu isDrawerOpen="@NavMenu.IsOpen" />
+        <NavMenuTemplate>
+            <NavMenu isDrawerOpen="@context.IsDrawerOpen" />
         </NavMenuTemplate>
     </DefaultApp>
 </CascadingAuthenticationState>
