@@ -10,9 +10,9 @@ using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using StockPlusPlus.Data.DbContext;
+using StockPlusPlus.Functions;
 #if (includeSampleApp)
 using StockPlusPlus.Data.Repositories;
-using StockPlusPlus.Functions;
 
 #endif
 
