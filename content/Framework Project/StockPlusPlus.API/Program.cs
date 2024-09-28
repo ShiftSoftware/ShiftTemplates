@@ -14,7 +14,7 @@ using StockPlusPlus.Shared.DTOs.Service;
 using StockPlusPlus.API.Services;
 using AutoMapper;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
-using ShiftSoftware.ShiftIdentity.Core.ReplicationModels;
+using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
 using ShiftSoftware.ShiftIdentity.Core.Entities;
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
 using ShiftSoftware.ShiftIdentity.AspNetCore;
