@@ -19,6 +19,7 @@ using System.Net.Http.Json;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
+using StockPlusPlus.Shared.Localization;
 #endif
 
 [assembly: RootNamespace("StockPlusPlus.Web")]
@@ -68,7 +69,7 @@ builder.Services.AddShiftBlazor(config =>
     };
 });
 
-builder.Services.AddShiftIdentity("StockPlusPlus-Dev", shiftIdentityApiURL, shiftIdentityFrontEndURL);
+builder.Services.AddShiftIdentity("StockPlusPlus-Dev", shiftIdentityApiURL, shiftIdentityFrontEndURL, false, typeof(IdentityResource));
 
 #if (internalShiftIdentityHosting)
 builder.Services.AddShiftIdentityDashboardBlazor(x =>
