@@ -33,6 +33,9 @@ steps:
  - script: git clone https://github.com/ShiftSoftware/AzureFunctionsAspNetCoreAuthorization.git ../AzureFunctionsAspNetCoreAuthorization
    displayName: 'Clone AzureFunctionsAspNetCoreAuthorization'
 
+ - script: git clone https://github.com/ShiftSoftware/ShiftFrameworkLocalization ../ShiftFrameworkLocalization
+   displayName: 'Clone ShiftFrameworkLocalization'
+
  - script: dotnet build --configuration release
    displayName: 'Build All Projects'
 
