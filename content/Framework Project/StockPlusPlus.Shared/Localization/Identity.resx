@@ -363,7 +363,7 @@
   <data name="Read" xml:space="preserve">
     <value>Read</value>
   </data>
-  <data name="Redirect Uri" xml:space="preserve">
+  <data name="Redirect URI" xml:space="preserve">
     <value>Redirect URI</value>
   </data>
   <data name="Region" xml:space="preserve">
