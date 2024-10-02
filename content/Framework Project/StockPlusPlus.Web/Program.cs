@@ -67,9 +67,11 @@ builder.Services.AddShiftBlazor(config =>
                .AddLanguage("en-US", "English RTL", true)
                .AddLanguage("ku-IQ", "Kurdish", true);
     };
+
+    config.LocalizationResource = typeof(Blazor);
 });
 
-builder.Services.AddShiftIdentity("StockPlusPlus-Dev", shiftIdentityApiURL, shiftIdentityFrontEndURL, false, typeof(IdentityResource));
+builder.Services.AddShiftIdentity("StockPlusPlus-Dev", shiftIdentityApiURL, shiftIdentityFrontEndURL, false, typeof(Identity));
 
 #if (internalShiftIdentityHosting)
 builder.Services.AddShiftIdentityDashboardBlazor(x =>

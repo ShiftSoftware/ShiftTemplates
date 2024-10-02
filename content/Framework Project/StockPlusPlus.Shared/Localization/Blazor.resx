@@ -1,0 +1,608 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ActionsColumnHeaderText" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="AddButtonChip" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="AddButtonTitleThumbnail" xml:space="preserve">
+    <value>Add Button</value>
+  </data>
+  <data name="AddNewItemTitle" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ApplyFilterButton" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="AppSettings" xml:space="preserve">
+    <value>App Settings</value>
+  </data>
+  <data name="BrandAutocompleteLabel" xml:space="preserve">
+    <value>Brand</value>
+  </data>
+  <data name="BrandColumnTitle" xml:space="preserve">
+    <value>Brand</value>
+  </data>
+  <data name="CancelChanges" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CancelConfirmText" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="CancelDeclineText" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="CancelWarningMessage" xml:space="preserve">
+    <value>You have unsaved changes, do you want to cancel?</value>
+  </data>
+  <data name="CancelWarningTitle" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="ClearAllFiles" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="ClearFilterButton" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="CloseButton" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="CloseModalButtonTitle" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="ClosePopupButtonLabel" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="CloseRevisions" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="ColumnChooserTitle" xml:space="preserve">
+    <value>Edit Columns</value>
+  </data>
+  <data name="ColumnEditorCloseMenuButton" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="ColumnEditorColumnHeader" xml:space="preserve">
+    <value>Column</value>
+  </data>
+  <data name="ColumnEditorResetSettingsButton" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="ColumnEditorStickyToggleHeader" xml:space="preserve">
+    <value>Sticky</value>
+  </data>
+  <data name="ColumnEditorVisiblityToggleHeader" xml:space="preserve">
+    <value>Visible</value>
+  </data>
+  <data name="ConfirmDefaultText" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="CopyActionFail" xml:space="preserve">
+    <value>Could not copy to clipboard</value>
+  </data>
+  <data name="CopyActionSuccess" xml:space="preserve">
+    <value>Copied to clipboard</value>
+  </data>
+  <data name="CopyButtonLabel" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="CreateForm" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="CreatingForm" xml:space="preserve">
+    <value>Creating new {0}</value>
+    <comment>0=title,1=id</comment>
+  </data>
+  <data name="DataGridItemPerPage" xml:space="preserve">
+    <value>DataGrid Items per page</value>
+  </data>
+  <data name="DataGridItemPerPageLabel" xml:space="preserve">
+    <value>Items per page</value>
+  </data>
+  <data name="DataGridSettings" xml:space="preserve">
+    <value>DataGrid Settings</value>
+  </data>
+  <data name="DateFormat" xml:space="preserve">
+    <value>Date format</value>
+  </data>
+  <data name="DefaultTitle" xml:space="preserve">
+    <value>Revisions</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteAccept" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteDecline" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="DeletedIndicator" xml:space="preserve">
+    <value>This item is deleted.</value>
+  </data>
+  <data name="DeleteWarningMessage" xml:space="preserve">
+    <value>Do you want to delete this item?</value>
+  </data>
+  <data name="DeleteWarningTitle" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="DialogDefaultCancel" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="DialogDefaultConfirm" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="DialogDefaultText" xml:space="preserve">
+    <value>Are you sure you want to perform this action on 1 item?</value>
+  </data>
+  <data name="DialogDefaultTextPlural" xml:space="preserve">
+    <value>Are you sure you want to perform this action on {0} items?</value>
+  </data>
+  <data name="DialogDefaultTitle" xml:space="preserve">
+    <value>Continue?</value>
+  </data>
+  <data name="DownloadFile" xml:space="preserve">
+    <value>Download File</value>
+  </data>
+  <data name="DraftColumnStateDraft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="DraftColumnStateFinal" xml:space="preserve">
+    <value>Final</value>
+  </data>
+  <data name="DraftVersionCheckboxLabel" xml:space="preserve">
+    <value>Draft Version</value>
+  </data>
+  <data name="DropdownNoItemsFound" xml:space="preserve">
+    <value>No Items Found, Add New</value>
+  </data>
+  <data name="DropdownViewButtonText" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="EditingForm" xml:space="preserve">
+    <value>Editing {0} ({1})</value>
+    <comment>0=title,1=id</comment>
+  </data>
+  <data name="ExportButtonTitle" xml:space="preserve">
+    <value>Export as CSV</value>
+  </data>
+  <data name="FileUploadSuccess" xml:space="preserve">
+    <value>File Uploaded Successfully</value>
+  </data>
+  <data name="FilterDeletedItemsTitle" xml:space="preserve">
+    <value>Filter deleted items</value>
+  </data>
+  <data name="FormCloseBehavior" xml:space="preserve">
+    <value>Form Close Behavior</value>
+  </data>
+  <data name="FormDefaultTitle" xml:space="preserve">
+    <value>Form</value>
+  </data>
+  <data name="FormSettings" xml:space="preserve">
+    <value>Form Settings</value>
+  </data>
+  <data name="GalleryDefaultTitle" xml:space="preserve">
+    <value>Gallery</value>
+  </data>
+  <data name="GridItemsLoadingText" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="IdColumnHeaderText" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="IdentityProfileButton" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="IsDeletedColumnHeaderText" xml:space="preserve">
+    <value>Is Deleted</value>
+  </data>
+  <data name="ItemCreated" xml:space="preserve">
+    <value>Item has been Created</value>
+  </data>
+  <data name="ItemSaved" xml:space="preserve">
+    <value>Item has been Saved</value>
+  </data>
+  <data name="ItemsPerPageLabel" xml:space="preserve">
+    <value>Rows per page:</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="ListDefaultTitle" xml:space="preserve">
+    <value>List</value>
+  </data>
+  <data name="LogoutButton" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="MaxAllowedFileUploadWarning" xml:space="preserve">
+    <value>Max file count for this form is {0}</value>
+  </data>
+  <data name="Maximize" xml:space="preserve">
+    <value>Maximize</value>
+  </data>
+  <data name="Minimize" xml:space="preserve">
+    <value>Minimize</value>
+  </data>
+  <data name="ModalClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="ModalClose1" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="ModalPosition" xml:space="preserve">
+    <value>Modal Position</value>
+  </data>
+  <data name="ModalSize" xml:space="preserve">
+    <value>Modal Size</value>
+  </data>
+  <data name="NewTab" xml:space="preserve">
+    <value>Open In New Tab</value>
+  </data>
+  <data name="NoFilesSelected" xml:space="preserve">
+    <value>No files attached</value>
+  </data>
+  <data name="NoItemsFound" xml:space="preserve">
+    <value>No Items Found.</value>
+  </data>
+  <data name="OkButton" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="Print" xml:space="preserve">
+    <value>Print</value>
+  </data>
+  <data name="ReadAccessDenied" xml:space="preserve">
+    <value>You can't View ({0})</value>
+  </data>
+  <data name="ReadAccessDenied1" xml:space="preserve">
+    <value>You can't access ({0})</value>
+  </data>
+  <data name="RefreshList" xml:space="preserve">
+    <value>Reload</value>
+  </data>
+  <data name="RemoveFile" xml:space="preserve">
+    <value>Remove File</value>
+  </data>
+  <data name="RevisionIndicator" xml:space="preserve">
+    <value>You are viewing a revision.</value>
+  </data>
+  <data name="Revisions" xml:space="preserve">
+    <value>View Revisions</value>
+  </data>
+  <data name="RevisionsTitle" xml:space="preserve">
+    <value>{0} Revisions</value>
+    <comment>0=title</comment>
+  </data>
+  <data name="SavedByColumnTitle" xml:space="preserve">
+    <value>Saved By</value>
+  </data>
+  <data name="SaveForm" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SelectAllButtonTitle" xml:space="preserve">
+    <value>Select All</value>
+  </data>
+  <data name="SelectColumnHeaderText" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="SelectedItemsCounterLabel" xml:space="preserve">
+    <value>{0} of {1} selected</value>
+    <comment>0=SelectedCount, 1=TotalCount</comment>
+  </data>
+  <data name="SettingsButton" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="SettingsHeader" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="ShowActiveOnlyOption" xml:space="preserve">
+    <value>Show Active Only</value>
+  </data>
+  <data name="ShowBothDeletedAndActiveOption" xml:space="preserve">
+    <value>Show all</value>
+  </data>
+  <data name="ShowDeletedOnlyOption" xml:space="preserve">
+    <value>Show Deleted Only</value>
+  </data>
+  <data name="SubmitTextDefault" xml:space="preserve">
+    <value>Submit</value>
+  </data>
+  <data name="TimeFormat" xml:space="preserve">
+    <value>Time Format</value>
+  </data>
+  <data name="ToggleViewMode" xml:space="preserve">
+    <value>Toggle View</value>
+  </data>
+  <data name="UploadFailedDefaultMessage" xml:space="preserve">
+    <value>File Upload Failed</value>
+  </data>
+  <data name="UploadInProgress" xml:space="preserve">
+    <value>Uploading in progress...</value>
+  </data>
+  <data name="ValidFromColumnTitle" xml:space="preserve">
+    <value>Valid From</value>
+  </data>
+  <data name="ValidToColumnTitle" xml:space="preserve">
+    <value>Valid To</value>
+  </data>
+  <data name="ViewGalleryButton" xml:space="preserve">
+    <value>Gallery</value>
+  </data>
+  <data name="ViewingForm" xml:space="preserve">
+    <value>Viewing {0} ({1})</value>
+    <comment>0=title,1=id</comment>
+  </data>
+  <data name="ViewItemButtonText" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="WriteAccessDenied" xml:space="preserve">
+    <value>You can't Create/Modify ({0})</value>
+  </data>
+  <data name="DataReadError" xml:space="preserve">
+    <value>Could not read server data</value>
+  </data>
+  <data name="DataParseError" xml:space="preserve">
+    <value>Could not read server data (parse error)</value>
+  </data>
+  <data name="DataReadEmptyError" xml:space="preserve">
+    <value>Could not read server data (empty content)</value>
+  </data>
+  <data name="DataReadStatusError" xml:space="preserve">
+    <value>Could not read server data ({0})</value>
+  </data>
+  <data name="HideDisabledColumnError" xml:space="preserve">
+    <value>Could not get or set column states</value>
+  </data>
+  <data name="ShiftListForeignColumnError" xml:space="preserve">
+    <value>Error processing foreign columns</value>
+  </data>
+  <data name="ShiftListFilterParseError" xml:space="preserve">
+    <value>Could not parse filter</value>
+  </data>
+  <data name="ActionButtonCreateError" xml:space="preserve">
+    <value>Could not execute this action.</value>
+  </data>
+  <data name="DateTimePickerTimeLabel" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="DateTimePickerDateLabel" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="LocalizedTextFieldError" xml:space="preserve">
+    <value>Could not create language fields</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Arabic" xml:space="preserve">
+    <value>Arabic</value>
+  </data>
+  <data name="Kurdish" xml:space="preserve">
+    <value>Kurdish</value>
+  </data>
+  <data name="FileUploaderError1" xml:space="preserve">
+    <value>Could not find file</value>
+  </data>
+  <data name="FileUploaderError2" xml:space="preserve">
+    <value>Something went wrong</value>
+  </data>
+  <data name="FileUploaderError3" xml:space="preserve">
+    <value>Something went wrong: {0}</value>
+  </data>
+  <data name="DefaultAppNotAuthorized" xml:space="preserve">
+    <value>Not Authorized</value>
+  </data>
+  <data name="DefaultAppRedirecting" xml:space="preserve">
+    <value>Redirecting...</value>
+  </data>
+  <data name="DefaultAppNotFoundTitle" xml:space="preserve">
+    <value>Not found</value>
+  </data>
+  <data name="DefaultAppNotFoundText" xml:space="preserve">
+    <value>Sorry, there's nothing at this address.</value>
+  </data>
+  <data name="DialogPositionCenter" xml:space="preserve">
+    <value>Center</value>
+  </data>
+  <data name="DialogPositionCenterLeft" xml:space="preserve">
+    <value>Center Left</value>
+  </data>
+  <data name="DialogPositionCenterRight" xml:space="preserve">
+    <value>Center Right</value>
+  </data>
+  <data name="DialogPositionTopCenter" xml:space="preserve">
+    <value>Top Center</value>
+  </data>
+  <data name="DialogPositionTopRight" xml:space="preserve">
+    <value>Top Right</value>
+  </data>
+  <data name="DialogPositionTopLeft" xml:space="preserve">
+    <value>Top Left</value>
+  </data>
+  <data name="DialogPositionBottomCenter" xml:space="preserve">
+    <value>Bottom Center</value>
+  </data>
+  <data name="DialogPositionBottomLeft" xml:space="preserve">
+    <value>Bottom Left</value>
+  </data>
+  <data name="DialogPositionBottomRight" xml:space="preserve">
+    <value>Bottom Right</value>
+  </data>
+  <data name="DialogPositionCustom" xml:space="preserve">
+    <value>Custom</value>
+  </data>
+  <data name="DialogSizeSmall" xml:space="preserve">
+    <value>Small</value>
+  </data>
+  <data name="DialogSizeExtraSmall" xml:space="preserve">
+    <value>Extra Small</value>
+  </data>
+  <data name="DialogSizeMedium" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="DialogSizeLarge" xml:space="preserve">
+    <value>Large</value>
+  </data>
+  <data name="DialogSizeExtraLarge" xml:space="preserve">
+    <value>Extra Large</value>
+  </data>
+  <data name="DialogSizeFalse" xml:space="preserve">
+    <value>False</value>
+  </data>
+  <data name="FormActionViewFormOnSave" xml:space="preserve">
+    <value>View Form On Save</value>
+  </data>
+  <data name="FormActionCloseFormOnSave" xml:space="preserve">
+    <value>Close Form On Save</value>
+  </data>
+  <data name="FormActionResetFormOnSave" xml:space="preserve">
+    <value>Reset Form On Save</value>
+  </data>
+  <data name="DialogSizeExtraExtraLarge" xml:space="preserve">
+    <value>Extra Extra Large</value>
+  </data>
+  <data name="FormTaskError" xml:space="preserve">
+    <value>Could not {0} the item.</value>
+  </data>
+  <data name="FormTaskCustom" xml:space="preserve">
+    <value>Custom</value>
+  </data>
+  <data name="FormTaskDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="FormTaskFetch" xml:space="preserve">
+    <value>Fetch</value>
+  </data>
+  <data name="FormTaskFetchRevisions" xml:space="preserve">
+    <value>Fetch Revisions</value>
+  </data>
+  <data name="FormTaskNone" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="FormTaskPrint" xml:space="preserve">
+    <value>Print</value>
+  </data>
+  <data name="FormTaskSave" xml:space="preserve">
+    <value>Save</value>
+  </data>
+</root>
