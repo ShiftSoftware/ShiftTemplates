@@ -20,6 +20,7 @@ using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
 using ShiftSoftware.ShiftIdentity.AspNetCore;
 using ShiftSoftware.ShiftEntity.Model.Enums;
 using StockPlusPlus.Data.DbContext;
+using StockPlusPlus.Shared.Localization;
 #endif
 #if (externalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
@@ -130,7 +131,7 @@ mvcBuilder.AddShiftEntityWeb(x =>
 #endif
 });
 
-mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!, builder.Configuration.GetValue<string>("Settings:TokenSettings:PublicKey")!);
+mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!, builder.Configuration.GetValue<string>("Settings:TokenSettings:PublicKey")!, typeof(Identity));
 
 #if (internalShiftIdentityHosting)
 

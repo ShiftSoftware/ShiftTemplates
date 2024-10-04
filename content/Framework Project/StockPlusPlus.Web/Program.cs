@@ -7,6 +7,7 @@ using ShiftSoftware.ShiftIdentity.Blazor.Extensions;
 using ShiftSoftware.ShiftIdentity.Blazor.Handlers;
 using ShiftSoftware.TypeAuth.Blazor.Extensions;
 using StockPlusPlus.Web;
+using StockPlusPlus.Shared.Localization;
 using System.Globalization;
 #if (internalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
@@ -19,7 +20,6 @@ using System.Net.Http.Json;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
-using StockPlusPlus.Shared.Localization;
 #endif
 
 [assembly: RootNamespace("StockPlusPlus.Web")]
