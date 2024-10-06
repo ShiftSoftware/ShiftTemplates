@@ -9,6 +9,7 @@ namespace StockPlusPlus.Data.Entities;
 [TemporalShiftEntity]
 public class Product : ShiftEntity<Product>,
     IEntityHasDraft<Product>, 
+    IEntityHasCountry<Product>,
     IEntityHasRegion<Product>, 
     IEntityHasCompany<Product>, 
     IEntityHasCompanyBranch<Product>, 
@@ -36,4 +37,5 @@ public class Product : ShiftEntity<Product>,
     public long? CompanyBranchID { get; set; }
     public Guid? IdempotencyKey { get; set; }
     public long? CityID { get; set; }
+    public long? CountryID { get; set; }
 }
