@@ -289,6 +289,9 @@ if (app.Environment.EnvironmentName != "Test")
 #if (internalShiftIdentityHosting)
     await app.SeedDBAsync("SuperUser", "OneTwo", new ShiftSoftware.ShiftIdentity.Data.DBSeedOptions
     {
+        CountryExternalId = "1",
+        CountryShortCode = "IQ",
+
         RegionExternalId = "1",
         RegionShortCode = "KRG",
 
