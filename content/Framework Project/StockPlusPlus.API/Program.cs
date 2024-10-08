@@ -291,6 +291,7 @@ if (app.Environment.EnvironmentName != "Test")
     {
         CountryExternalId = "1",
         CountryShortCode = "IQ",
+        CountryCallingCode = "+964",
 
         RegionExternalId = "1",
         RegionShortCode = "KRG",
