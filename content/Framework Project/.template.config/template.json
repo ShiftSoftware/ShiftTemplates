@@ -112,6 +112,11 @@
     }
   ],
   "symbols": {
+    "userSecretId": {
+      "type": "generated",
+      "generator": "guid",
+      "replaces": "9424fe73-f4dd-4d92-a137-deea3d0f1c46"
+    },
     "HostIdentifier": {
       "type": "bind",
       "binding": "host:HostIdentifier"
