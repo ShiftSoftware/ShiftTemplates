@@ -48,7 +48,7 @@ if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
 #if (internalShiftIdentityHosting)
     builder.Services.AddShiftEntityCosmosDbReplicationTrigger(x =>
     {
-        string databaseId = "test";
+        string databaseId = "Identity";
         var client = x.Services.GetRequiredService<CosmosClient>();
 
         x.SetUpReplication<DB, Service>(client, databaseId, null, false)
@@ -76,12 +76,17 @@ if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
             .Replicate<CompanyBranchSubItemModel>(ReplicationConfiguration.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
 
         x.SetUpReplication<DB, Region>(client, databaseId)
-            .Replicate<RegionModel>("Regions", x => x.id, x => x.RegionID, x => x.ItemType)
-            .UpdatePropertyReference<RegionModel, CompanyBranchModel>("CompanyBranches", x => x.City.Region,
+            .Replicate<RegionModel>(ReplicationConfiguration.CountryContainerName, x => x.CountryID, x => x.RegionID, x => x.ItemType)
+            .UpdatePropertyReference<CityRegionModel, CompanyBranchModel>("CompanyBranches", x => x.City.Region,
             (q, e) => q.Where(x => x.City.Region.id == e.Entity.ID.ToString() && x.ItemType == "Branch"));
 
+        x.SetUpReplication<DB, Country>(client, databaseId)
+            .Replicate<CountryModel>(ReplicationConfiguration.CountryContainerName, x => x.CountryID, x => x.RegionID, x => x.ItemType)
+            .UpdatePropertyReference<CountryModel, CompanyBranchModel>("CompanyBranches", x => x.City.Region.Country,
+            (q, e) => q.Where(x => x.City.Region.Country.id == e.Entity.ID.ToString() && x.ItemType == "Branch"));
+
         x.SetUpReplication<DB, City>(client, databaseId)
-            .Replicate<CityModel>("Regions", x => x.id, x => x.RegionID, x => x.ItemType,
+            .Replicate<CityModel>(ReplicationConfiguration.CountryContainerName, x => x.CountryID, x => x.RegionID, x => x.ItemType,
             e =>
             {
                 var mapper = e.Services.GetRequiredService<IMapper>();
@@ -91,7 +96,7 @@ if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
             (q, e) => q.Where(x => x.City.id == e.Entity.ID.ToString() && x.ItemType == "Branch"));
 
         x.SetUpReplication<DB, CompanyBranch>(client, databaseId)
-            .Replicate<CompanyBranchModel>("CompanyBranches", x => x.id, x => x.BranchID, x => x.ItemType);
+            .Replicate<CompanyBranchModel>("CompanyBranches", x => x.BranchID, x => x.ItemType);
 
         x.SetUpReplication<DB, Company>(client, databaseId)
             .Replicate<CompanyModel>("Companies", x=> x.id)
