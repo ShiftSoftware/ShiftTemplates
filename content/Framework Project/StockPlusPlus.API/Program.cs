@@ -172,7 +172,7 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
             UserIdsSalt = "k02iUHSb2ier9fiui02349AbfJEI",
             UserIdsMinHashLength = 5
         },
-        SASToken= new SASTokenModel
+        SASToken = new SASTokenModel
         {
             ExpiresInSeconds = 3600,
             Key = "One-Two-Three-Four-Five",
@@ -190,6 +190,10 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
             AccessTreeFeatureIsLocked = false,
             UserFeatureIsLocked = false,
             TeamFeatureIsLocked = false,
+        },
+        DynamicActionFilters = new DynamicActionFilters
+        {
+            DisableDefaultCountryFilter = true
         }
     }
 );
