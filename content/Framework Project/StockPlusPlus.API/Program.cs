@@ -136,7 +136,9 @@ mvcBuilder.AddShiftEntityWeb(x =>
 #endif
 });
 
-mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!, builder.Configuration.GetValue<string>("Settings:TokenSettings:PublicKey")!, typeof(Identity));
+mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!, 
+    builder.Configuration.GetValue<string>("Settings:TokenSettings:PublicKey")!,
+    typeof(Identity));
 
 #if (internalShiftIdentityHosting)
 
