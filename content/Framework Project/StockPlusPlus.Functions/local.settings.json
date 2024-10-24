@@ -20,5 +20,18 @@
     "ClientID": "",
     "ClientSecret": "",
     "AppID": ""
-  }
+  },
+  "Host": {
+    "CORS": "*"
+  },
+  "AzureStorageAccounts": [
+    {
+      "AccountName": "devstoreaccount1",
+      "AccountKey": "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==",
+      "ConnectionString": "UseDevelopmentStorage=true",
+      "DefaultContainerName": "development",
+      "EndPoint": "http://127.0.0.1:10000/devstoreaccount1",
+      "IsDefaultAccount": true
+    }
+  ]
 }

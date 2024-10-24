@@ -13,6 +13,8 @@ using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Functions;
 #if (includeSampleApp)
 using StockPlusPlus.Data.Repositories;
+using Microsoft.Extensions.Azure;
+
 
 #endif
 
@@ -59,9 +61,21 @@ var host = new HostBuilder()
         {
             x.AddDataAssembly(typeof(StockPlusPlus.Data.Marker).Assembly);
             x.HashId.RegisterHashId(false);
+
+            var azureStorageAccounts = new List<ShiftSoftware.ShiftEntity.Core.Services.AzureStorageOption>();
+
+            hostBuilder.Configuration.Bind("AzureStorageAccounts", azureStorageAccounts);
+
+            x.AddAzureStorage(azureStorageAccounts.ToArray());
         })
         .RegisterShiftEntityEfCoreTriggers()
         .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")!));
+
+        services.AddAzureClients(clientBuilder =>
+        {
+            clientBuilder.AddBlobServiceClient(hostBuilder.Configuration["devstoreaccount1:blob"]!);
+            clientBuilder.AddQueueServiceClient(hostBuilder.Configuration["devstoreaccount1:queue"]!);
+        });
 
 #if (includeSampleApp)
         //services.AddScoped<ProductCategoryRepository>()

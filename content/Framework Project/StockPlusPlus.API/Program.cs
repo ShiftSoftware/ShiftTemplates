@@ -20,6 +20,8 @@ using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
 using ShiftSoftware.ShiftIdentity.AspNetCore;
 using ShiftSoftware.ShiftEntity.Model.Enums;
 using StockPlusPlus.Data.DbContext;
+using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
+using Microsoft.Extensions.Azure;
 #endif
 #if (externalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
@@ -36,6 +38,7 @@ Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
 builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
 
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
+builder.Services.AddHttpClient();
 
 var cosmosConnectionString = builder.Configuration.GetValue<string>("CosmosDb:ConnectionString")!;
 if (!string.IsNullOrWhiteSpace(cosmosConnectionString))
@@ -265,6 +268,11 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddRazorPages();
 }
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["devstoreaccount1:blob"]!, preferMsi: true);
+    clientBuilder.AddQueueServiceClient(builder.Configuration["devstoreaccount1:queue"]!, preferMsi: true);
+});
 
 var app = builder.Build();
 

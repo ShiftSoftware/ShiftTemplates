@@ -19,6 +19,9 @@ using System.Net.Http.Json;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
+using Syncfusion.Blazor;
+using Syncfusion.Licensing;
+using ShiftSoftware.ShiftEntity.Core.Extensions;
 #endif
 
 [assembly: RootNamespace("StockPlusPlus.Web")]
@@ -45,6 +48,8 @@ shiftIdentityApiURL = string.IsNullOrWhiteSpace(shiftIdentityApiURL) ? baseUrl :
 var shiftIdentityFrontEndURL = builder.Configuration!.GetValue<string>("ShiftIdentityFrontEnd")!;
 shiftIdentityFrontEndURL = string.IsNullOrWhiteSpace(shiftIdentityFrontEndURL) ? baseUrl : shiftIdentityFrontEndURL; //Fallback to BaseURL if emtpy
 
+builder.Services.AddSyncfusionBlazor();
+SyncfusionLicenseProvider.RegisterLicense("");
 
 builder.Services.AddShiftBlazor(config =>
 {
