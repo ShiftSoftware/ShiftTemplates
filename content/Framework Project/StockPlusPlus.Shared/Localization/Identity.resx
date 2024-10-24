@@ -1,0 +1,510 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Access Tree" xml:space="preserve">
+    <value>Access Tree</value>
+  </data>
+  <data name="Access Tree Feature is locked" xml:space="preserve">
+    <value>Access Tree Feature is locked</value>
+  </data>
+  <data name="Access Tree List" xml:space="preserve">
+    <value>Access Tree List</value>
+  </data>
+  <data name="Access Trees" xml:space="preserve">
+    <value>Access Trees</value>
+  </data>
+  <data name="Action Tree" xml:space="preserve">
+    <value>Action Tree</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="Allow" xml:space="preserve">
+    <value>Allow</value>
+  </data>
+  <data name="App" xml:space="preserve">
+    <value>App</value>
+  </data>
+  <data name="App Feature is locked" xml:space="preserve">
+    <value>App Feature is locked</value>
+  </data>
+  <data name="App Id" xml:space="preserve">
+    <value>App Id</value>
+  </data>
+  <data name="App List" xml:space="preserve">
+    <value>App List</value>
+  </data>
+  <data name="Apps" xml:space="preserve">
+    <value>Apps</value>
+  </data>
+  <data name="Are you sure you want to randomly assign new passwords for the selected users?" xml:space="preserve">
+    <value>Are you sure you want to randomly assign new passwords for the selected users?</value>
+  </data>
+  <data name="Assign Random Passwords" xml:space="preserve">
+    <value>Assign Random Passwords</value>
+  </data>
+  <data name="Below Access Trees contain accesses that you can not grant" xml:space="preserve">
+    <value>Below Access Trees contain accesses that you can not grant</value>
+  </data>
+  <data name="Birth Date" xml:space="preserve">
+    <value>Birth Date</value>
+  </data>
+  <data name="Branch" xml:space="preserve">
+    <value>Branch</value>
+  </data>
+  <data name="Branches" xml:space="preserve">
+    <value>Branches</value>
+  </data>
+  <data name="Brand" xml:space="preserve">
+    <value>Brand</value>
+  </data>
+  <data name="Brand Feature is locked" xml:space="preserve">
+    <value>Brand Feature is locked</value>
+  </data>
+  <data name="Brand List" xml:space="preserve">
+    <value>Brand List</value>
+  </data>
+  <data name="Brands" xml:space="preserve">
+    <value>Brands</value>
+  </data>
+  <data name="Built-In Data can't be modified." xml:space="preserve">
+    <value>Built-In Data can't be modified.</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Choose a strong password" xml:space="preserve">
+    <value>Choose a strong password</value>
+  </data>
+  <data name="Cities" xml:space="preserve">
+    <value>Cities</value>
+  </data>
+  <data name="City" xml:space="preserve">
+    <value>City</value>
+  </data>
+  <data name="City Feature is locked" xml:space="preserve">
+    <value>City Feature is locked</value>
+  </data>
+  <data name="City List" xml:space="preserve">
+    <value>City List</value>
+  </data>
+  <data name="Companies" xml:space="preserve">
+    <value>Companies</value>
+  </data>
+  <data name="Company" xml:space="preserve">
+    <value>Company</value>
+  </data>
+  <data name="Company and Region can not be changed after creation." xml:space="preserve">
+    <value>Company and Region can not be changed after creation.</value>
+  </data>
+  <data name="Company Branch" xml:space="preserve">
+    <value>Company Branch</value>
+  </data>
+  <data name="Company Branch List" xml:space="preserve">
+    <value>Company Branch List</value>
+  </data>
+  <data name="Company Feature is locked" xml:space="preserve">
+    <value>Company Feature is locked</value>
+  </data>
+  <data name="Company List" xml:space="preserve">
+    <value>Company List</value>
+  </data>
+  <data name="Company Type" xml:space="preserve">
+    <value>Company Type</value>
+  </data>
+  <data name="Confirm Password" xml:space="preserve">
+    <value>Confirm Password</value>
+  </data>
+  <data name="Current Password" xml:space="preserve">
+    <value>Current Password</value>
+  </data>
+  <data name="Current Password is incorrect" xml:space="preserve">
+    <value>Current Password is incorrect</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Deny" xml:space="preserve">
+    <value>Deny</value>
+  </data>
+  <data name="Department" xml:space="preserve">
+    <value>Department</value>
+  </data>
+  <data name="Department Feature is locked" xml:space="preserve">
+    <value>Department Feature is locked</value>
+  </data>
+  <data name="Department List" xml:space="preserve">
+    <value>Department List</value>
+  </data>
+  <data name="Departments" xml:space="preserve">
+    <value>Departments</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Display Name" xml:space="preserve">
+    <value>Display Name</value>
+  </data>
+  <data name="Display Name is required" xml:space="preserve">
+    <value>Display Name is required</value>
+  </data>
+  <data name="Duplicate" xml:space="preserve">
+    <value>Duplicate</value>
+  </data>
+  <data name="Duplicate users are not allowed." xml:space="preserve">
+    <value>Duplicate users are not allowed.</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Email verification link sent successfully." xml:space="preserve">
+    <value>Email verification link sent successfully.</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Failed to genearate auth-code" xml:space="preserve">
+    <value>Failed to generate auth-code</value>
+  </data>
+  <data name="Failed to genearate token" xml:space="preserve">
+    <value>Failed to generate the token</value>
+  </data>
+  <data name="Forgot Password?" xml:space="preserve">
+    <value>Forgot Password?</value>
+  </data>
+  <data name="Full Name" xml:space="preserve">
+    <value>Full Name</value>
+  </data>
+  <data name="HQ Address" xml:space="preserve">
+    <value>HQ Address</value>
+  </data>
+  <data name="HQ Email" xml:space="preserve">
+    <value>HQ Email</value>
+  </data>
+  <data name="HQ Phone" xml:space="preserve">
+    <value>HQ Phone</value>
+  </data>
+  <data name="Integration ID" xml:space="preserve">
+    <value>Integration ID</value>
+  </data>
+  <data name="Invalid Phone Number" xml:space="preserve">
+    <value>Invalid Phone Number</value>
+  </data>
+  <data name="Invalid refresh token" xml:space="preserve">
+    <value>Invalid refresh token</value>
+  </data>
+  <data name="Last Seen" xml:space="preserve">
+    <value>Last Seen</value>
+  </data>
+  <data name="Latitude" xml:space="preserve">
+    <value>Latitude</value>
+  </data>
+  <data name="Legal Name" xml:space="preserve">
+    <value>Legal Name</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Longitude" xml:space="preserve">
+    <value>Longitude</value>
+  </data>
+  <data name="Max" xml:space="preserve">
+    <value>Max</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="New Password" xml:space="preserve">
+    <value>New Password</value>
+  </data>
+  <data name="New Password can not be the same as the current password" xml:space="preserve">
+    <value>New Password can not be the same as the current password</value>
+  </data>
+  <data name="No Items found." xml:space="preserve">
+    <value>No Items found.</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Password can not be empty." xml:space="preserve">
+    <value>Password can not be empty.</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Photos" xml:space="preserve">
+    <value>Photos</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="Read" xml:space="preserve">
+    <value>Read</value>
+  </data>
+  <data name="Redirect URI" xml:space="preserve">
+    <value>Redirect URI</value>
+  </data>
+  <data name="Region" xml:space="preserve">
+    <value>Region</value>
+  </data>
+  <data name="Region List" xml:space="preserve">
+    <value>Region List</value>
+  </data>
+  <data name="Regions" xml:space="preserve">
+    <value>Regions</value>
+  </data>
+  <data name="Reset Password" xml:space="preserve">
+    <value>Reset Password</value>
+  </data>
+  <data name="Reset password link has been sent to your email." xml:space="preserve">
+    <value>Reset password link has been sent to your email.</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Send login info to the user" xml:space="preserve">
+    <value>Send login info to the user</value>
+  </data>
+  <data name="Send Reset Password Link" xml:space="preserve">
+    <value>Send Reset Password Link</value>
+  </data>
+  <data name="Service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="Service Feature is locked" xml:space="preserve">
+    <value>Service Feature is locked</value>
+  </data>
+  <data name="Service List" xml:space="preserve">
+    <value>Service List</value>
+  </data>
+  <data name="Services" xml:space="preserve">
+    <value>Services</value>
+  </data>
+  <data name="Short Code" xml:space="preserve">
+    <value>Short Code</value>
+  </data>
+  <data name="Short Phone" xml:space="preserve">
+    <value>Short Phone</value>
+  </data>
+  <data name="Standard Working Day" xml:space="preserve">
+    <value>Standard Working Day</value>
+  </data>
+  <data name="Standard Working Hours" xml:space="preserve">
+    <value>Standard Working Hours</value>
+  </data>
+  <data name="Team" xml:space="preserve">
+    <value>Team</value>
+  </data>
+  <data name="Team Feature is locked" xml:space="preserve">
+    <value>Team Feature is locked</value>
+  </data>
+  <data name="Team List" xml:space="preserve">
+    <value>Team List</value>
+  </data>
+  <data name="Team Name" xml:space="preserve">
+    <value>Team Name</value>
+  </data>
+  <data name="Teams" xml:space="preserve">
+    <value>Teams</value>
+  </data>
+  <data name="the access tree name {0} already exists." xml:space="preserve">
+    <value>the access tree name {0} already exists.</value>
+  </data>
+  <data name="The App ID {0} already exists." xml:space="preserve">
+    <value>The App ID {0} already exists.</value>
+  </data>
+  <data name="The app is trying to access your account" xml:space="preserve">
+    <value>The app &lt;b&gt;'{0}'&lt;/b&gt; is trying to access your account</value>
+  </data>
+  <data name="The email {0} exist" xml:space="preserve">
+    <value>The email {0} exist</value>
+  </data>
+  <data name="The phone {0} exist" xml:space="preserve">
+    <value>The phone {0} exist</value>
+  </data>
+  <data name="The user is deactivated" xml:space="preserve">
+    <value>The user is deactivated</value>
+  </data>
+  <data name="The user will be redirected to" xml:space="preserve">
+    <value>The user will be redirected to</value>
+  </data>
+  <data name="The username {0} exist" xml:space="preserve">
+    <value>The username {0} exist</value>
+  </data>
+  <data name="This email address is verified" xml:space="preserve">
+    <value>This email address is verified</value>
+  </data>
+  <data name="This phone number is verified" xml:space="preserve">
+    <value>This phone number is verified</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="User Feature is locked" xml:space="preserve">
+    <value>User Feature is locked</value>
+  </data>
+  <data name="User is lockdown for {0} minutes" xml:space="preserve">
+    <value>User is locked down for {0} minutes</value>
+  </data>
+  <data name="User List" xml:space="preserve">
+    <value>User List</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="Username or password is incorrect" xml:space="preserve">
+    <value>Username or password is incorrect</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Users</value>
+  </data>
+  <data name="Validation Error" xml:space="preserve">
+    <value>Validation Error</value>
+  </data>
+  <data name="Verify Emails" xml:space="preserve">
+    <value>Verify Emails</value>
+  </data>
+  <data name="Verify Phones" xml:space="preserve">
+    <value>Verify Phones</value>
+  </data>
+  <data name="Write" xml:space="preserve">
+    <value>Write</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Your password reseted successfully" xml:space="preserve">
+    <value>Your password reseted successfully</value>
+  </data>
+  <data name="Security" xml:space="preserve">
+    <value>Security</value>
+  </data>
+  <data name="Contacts" xml:space="preserve">
+    <value>Contacts</value>
+  </data>
+  <data name="Change Password" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+</root>

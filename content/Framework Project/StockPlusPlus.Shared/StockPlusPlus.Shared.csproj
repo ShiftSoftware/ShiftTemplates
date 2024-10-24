@@ -24,4 +24,28 @@
 		<!--#endif -->
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Update="Localization\Blazor.Designer.cs">
+	    <DependentUpon>Blazor.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Localization\Identity.Designer.cs">
+	    <DependentUpon>Identity.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Localization\Blazor.resx">
+	    <LastGenOutput>Blazor.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Localization\Identity.resx">
+	    <LastGenOutput>Identity.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	  </EmbeddedResource>
+	</ItemGroup>
+
 </Project>

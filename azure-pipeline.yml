@@ -33,8 +33,15 @@ steps:
  - script: git clone https://github.com/ShiftSoftware/AzureFunctionsAspNetCoreAuthorization.git ../AzureFunctionsAspNetCoreAuthorization
    displayName: 'Clone AzureFunctionsAspNetCoreAuthorization'
 
+ - script: git clone https://github.com/ShiftSoftware/ShiftFrameworkLocalization ../ShiftFrameworkLocalization
+   displayName: 'Clone ShiftFrameworkLocalization'
+
  - script: dotnet build --configuration release
    displayName: 'Build All Projects'
+
+ - script: dotnet pack ../ShiftFrameworkLocalization/ShiftSoftwareLocalization --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
+   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 
+   displayName: 'pack ShiftSoftwareLocalization'
 
  - script: dotnet pack ../ShiftFrameworkTestingTools/ShiftFrameworkTestingTools --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
    condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) 

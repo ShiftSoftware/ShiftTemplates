@@ -7,6 +7,7 @@ using ShiftSoftware.ShiftIdentity.Blazor.Extensions;
 using ShiftSoftware.ShiftIdentity.Blazor.Handlers;
 using ShiftSoftware.TypeAuth.Blazor.Extensions;
 using StockPlusPlus.Web;
+using StockPlusPlus.Shared.Localization;
 using System.Globalization;
 #if (internalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
@@ -71,9 +72,11 @@ builder.Services.AddShiftBlazor(config =>
                .AddLanguage("en-US", "English RTL", true)
                .AddLanguage("ku-IQ", "Kurdish", true);
     };
+
+    config.LocalizationResource = typeof(Blazor);
 });
 
-builder.Services.AddShiftIdentity("StockPlusPlus-Dev", shiftIdentityApiURL, shiftIdentityFrontEndURL);
+builder.Services.AddShiftIdentity("StockPlusPlus-Dev", shiftIdentityApiURL, shiftIdentityFrontEndURL, false, typeof(Identity));
 
 #if (internalShiftIdentityHosting)
 builder.Services.AddShiftIdentityDashboardBlazor(x =>

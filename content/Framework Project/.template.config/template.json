@@ -112,6 +112,16 @@
     }
   ],
   "symbols": {
+    "userSecretId": {
+      "type": "generated",
+      "generator": "guid",
+      "replaces": "9424fe73-f4dd-4d92-a137-deea3d0f1c46"
+    },
+    "functionsUserSecretId": {
+      "type": "generated",
+      "generator": "guid",
+      "replaces": "1fad2a95-8f41-4ec1-bbd2-f40a3c3f86ac"
+    },
     "HostIdentifier": {
       "type": "bind",
       "binding": "host:HostIdentifier"
@@ -238,7 +248,7 @@
       "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2024.8.27.1"
+        "value": "2024.10.4.1"
       },
       "datatype": "string",
       "generator": "constant"

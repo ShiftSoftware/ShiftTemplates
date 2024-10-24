@@ -25,8 +25,8 @@ using System.Security.Claims;
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication((h, x) =>
     {
-        var issuer= "Please-Change-This-Issuer";
-        var key = "Please-Change-This-Key:one-two-three-four-five-six-seven-eight.one-two-three-four-five-six-seven-eight";
+        var issuer = "Please-Change-This-Issuer";
+        var key = "MIIBCgKCAQEAl4cuKYvpxSW723/Evi/fBvIQ97CjV56jivFx2sMRUs+qIZoFqGtcsg9xkcS0PjCPNyH9Db3oK1jSYNaWwGXvoP+ruVPJAKMRlvGyxPcD7roSOKQAbbzpsfkDBCIMexLlZ9r2DAcuz3CntFkQvf5rL5hpM905aHJmObNcRNzeKl12X/o9jEJcoxX8YZ3nEllGLRwCfox6f/a7aXeiT7HaHEzM1vj2VmDmUSq/HlGrd1+Q8uS6RWUWtCIYmifXQVIP3yr/3uCvw4nXC3CQesstzcmmDoiRPU88+ChG16RoA4UCFbqOG7Ce1q5gyfRR5mgu4s0TQUj4Q1KNfpKRU3BT3QIDAQAB";
 
         x.AddShiftIdentity(issuer, key);
         x.AddGoogleReCaptcha("");

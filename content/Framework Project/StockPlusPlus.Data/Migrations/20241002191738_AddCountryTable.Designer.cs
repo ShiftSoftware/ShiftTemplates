@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockPlusPlus.Data.DbContext;
 
@@ -11,9 +12,11 @@ using StockPlusPlus.Data.DbContext;
 namespace StockPlusPlus.Data.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20241002191738_AddCountryTable")]
+    partial class AddCountryTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -283,9 +286,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<bool>("BuiltIn")
                         .HasColumnType("bit");
 
-                    b.Property<long?>("CountryID")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTimeOffset>("CreateDate")
                         .HasColumnType("datetimeoffset");
 
@@ -448,9 +448,6 @@ namespace StockPlusPlus.Data.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<long?>("CompanyID")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("CountryID")
                         .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("CreateDate")
@@ -871,9 +868,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<bool>("BuiltIn")
                         .HasColumnType("bit");
 
-                    b.Property<long?>("CountryID")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTimeOffset>("CreateDate")
                         .HasColumnType("datetimeoffset");
 
@@ -913,8 +907,6 @@ namespace StockPlusPlus.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("CountryID");
 
                     b.ToTable("Regions", "ShiftIdentity");
 
@@ -1142,9 +1134,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long?>("CompanyID")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("CountryID")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTimeOffset>("CreateDate")
                         .HasColumnType("datetimeoffset");
 
@@ -1234,8 +1223,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.HasIndex("CompanyBranchID");
 
                     b.HasIndex("CompanyID");
-
-                    b.HasIndex("CountryID");
 
                     b.HasIndex("Email")
                         .IsUnique()
@@ -1449,9 +1436,6 @@ namespace StockPlusPlus.Data.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<long?>("CompanyID")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("CountryID")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("CountryOfOriginID")
@@ -1793,15 +1777,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Navigation("Service");
                 });
 
-            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Region", b =>
-                {
-                    b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.Country", "Country")
-                        .WithMany("Regions")
-                        .HasForeignKey("CountryID");
-
-                    b.Navigation("Country");
-                });
-
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Team", b =>
                 {
                     b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.Company", "Company")
@@ -1840,10 +1815,6 @@ namespace StockPlusPlus.Data.Migrations
                         .WithMany()
                         .HasForeignKey("CompanyID");
 
-                    b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.Country", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryID");
-
                     b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.Region", "Region")
                         .WithMany()
                         .HasForeignKey("RegionID");
@@ -1851,8 +1822,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Navigation("Company");
 
                     b.Navigation("CompanyBranch");
-
-                    b.Navigation("Country");
 
                     b.Navigation("Region");
                 });
@@ -1931,11 +1900,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Navigation("CompanyBranchServices");
 
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Country", b =>
-                {
-                    b.Navigation("Regions");
                 });
 
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Region", b =>
