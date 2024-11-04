@@ -1,3 +1,12 @@
-﻿@page "/filemanager"
+﻿@attribute [Route($"/filemanager/{{Root?}}")]
 
-<FileManager></FileManager>
+@if (Root is not null)
+{
+    <FileManager FileManagerRoot="@Root"></FileManager>
+}
+
+
+@code {
+    [Parameter]
+    public string Root { get; set; } = default!;
+}
