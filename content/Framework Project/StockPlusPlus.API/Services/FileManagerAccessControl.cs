@@ -1,18 +1,17 @@
 ﻿using Azure.Storage.Blobs;
+using ShiftSoftware.ShiftEntity.Model.Dtos;
 using ShiftSoftware.ShiftEntity.Web.Services;
-using Syncfusion.Blazor.FileManager;
-using static Grpc.Core.Metadata;
-using static MudBlazor.CategoryTypes;
+using Syncfusion.EJ2.FileManager.Base;
 
 namespace StockPlusPlus.API.Services;
 
 public class FileManagerAccessControl : IFileManagerAccessControl
 {
+    string permissions = "/Extra/Downloads|/Extra/{dealer_name} Downloads/{branch_name}|/Extra/{dealer_name} Downloads/Shared|/Extra/TOS/{dealer_name}/{branch_name}|/Extra/TOS/{dealer_name}/Shared|/Extra/TOS/Shared|/Extra/Business Report/{dealer_name}|/Extra/Business Report/Shared|/Extra/Best Practices/{dealer_name}|/Extra/Best Practices/Shared";
+    
     public async Task<List<Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent>> FilterWithReadAccessAsync(BlobContainerClient container, List<Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent> details)
     {
         var newDetails = new List<Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent>();
-
-        var permissions = "/Extra/Downloads|/Extra/{dealer_name} Downloads/{branch_name}|/Extra/{dealer_name} Downloads/Shared|/Extra/TOS/{dealer_name}/{branch_name}|/Extra/TOS/{dealer_name}/Shared|/Extra/TOS/Shared|/Extra/Business Report/{dealer_name}|/Extra/Business Report/Shared|/Extra/Best Practices/{dealer_name}|/Extra/Best Practices/Shared";
 
         foreach (var item in details)
         {
@@ -49,6 +48,46 @@ public class FileManagerAccessControl : IFileManagerAccessControl
         }
 
         return newDetails;
+    }
+
+    public List<ShiftFileDTO> FilterWithWriteAccess(List<ShiftFileDTO> files)
+    {
+        var newFiles = new List<ShiftFileDTO>();
+
+        foreach (var item in files)
+        {
+            if (!item.Blob!.StartsWith("Extra/"))
+            {
+                newFiles.Add(item);
+                continue;
+            }
+
+            var permission = UserCanRead_WritePath(item.Blob!, permissions, permissions, permissions, "Shift Software - HQ", "Shift Software", new List<string> { });
+
+            if (!permission.Write)
+                continue;
+
+            newFiles.Add(item);
+        }
+
+        return newFiles;
+    }
+
+    public List<FileManagerDirectoryContent> FilterWithDeleteAccess(FileManagerDirectoryContent[] data)
+    {
+        var newDirectoryContent = new List<FileManagerDirectoryContent>();
+
+        foreach (var item in data)
+        {
+            var permission = UserCanRead_WritePath(item.Path!, permissions, permissions, permissions, "Shift Software - HQ", "Shift Software", new List<string> { });
+
+            if (!permission.Remove)
+                continue;
+
+            newDirectoryContent.Add(item);
+        }
+
+        return newDirectoryContent;
     }
 
     public class DownloadableFileAccess
