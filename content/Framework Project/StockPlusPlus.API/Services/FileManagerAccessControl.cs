@@ -1,0 +1,117 @@
+﻿using Azure.Storage.Blobs;
+using ShiftSoftware.ShiftEntity.Web.Services;
+using Syncfusion.Blazor.FileManager;
+using static Grpc.Core.Metadata;
+using static MudBlazor.CategoryTypes;
+
+namespace StockPlusPlus.API.Services;
+
+public class FileManagerAccessControl : IFileManagerAccessControl
+{
+    public async Task<List<Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent>> FilterWithReadAccessAsync(BlobContainerClient container, List<Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent> details)
+    {
+        var newDetails = new List<Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent>();
+
+        var permissions = "/Extra/Downloads|/Extra/{dealer_name} Downloads/{branch_name}|/Extra/{dealer_name} Downloads/Shared|/Extra/TOS/{dealer_name}/{branch_name}|/Extra/TOS/{dealer_name}/Shared|/Extra/TOS/Shared|/Extra/Business Report/{dealer_name}|/Extra/Business Report/Shared|/Extra/Best Practices/{dealer_name}|/Extra/Best Practices/Shared";
+
+        foreach (var item in details)
+        {
+            var permission = UserCanRead_WritePath(item.Path, permissions, permissions, permissions, "Shift Software - HQ", "Shift Software", new List<string> { });
+
+            if (!permission.Read)
+                continue;
+
+            newDetails.Add(item);
+        }
+
+        foreach (var item in details.Where(x => x.Path.EndsWith("info.deleted")).ToList())
+        {
+            newDetails.Remove(item);
+
+            //Read content of the file
+            var blob = container.GetBlobClient(item.Path);
+
+            var content = await blob.DownloadContentAsync();
+
+            var contentString = content.Value.Content.ToString();
+
+            var deletedPaths = contentString.Split("\r\n").ToList().Where(x => !string.IsNullOrWhiteSpace(x));
+
+            foreach (var deletedPath in deletedPaths)
+            {
+                var deletedItem = newDetails.FirstOrDefault(x => x.Path.StartsWith(deletedPath) || $"/{x.Path}".StartsWith(deletedPath));
+
+                if (deletedItem != null)
+                {
+                    newDetails.Remove(deletedItem);
+                }
+            }
+        }
+
+        return newDetails;
+    }
+
+    public class DownloadableFileAccess
+    {
+        public bool Read { get; set; }
+        public bool Write { get; set; }
+        public bool Remove { get; set; }
+        public DownloadableFileAccess(bool read, bool write, bool remove)
+        {
+            this.Read = read;
+            this.Write = write;
+            this.Remove = remove;
+        }
+    }
+    public static DownloadableFileAccess UserCanRead_WritePath(string path, string readAccessPaths, string writeAccessPaths, string removeAccessPaths, string userBranchName, string divisionName, List<string> deletedPaths)
+    {
+        string shouldStartWith = "Extra";
+        path = path.Replace("//", "/");
+        path = path.TrimEnd('/');
+        var readAccess = false;
+        var writeAccess = false;
+        var removeAccess = false;
+        //var absolutePath = HostingEnvironment.MapPath("/" + path);
+        if (
+                (path.StartsWith(shouldStartWith) || path.StartsWith($"/{shouldStartWith}"))
+            //&& !ForbiddenPaths.Any(y => path.EndsWith(y))
+            //&& !(deletedPaths.Contains(absolutePath) && !ShiftSoftware.AuthorizationServer.AllPermissions.FileSystemPermissions.CanSeeRemovedFiles(loggedInUser))
+            )
+        {
+            //var readAccessPaths = ShiftSoftware.AuthorizationServer.AllPermissions.FileSystemPermissions.ReadAccessPaths(loggedInUser);
+            //var writeAccessPaths = ShiftSoftware.AuthorizationServer.AllPermissions.FileSystemPermissions.WriteAccessPaths(loggedInUser);
+            //var removeAccessPaths = ShiftSoftware.AuthorizationServer.AllPermissions.FileSystemPermissions.RemoveAccessPaths(loggedInUser);
+            readAccessPaths = readAccessPaths.Replace("{dealer_name}", divisionName);
+            writeAccessPaths = writeAccessPaths.Replace("{dealer_name}", divisionName);
+            removeAccessPaths = removeAccessPaths.Replace("{dealer_name}", divisionName);
+            readAccessPaths = readAccessPaths.Replace("{branch_name}", userBranchName);
+            writeAccessPaths = writeAccessPaths.Replace("{branch_name}", userBranchName);
+            removeAccessPaths = removeAccessPaths.Replace("{branch_name}", userBranchName);
+            foreach (var accessiblePath in readAccessPaths.Split('|'))
+            {
+                if (!string.IsNullOrEmpty(accessiblePath) && (path.StartsWith(accessiblePath) || ("/" + path).StartsWith(accessiblePath)) || readAccessPaths.Split('|').Any(x => x.StartsWith("/" + path + "/") || x.StartsWith(path + "/")))
+                {
+                    readAccess = true;
+                    break;
+                }
+            }
+            foreach (var writablePath in writeAccessPaths.Split('|'))
+            {
+                if (!string.IsNullOrEmpty(writablePath) && (path.StartsWith(writablePath) || ("/" + path).StartsWith(writablePath)))
+                {
+                    writeAccess = true;
+                    break;
+                }
+            }
+            foreach (var removablePath in removeAccessPaths.Split('|'))
+            {
+                if (!string.IsNullOrEmpty(removablePath) && (path.StartsWith(removablePath) || ("/" + path).StartsWith(removablePath)))
+                {
+                    removeAccess = true;
+                    break;
+                }
+            }
+        }
+        return new DownloadableFileAccess(readAccess, writeAccess, removeAccess);
+    }
+}

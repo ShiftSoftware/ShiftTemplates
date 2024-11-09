@@ -41,6 +41,8 @@ builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Ass
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
 builder.Services.AddHttpClient();
 
+builder.Services.AddScoped<IFileManagerAccessControl, FileManagerAccessControl>();
+
 var cosmosConnectionString = builder.Configuration.GetValue<string>("CosmosDb:ConnectionString")!;
 if (!string.IsNullOrWhiteSpace(cosmosConnectionString))
     builder.Services.AddSingleton(new CosmosClient(cosmosConnectionString));
