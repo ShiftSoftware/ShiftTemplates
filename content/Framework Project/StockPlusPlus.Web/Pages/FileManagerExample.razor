@@ -1,12 +1,15 @@
 ﻿@attribute [Route($"/filemanager/{{Root?}}")]
 
-@if (Root is not null)
+@if (Root is not null && InitialPath is not null)
 {
-    <FileManager FileManagerRoot="@Root"></FileManager>
+    <FileManager FileManagerRoot="@Root" InitialPath="@InitialPath"></FileManager>
 }
 
 
 @code {
     [Parameter]
     public string Root { get; set; } = default!;
+
+    [SupplyParameterFromQuery]
+    public string InitialPath { get; set; } = default!;
 }
