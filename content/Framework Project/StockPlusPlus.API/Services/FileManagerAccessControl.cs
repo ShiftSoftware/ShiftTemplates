@@ -5,7 +5,7 @@ using Syncfusion.EJ2.FileManager.Base;
 
 namespace StockPlusPlus.API.Services;
 
-public class FileManagerAccessControl : IFileManagerAccessControl
+public class FileManagerAccessControl : IFileExplorerAccessControl
 {
     string permissions = "/Extra/Downloads|/Extra/{dealer_name} Downloads/{branch_name}|/Extra/{dealer_name} Downloads/Shared|/Extra/TOS/{dealer_name}/{branch_name}|/Extra/TOS/{dealer_name}/Shared|/Extra/TOS/Shared|/Extra/Business Report/{dealer_name}|/Extra/Business Report/Shared|/Extra/Best Practices/{dealer_name}|/Extra/Best Practices/Shared";
     
