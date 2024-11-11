@@ -1,0 +1,11 @@
+﻿@attribute [Route($"/FileExplorer")]
+
+@if (Root is not null)
+{
+    <FileExplorer Root="@Root" RootAliasName="@Root.Split('/').LastOrDefault()"></FileExplorer>
+}
+
+@code {
+    [SupplyParameterFromQuery]
+    public string Root { get; set; } = default!;
+}
