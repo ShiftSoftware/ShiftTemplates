@@ -13,9 +13,6 @@ using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Functions;
 #if (includeSampleApp)
 using StockPlusPlus.Data.Repositories;
-using Microsoft.Extensions.Azure;
-
-
 #endif
 
 #if (includeSampleApp)
@@ -70,12 +67,6 @@ var host = new HostBuilder()
         })
         .RegisterShiftEntityEfCoreTriggers()
         .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")!));
-
-        services.AddAzureClients(clientBuilder =>
-        {
-            clientBuilder.AddBlobServiceClient(hostBuilder.Configuration["devstoreaccount1:blob"]!);
-            clientBuilder.AddQueueServiceClient(hostBuilder.Configuration["devstoreaccount1:queue"]!);
-        });
 
 #if (includeSampleApp)
         //services.AddScoped<ProductCategoryRepository>()
