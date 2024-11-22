@@ -60,7 +60,9 @@
         "ShiftFrameworkGlobalSettings.props",
         "**/StockPlusPlus.Data/Migrations/*.cs",
         "ShiftTemplates.Builder",
-        "TestProject"
+        "TestProject",
+        "StockPlusPlus.WebComponents/**/*",
+        "StockPlusPlus.Store/**/*"
       ],
       "modifiers": [
         {
