@@ -1,7 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using ShiftSoftware.ShiftEntity.Web.Services;
-using Syncfusion.EJ2.FileManager.Base;
 
 namespace StockPlusPlus.API.Services;
 
@@ -9,9 +8,9 @@ public class FileManagerAccessControl : IFileExplorerAccessControl
 {
     string permissions = "/Extra/Downloads|/Extra/{dealer_name} Downloads/{branch_name}|/Extra/{dealer_name} Downloads/Shared|/Extra/TOS/{dealer_name}/{branch_name}|/Extra/TOS/{dealer_name}/Shared|/Extra/TOS/Shared|/Extra/Business Report/{dealer_name}|/Extra/Business Report/Shared|/Extra/Best Practices/{dealer_name}|/Extra/Best Practices/Shared";
     
-    public async Task<List<Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent>> FilterWithReadAccessAsync(BlobContainerClient container, List<Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent> details)
+    public async Task<List<FileExplorerDirectoryContent>> FilterWithReadAccessAsync(BlobContainerClient container, List<FileExplorerDirectoryContent> details)
     {
-        var newDetails = new List<Syncfusion.EJ2.FileManager.Base.FileManagerDirectoryContent>();
+        var newDetails = new List<FileExplorerDirectoryContent>();
 
         foreach (var item in details)
         {
@@ -73,9 +72,9 @@ public class FileManagerAccessControl : IFileExplorerAccessControl
         return newFiles;
     }
 
-    public List<FileManagerDirectoryContent> FilterWithDeleteAccess(FileManagerDirectoryContent[] data)
+    public List<FileExplorerDirectoryContent> FilterWithDeleteAccess(FileExplorerDirectoryContent[] data)
     {
-        var newDirectoryContent = new List<FileManagerDirectoryContent>();
+        var newDirectoryContent = new List<FileExplorerDirectoryContent>();
 
         foreach (var item in data)
         {
