@@ -91,6 +91,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Localization", "Localizatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftSoftwareLocalization", "..\..\..\ShiftFrameworkLocalization\ShiftSoftwareLocalization\ShiftSoftwareLocalization.csproj", "{AF49ADB4-B36C-476B-AF0C-BC9277FFA8AF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockPlusPlus.Web.Tests", "StockPlusPlus.Web.Tests\StockPlusPlus.Web.Tests.csproj", "{8FF93190-7E36-4E40-9D1F-569CDAD1C752}"
+EndProject
 <!--#endif -->
 
 Global
@@ -212,6 +214,10 @@ Global
 		{AF49ADB4-B36C-476B-AF0C-BC9277FFA8AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF49ADB4-B36C-476B-AF0C-BC9277FFA8AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF49ADB4-B36C-476B-AF0C-BC9277FFA8AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FF93190-7E36-4E40-9D1F-569CDAD1C752}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FF93190-7E36-4E40-9D1F-569CDAD1C752}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FF93190-7E36-4E40-9D1F-569CDAD1C752}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FF93190-7E36-4E40-9D1F-569CDAD1C752}.Release|Any CPU.Build.0 = Release|Any CPU
 		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
