@@ -1,6 +1,6 @@
 ﻿@attribute [Route($"/FileExplorer")]
 
-<FileExplorer Root="@Root" RootAliasName="@Root?.Split('/').LastOrDefault()"></FileExplorer>
+<FileExplorer @key="Root" Root="@Root" RootAliasName="@Root?.Split('/').LastOrDefault()"></FileExplorer>
 
 @code {
     [SupplyParameterFromQuery]
