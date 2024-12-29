@@ -10,14 +10,14 @@
 @using StockPlusPlus.Web.Pages.ProductCategory;
 
 <ShiftList EntitySet="Product"
-            Title="Product List"
-            T="ProductListDTO"
-            Dense
-            ComponentType="typeof(ProductForm)"
-            ShowIDColumn="true"
-            TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Product"
-            AddDialogParameters="AddDialogParameters"
-            EnableExport>
+           Title="Product List"
+           T="ProductListDTO"
+           Dense
+           ComponentType="typeof(ProductForm)"
+           ShowIDColumn="true"
+           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Product"
+           AddDialogParameters="AddDialogParameters"
+           EnableExport>
 
     @if (ProductBrandID != null)
     {
@@ -48,24 +48,28 @@
     </ButtonColumn>
 
     <ForeignColumn IsButtonColumn
-                ComponentType="typeof(ProductCategoryForm)"
-                Property="x => x.ProductCategoryID"
-                Title="Category"
-                T="ProductListDTO"
-                TEntity="ProductCategoryListDTO"
-                TProperty="string"
-                EntitySet="ProductCategory"
-                OpenMode="ModalOpenMode.NewTab" />
+                   ComponentType="typeof(ProductCategoryForm)"
+                   Property="x => x.ProductCategoryID"
+                   Title="Category"
+                   T="ProductListDTO"
+                   TEntity="ProductCategoryListDTO"
+                   TProperty="string"
+                   EntitySet="ProductCategory"
+                   OpenMode="ModalOpenMode.NewTab" />
 
     <ForeignColumn Property="x => x.CityID"
                    Title="City"
                    T="ProductListDTO"
+                   ForeignEntiyField="@nameof(ProductListDTO.City)"
                    TEntity="CityListDTO"
                    TProperty="string"
                    EntitySet="IdentityCity" />
-    </ShiftList>
 
- @code {
+    <PropertyColumn Property="x => x.CustomID" Title="Custom ID" />
+
+</ShiftList>
+
+@code {
 
     public Dictionary<string, object> AddDialogParameters = new();
 
