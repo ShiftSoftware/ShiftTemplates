@@ -1,14 +1,21 @@
 ﻿@attribute [Route($"/{nameof(PerfTest2Form)}")]
 
-<div style="height: 500px; overflow: auto;">
-    
-
+<MudGrid Spacing="4">
+    <MudItem lg="3" md="4" sm="6" xs="12">
         <MudTextFieldExtended Label="TWC No."
                               @bind-Value="TheItem.TWCNo"
                               For="() => TheItem.TWCNo" />
+    </MudItem>
 
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">A1</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
 
-
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="2" md="2" sm="4" xs="6">
                         <MudTextFieldExtended Label="Dealer Code"
@@ -22,12 +29,17 @@
                                               For="() => TheItem.DealerClaimNo" />
                     </MudItem>
 
-                    <MudItem lg="3" md="3" sm="4" xs="6">
-                        <MudDatePickerExtended Label="Date of Receipt"
-                                               Clearable="true"
-                                               @bind-Date="TheItem.DateOfReceipt"
-                                               For="() => TheItem.DateOfReceipt" />
-                    </MudItem>
+                    @if (TheItem.WarrantyType == WarrantyTypes.VE.Key ||
+                    TheItem.WarrantyType == WarrantyTypes.SSC.Key
+                    )
+                    {
+                        <MudItem lg="3" md="3" sm="4" xs="6">
+                            <MudDatePickerExtended Label="Date of Receipt"
+                                                   Clearable="true"
+                                                   @bind-Date="TheItem.DateOfReceipt"
+                                                   For="() => TheItem.DateOfReceipt" />
+                        </MudItem>
+                    }
 
                     <MudItem lg="5" md="5" sm="12" xs="12">
                         <MudSelectExtended OnlyValidateIfDirty="true"
@@ -43,13 +55,24 @@
                         </MudSelectExtended>
                     </MudItem>
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
-        
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">A2</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="3" md="4" sm="6" xs="12">
                         <MudSelectExtended OnlyValidateIfDirty="true"
                                            T="string"
-                                           Label="Type"
+                                           Label="Warranty Type"
                                            AnchorOrigin="Origin.BottomCenter"
                                            @bind-Value="TheItem.WarrantyType"
                                            For="@(() => TheItem.WarrantyType)">
@@ -88,14 +111,114 @@
                             <MudSelectItem Value="@(Franchises.Lexus.Key)" T="string">@Franchises.Lexus.Value</MudSelectItem>
                         </MudSelectExtended>
                     </MudItem>
+
+
+                    @if (TheItem.WarrantyType == WarrantyTypes.P1.Key)
+                    {
+                        <MudItem lg="3" md="3" sm="4" xs="6">
+                            <MudDatePickerExtended Label="Previous Repair Date"
+                                                   Clearable="true"
+                                                   @bind-Date="TheItem.AcPreviousRepairDate"
+                                                   For="() => TheItem.AcPreviousRepairDate" />
+                        </MudItem>
+
+                        <MudItem lg="3" md="3" sm="4" xs="6">
+                            <MudNumericFieldExtended Label="Previous Repair KM"
+                                                     Format="#,0"
+                                                     Step="100"
+                                                     @bind-Value="TheItem.AcPreviousRepairKm"
+                                                     For="() => TheItem.AcPreviousRepairKm" />
+                        </MudItem>
+
+                        <MudItem lg="3" md="3" sm="4" xs="6">
+                            <MudTextFieldExtended Label="Previous Repair Order No"
+                                                  @bind-Value="TheItem.ACPreviousRepairOrderNo"
+                                                  For="() => TheItem.ACPreviousRepairOrderNo" />
+                        </MudItem>
+                    }
+
+                    @if (TheItem.WarrantyType == WarrantyTypes.P2.Key)
+                    {
+                        <MudItem lg="3" md="3" sm="4" xs="6">
+                            <MudTextFieldExtended Label="AcPrevious Invoice No"
+                                                  @bind-Value="TheItem.AcPreviousInvoiceNo"
+                                                  For="() => TheItem.AcPreviousInvoiceNo" />
+                        </MudItem>
+
+                        <MudItem lg="3" md="3" sm="4" xs="6">
+                            <MudDatePickerExtended Label="Previous Counter Sale Date"
+                                                   Clearable="true"
+                                                   @bind-Date="TheItem.AcPreviousRepairDate"
+                                                   For="() => TheItem.AcPreviousRepairDate" />
+                        </MudItem>
+
+                        <MudItem lg="3" md="3" sm="4" xs="6">
+                            <MudTextFieldExtended Label="Current Invoice No."
+                                                  @bind-Value="TheItem.AcCurrentInvoiceNo"
+                                                  For="() => TheItem.AcCurrentInvoiceNo" />
+                        </MudItem>
+
+                        <MudItem lg="3" md="3" sm="4" xs="6">
+                            <MudDatePickerExtended Label="Current Counter Sale Date"
+                                                   Clearable="true"
+                                                   @bind-Date="TheItem.RepairDate"
+                                                   For="() => TheItem.RepairDate" />
+                        </MudItem>
+                    }
+
+                    @if (TheItem.WarrantyType == WarrantyTypes.A1.Key || TheItem.WarrantyType == WarrantyTypes.A2.Key)
+                    {
+                        <MudItem lg="3" md="3" sm="4" xs="6">
+                            <MudDatePickerExtended Label="AC. Install Date"
+                                                   Clearable="true"
+                                                   @bind-Date="TheItem.AcInstallDate"
+                                                   For="() => TheItem.AcInstallDate" />
+                        </MudItem>
+
+                        <MudItem lg="3" md="3" sm="4" xs="6">
+                            <MudNumericFieldExtended Label="AC Install KM"
+                                                     Format="#,0"
+                                                     Step="100"
+                                                     @bind-Value="TheItem.AcInstallKm"
+                                                     For="() => TheItem.AcInstallKm" />
+                        </MudItem>
+                    }
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">A4</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
 
-
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
-                    <MudItem lg="1" md="3" sm="6" xs="12">
-                        <MudCheckBoxExtended Class="checkbox-with-border-bottom" Label="NV" T="bool" Size="Size.Small" />
-                    </MudItem>
+                    @if (TheItem.WarrantyType == WarrantyTypes.P2.Key)
+                    {
+                        <MudItem lg="1" md="3" sm="6" xs="12">
+                            <MudCheckBoxExtended Class="checkbox-with-border-bottom"
+                                                 Label="NV"
+                                                 Disabled
+                                                 Value="true"
+                                                 T="bool"
+                                                 Size="Size.Small" />
+                        </MudItem>
+                    }
+                    else
+                    {
+                        <MudItem lg="1" md="3" sm="6" xs="12">
+                            <MudCheckBoxExtended Class="checkbox-with-border-bottom"
+                                                 Label="NV"
+                                                 @bind-Value="TheItem.NV"
+                                                 For="@(() => TheItem.NV)"
+                                                 Size="Size.Small" />
+                        </MudItem>
+                    }
 
                     <MudItem lg="2" md="3" sm="6" xs="12">
                         <MudTextFieldExtended Label="WMI"
@@ -133,19 +256,23 @@
                                                For="() => TheItem.DeliveryDate" />
                     </MudItem>
 
-                    <MudItem lg="3" md="4" sm="6" xs="12">
-                        <MudDatePickerExtended Label="Repair (Open) Date"
-                                               Clearable="true"
-                                               @bind-Date="TheItem.RepairDate"
-                                               For="() => TheItem.RepairDate" />
-                    </MudItem>
+                    @if (TheItem.WarrantyType != WarrantyTypes.P2.Key)
+                    {
 
-                    <MudItem lg="3" md="4" sm="6" xs="12">
-                        <MudDatePickerExtended Label="Repair (Completion) Date"
-                                               Clearable="true"
-                                               @bind-Date="TheItem.RepairCompletionDate"
-                                               For="() => TheItem.RepairCompletionDate" />
-                    </MudItem>
+                        <MudItem lg="3" md="4" sm="6" xs="12">
+                            <MudDatePickerExtended Label="Repair (Open) Date"
+                                                   Clearable="true"
+                                                   @bind-Date="TheItem.RepairDate"
+                                                   For="() => TheItem.RepairDate" />
+                        </MudItem>
+
+                        <MudItem lg="3" md="4" sm="6" xs="12">
+                            <MudDatePickerExtended Label="Repair (Completion) Date"
+                                                   Clearable="true"
+                                                   @bind-Date="TheItem.RepairCompletionDate"
+                                                   For="() => TheItem.RepairCompletionDate" />
+                        </MudItem>
+                    }
 
                     <MudItem lg="3" md="4" sm="6" xs="12">
                         <MudNumericFieldExtended Label="Odometer"
@@ -169,9 +296,19 @@
                         </MudSelectExtended>
                     </MudItem>
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">A5</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
 
-
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="3" md="4" sm="6" xs="12">
                         <MudTextFieldExtended Label="Current Repair Order No."
@@ -192,8 +329,19 @@
                         </MudSelectExtended>
                     </MudItem>
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">B1 - Labor</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
 
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="11" md="11" sm="11" xs="11">
                         <MudGrid Spacing="3" Style="align-items: baseline;">
@@ -205,25 +353,20 @@
                                 <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Ope. M</MudText>
                             </MudItem>
 
-                            <MudItem lg="2" md="4" sm="6" xs="12">
+                            <MudItem lg="3" md="4" sm="6" xs="12">
                                 <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Operation No.</MudText>
                             </MudItem>
 
-                            <MudItem lg="1" md="4" sm="6" xs="12">
+                            <MudItem lg="2" md="4" sm="6" xs="12">
                                 <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Hour</MudText>
                             </MudItem>
 
-                            <MudItem lg="1" md="4" sm="6" xs="12">
-                                <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">TCA Hour</MudText>
-                            </MudItem>
-
-                            <MudItem lg="2" md="4" sm="6" xs="12">
-                                <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Amount</MudText>
-                            </MudItem>
-
-                            <MudItem lg="2" md="4" sm="6" xs="12">
-                                <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">TCA Amount</MudText>
-                            </MudItem>
+                            @if (isDistributor)
+                            {
+                                <MudItem lg="2" md="4" sm="6" xs="12">
+                                    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">TCA Hour</MudText>
+                                </MudItem>
+                            }
                         </MudGrid>
                     </MudItem>
 
@@ -252,13 +395,13 @@
                                                          Size="Size.Small" />
                                 </MudItem>
 
-                                <MudItem Class="pt-1 pb-1" lg="2" md="4" sm="6" xs="12">
+                                <MudItem Class="pt-1 pb-1" lg="3" md="4" sm="6" xs="12">
                                     <MudTextFieldExtended Label="Operation No."
                                                           @bind-Value="line.OperationNumber"
                                                           For="() => line.OperationNumber" />
                                 </MudItem>
 
-                                <MudItem Class="pt-1 pb-1" lg="1" md="4" sm="6" xs="12">
+                                <MudItem Class="pt-1 pb-1" lg="2" md="4" sm="6" xs="12">
                                     <MudNumericFieldExtended Label="Hour"
                                                              Format="0.0"
                                                              Step="0.1m"
@@ -266,29 +409,16 @@
                                                              For="() => line.Hour" />
                                 </MudItem>
 
-                                <MudItem Class="pt-1 pb-1" lg="1" md="4" sm="6" xs="12">
-                                    <MudNumericFieldExtended Label="TCA Hour"
-                                                             Format="0.0"
-                                                             Step="0.1m"
-                                                             @bind-Value="line.TCAHour"
-                                                             For="() => line.TCAHour" />
-                                </MudItem>
-
-                                <MudItem Class="pt-1 pb-1" lg="2" md="4" sm="6" xs="12">
-                                    <MudNumericFieldExtended Label="Amount"
-                                                             Format="#,0"
-                                                             Step="0.1m"
-                                                             @bind-Value="line.Amount"
-                                                             For="() => line.Amount" />
-                                </MudItem>
-
-                                <MudItem Class="pt-1 pb-1" lg="2" md="4" sm="6" xs="12">
-                                    <MudNumericFieldExtended Label="TCA Amount"
-                                                             Format="#,0"
-                                                             Step="0.1m"
-                                                             @bind-Value="line.TCAAmount"
-                                                             For="() => line.TCAAmount" />
-                                </MudItem>
+                                @if (isDistributor)
+                                {
+                                    <MudItem Class="pt-1 pb-1" lg="2" md="4" sm="6" xs="12">
+                                        <MudNumericFieldExtended Label="TCA Hour"
+                                                                 Format="0.0"
+                                                                 Step="0.1m"
+                                                                 @bind-Value="line.TCAHour"
+                                                                 For="() => line.TCAHour" />
+                                    </MudItem>
+                                }
                             </MudGrid>
                         </MudItem>
 
@@ -318,43 +448,66 @@
                         </MudButton>
                     }
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">B2 - Labor</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
 
-
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="2" md="3" sm="6" xs="12">
                         <MudField Variant="Variant.Outlined" Label="Labor Rate">
-                            $0.00
+                            @TheItem.LaborRate.ToCurrencyFormat()
                         </MudField>
                     </MudItem>
 
                     <MudItem lg="2" md="3" sm="6" xs="12">
                         <MudField Variant="Variant.Outlined" Label="Labor Total (Hrs)">
-                            0
+                            @TheItem.HourTotal
                         </MudField>
                     </MudItem>
 
                     <MudItem lg="2" md="3" sm="6" xs="12">
                         <MudField Variant="Variant.Outlined" Label="Labor Total (Amount)">
-                            $0.00
+                            @TheItem.LaborTotalAmount.ToCurrencyFormat()
                         </MudField>
                     </MudItem>
 
-                    <MudItem lg="2" md="3" sm="6" xs="12">
-                        <MudField Variant="Variant.Outlined" Label="TCA Labor Total (Hrs)">
-                            0
-                        </MudField>
-                    </MudItem>
+                    @if (isDistributor)
+                    {
+                        <MudItem lg="2" md="3" sm="6" xs="12">
+                            <MudField Variant="Variant.Outlined" Label="TCA Labor Total (Hrs)">
+                                @TheItem.HourTotalTCA
+                            </MudField>
+                        </MudItem>
 
-                    <MudItem lg="2" md="3" sm="6" xs="12">
-                        <MudField Variant="Variant.Outlined" Label="TCA Labor Total (Amount)">
-                            $0.00
-                        </MudField>
-                    </MudItem>
+                        <MudItem lg="2" md="3" sm="6" xs="12">
+                            <MudField Variant="Variant.Outlined" Label="TCA Labor Total (Amount)">
+                                @TheItem.LaborTotalAmountTCA.ToCurrencyFormat()
+                            </MudField>
+                        </MudItem>
+                    }
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">C1 - Sublet</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
 
-
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="11" md="11" sm="11" xs="11">
                         <MudGrid Spacing="3" Style="align-items: baseline;">
@@ -430,7 +583,7 @@
 
                                 <MudItem Class="pt-1 pb-1" lg="2" md="4" sm="6" xs="12">
                                     <MudNumericFieldExtended Label="Amount"
-                                                             Format="#,0"
+                                                             Format="#,0.00"
                                                              Step="0.1m"
                                                              @bind-Value="line.Amount"
                                                              For="() => line.Amount" />
@@ -470,19 +623,47 @@
                         </MudButton>
                     }
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">C2 - Sublet</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
 
-
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
-                    <MudItem lg="2" md="3" sm="6" xs="12">
+                    <MudItem lg="4" md="6" sm="6" xs="12">
+                        <MudTextFieldExtended Label="Sublet Description"
+                                              @bind-Value="TheItem.SubletDescription"
+                                              For="() => TheItem.SubletDescription" />
+                    </MudItem>
+
+                    <MudItem lg="8" md="6" sm="6" xs="12"></MudItem>
+
+                    <MudItem lg="4" md="6" sm="6" xs="12">
                         <MudField Variant="Variant.Outlined" Label="Sublet Total">
-                            $0.00
+                            @TheItem.SubletTotalAmount.ToCurrencyFormat()
                         </MudField>
                     </MudItem>
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">D1 - T Codes</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
 
-
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="5" md="5" sm="12" xs="12">
                         <MudGrid Spacing="3">
@@ -542,9 +723,19 @@
                                               For="() => TheItem.T3_7" />
                     </MudItem>
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
+    <MudItem lg="4" md="4" sm="6" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">E1 - Condition</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
 
- 
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="12" md="12" sm="12" xs="12">
                         <MudTextFieldExtended Label="Condition"
@@ -552,9 +743,19 @@
                                               For="() => TheItem.Condition" />
                     </MudItem>
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
+    <MudItem lg="4" md="4" sm="6" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">E2 - Cause</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
 
-
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="12" md="12" sm="12" xs="12">
                         <MudTextFieldExtended Label="Cause"
@@ -562,9 +763,19 @@
                                               For="() => TheItem.Cause" />
                     </MudItem>
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
+    <MudItem lg="4" md="4" sm="6" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">E1 - Remedy</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
 
-
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="12" md="12" sm="12" xs="12">
                         <MudTextFieldExtended Label="Remedy"
@@ -572,7 +783,19 @@
                                               For="() => TheItem.Remedy" />
                     </MudItem>
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">F1 - Parts</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="11" md="11" sm="11" xs="11">
                         <MudGrid Spacing="3" Style="align-items: baseline;">
@@ -601,12 +824,15 @@
                             </MudItem>
 
                             <MudItem lg="1" md="4" sm="6" xs="12">
-                                <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Amount</MudText>
+                                <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Price</MudText>
                             </MudItem>
 
-                            <MudItem lg="1" md="4" sm="6" xs="12">
-                                <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">TCA Amount</MudText>
-                            </MudItem>
+                            @if (isDistributor)
+                            {
+                                <MudItem lg="1" md="4" sm="6" xs="12">
+                                    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">TCA Price</MudText>
+                                </MudItem>
+                            }
                         </MudGrid>
                     </MudItem>
 
@@ -664,20 +890,23 @@
                                 </MudItem>
 
                                 <MudItem Class="pt-1 pb-1" lg="1" md="4" sm="6" xs="12">
-                                    <MudNumericFieldExtended Label="Amount"
-                                                             Format="#,0"
+                                    <MudNumericFieldExtended Label="Price"
+                                                             Format="#,0.00"
                                                              Step="0.1m"
                                                              @bind-Value="line.Price"
                                                              For="() => line.Price" />
                                 </MudItem>
 
-                                <MudItem Class="pt-1 pb-1" lg="1" md="4" sm="6" xs="12">
-                                    <MudNumericFieldExtended Label="TCA Amount"
-                                                             Format="#,0"
-                                                             Step="0.1m"
-                                                             @bind-Value="line.TCAPrice"
-                                                 For="() => line.TCAPrice" />
-                                </MudItem>
+                                @if (isDistributor)
+                                {
+                                    <MudItem Class="pt-1 pb-1" lg="1" md="4" sm="6" xs="12">
+                                        <MudNumericFieldExtended Label="TCA Price"
+                                                                 Format="#,0.00"
+                                                                 Step="0.1m"
+                                                                 @bind-Value="line.TCAPrice"
+                                                                 For="() => line.TCAPrice" />
+                                    </MudItem>
+                                }
                             </MudGrid>
                         </MudItem>
 
@@ -707,7 +936,19 @@
                         </MudButton>
                     }
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">F2 - Parts</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="2" md="3" sm="6" xs="12">
                         <MudField Variant="Variant.Outlined" Label="OFP No.">
@@ -717,43 +958,75 @@
 
                     <MudItem lg="2" md="3" sm="6" xs="12">
                         <MudField Variant="Variant.Outlined" Label="Parts Total">
-                            $0.00
+                            @TheItem.PartsTotalAmount.ToCurrencyFormat()
                         </MudField>
                     </MudItem>
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
-                <MudGrid Spacing="3" Class="pb-3">
-                    <MudItem lg="2" md="3" sm="6" xs="12">
-                        <MudTextFieldExtended T="decimal" Label="P.W.R. / P.R.R" Value="1.00m" />
-                    </MudItem>
-                </MudGrid>
+    @if (isDistributor)
+    {
+        <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+            <MudCard Elevation="2">
+                <MudCardHeader Class="pt-1 pb-1 background-gray">
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.subtitle2">F3 - Parts (TCA)</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
 
-                <MudGrid Spacing="3">
-                    <MudItem lg="2" md="3" sm="6" xs="12">
-                        <MudField Variant="Variant.Outlined" Label="Parts Sub Total">
-                            $0.00
-                        </MudField>
-                    </MudItem>
+                <MudCardContent Class="pt-2 pb-2">
+                    <MudGrid Spacing="3" Class="pb-3">
+                        <MudItem lg="2" md="3" sm="6" xs="12">
+                            <MudTextFieldExtended Label="P.W.R. / P.R.R"
+                                                  Format="0.00"
+                                                  @bind-Value="TheItem.PRR1" />
+                        </MudItem>
+                    </MudGrid>
 
-                    <MudItem lg="2" md="3" sm="6" xs="12">
-                        <MudField Variant="Variant.Outlined" Label="Parts Total">
-                            $0.00
-                        </MudField>
-                    </MudItem>
-                </MudGrid>
+                    <MudGrid Spacing="3">
+                        <MudItem lg="2" md="3" sm="6" xs="12">
+                            <MudField Variant="Variant.Outlined" Label="Parts Sub Total">
+                                @TheItem.PartsSubTotalAmountTCA.ToCurrencyFormat()
+                            </MudField>
+                        </MudItem>
 
+                        <MudItem lg="2" md="3" sm="6" xs="12">
+                            <MudField Variant="Variant.Outlined" Label="Parts Total">
+                                @TheItem.PartsTotalAmountTCA.ToCurrencyFormat()
+                            </MudField>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">G1</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="3" md="3" sm="6" xs="12">
                         <MudField Variant="Variant.Outlined" Label="Total Claim Amount">
-                            $0.00
+                            @TheItem.TotalClaimAmount.ToCurrencyFormat()
                         </MudField>
                     </MudItem>
 
-                    <MudItem lg="3" md="3" sm="6" xs="12">
-                        <MudField Variant="Variant.Outlined" Label="Total Clam Amount (TCA)">
-                            $0.00
-                        </MudField>
-                    </MudItem>
+                    @if (isDistributor)
+                    {
+                        <MudItem lg="3" md="3" sm="6" xs="12">
+                            <MudField Variant="Variant.Outlined" Label="Total Clam Amount (TCA)">
+                                @TheItem.TotalClaimAmountTCA.ToCurrencyFormat()
+                            </MudField>
+                        </MudItem>
+                    }
 
                     <MudItem lg="3" md="3" sm="6" xs="12">
                         <MudField Variant="Variant.Outlined" Label="Process Date">
@@ -767,24 +1040,57 @@
                         </MudField>
                     </MudItem>
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
-                <MudGrid Spacing="3">
-                    <MudItem lg="4" md="4" sm="6" xs="12">
-                        <MudTextFieldExtended Label="Labor %" T="string" />
-                    </MudItem>
+    @if (isDistributor)
+    {
+        <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+            <MudCard Elevation="2">
+                <MudCardHeader Class="pt-1 pb-1 background-gray">
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.subtitle2">H1 - Claim Adjustment</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
 
-                    <MudItem lg="4" md="4" sm="6" xs="12">
-                        <MudTextFieldExtended Label="Sublet %" T="string" />
-                    </MudItem>
+                <MudCardContent Class="pt-2 pb-2">
+                    <MudGrid Spacing="3">
+                        <MudItem lg="4" md="4" sm="6" xs="12">
+                            <MudTextFieldExtended Label="Labor %"
+                                                  @bind-Value="TheItem.LaborAdjustment"
+                                                  For="() => TheItem.LaborAdjustment" />
+                        </MudItem>
 
-                    <MudItem lg="4" md="4" sm="6" xs="12">
-                        <MudTextFieldExtended Label="Parts %" T="string" />
-                    </MudItem>
-                </MudGrid>
+                        <MudItem lg="4" md="4" sm="6" xs="12">
+                            <MudTextFieldExtended Label="Sublet %"
+                                                  @bind-Value="TheItem.SubletAdjustment"
+                                                  For="() => TheItem.SubletAdjustment" />
+                        </MudItem>
 
+                        <MudItem lg="4" md="4" sm="6" xs="12">
+                            <MudTextFieldExtended Label="Parts %"
+                                                  @bind-Value="TheItem.PartsAdjustment"
+                                                  For="() => TheItem.PartsAdjustment" />
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">J1 - Dealer Comments</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="12" md="12" sm="12" xs="12">
-                        <MudTextFieldExtended Label="DealerComments"
+                        <MudTextFieldExtended Label="Dealer Comments"
                                               @bind-Value="TheItem.DealerComments"
                                               For="() => TheItem.DealerComments" />
                     </MudItem>
@@ -793,19 +1099,46 @@
                         <MudAlert Severity="Severity.Warning">This <strong>WILL NOT</strong> be Exported to CSV. It's from <strong>Dealer to TCA</strong></MudAlert>
                     </MudItem>
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
-                <MudGrid Spacing="3">
-                    <MudItem lg="12" md="12" sm="12" xs="12">
-                        <MudTextFieldExtended Label="DistComment1"
-                                              @bind-Value="TheItem.DistComment1"
-                                              For="() => TheItem.DistComment1" />
-                    </MudItem>
+    @if (isDistributor)
+    {
+        <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+            <MudCard Elevation="2">
+                <MudCardHeader Class="pt-1 pb-1 background-gray">
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.subtitle2">J2 - TCA Comments</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
 
-                    <MudItem lg="12" md="12" sm="12" xs="12">
-                        <MudAlert Severity="Severity.Success">This <strong>WILL</strong> be Exported to CSV. It's from <strong>TCA to TMC</strong></MudAlert>
-                    </MudItem>
-                </MudGrid>
+                <MudCardContent Class="pt-2 pb-2">
+                    <MudGrid Spacing="3">
+                        <MudItem lg="12" md="12" sm="12" xs="12">
+                            <MudTextFieldExtended Label="TCA Comments"
+                                                  @bind-Value="TheItem.DistComment1"
+                                                  For="() => TheItem.DistComment1" />
+                        </MudItem>
 
+                        <MudItem lg="12" md="12" sm="12" xs="12">
+                            <MudAlert Severity="Severity.Success">This <strong>WILL</strong> be Exported to CSV. It's from <strong>TCA to TMC</strong></MudAlert>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">K1 - Battery Test Codes</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="3" md="3" sm="6" xs="12">
                         <MudTextFieldExtended Label="Test Code 1-1"
@@ -831,7 +1164,19 @@
                                               For="() => TheItem.BatteryTestCode22" />
                     </MudItem>
                 </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
 
+    <MudItem lg="12" md="12" sm="12" xs="12" Class="">
+        <MudCard Elevation="2">
+            <MudCardHeader Class="pt-1 pb-1 background-gray">
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle2">L1 - TSB</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+
+            <MudCardContent Class="pt-2 pb-2">
                 <MudGrid Spacing="3">
                     <MudItem lg="12" md="12" sm="12" xs="12">
                         <MudTextFieldExtended Label="TSB Number"
@@ -839,15 +1184,18 @@
                                               For="() => TheItem.TSB" />
                     </MudItem>
                 </MudGrid>
-
-
-</div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
 @code {
 
-    private WarrantyClaimDTO TheItem {get; set; } = new WarrantyClaimDTO();
+    private WarrantyClaimDTO TheItem { get; set; } = new WarrantyClaimDTO();
 
-    [Parameter] public FormModes Mode { get; set; } = FormModes.View;
+    [Parameter] public FormModes Mode { get; set; } = FormModes.Create;
     [Parameter] public object? Key { get; set; }
+
+    private bool isDistributor = true;
 
     // protected override void OnAfterRender(bool firstRender)
     // {
@@ -895,7 +1243,7 @@
     //                 TheItem.BatteryTestCode21 = "21";
     //                 TheItem.BatteryTestCode22 = "22";
     //                 TheItem.TSB = "TSB Number";
-    //             }
+        //             }
 
     //             StateHasChanged();
     //         }
