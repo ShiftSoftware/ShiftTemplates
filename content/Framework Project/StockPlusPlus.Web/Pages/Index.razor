@@ -1,6 +1,14 @@
 ﻿@page "/"
 @attribute [Authorize]
+@using StockPlusPlus.Web.Pages.FormTest
+@inject IDialogService DialogService
 
 <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Reverse>
     <DateBig/>
 </MudStack>
+
+<MudButton OnClick="@(() => DialogService.Show<PerfTestForm>())">FormTest Dialog</MudButton>
+<MudButton OnClick="@(() => DialogService.Show<HTMLForm>())">HTMLForm Dialog</MudButton>
+<MudButton Href="/PerfTestForm">FormTest Page</MudButton>
+<MudButton Href="/PerfTest2Form">FormTest 2 Page</MudButton>
+<MudButton Href="/HTMLForm">HTMLForm Page</MudButton>

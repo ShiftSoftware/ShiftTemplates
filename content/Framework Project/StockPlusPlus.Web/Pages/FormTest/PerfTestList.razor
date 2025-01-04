@@ -1,0 +1,92 @@
+﻿@attribute [Authorize]
+@attribute [Route($"/{nameof(PerfTestList)}")]
+
+@using ShiftSoftware.ShiftIdentity.Core.DTOs.User
+
+<ShiftList Values="Values"
+           Title="List"
+           T="WarrantyClaimListDTO"
+           Dense
+           DisableActionColumn
+           ComponentType="typeof(PerfTestForm)"
+           ShowIDColumn="false"
+           TypeAuthAction="null"
+           EnableExport>
+
+    <PropertyColumn Property="x => x.TWCNo" Title="TWC No." Class="whitespace-nowrap" />
+    <PropertyColumn Property="x => x.InvoiceNo" Title="Invoice No." Class="whitespace-nowrap" />
+    <PropertyColumn Property="x => x.DealerCode" Title="Dealer" Class="whitespace-nowrap" />
+    <PropertyColumn Property="x => x.WarrantyType" Title="Type" Class="whitespace-nowrap" />
+
+    <PropertyColumn Format="F" Property="x => x.RepairDate" Title="Repair Date" HeaderClass="whitespace-nowrap">
+        <CellTemplate>
+            @if (context?.Item?.RepairDate > DateTime.MinValue)
+            {
+                @context.Item.RepairDate
+            }
+        </CellTemplate>
+    </PropertyColumn>
+
+    <PropertyColumn Format="F" Property="x => x.ProcessDate" Title="Repair Date" HeaderClass="whitespace-nowrap">
+        <CellTemplate>
+            @if (context?.Item?.ProcessDate > DateTime.MinValue)
+            {
+                @context.Item.ProcessDate
+            }
+        </CellTemplate>
+    </PropertyColumn>
+
+    <PropertyColumn Property="x => x.HourTotal" Title="Dealer Process Days" Class="whitespace-nowrap" />
+    <PropertyColumn Property="x => x.HourTotalTIQ" Title="TCA Process Days" Class="whitespace-nowrap" />
+
+    <PropertyColumn Property="x => x.TotalClaimAmount" Title="Total Amount" Class="whitespace-nowrap" />
+    <PropertyColumn Property="x => x.TotalClaimAmountTIQ" Title="TCA Amount" Class="whitespace-nowrap" />
+
+    <PropertyColumn Property="x => x.TWCStatus" Title="Status" Class="whitespace-nowrap">
+        <CellTemplate>
+            <MudChip T="string" Size="@Size.Small" Icon="@Icons.Material.Filled.PendingActions" Color="Color.Info">Pending</MudChip>
+        </CellTemplate>
+    </PropertyColumn>
+
+    <PropertyColumn Property="x => x.TWCTmcStatus" Title="TMC Status" Class="whitespace-nowrap">
+        <CellTemplate>
+            <MudChip T="string" Size="@Size.Small" Icon="@Icons.Material.Filled.MoreHoriz" Color="Color.Default">N/A</MudChip>
+        </CellTemplate>
+    </PropertyColumn>
+</ShiftList>
+
+
+@code {
+    List<WarrantyClaimListDTO> Values = new List<WarrantyClaimListDTO>
+    {
+        new()
+        {
+            TWCNo = "123456",
+            InvoiceNo = "345",
+            DealerCode = "Dealer 1",
+            WarrantyType = "VW",
+            RepairDate = DateTime.Now.AddDays(-10),
+            RepairCompletionDate = DateTime.Now.AddDays(-4),
+            ProcessDate = DateTime.Now,
+            HourTotal = 3,
+            HourTotalTIQ = 1,
+            TotalClaimAmount = 48,
+            TotalClaimAmountTIQ = 57
+        },
+
+        new()
+        {
+            TWCNo = "123",
+            InvoiceNo = "1234",
+            DealerCode = "Dealer 2",
+            WarrantyType = "S",
+            RepairDate = DateTime.Now.AddDays(-7),
+            RepairCompletionDate = DateTime.Now.AddDays(-2),
+            ProcessDate = DateTime.Now.AddDays(-1),
+            HourTotal = 3,
+            HourTotalTIQ = 1,
+            TotalClaimAmount = 25,
+            TotalClaimAmountTIQ = 32
+        },
+    };
+}
