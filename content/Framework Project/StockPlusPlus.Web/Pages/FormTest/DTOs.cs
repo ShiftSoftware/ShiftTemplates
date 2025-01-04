@@ -23,7 +23,7 @@ public class WarrantyClaimDTO : ShiftEntityViewAndUpsertDTO
     public string? AP3 { get; set; }
     public string? AP4 { get; set; }
     public string? AP5 { get; set; }
-    public int? NV { get; set; }
+    public bool NV { get; set; }
     public int? FV { get; set; }
     public string VIN_WMI { get; set; } = default!;
     public string VIN_VDS { get; set; } = default!;
@@ -43,12 +43,12 @@ public class WarrantyClaimDTO : ShiftEntityViewAndUpsertDTO
     public List<WarrantyClaimSubletLineDTO> WarrantyClaimSubletLines { get; set; } = new();
     public List<WarrantyClaimPartLineDTO> WarrantyClaimPartLines { get; set; } = new();
     public string? LaborOperationNoMain { get; set; }
-    public decimal? LaborRate { get; set; }
-    public decimal? HourTotal { get; set; }
-    public decimal? HourTotalTIQ { get; set; }
-    public decimal? LaborTotalAmount { get; set; }
-    public decimal? LaborTotalAmountTIQ { get; set; }
-    public decimal? SubletTotalAmount { get; set; }
+    public decimal LaborRate { get => Franchise == Franchises.Toyota.Key ? 5 : 10; }
+    public decimal HourTotal { get => WarrantyClaimLaborLines.Sum(x => x.Hour ?? 0m); }
+    public decimal HourTotalTCA { get => WarrantyClaimLaborLines.Sum(x => x.TCAHour ?? 0m); }
+    public decimal? LaborTotalAmount { get => HourTotal * LaborRate; }
+    public decimal? LaborTotalAmountTCA { get => HourTotalTCA * LaborRate; }
+    public decimal? SubletTotalAmount { get => WarrantyClaimSubletLines.Sum(x => x.Amount); }
     public string? SubletDescription { get; set; }
     public string? T1 { get; set; }
     public string? T2 { get; set; }
@@ -64,16 +64,17 @@ public class WarrantyClaimDTO : ShiftEntityViewAndUpsertDTO
     public string Remedy { get; set; } = default!;
     public string? OFPLocalFlag { get; set; }
     public string? OFP { get; set; }
-    public decimal? PRR1 { get; set; }
-    public decimal? PartsTotalAmount { get; set; }
-    public decimal? PartsTotalAmountTIQ { get; set; }
-    public decimal? TotalClaimAmount { get; set; }
-    public decimal? TotalClaimAmountTIQ { get; set; }
+    public decimal? PRR1 { get; set; } = 1.00m;
+    public decimal? PartsTotalAmount { get => WarrantyClaimPartLines.Sum(x => (x.Price ?? 0m) * (x.Qty ?? 0)); }
+    public decimal? PartsSubTotalAmountTCA { get => WarrantyClaimPartLines.Sum(x => (x.TCAPrice ?? 0m) * (x.Qty ?? 0)); }
+    public decimal? PartsTotalAmountTCA { get => WarrantyClaimPartLines.Sum(x => (x.TCAPrice ?? 0m) * (x.Qty ?? 0) * (PRR1 ?? 0m)); }
+    public decimal? TotalClaimAmount { get => LaborTotalAmount + SubletTotalAmount + PartsTotalAmount; }
+    public decimal? TotalClaimAmountTCA { get => LaborTotalAmountTCA + SubletTotalAmount + PartsTotalAmountTCA; }
     public DateTime? ProcessDate { get; set; }
-    public DateTime? TIQProcessDate { get; set; }
-    public int? LaborAdjustment { get; set; }
-    public int? SubletAdjustment { get; set; }
-    public int? PartsAdjustment { get; set; }
+    public DateTime? TCAProcessDate { get; set; }
+    public int LaborAdjustment { get; set; } = 100;
+    public int SubletAdjustment { get; set; } = 100;
+    public int PartsAdjustment { get; set; } = 100;
     public string? DistComment1 { get; set; }
     public int? TWCStatus { get; set; }
     public int? SupplierTWCStatus { get; set; }
@@ -91,7 +92,7 @@ public class WarrantyClaimDTO : ShiftEntityViewAndUpsertDTO
     public long? ToyotaFreeServiceRegisteredVehicleId { get; set; }
     public int? ToyotaFreeServiceBreakPart { get; set; }
     public string? DealerComments { get; set; }
-    public string VIN { get { return $"{VIN_WMI}{VIN_VDS}{VIN_CD}{VIN_VIS}"; } }
+    public string VIN { get => $"{VIN_WMI}{VIN_VDS}{VIN_CD}{VIN_VIS}"; }
     public string? ModelCode { get; set; }
     public int? ProductionYear { get; set; }
     public int? ProductionMonth { get; set; }
@@ -220,25 +221,25 @@ public class WarrantyClaimListDTO : ShiftEntityListDTO
 
 public class WarrantyClaimLaborLineDTO
 {
-    public string PayCode { get; set; } = default!;
+    public string? PayCode { get; set; } = default!;
     public bool MainOperation { get; set; }
-    public string OperationNumber { get; set; } = default!;
-    public decimal Hour { get; set; }
-    public decimal TCAHour { get; set; }
-    public decimal Amount { get; set; }
-    public decimal TCAAmount { get; set; }
+    public string? OperationNumber { get; set; } = default!;
+    public decimal? Hour { get; set; }
+    public decimal? TCAHour { get; set; }
+    public decimal? Amount { get; set; }
+    public decimal? TCAAmount { get; set; }
 }
 
 public class WarrantyClaimPartLineDTO
 {
-    public string PayCode { get; set; } = default!;
+    public string? PayCode { get; set; } = default!;
     public bool OFP { get; set; }
-    public string LocalF { get; set; } = default!;
-    public string PartNumber { get; set; } = default!;
+    public string? LocalF { get; set; } = default!;
+    public string? PartNumber { get; set; } = default!;
     public string? PartDescription { get; set; }
     public int? Qty { get; set; }
-    public decimal Amount { get; set; }
-    public decimal TCAAmount { get; set; }
+    public decimal? Price { get; set; }
+    public decimal? TCAPrice { get; set; }
 }
 
 public class WarrantyClaimSubletLineDTO
@@ -286,6 +287,7 @@ public class WarrantyClaimValidator : AbstractValidator<WarrantyClaimDTO>
     public WarrantyClaimValidator()
     {
         RuleFor(x => x.TWCNo)
+            .NotEmpty()
             .Length(7);
 
         RuleFor(x => x.DealerCode)
@@ -304,15 +306,78 @@ public class WarrantyClaimValidator : AbstractValidator<WarrantyClaimDTO>
             .NotEmpty();
 
         RuleFor(x => x.VIN_WMI)
-            .Length(3);
+            .NotEmpty()
+            .Length(3)
+            .When(x => !(x.WarrantyType == WarrantyTypes.P2.Key || x.NV));
 
         RuleFor(x => x.VIN_VDS)
-            .Length(5);
+            .NotEmpty()
+            .Length(5)
+            .When(x => !(x.WarrantyType == WarrantyTypes.P2.Key || x.NV));
 
         RuleFor(x => x.VIN_CD)
-            .Length(1);
+            .NotEmpty()
+            .Length(1)
+            .When(x => !(x.WarrantyType == WarrantyTypes.P2.Key || x.NV));
 
         RuleFor(x => x.VIN_VIS)
-            .Length(8);
+            .NotEmpty()
+            .Length(8)
+            .When(x => !(x.WarrantyType == WarrantyTypes.P2.Key || x.NV));
+
+        RuleFor(x => x.DeliveryDate)
+            .NotNull()
+            .When(x => !(x.WarrantyType == WarrantyTypes.P2.Key || x.NV));
+
+        RuleFor(x => x.RepairDate)
+            .NotNull();
+        //.When(x => !(x.WarrantyType == WarrantyTypes.P2.Key || x.NV));
+
+        RuleFor(x => x.Odometer)
+            .NotNull()
+            .When(x => !(x.WarrantyType == WarrantyTypes.P2.Key || x.NV));
+
+        RuleFor(x => x.RepairOrderNo)
+            .NotEmpty()
+            .When(x => !(x.WarrantyType == WarrantyTypes.P2.Key || x.NV));
+
+        RuleFor(x => x.AcPreviousRepairDate)
+            .NotNull()
+            .When(x => x.WarrantyType == WarrantyTypes.P1.Key || x.WarrantyType == WarrantyTypes.P2.Key);
+
+        RuleFor(x => x.ACPreviousRepairOrderNo)
+            .NotEmpty()
+            .When(x => x.WarrantyType == WarrantyTypes.P1.Key);
+
+        RuleFor(x => x.AcPreviousRepairKm)
+            .NotNull()
+            .When(x => x.WarrantyType == WarrantyTypes.P1.Key);
+
+
+        RuleFor(x => x.AcPreviousInvoiceNo)
+            .NotNull()
+            .When(x => x.WarrantyType == WarrantyTypes.P2.Key);
+
+        RuleFor(x => x.AcCurrentInvoiceNo)
+            .NotNull()
+            .When(x => x.WarrantyType == WarrantyTypes.P2.Key);
+    }
+}
+
+public static class SystemExtentsions
+{
+    private static readonly string CurrencyFormat = "{0:$#,0.00}";
+
+    public static string ToCurrencyFormat(this decimal value)
+    {
+        return string.Format(CurrencyFormat, value);
+    }
+
+    public static string? ToCurrencyFormat(this decimal? value)
+    {
+        if (value is null)
+            return null;
+
+        return value.Value.ToCurrencyFormat();
     }
 }
