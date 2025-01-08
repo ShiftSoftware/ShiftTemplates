@@ -13,7 +13,6 @@ using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Functions;
 #if (includeSampleApp)
 using StockPlusPlus.Data.Repositories;
-using ShiftSoftware.ShiftEntity.Functions.Services;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
 
 
@@ -50,9 +49,6 @@ var host = new HostBuilder()
     .ConfigureServices((hostBuilder, services) =>
     {
         services.AddValidatorsFromAssemblyContaining<Program>();
-
-        services.AddSingleton<OpenApiConfigurationOptions>();
-        services.AddSingleton<IOpenApiHttpTriggerAuthorization, OpenApiHttpTriggerAuthorization>();
 
         services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
 
