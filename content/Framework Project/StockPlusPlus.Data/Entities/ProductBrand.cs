@@ -13,7 +13,7 @@ namespace StockPlusPlus.Data.Entities;
 #endif
 public class ProductBrand : ShiftEntity<ProductBrand>
 #if (includeItemTemplateContent)
-    ,IEntityHasTeam<ProductBrand>, IEntityHasRegion<ProductBrand>, IEntityHasCompany<ProductBrand>, IEntityHasCompanyBranch<ProductBrand>, IEntityHasIdempotencyKey<ProductBrand>
+    ,IEntityHasTeam<ProductBrand>, IEntityHasRegion<ProductBrand>, IEntityHasCompany<ProductBrand>, IEntityHasCompanyBranch<ProductBrand>, IEntityHasIdempotencyKey<ProductBrand>, IEntityHasUniqueHash<ProductBrand>
 #endif
 {
 #if (includeItemTemplateContent)
@@ -27,5 +27,10 @@ public class ProductBrand : ShiftEntity<ProductBrand>
     public long? CompanyID { get; set; }
     public long? CompanyBranchID { get; set; }
     public Guid? IdempotencyKey { get; set; }
+
+    public string? CalculateUniqueHash()
+    {
+        return $"{Name}|{Code}";
+    }
 #endif
 }

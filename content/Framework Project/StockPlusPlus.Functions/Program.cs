@@ -13,6 +13,9 @@ using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Functions;
 #if (includeSampleApp)
 using StockPlusPlus.Data.Repositories;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
+
+
 #endif
 
 #if (includeSampleApp)
@@ -46,8 +49,6 @@ var host = new HostBuilder()
     .ConfigureServices((hostBuilder, services) =>
     {
         services.AddValidatorsFromAssemblyContaining<Program>();
-
-        services.AddSingleton<OpenApiConfigurationOptions>();
 
         services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
 

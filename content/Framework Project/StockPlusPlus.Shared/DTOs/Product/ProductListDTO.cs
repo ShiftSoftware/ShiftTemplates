@@ -3,6 +3,7 @@ using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using ShiftSoftware.ShiftEntity.Model.HashIds;
+using ShiftSoftware.ShiftIdentity.Core.DTOs.City;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.Enums;
 using System.Text.Json.Serialization;
@@ -34,4 +35,15 @@ public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO
 
     [CityHashIdConverter]
     public string? CityID { get; set; }
+    public CityListDTO? City { get; set; }
+    public string? CustomID
+    {
+        get
+        {
+            if (this.City is null)
+                return null;
+
+            return $"{this.ID}-{this.CityID}-{this.City.Name}";
+        }
+    }
 }

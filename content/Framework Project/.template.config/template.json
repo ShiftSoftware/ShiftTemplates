@@ -250,7 +250,7 @@
       "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2024.11.13.3"
+        "value": "2024.12.24.4"
       },
       "datatype": "string",
       "generator": "constant"
