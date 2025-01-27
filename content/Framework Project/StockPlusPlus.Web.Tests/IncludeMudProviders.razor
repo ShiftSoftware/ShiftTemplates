@@ -1,0 +1,12 @@
+﻿@using ShiftSoftware.ShiftBlazor.Components
+
+<AddMudProviders></AddMudProviders>
+
+@ChildContent
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+}
