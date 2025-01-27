@@ -11,11 +11,10 @@ using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Functions;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
+using ShiftSoftware.ShiftEntity.Functions.Services;
 #if (includeSampleApp)
 using StockPlusPlus.Data.Repositories;
-using ShiftSoftware.ShiftEntity.Functions.Services;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
-
 
 #endif
 
@@ -52,7 +51,10 @@ var host = new HostBuilder()
         services.AddValidatorsFromAssemblyContaining<Program>();
 
         services.AddSingleton<OpenApiConfigurationOptions>();
-        services.AddSingleton<IOpenApiHttpTriggerAuthorization, OpenApiHttpTriggerAuthorization>();
+
+        var openApiKey = hostBuilder.Configuration["OpenApi:ApiKey"]!;
+        
+        services.AddSingleton<IOpenApiHttpTriggerAuthorization, OpenApiHttpTriggerAuthorization>(x => new OpenApiHttpTriggerAuthorization(openApiKey));
 
         services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
 

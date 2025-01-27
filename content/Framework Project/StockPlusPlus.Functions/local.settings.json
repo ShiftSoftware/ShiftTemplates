@@ -5,8 +5,10 @@
   },
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "OpenApi__ApiKey": "1234567890"
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
+  },
+  "OpenApi": {
+    "ApiKey":  "1234567890"
   },
   "CosmosDb": {
     "Enabled": false,
