@@ -110,7 +110,11 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
     x.AddCompanyCustomField("SomeExternalLink", "Some External Link")
     .AddCompanyCustomField("Password", "Password", true)
     .AddCompanyBranchCustomField("Username", "User Name")
-    .AddCompanyBranchCustomField("Password", true);
+    .AddCompanyBranchCustomField("Password", true)
+    .AddCompanyBranchPhoneTag("marketing")
+    .AddCompanyBranchPhoneTag("customer-service")
+    .AddCompanyBranchEmailTag("support")
+    .AddCompanyBranchEmailTag("help-desk");
 #endif
 });
 #endif
