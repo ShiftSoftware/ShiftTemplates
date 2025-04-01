@@ -61,7 +61,8 @@ builder.Services.AddShiftBlazor(config =>
         options.BaseAddress = baseUrl!;
         options.ExternalAddresses = new Dictionary<string, string?>
         {
-            ["ShiftIdentityApi"] = shiftIdentityApiURL
+            ["ShiftIdentityApi"] = shiftIdentityApiURL,
+            ["StockPluPlus"] = baseUrl
         };
         options.ApiPath = "/api";
         //options.ODataPath = "/odata";
