@@ -57,8 +57,6 @@ builder.Services.AddShiftBlazor(config =>
             ["ShiftIdentityApi"] = shiftIdentityApiURL,
             ["StockPluPlus"] = baseUrl
         };
-        options.ApiPath = "/api";
-        //options.ODataPath = "/odata";
         options.UserListEndpoint = shiftIdentityApiURL.AddUrlPath("IdentityPublicUser");
 #if (internalShiftIdentityHosting)
         options.AdditionalAssemblies = new[] { typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly };
