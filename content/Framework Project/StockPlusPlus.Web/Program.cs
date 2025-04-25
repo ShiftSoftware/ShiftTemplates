@@ -88,8 +88,8 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
 
         await Task.WhenAll(new List<Task>
         {
-            Task.Run(async () => { brands = await httpService.GetFromJsonAsync<ODataDTO<ProductBrandListDTO>>("/api/ProductBrand"); }),
-            Task.Run(async () => { categories = await httpService.GetFromJsonAsync<ODataDTO<ProductCategoryListDTO>>("/api/ProductCategory"); })
+            Task.Run(async () => { brands = await httpService.GetFromJsonAsync<ODataDTO<ProductBrandListDTO>>("/ProductBrand"); }),
+            Task.Run(async () => { categories = await httpService.GetFromJsonAsync<ODataDTO<ProductCategoryListDTO>>("/ProductCategory"); })
         });
 
         StockPlusPlusActionTree.DataLevelAccess.ProductBrand.Expand(brands!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
