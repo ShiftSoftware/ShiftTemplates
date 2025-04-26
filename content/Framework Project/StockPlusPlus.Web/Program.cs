@@ -15,8 +15,6 @@ using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
 #endif
 #if (includeSampleApp)
 using StockPlusPlus.Shared.ActionTrees;
-using Syncfusion.Blazor;
-using Syncfusion.Licensing;
 #endif
 #if (includeSampleApp && internalShiftIdentityHosting)
 using System.Net.Http.Json;
@@ -49,11 +47,6 @@ shiftIdentityApiURL = string.IsNullOrWhiteSpace(shiftIdentityApiURL) ? baseUrl :
 var shiftIdentityFrontEndURL = builder.Configuration!.GetValue<string>("ShiftIdentityFrontEnd")!;
 shiftIdentityFrontEndURL = string.IsNullOrWhiteSpace(shiftIdentityFrontEndURL) ? baseUrl : shiftIdentityFrontEndURL; //Fallback to BaseURL if emtpy
 
-#if (includeSampleApp)
-builder.Services.AddSyncfusionBlazor();
-SyncfusionLicenseProvider.RegisterLicense("");
-#endif
-
 builder.Services.AddShiftBlazor(config =>
 {
     config.ShiftConfiguration = options =>
@@ -64,8 +57,6 @@ builder.Services.AddShiftBlazor(config =>
             ["ShiftIdentityApi"] = shiftIdentityApiURL,
             ["StockPluPlus"] = baseUrl
         };
-        options.ApiPath = "/api";
-        //options.ODataPath = "/odata";
         options.UserListEndpoint = shiftIdentityApiURL.AddUrlPath("IdentityPublicUser");
 #if (internalShiftIdentityHosting)
         options.AdditionalAssemblies = new[] { typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly };
@@ -97,8 +88,8 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
 
         await Task.WhenAll(new List<Task>
         {
-            Task.Run(async () => { brands = await httpService.GetFromJsonAsync<ODataDTO<ProductBrandListDTO>>("/api/ProductBrand"); }),
-            Task.Run(async () => { categories = await httpService.GetFromJsonAsync<ODataDTO<ProductCategoryListDTO>>("/api/ProductCategory"); })
+            Task.Run(async () => { brands = await httpService.GetFromJsonAsync<ODataDTO<ProductBrandListDTO>>("/ProductBrand"); }),
+            Task.Run(async () => { categories = await httpService.GetFromJsonAsync<ODataDTO<ProductCategoryListDTO>>("/ProductCategory"); })
         });
 
         StockPlusPlusActionTree.DataLevelAccess.ProductBrand.Expand(brands!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
