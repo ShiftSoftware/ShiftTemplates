@@ -1,0 +1,547 @@
+﻿@page "/EditForm"
+
+<EditForm Model="Model" OnValidSubmit="Submit" FormName="Starship3">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <button type="submit" class="btn btn-primary ml-auto">Order</button>
+
+    <InputText @bind-Value="Model.TWCNo" id="TWCNo" class="form-control" />
+    <label for="TWCNo">TWC No.</label>
+
+    <InputText @bind-Value="Model.DealerClaimNo" id="DealerClaimNo" class="form-control" />
+    <label for="DealerClaimNo">Dealer Claim No.</label>
+
+    <InputText @bind-Value="Model.DealerCode" id="DealerCode" class="form-control" />
+    <label for="DealerCode">Dealer Code</label>
+
+    @if (Model.WarrantyType == WarrantyTypes.VE.Key || Model.WarrantyType == WarrantyTypes.SSC.Key)
+    {
+        <InputDate @bind-Value="Model.DateOfReceipt" id="DateOfReceipt" class="form-control" />
+        <label for="DateOfReceipt">Date of Receipt</label>
+    }
+
+    <InputSelect @bind-Value="Model.ProcessFlg" id="ProcessFlg" class="form-control">
+        <option disabled selected value="">Select Process Flag</option>
+        @foreach (var x in Enum.GetValues<ProcessFlags>())
+        {
+            <option value="@x">@x.Describe()</option>
+        }
+    </InputSelect>
+    <label for="ProcessFlg">Process Flag</label>
+
+    <InputSelect @bind-Value="Model.WarrantyType" id="WarrantyType" class="form-control">
+        <option value="@WarrantyTypes.SSC.Key">@WarrantyTypes.SSC.Value</option>
+        <option value="@WarrantyTypes.VE.Key">@WarrantyTypes.VE.Value</option>
+        <option value="@WarrantyTypes.AC.Key">@WarrantyTypes.AC.Value</option>
+        <option value="@WarrantyTypes.P1.Key">@WarrantyTypes.P1.Value</option>
+        <option value="@WarrantyTypes.P2.Key">@WarrantyTypes.P2.Value</option>
+        <option value="@WarrantyTypes.A1.Key">@WarrantyTypes.A1.Value</option>
+        <option value="@WarrantyTypes.A2.Key">@WarrantyTypes.A2.Value</option>
+    </InputSelect>
+    <label for="WarrantyType">Warranty Type</label>
+
+    <InputSelect @bind-Value="Model.OperationType" id="OperationType" class="form-control">
+        <option disabled selected value="">Select Operation Type</option>
+        @foreach (var x in Enum.GetValues<OperationTypes>())
+        {
+            <option value="@x">@x.Describe()</option>
+        }
+    </InputSelect>
+    <label for="OperationType">Operation Type</label>
+
+    <InputSelect @bind-Value="Model.Franchise" id="Franchise" class="form-control">
+        <option value="@Franchises.Toyota.Key">@Franchises.Toyota.Value</option>
+        <option value="@Franchises.Lexus.Key">@Franchises.Lexus.Value</option>
+    </InputSelect>
+    <label for="Franchise">Franchise</label>
+    <InputDate @bind-Value="Model.AcPreviousRepairDate" id="AcPreviousRepairDate" class="form-control" />
+    <label for="AcPreviousRepairDate">Previous Repair Date</label>
+
+    <InputNumber @bind-Value="Model.AcPreviousRepairKm" id="AcPreviousRepairKm" class="form-control" step="100" />
+    <label for="AcPreviousRepairKm">Previous Repair KM</label>
+
+    <InputText @bind-Value="Model.ACPreviousRepairOrderNo" id="ACPreviousRepairOrderNo" class="form-control" />
+    <label for="ACPreviousRepairOrderNo">Previous Repair Order No</label>
+
+    <InputText @bind-Value="Model.AcPreviousInvoiceNo" id="AcPreviousInvoiceNo" class="form-control" />
+    <label for="AcPreviousInvoiceNo">AcPrevious Invoice No</label>
+
+    @if (Model.WarrantyType == WarrantyTypes.P2.Key)
+    {
+        <InputDate @bind-Value="Model.AcPreviousRepairDate" id="PreviousCounterSaleDate" class="form-control" />
+        <label for="PreviousCounterSaleDate">Previous Counter Sale Date</label>
+
+        <InputText @bind-Value="Model.AcCurrentInvoiceNo" id="AcCurrentInvoiceNo" class="form-control" />
+        <label for="AcCurrentInvoiceNo">Current Invoice No.</label>
+
+        <InputDate @bind-Value="Model.RepairDate" id="CurrentCounterSaleDate" class="form-control" />
+        <label for="CurrentCounterSaleDate">Current Counter Sale Date</label>
+    }
+
+    @if (Model.WarrantyType == WarrantyTypes.A1.Key || Model.WarrantyType == WarrantyTypes.A2.Key)
+    {
+        <InputDate @bind-Value="Model.AcInstallDate" id="AcInstallDate" class="form-control" />
+        <label for="AcInstallDate">AC. Install Date</label>
+
+        <InputNumber @bind-Value="Model.AcInstallKm" id="AcInstallKm" class="form-control" step="100" />
+        <label for="AcInstallKm">AC Install KM</label>
+    }
+
+    @if (Model.WarrantyType == WarrantyTypes.P2.Key)
+    {
+        <InputText type="checkbox" checked disabled class="checkbox-with-border-bottom" />
+        <label>NV</label>
+    }
+    else
+    {
+        <InputCheckbox @bind-Value="Model.NV" class="checkbox-with-border-bottom" />
+        <label>NV</label>
+    }
+
+
+    <InputText @bind-Value="Model.VIN_WMI" id="VIN_WMI" class="form-control" />
+    <label for="VIN_WMI">WMI</label>
+
+    <InputText @bind-Value="Model.VIN_VDS" id="VIN_VDS" class="form-control" />
+    <label for="VIN_VDS">VDS</label>
+
+    <InputText @bind-Value="Model.VIN_CD" id="VIN_CD" class="form-control" />
+    <label for="VIN_CD">CD</label>
+
+    <InputText @bind-Value="Model.VIN_VIS" id="VIN_VIS" class="form-control" />
+    <label for="VIN_VIS">VIS</label>
+
+    <InputText Value="Model.VIN" id="VIN" class="form-control" readonly />
+    <label for="VIN">VIN</label>
+
+    <InputDate @bind-Value="Model.DeliveryDate" id="DeliveryDate" class="form-control" />
+    <label for="DeliveryDate">Delivery Date</label>
+
+    @if (Model.WarrantyType != WarrantyTypes.P2.Key)
+    {
+        <InputDate @bind-Value="Model.RepairDate" id="RepairDate" class="form-control" />
+        <label for="RepairDate">Repair (Open) Date</label>
+
+        <InputDate @bind-Value="Model.RepairCompletionDate" id="RepairCompletionDate" class="form-control" />
+        <label for="RepairCompletionDate">Repair (Completion) Date</label>
+    }
+    <InputNumber @bind-Value="Model.Odometer" id="Odometer" step="100" class="form-control" />
+    <label for="Odometer">Odometer</label>
+
+    <InputSelect @bind-Value="Model.KMFlg" id="KMFlg" class="form-control">
+        <option disabled value="">-- Select K/M Flag --</option>
+        @foreach (var x in Enum.GetValues<KMFlags>())
+        {
+            <option value="@x">@x.Describe()</option>
+        }
+    </InputSelect>
+    <label for="KMFlg">K/M Flag</label>
+
+    <InputText @bind-Value="Model.RepairOrderNo" id="RepairOrderNo" class="form-control" />
+    <label for="RepairOrderNo">Current Repair Order No.</label>
+
+    <InputSelect @bind-Value="Model.DataID" id="DataID" class="form-control">
+        <option disabled value="">-- Select Data-ID --</option>
+        <option value="@DataIDs.W.Key">@DataIDs.W.Value</option>
+        <option value="@DataIDs.S.Key">@DataIDs.S.Value</option>
+        <option value="@DataIDs.T.Key">@DataIDs.T.Value</option>
+    </InputSelect>
+    <label for="DataID">Data-ID</label>
+
+    <!-- Static Text Headers -->
+    <p class="mud-text-with-border pb-3"><strong>Pay Code</strong></p>
+    <p class="mud-text-with-border pb-3"><strong>Ope. M</strong></p>
+    <p class="mud-text-with-border pb-3"><strong>Operation No.</strong></p>
+    <p class="mud-text-with-border pb-3"><strong>Hour</strong></p>
+
+
+    @foreach (var line in Model.WarrantyClaimLaborLines)
+    {
+        <InputSelect @bind-Value="line.PayCode" class="form-control">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </InputSelect>
+
+        <InputCheckbox @bind-Value="line.MainOperation" class="checkbox-with-border-bottom" />
+
+        <InputText @bind-Value="line.OperationNumber" class="form-control" placeholder="Operation No." />
+
+        <InputNumber @bind-Value="line.Hour" step="0.1" class="form-control" placeholder="Hour" />
+
+        <InputNumber @bind-Value="line.TCAHour" step="0.1" class="form-control" placeholder="TCA Hour" />
+
+        <button type="button"
+                class="btn btn-outline-danger btn-sm"
+                style="margin:10px;"
+                @onclick="@(() => Model.WarrantyClaimLaborLines.Remove(line))">
+            🗑️ Delete
+        </button>
+    }
+
+    <button type="button"
+            class="btn btn-info btn-sm"
+            style="margin:auto; margin-top:15px;"
+            @onclick="@(() => Model.WarrantyClaimLaborLines.Add(new()))">
+        ➕ Add Labor Line
+    </button>
+
+    <div class="form-group">
+        <label>Labor Rate</label>
+        <div class="form-control-plaintext">
+            @Model.LaborRate.ToCurrencyFormat()
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Labor Total (Hrs)</label>
+        <div class="form-control-plaintext">
+            @Model.HourTotal
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Labor Total (Amount)</label>
+        <div class="form-control-plaintext">
+            @Model.LaborTotalAmount.ToCurrencyFormat()
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>TCA Labor Total (Hrs)</label>
+        <div class="form-control-plaintext">
+            @Model.HourTotalTCA
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>TCA Labor Total (Amount)</label>
+        <div class="form-control-plaintext">
+            @Model.LaborTotalAmountTCA.ToCurrencyFormat()
+        </div>
+    </div>
+
+    <h6 class="pb-3 border-bottom">Pay Code</h6>
+    <h6 class="pb-3 border-bottom">Sublet Type</h6>
+    <h6 class="pb-3 border-bottom">Invoice No.</h6>
+    <h6 class="pb-3 border-bottom">Amount</h6>
+    <h6 class="pb-3 border-bottom">Description</h6>
+
+    @foreach (var line in Model.WarrantyClaimSubletLines)
+    {
+        <div class="form-row mb-3">
+            <div class="col">
+                <label>Pay Code</label>
+                <InputSelect class="form-control" @bind-Value="line.PayCode">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </InputSelect>
+            </div>
+
+            <div class="col">
+                <label>Sublet Type</label>
+                <InputSelect class="form-control" @bind-Value="line.SubletType">
+                    <option value="@SubletTypes.AC.Key">@SubletTypes.AC.Value</option>
+                    <option value="@SubletTypes.AL.Key">@SubletTypes.AL.Value</option>
+                    <option value="@SubletTypes.BA.Key">@SubletTypes.BA.Value</option>
+                    <option value="@SubletTypes.DS.Key">@SubletTypes.DS.Value</option>
+                    <option value="@SubletTypes.EL.Key">@SubletTypes.EL.Value</option>
+                    <option value="@SubletTypes.GL.Key">@SubletTypes.GL.Value</option>
+                    <option value="@SubletTypes.MC.Key">@SubletTypes.MC.Value</option>
+                    <option value="@SubletTypes.OF.Key">@SubletTypes.OF.Value</option>
+                    <option value="@SubletTypes.PT.Key">@SubletTypes.PT.Value</option>
+                    <option value="@SubletTypes.RA.Key">@SubletTypes.RA.Value</option>
+                    <option value="@SubletTypes.SL.Key">@SubletTypes.SL.Value</option>
+                    <option value="@SubletTypes.TW.Key">@SubletTypes.TW.Value</option>
+                    <option value="@SubletTypes.TY.Key">@SubletTypes.TY.Value</option>
+                    <option value="@SubletTypes.UP.Key">@SubletTypes.UP.Value</option>
+                    <option value="@SubletTypes.WD.Key">@SubletTypes.WD.Value</option>
+                    <option value="@SubletTypes.ZZ.Key">@SubletTypes.ZZ.Value</option>
+                </InputSelect>
+            </div>
+        </div>
+
+        <div class="form-row mb-3">
+            <div class="col">
+                <label>Invoice No.</label>
+                <InputText class="form-control" @bind-Value="line.InvoiceNo" />
+            </div>
+            <div class="col">
+                <label>Amount</label>
+                <InputNumber type="number" step="0.1" class="form-control" @bind-Value="line.Amount" />
+            </div>
+        </div>
+
+        <div class="form-row mb-3">
+            <div class="col">
+                <label>Description</label>
+                <InputText class="form-control" @bind-Value="line.Description" />
+            </div>
+            <div class="col-auto d-flex align-items-end">
+                <button type="button" class="btn btn-outline-danger btn-sm"
+                        @onclick="@(() => Model.WarrantyClaimSubletLines.Remove(line))">
+                    <i class="material-icons">delete</i>
+                </button>
+            </div>
+        </div>
+    }
+
+    <div class="text-center mt-3">
+        <button type="button" class="btn btn-info btn-sm"
+                @onclick="@(() => Model.WarrantyClaimSubletLines.Add(new()))">
+            <i class="material-icons">add</i> Add Sublet Line
+        </button>
+    </div>
+    <div class="form-group">
+        <label>Sublet Description</label>
+        <InputText class="form-control" @bind-Value="Model.SubletDescription" />
+    </div>
+
+    <div class="form-group">
+        <label>Sublet Total</label>
+        <div class="form-control-plaintext">@Model.SubletTotalAmount.ToCurrencyFormat()</div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label>T1</label>
+            <InputText class="form-control" @bind-Value="Model.T1" />
+        </div>
+        <div class="form-group col-md-4">
+            <label>T2</label>
+            <InputText class="form-control" @bind-Value="Model.T2" />
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-2">
+            <label>T3 - 1</label>
+            <InputText class="form-control" @bind-Value="Model.T3_1" />
+        </div>
+        <div class="form-group col-md-2">
+            <label>T3 - 2</label>
+            <InputText class="form-control" @bind-Value="Model.T3_2" />
+        </div>
+        <div class="form-group col-md-2">
+            <label>T3 - 3</label>
+            <InputText class="form-control" @bind-Value="Model.T3_3" />
+        </div>
+        <div class="form-group col-md-2">
+            <label>T3 - 4</label>
+            <InputText class="form-control" @bind-Value="Model.T3_4" />
+        </div>
+        <div class="form-group col-md-2">
+            <label>T3 - 5</label>
+            <InputText class="form-control" @bind-Value="Model.T3_5" />
+        </div>
+        <div class="form-group col-md-2">
+            <label>T3 - 6</label>
+            <InputText class="form-control" @bind-Value="Model.T3_6" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>T3 - 7</label>
+        <InputText class="form-control" @bind-Value="Model.T3_7" />
+    </div>
+
+    <div class="form-group">
+        <label>Condition</label>
+        <InputText class="form-control" @bind-Value="Model.Condition" />
+    </div>
+
+    <div class="form-group">
+        <label>Cause</label>
+        <InputText class="form-control" @bind-Value="Model.Cause" />
+    </div>
+
+    <div class="form-group">
+        <label>Remedy</label>
+        <InputText class="form-control" @bind-Value="Model.Remedy" />
+    </div>
+
+    <div class="form-row font-weight-bold border-bottom pb-2 mb-2">
+        <div class="col">Pay Code</div>
+        <div class="col">OFP</div>
+        <div class="col">Local F.</div>
+        <div class="col">Part No.</div>
+        <div class="col">Part Description</div>
+        <div class="col">Qty.</div>
+        <div class="col">Price</div>
+        <div class="col">TCA Price</div>
+        <div class="col">Actions</div>
+    </div>
+
+    @foreach (var line in Model.WarrantyClaimPartLines)
+    {
+        <div class="form-row align-items-center mb-2">
+            <div class="col">
+                <InputSelect class="form-control" @bind-Value="line.PayCode">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </InputSelect>
+            </div>
+
+            <div class="col text-center">
+                <InputCheckbox  class="form-check-input" style="margin-top: 0.5rem;" @bind-Value="line.OFP" />
+            </div>
+
+            <div class="col">
+                <InputSelect class="form-control" @bind-Value="line.LocalF">
+                    <option value="J">J</option>
+                    <option value="L">L</option>
+                </InputSelect>
+            </div>
+
+            <div class="col">
+                <InputText class="form-control" @bind-Value="line.PartNumber" placeholder="Part No." />
+            </div>
+
+            <div class="col">
+                <InputText class="form-control" @bind-Value="line.PartDescription" placeholder="Part Description" />
+            </div>
+
+            <div class="col">
+                <InputNumber  step="1" class="form-control" @bind-Value="line.Qty" placeholder="Qty" />
+            </div>
+
+            <div class="col">
+                <InputNumber type="number" step="0.1" class="form-control" @bind-Value="line.Price" placeholder="Price" />
+            </div>
+
+            <div class="col">
+                <InputNumber type="number" step="0.1" class="form-control" @bind-Value="line.TCAPrice" placeholder="TCA Price" />
+            </div>
+
+            <div class="col text-center">
+                <button type="button" class="btn btn-outline-danger btn-sm" @onclick="@(() => Model.WarrantyClaimPartLines.Remove(line))">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+    }
+
+    <div class="text-center mt-3">
+        <button type="button" class="btn btn-info btn-sm" @onclick="@(() => Model.WarrantyClaimPartLines.Add(new()))">
+            <i class="fas fa-plus mr-1"></i> Add Part Line
+        </button>
+    </div>
+
+
+
+
+    <div class="form-group">
+        <label>OFP No.</label>
+        <div class="form-control-plaintext border rounded py-2 px-3 bg-light">Test</div>
+    </div>
+
+    <div class="form-group">
+        <label>Parts Total</label>
+        <div class="form-control-plaintext border rounded py-2 px-3 bg-light">@Model.PartsTotalAmount.ToCurrencyFormat()</div>
+    </div>
+
+    <div class="form-group">
+        <label>P.W.R. / P.R.R</label>
+        <InputNumber  step="0.01" class="form-control" @bind-Value="Model.PRR1" placeholder="0.00" />
+    </div>
+
+    <div class="form-group">
+        <label>Parts Sub Total</label>
+        <div class="form-control-plaintext border rounded py-2 px-3 bg-light">@Model.PartsSubTotalAmountTCA.ToCurrencyFormat()</div>
+    </div>
+
+    <div class="form-group">
+        <label>Parts Total</label>
+        <div class="form-control-plaintext border rounded py-2 px-3 bg-light">@Model.PartsTotalAmountTCA.ToCurrencyFormat()</div>
+    </div>
+
+    <div class="form-group">
+        <label>Total Claim Amount</label>
+        <div class="form-control-plaintext border rounded py-2 px-3 bg-light">@Model.TotalClaimAmount.ToCurrencyFormat()</div>
+    </div>
+
+    <div class="form-group">
+        <label>Total Claim Amount (TCA)</label>
+        <div class="form-control-plaintext border rounded py-2 px-3 bg-light">@Model.TotalClaimAmountTCA.ToCurrencyFormat()</div>
+    </div>
+
+    <div class="form-group">
+        <label>Process Date</label>
+        <div class="form-control-plaintext border rounded py-2 px-3 bg-light"></div>
+    </div>
+
+    <div class="form-group">
+        <label>Process Date (TCA)</label>
+        <div class="form-control-plaintext border rounded py-2 px-3 bg-light"></div>
+    </div>
+
+
+    <div class="form-group">
+    <label for="LaborAdjustment">Labor %</label>
+   <InputNumber @bind-Value="Model.LaborAdjustment"  />
+</div>
+
+<div class="form-group">
+    <label for="SubletAdjustment">Sublet %</label>
+    <InputNumber type="number" step="0.01" class="form-control" id="SubletAdjustment" @bind-Value="Model.SubletAdjustment" />
+</div>
+
+<div class="form-group">
+    <label for="PartsAdjustment">Parts %</label>
+    <InputNumber type="number" step="0.01" class="form-control" id="PartsAdjustment" @bind-Value="Model.PartsAdjustment" />
+</div>
+
+<div class="form-group">
+    <label for="DealerComments">Dealer Comments</label>
+        <InputTextArea class="form-control" id="DealerComments" @bind-Value="Model.DealerComments"></InputTextArea>
+</div>
+
+<div class="alert alert-warning">
+    This <strong>WILL NOT</strong> be Exported to CSV. It's from <strong>Dealer to TCA</strong>
+</div>
+
+<div class="form-group">
+    <label for="DistComment1">TCA Comments</label>
+    <InputTextArea class="form-control" id="DistComment1" @bind-Value="Model.DistComment1"></InputTextArea>
+</div>
+
+<div class="alert alert-success">
+    This <strong>WILL</strong> be Exported to CSV. It's from <strong>TCA to TMC</strong>
+</div>
+
+<div class="form-group">
+    <label for="BatteryTestCode11">Test Code 1-1</label>
+    <InputText type="text" class="form-control" id="BatteryTestCode11" @bind-Value="Model.BatteryTestCode11" />
+</div>
+
+<div class="form-group">
+    <label for="BatteryTestCode12">Test Code 1-2</label>
+    <InputText type="text" class="form-control" id="BatteryTestCode12" @bind-Value="Model.BatteryTestCode12" />
+</div>
+
+    <div class="form-group">
+        <label for="TSB">TSB Number</label>
+        <InputText type="text" class="form-control" id="TSB" @bind-Value="Model.TSB" />
+    </div>
+</EditForm>
+@code {
+    [SupplyParameterFromForm]
+    WarrantyClaimDTO Model { get; set; }
+
+    WarrantyClaimValidator validator = new();
+
+    async void Submit()
+    {
+        Console.WriteLine("Submit");
+        await validator.ValidateAsync(Model);
+    }
+    protected override void OnInitialized() =>
+    Model ??= new() { };
+}

@@ -1,0 +1,636 @@
+﻿@page "/NormalForm"
+<h3>Normal Form</h3>
+
+<EditForm  Model="Model"  OnValidSubmit="Submit" FormName="Starship3">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" ButtonType="ButtonType.Submit">Order</MudButton>
+
+    <MudTextFieldExtended Label="TWC No."
+    @bind-Value="Model.TWCNo"
+    For="() => Model.TWCNo" />
+
+    <MudTextFieldExtended Label="Dealer Claim No."
+    @bind-Value="Model.DealerClaimNo"
+    For="() => Model.DealerClaimNo" />
+    <MudTextFieldExtended Label="Dealer Code"
+    @bind-Value="Model.DealerCode"
+    For="() => Model.DealerCode" />
+
+    @if (Model.WarrantyType == WarrantyTypes.VE.Key ||
+    Model.WarrantyType == WarrantyTypes.SSC.Key
+    )
+    {
+
+        <MudDatePickerExtended Label="Date of Receipt"
+        Clearable="true"
+        @bind-Date="Model.DateOfReceipt"
+        For="() => Model.DateOfReceipt" />
+    }
+
+    <MudSelectExtended OnlyValidateIfDirty="true"
+    T="ProcessFlags"
+    Label="Process Flag"
+    AnchorOrigin="Origin.BottomCenter"
+    @bind-Value="Model.ProcessFlg"
+    For="@(() => Model.ProcessFlg)">
+        @foreach (var x in Enum.GetValues<ProcessFlags>())
+        {
+            <MudSelectItem Value="@x">@x.Describe()</MudSelectItem>
+        }
+    </MudSelectExtended>
+
+    <MudSelectExtended OnlyValidateIfDirty="true"
+    T="string"
+    Label="Warranty Type"
+    AnchorOrigin="Origin.BottomCenter"
+    @bind-Value="Model.WarrantyType"
+    For="@(() => Model.WarrantyType)">
+        <MudSelectItem Value="@(WarrantyTypes.SSC.Key)" T="string">@WarrantyTypes.SSC.Value</MudSelectItem>
+        <MudSelectItem Value="@(WarrantyTypes.VE.Key)" T="string">@WarrantyTypes.VE.Value</MudSelectItem>
+        <MudSelectItem Value="@(WarrantyTypes.AC.Key)" T="string">@WarrantyTypes.AC.Value</MudSelectItem>
+        <MudSelectItem Value="@(WarrantyTypes.P1.Key)" T="string">@WarrantyTypes.P1.Value</MudSelectItem>
+        <MudSelectItem Value="@(WarrantyTypes.P2.Key)" T="string">@WarrantyTypes.P2.Value</MudSelectItem>
+        <MudSelectItem Value="@(WarrantyTypes.A1.Key)" T="string">@WarrantyTypes.A1.Value</MudSelectItem>
+        <MudSelectItem Value="@(WarrantyTypes.A2.Key)" T="string">@WarrantyTypes.A2.Value</MudSelectItem>
+    </MudSelectExtended>
+
+    <MudSelectExtended OnlyValidateIfDirty="true"
+    T="OperationTypes"
+    Label="Operation Type"
+    AnchorOrigin="Origin.BottomCenter"
+    @bind-Value="Model.OperationType"
+    For="@(() => Model.OperationType)">
+        @foreach (var x in Enum.GetValues<OperationTypes>())
+        {
+            <MudSelectItem Value="@x">@x.Describe()</MudSelectItem>
+        }
+    </MudSelectExtended>
+
+    <MudSelectExtended OnlyValidateIfDirty="true"
+    T="string"
+    Label="Franchise"
+    @bind-Value="Model.Franchise"
+    For="@(() => Model.Franchise)"
+    AnchorOrigin="Origin.BottomCenter">
+        <MudSelectItem Value="@(Franchises.Toyota.Key)" T="string">@Franchises.Toyota.Value</MudSelectItem>
+        <MudSelectItem Value="@(Franchises.Lexus.Key)" T="string">@Franchises.Lexus.Value</MudSelectItem>
+    </MudSelectExtended>
+
+    <MudDatePickerExtended Label="Previous Repair Date"
+    Clearable="true"
+    @bind-Date="Model.AcPreviousRepairDate"
+    For="() => Model.AcPreviousRepairDate" />
+
+    <MudNumericFieldExtended Label="Previous Repair KM"
+    Format="#,0"
+    Step="100"
+    @bind-Value="Model.AcPreviousRepairKm"
+    For="() => Model.AcPreviousRepairKm" />
+
+    <MudTextFieldExtended Label="Previous Repair Order No"
+    @bind-Value="Model.ACPreviousRepairOrderNo"
+    For="() => Model.ACPreviousRepairOrderNo" />
+
+    <MudTextFieldExtended Label="AcPrevious Invoice No"
+    @bind-Value="Model.AcPreviousInvoiceNo"
+    For="() => Model.AcPreviousInvoiceNo" />
+
+
+    @if (Model.WarrantyType == WarrantyTypes.P2.Key)
+    {
+
+        <MudDatePickerExtended Label="Previous Counter Sale Date"
+        Clearable="true"
+        @bind-Date="Model.AcPreviousRepairDate"
+        For="() => Model.AcPreviousRepairDate" />
+
+        <MudTextFieldExtended Label="Current Invoice No."
+        @bind-Value="Model.AcCurrentInvoiceNo"
+        For="() => Model.AcCurrentInvoiceNo" />
+
+        <MudDatePickerExtended Label="Current Counter Sale Date"
+        Clearable="true"
+        @bind-Date="Model.RepairDate"
+        For="() => Model.RepairDate" />
+    }
+
+    @if (Model.WarrantyType == WarrantyTypes.A1.Key || Model.WarrantyType == WarrantyTypes.A2.Key)
+    {
+        <MudDatePickerExtended Label="AC. Install Date"
+        Clearable="true"
+        @bind-Date="Model.AcInstallDate"
+        For="() => Model.AcInstallDate" />
+
+        <MudNumericFieldExtended Label="AC Install KM"
+        Format="#,0"
+        Step="100"
+        @bind-Value="Model.AcInstallKm"
+        For="() => Model.AcInstallKm" />
+    }
+
+    @if (Model.WarrantyType == WarrantyTypes.P2.Key)
+    {
+        <MudCheckBoxExtended Class="checkbox-with-border-bottom"
+        Label="NV"
+        Disabled
+        Value="true"
+        T="bool"
+        Size="Size.Small" />
+    }
+    else
+    {
+        <MudCheckBoxExtended Class="checkbox-with-border-bottom"
+        Label="NV"
+        @bind-Value="Model.NV"
+        For="@(() => Model.NV)"
+        Size="Size.Small" />
+    }
+
+
+    <MudTextFieldExtended Label="WMI"
+    @bind-Value="Model.VIN_WMI"
+    For="() => Model.VIN_WMI" />
+
+    <MudTextFieldExtended Label="VDS"
+    @bind-Value="Model.VIN_VDS"
+    For="() => Model.VIN_VDS" />
+
+    <MudTextFieldExtended Label="CD"
+    @bind-Value="Model.VIN_CD"
+    For="() => Model.VIN_CD" />
+
+    <MudTextFieldExtended Label="VIS"
+    @bind-Value="Model.VIN_VIS"
+    For="() => Model.VIN_VIS" />
+
+    <MudTextFieldExtended Label="VIN"
+    Value="Model.VIN" />
+
+    <MudDatePickerExtended Label="Delivery Date"
+    Clearable="true"
+    @bind-Date="Model.DeliveryDate"
+    For="() => Model.DeliveryDate" />
+
+    @if (Model.WarrantyType != WarrantyTypes.P2.Key)
+    {
+
+        <MudDatePickerExtended Label="Repair (Open) Date"
+        Clearable="true"
+        @bind-Date="Model.RepairDate"
+        For="() => Model.RepairDate" />
+
+        <MudDatePickerExtended Label="Repair (Completion) Date"
+        Clearable="true"
+        @bind-Date="Model.RepairCompletionDate"
+        For="() => Model.RepairCompletionDate" />
+    }
+
+    <MudNumericFieldExtended Label="Odometer"
+    Format="#,0"
+    Step="100"
+    @bind-Value="Model.Odometer"
+    For="() => Model.Odometer" />
+
+    <MudSelectExtended OnlyValidateIfDirty="true"
+    T="KMFlags"
+    Label="K/M Flag"
+    AnchorOrigin="Origin.BottomCenter"
+    @bind-Value="Model.KMFlg"
+    For="@(() => Model.KMFlg)">
+        @foreach (var x in Enum.GetValues<KMFlags>())
+        {
+            <MudSelectItem Value="@x">@x.Describe()</MudSelectItem>
+        }
+    </MudSelectExtended>
+
+
+    <MudTextFieldExtended Label="Current Repair Order No."
+    @bind-Value="Model.RepairOrderNo"
+    For="() => Model.RepairOrderNo" />
+
+    <MudSelectExtended OnlyValidateIfDirty="true"
+    T="string"
+    Label="Data-ID"
+    @bind-Value="Model.DataID"
+    For="@(() => Model.DataID)"
+    AnchorOrigin="Origin.BottomCenter">
+        <MudSelectItem Value="@(DataIDs.W.Key)" T="string">@DataIDs.W.Value</MudSelectItem>
+        <MudSelectItem Value="@(DataIDs.S.Key)" T="string">@DataIDs.S.Value</MudSelectItem>
+        <MudSelectItem Value="@(DataIDs.T.Key)" T="string">@DataIDs.T.Value</MudSelectItem>
+    </MudSelectExtended>
+
+
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Pay Code</MudText>
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Ope. M</MudText>
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Operation No.</MudText>
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Hour</MudText>
+
+
+
+    @foreach (var line in Model.WarrantyClaimLaborLines)
+    {
+        <MudSelectExtended OnlyValidateIfDirty="true"
+        @bind-Value="line.PayCode"
+        For="@(() => line.PayCode)"
+        AnchorOrigin="Origin.BottomCenter">
+            <MudSelectItem Value="@("0")" T="string">0</MudSelectItem>
+            <MudSelectItem Value="@("1")" T="string">1</MudSelectItem>
+            <MudSelectItem Value="@("2")" T="string">2</MudSelectItem>
+            <MudSelectItem Value="@("3")" T="string">3</MudSelectItem>
+        </MudSelectExtended>
+
+        <MudCheckBoxExtended Class="checkbox-with-border-bottom"
+        @bind-Value="line.MainOperation"
+        For="@(() => line.MainOperation)"
+        Size="Size.Small" />
+
+        <MudTextFieldExtended Label="Operation No."
+        @bind-Value="line.OperationNumber"
+        For="() => line.OperationNumber" />
+
+        <MudNumericFieldExtended Label="Hour"
+        Format="0.0"
+        Step="0.1m"
+        @bind-Value="line.Hour"
+        For="() => line.Hour" />
+
+        <MudNumericFieldExtended Label="TCA Hour"
+        Format="0.0"
+        Step="0.1m"
+        @bind-Value="line.TCAHour"
+        For="() => line.TCAHour" />
+
+        <MudIconButton ButtonType="ButtonType.Button"
+        Style="margin:10px;"
+        Variant="Variant.Outlined"
+        Color="Color.Error"
+        Size="Size.Small"
+        OnClick="@(() => Model.WarrantyClaimLaborLines.Remove(line))"
+        Icon="@Icons.Material.Filled.Delete" />
+    }
+
+
+    <MudButton Variant="Variant.Filled"
+    Color="Color.Info"
+    Style="margin:auto; margin-top:15px;"
+    Size="Size.Small"
+    OnClick="@(() => Model.WarrantyClaimLaborLines.Add(new()))"
+    StartIcon="@Icons.Material.Filled.Add">
+        Add Labor Line
+    </MudButton>
+
+
+    <MudField Variant="Variant.Outlined" Label="Labor Rate">
+        @Model.LaborRate.ToCurrencyFormat()
+    </MudField>
+
+    <MudField Variant="Variant.Outlined" Label="Labor Total (Hrs)">
+        @Model.HourTotal
+    </MudField>
+
+    <MudField Variant="Variant.Outlined" Label="Labor Total (Amount)">
+        @Model.LaborTotalAmount.ToCurrencyFormat()
+    </MudField>
+
+
+    <MudField Variant="Variant.Outlined" Label="TCA Labor Total (Hrs)">
+        @Model.HourTotalTCA
+    </MudField>
+
+    <MudField Variant="Variant.Outlined" Label="TCA Labor Total (Amount)">
+        @Model.LaborTotalAmountTCA.ToCurrencyFormat()
+    </MudField>
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Pay Code</MudText>
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Sublet Type</MudText>
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Invoice No.</MudText>
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Amount</MudText>
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Description</MudText>
+
+
+    @foreach (var line in Model.WarrantyClaimSubletLines)
+    {
+        <MudSelectExtended OnlyValidateIfDirty="true"
+        @bind-Value="line.PayCode"
+        For="@(() => line.PayCode)"
+        AnchorOrigin="Origin.BottomCenter">
+            <MudSelectItem Value="@("0")" T="string">0</MudSelectItem>
+            <MudSelectItem Value="@("1")" T="string">1</MudSelectItem>
+            <MudSelectItem Value="@("2")" T="string">2</MudSelectItem>
+            <MudSelectItem Value="@("3")" T="string">3</MudSelectItem>
+        </MudSelectExtended>
+
+        <MudSelectExtended OnlyValidateIfDirty="true"
+        @bind-Value="line.SubletType"
+        For="@(() => line.SubletType)"
+        AnchorOrigin="Origin.BottomCenter">
+            <MudSelectItem Value="@SubletTypes.AC.Key">@(SubletTypes.AC.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.AL.Key">@(SubletTypes.AL.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.BA.Key">@(SubletTypes.BA.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.DS.Key">@(SubletTypes.DS.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.EL.Key">@(SubletTypes.EL.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.GL.Key">@(SubletTypes.GL.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.MC.Key">@(SubletTypes.MC.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.OF.Key">@(SubletTypes.OF.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.PT.Key">@(SubletTypes.PT.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.RA.Key">@(SubletTypes.RA.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.SL.Key">@(SubletTypes.SL.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.TW.Key">@(SubletTypes.TW.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.TY.Key">@(SubletTypes.TY.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.UP.Key">@(SubletTypes.UP.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.WD.Key">@(SubletTypes.WD.Value)</MudSelectItem>
+            <MudSelectItem Value="@SubletTypes.ZZ.Key">@(SubletTypes.ZZ.Value)</MudSelectItem>
+        </MudSelectExtended>
+
+        <MudTextFieldExtended Label="Invoice No."
+        @bind-Value="line.InvoiceNo"
+        For="() => line.InvoiceNo" />
+
+        <MudNumericFieldExtended Label="Amount"
+        Format="#,0.00"
+        Step="0.1m"
+        @bind-Value="line.Amount"
+        For="() => line.Amount" />
+
+        <MudTextFieldExtended Label="Description"
+        @bind-Value="line.Description"
+        For="() => line.Description" />
+
+        <MudIconButton ButtonType="ButtonType.Button"
+        Style="margin:10px;"
+        Variant="Variant.Outlined"
+        Color="Color.Error"
+        Size="Size.Small"
+        OnClick="@(() => Model.WarrantyClaimSubletLines.Remove(line))"
+        Icon="@Icons.Material.Filled.Delete" />
+
+    }
+
+
+    <MudButton Variant="Variant.Filled"
+    Color="Color.Info"
+    Style="margin:auto; margin-top:15px;"
+    Size="Size.Small"
+    OnClick="@(() => Model.WarrantyClaimSubletLines.Add(new()))"
+    StartIcon="@Icons.Material.Filled.Add">
+        Add Sublet Line
+    </MudButton>
+
+
+    <MudTextFieldExtended Label="Sublet Description"
+    @bind-Value="Model.SubletDescription"
+    For="() => Model.SubletDescription" />
+
+
+    <MudField Variant="Variant.Outlined" Label="Sublet Total">
+        @Model.SubletTotalAmount.ToCurrencyFormat()
+    </MudField>
+
+    <MudTextFieldExtended Label="T1"
+    @bind-Value="Model.T1"
+    For="() => Model.T1" />
+
+    <MudTextFieldExtended Label="T2"
+    @bind-Value="Model.T2"
+    For="() => Model.T2" />
+
+    <MudTextFieldExtended Label="T3 - 1"
+    @bind-Value="Model.T3_1"
+    For="() => Model.T3_1" />
+
+    <MudTextFieldExtended Label="T3 - 2"
+    @bind-Value="Model.T3_2"
+    For="() => Model.T3_2" />
+
+    <MudTextFieldExtended Label="T3 - 3"
+    @bind-Value="Model.T3_3"
+    For="() => Model.T3_3" />
+
+    <MudTextFieldExtended Label="T3 - 4"
+    @bind-Value="Model.T3_4"
+    For="() => Model.T3_4" />
+
+    <MudTextFieldExtended Label="T3 - 5"
+    @bind-Value="Model.T3_5"
+    For="() => Model.T3_5" />
+
+    <MudTextFieldExtended Label="T3 - 6"
+    @bind-Value="Model.T3_6"
+    For="() => Model.T3_6" />
+
+    <MudTextFieldExtended Label="T3 - 7"
+    @bind-Value="Model.T3_7"
+    For="() => Model.T3_7" />
+
+
+    <MudTextFieldExtended Label="Condition"
+    @bind-Value="Model.Condition"
+    For="() => Model.Condition" />
+
+
+    <MudTextFieldExtended Label="Cause"
+    @bind-Value="Model.Cause"
+    For="() => Model.Cause" />
+
+
+
+    <MudTextFieldExtended Label="Remedy"
+    @bind-Value="Model.Remedy"
+    For="() => Model.Remedy" />
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Pay Code</MudText>
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">OFP</MudText>
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Local F.</MudText>
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Part No.</MudText>
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Part Description</MudText>
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Qty.</MudText>
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">Price</MudText>
+
+
+    <MudText Class="mud-text-with-border pb-3" Typo="Typo.subtitle2">TCA Price</MudText>
+
+    @foreach (var line in Model.WarrantyClaimPartLines)
+    {
+
+        <MudSelectExtended OnlyValidateIfDirty="true"
+        @bind-Value="line.PayCode"
+        For="@(() => line.PayCode)"
+        AnchorOrigin="Origin.BottomCenter">
+            <MudSelectItem Value="@("0")" T="string">0</MudSelectItem>
+            <MudSelectItem Value="@("1")" T="string">1</MudSelectItem>
+            <MudSelectItem Value="@("2")" T="string">2</MudSelectItem>
+            <MudSelectItem Value="@("3")" T="string">3</MudSelectItem>
+        </MudSelectExtended>
+
+        <MudCheckBoxExtended Class="checkbox-with-border-bottom"
+        @bind-Value="line.OFP"
+        For="@(() => line.OFP)"
+        Size="Size.Small" />
+
+        <MudSelectExtended OnlyValidateIfDirty="true"
+        @bind-Value="line.LocalF"
+        For="@(() => line.LocalF)"
+        AnchorOrigin="Origin.BottomCenter">
+            <MudSelectItem Value="@("J")" T="string">J</MudSelectItem>
+            <MudSelectItem Value="@("L")" T="string">L</MudSelectItem>
+        </MudSelectExtended>
+
+        <MudTextFieldExtended Label="Part No."
+        @bind-Value="line.PartNumber"
+        For="() => line.PartNumber" />
+
+        <MudTextFieldExtended Label="Part Description"
+        @bind-Value="line.PartDescription"
+        For="() => line.PartDescription" />
+
+        <MudNumericFieldExtended Label="Qty"
+        Format="0"
+        Step="1"
+        @bind-Value="line.Qty"
+        For="() => line.Qty" />
+
+        <MudNumericFieldExtended Label="Price"
+        Format="#,0.00"
+        Step="0.1m"
+        @bind-Value="line.Price"
+        For="() => line.Price" />
+
+
+        <MudNumericFieldExtended Label="TCA Price"
+        Format="#,0.00"
+        Step="0.1m"
+        @bind-Value="line.TCAPrice"
+        For="() => line.TCAPrice" />
+
+        <MudIconButton ButtonType="ButtonType.Button"
+        Style="margin:10px;"
+        Variant="Variant.Outlined"
+        Color="Color.Error"
+        Size="Size.Small"
+        OnClick="@(() => Model.WarrantyClaimPartLines.Remove(line))"
+        Icon="@Icons.Material.Filled.Delete" />
+    }
+
+
+    <MudButton Variant="Variant.Filled"
+    Color="Color.Info"
+    Style="margin:auto; margin-top:15px;"
+    Size="Size.Small"
+    OnClick="@(() => Model.WarrantyClaimPartLines.Add(new()))"
+    StartIcon="@Icons.Material.Filled.Add">
+        Add Part Line
+    </MudButton>
+
+    <MudField Variant="Variant.Outlined" Label="OFP No.">
+        Test
+    </MudField>
+
+    <MudField Variant="Variant.Outlined" Label="Parts Total">
+        @Model.PartsTotalAmount.ToCurrencyFormat()
+    </MudField>
+
+
+    <MudTextFieldExtended Label="P.W.R. / P.R.R"
+    Format="0.00"
+    @bind-Value="Model.PRR1" />
+
+    <MudField Variant="Variant.Outlined" Label="Parts Sub Total">
+        @Model.PartsSubTotalAmountTCA.ToCurrencyFormat()
+    </MudField>
+
+    <MudField Variant="Variant.Outlined" Label="Parts Total">
+        @Model.PartsTotalAmountTCA.ToCurrencyFormat()
+    </MudField>
+
+    <MudField Variant="Variant.Outlined" Label="Total Claim Amount">
+        @Model.TotalClaimAmount.ToCurrencyFormat()
+    </MudField>
+
+    <MudField Variant="Variant.Outlined" Label="Total Clam Amount (TCA)">
+        @Model.TotalClaimAmountTCA.ToCurrencyFormat()
+    </MudField>
+
+
+    <MudField Variant="Variant.Outlined" Label="Process Date">
+
+    </MudField>
+
+    <MudField Variant="Variant.Outlined" Label="Process Date (TCA)">
+
+    </MudField>
+
+
+    <MudTextFieldExtended Label="Labor %"
+    @bind-Value="Model.LaborAdjustment"
+    For="() => Model.LaborAdjustment" />
+
+    <MudTextFieldExtended Label="Sublet %"
+    @bind-Value="Model.SubletAdjustment"
+    For="() => Model.SubletAdjustment" />
+
+    <MudTextFieldExtended Label="Parts %"
+    @bind-Value="Model.PartsAdjustment"
+    For="() => Model.PartsAdjustment" />
+
+    <MudTextFieldExtended Label="Dealer Comments"
+    @bind-Value="Model.DealerComments"
+    For="() => Model.DealerComments" />
+
+    <MudAlert Severity="Severity.Warning">This <strong>WILL NOT</strong> be Exported to CSV. It's from <strong>Dealer to TCA</strong></MudAlert>
+
+
+    <MudTextFieldExtended Label="TCA Comments"
+    @bind-Value="Model.DistComment1"
+    For="() => Model.DistComment1" />
+
+    <MudAlert Severity="Severity.Success">This <strong>WILL</strong> be Exported to CSV. It's from <strong>TCA to TMC</strong></MudAlert>
+
+
+    <MudTextFieldExtended Label="Test Code 1-1"
+    @bind-Value="Model.BatteryTestCode11"
+    For="() => Model.BatteryTestCode11" />
+
+    <MudTextFieldExtended Label="Test Code 1-2"
+    @bind-Value="Model.BatteryTestCode12"
+    For="() => Model.BatteryTestCode12" />
+
+    <MudTextFieldExtended Label="Test Code 2-1"
+    @bind-Value="Model.BatteryTestCode21"
+    For="() => Model.BatteryTestCode21" />
+
+    <MudTextFieldExtended Label="Test Code 2-2"
+    @bind-Value="Model.BatteryTestCode22"
+    For="() => Model.BatteryTestCode22"></MudTextFieldExtended>
+
+    <MudTextFieldExtended Label="TSB Number"
+    @bind-Value="Model.TSB"
+    For="() => Model.TSB" />
+</EditForm>
+@code {
+    [SupplyParameterFromForm]
+    WarrantyClaimDTO Model { get; set; }
+
+    WarrantyClaimValidator validator = new();
+
+    async void Submit()
+    {
+        Console.WriteLine("Submit");
+        await validator.ValidateAsync(Model);
+    }
+    protected override void OnInitialized() =>
+    Model ??= new() { };
+}
