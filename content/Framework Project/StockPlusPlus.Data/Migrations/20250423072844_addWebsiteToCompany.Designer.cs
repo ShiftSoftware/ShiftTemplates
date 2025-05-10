@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockPlusPlus.Data.DbContext;
 
@@ -11,9 +12,11 @@ using StockPlusPlus.Data.DbContext;
 namespace StockPlusPlus.Data.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20250423072844_addWebsiteToCompany")]
+    partial class addWebsiteToCompany
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -400,9 +403,6 @@ namespace StockPlusPlus.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("ParentCompanyID")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("PeriodEnd")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
@@ -420,8 +420,6 @@ namespace StockPlusPlus.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("ParentCompanyID");
 
                     b.ToTable("Companies", "ShiftIdentity");
 
@@ -1237,9 +1235,6 @@ namespace StockPlusPlus.Data.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<string>("Signature")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -1741,16 +1736,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Navigation("Region");
                 });
 
-            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Company", b =>
-                {
-                    b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.Company", "ParentCompany")
-                        .WithMany("ChildCompanies")
-                        .HasForeignKey("ParentCompanyID")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("ParentCompany");
-                });
-
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.CompanyBranch", b =>
                 {
                     b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.City", "City")
@@ -1955,8 +1940,6 @@ namespace StockPlusPlus.Data.Migrations
 
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Company", b =>
                 {
-                    b.Navigation("ChildCompanies");
-
                     b.Navigation("CompanyBranches");
                 });
 
