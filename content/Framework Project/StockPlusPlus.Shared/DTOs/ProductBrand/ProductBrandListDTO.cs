@@ -1,5 +1,7 @@
 ﻿
 using ShiftSoftware.ShiftEntity.Model.Dtos;
+using ShiftSoftware.ShiftBlazor.Utils;
+
 #if (includeItemTemplateContent)
 using ShiftSoftware.ShiftEntity.Model;
 using System.Text.Json.Serialization;
@@ -11,6 +13,7 @@ namespace StockPlusPlus.Shared.DTOs.ProductBrand;
 #endif
 public class ProductBrandListDTO : ShiftEntityListDTO
 {
+    [ShiftListNumberFormatterExport("###,###.")]
     public override string? ID { get; set; }
 #if (includeItemTemplateContent)
     [JsonConverter(typeof(LocalizedTextJsonConverter))]

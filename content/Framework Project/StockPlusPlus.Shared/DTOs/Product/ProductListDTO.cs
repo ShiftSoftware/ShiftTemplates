@@ -1,6 +1,7 @@
 ﻿
 using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model;
+using ShiftSoftware.ShiftBlazor.Utils;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using ShiftSoftware.ShiftEntity.Model.HashIds;
 using ShiftSoftware.ShiftIdentity.Core.DTOs.City;
@@ -36,6 +37,8 @@ public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO
     [CityHashIdConverter]
     public string? CityID { get; set; }
     public CityListDTO? City { get; set; }
+
+    [ShiftListCustomColumnExport("Property.ID", "-", "Property.CityID", "-", "Property.City.Name")]
     public string? CustomID
     {
         get
