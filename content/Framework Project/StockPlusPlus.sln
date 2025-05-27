@@ -11,9 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockPlusPlus.Data", "Stock
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockPlusPlus.Web", "StockPlusPlus.Web\StockPlusPlus.Web.csproj", "{656427A0-3E14-4C43-B69B-0F259EDE18F5}"
 EndProject
-
-<!--#if shiftFrameworkDevelopmentMode-->
-
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftFramework", "ShiftFramework", "{6B5137B3-F21C-483E-B131-54706EE91D55}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\azure-pipeline.yml = ..\..\azure-pipeline.yml
@@ -23,20 +20,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftFramework", "ShiftFram
 		..\..\template-versions.ps1 = ..\..\template-versions.ps1
 	EndProjectSection
 EndProject
-
-<!--#endif -->
-
-<!--#if addFunctions-->
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockPlusPlus.Functions", "StockPlusPlus.Functions\StockPlusPlus.Functions.csproj", "{D781393E-1509-4ABC-BEA2-404A3F829548}"
 EndProject
-<!--#endif -->
-
-<!--#if addTest-->
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockPlusPlus.Test", "StockPlusPlus.Test\StockPlusPlus.Test.csproj", "{FDF7449B-ED4F-44C7-8B2A-956CF45E337D}"
 EndProject
-<!--#endif -->
-
-<!--#if shiftFrameworkDevelopmentMode-->
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftEntity", "ShiftEntity", "{221AA4A6-F48E-4605-90FC-ACCE31C9397D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftEntity.Model", "..\..\..\ShiftEntity\ShiftEntity.Model\ShiftEntity.Model.csproj", "{B0353BF9-2018-48B0-AEA5-4FC3A5225F93}"
@@ -93,8 +80,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftSoftwareLocalization",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockPlusPlus.Web.Tests", "StockPlusPlus.Web.Tests\StockPlusPlus.Web.Tests.csproj", "{8FF93190-7E36-4E40-9D1F-569CDAD1C752}"
 EndProject
-<!--#endif -->
-
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,23 +102,14 @@ Global
 		{656427A0-3E14-4C43-B69B-0F259EDE18F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{656427A0-3E14-4C43-B69B-0F259EDE18F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{656427A0-3E14-4C43-B69B-0F259EDE18F5}.Release|Any CPU.Build.0 = Release|Any CPU
-
-		<!--#if addFunctions-->
 		{D781393E-1509-4ABC-BEA2-404A3F829548}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D781393E-1509-4ABC-BEA2-404A3F829548}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D781393E-1509-4ABC-BEA2-404A3F829548}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D781393E-1509-4ABC-BEA2-404A3F829548}.Release|Any CPU.Build.0 = Release|Any CPU
-		<!--#endif -->
-
-		<!--#if addTest-->
 		{FDF7449B-ED4F-44C7-8B2A-956CF45E337D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FDF7449B-ED4F-44C7-8B2A-956CF45E337D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDF7449B-ED4F-44C7-8B2A-956CF45E337D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDF7449B-ED4F-44C7-8B2A-956CF45E337D}.Release|Any CPU.Build.0 = Release|Any CPU
-		<!--#endif -->
-
-
-		<!--#if shiftFrameworkDevelopmentMode-->
 		{B0353BF9-2018-48B0-AEA5-4FC3A5225F93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0353BF9-2018-48B0-AEA5-4FC3A5225F93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0353BF9-2018-48B0-AEA5-4FC3A5225F93}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -218,13 +194,11 @@ Global
 		{8FF93190-7E36-4E40-9D1F-569CDAD1C752}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FF93190-7E36-4E40-9D1F-569CDAD1C752}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8FF93190-7E36-4E40-9D1F-569CDAD1C752}.Release|Any CPU.Build.0 = Release|Any CPU
-		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-	<!--#if shiftFrameworkDevelopmentMode-->
 		{221AA4A6-F48E-4605-90FC-ACCE31C9397D} = {6B5137B3-F21C-483E-B131-54706EE91D55}
 		{B0353BF9-2018-48B0-AEA5-4FC3A5225F93} = {221AA4A6-F48E-4605-90FC-ACCE31C9397D}
 		{DD2654E7-C46E-4112-A453-039005BBBD30} = {221AA4A6-F48E-4605-90FC-ACCE31C9397D}
@@ -252,7 +226,6 @@ Global
 		{5B117C1F-88F6-4B06-9ADE-C39A47EFAF58} = {221AA4A6-F48E-4605-90FC-ACCE31C9397D}
 		{4D85A86A-821A-4F93-B525-E3C22360EFC1} = {6B5137B3-F21C-483E-B131-54706EE91D55}
 		{AF49ADB4-B36C-476B-AF0C-BC9277FFA8AF} = {4D85A86A-821A-4F93-B525-E3C22360EFC1}
-		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C409BB4-536D-4DA4-8127-17F75A5B4330}
