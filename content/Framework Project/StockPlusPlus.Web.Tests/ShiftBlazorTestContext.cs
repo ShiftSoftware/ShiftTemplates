@@ -2,10 +2,6 @@
 using Bunit.TestDoubles;
 using ShiftSoftware.ShiftBlazor.Extensions;
 using ShiftSoftware.TypeAuth.Blazor.Extensions;
-using StockPlusPlus.Shared.Localization;
-using Syncfusion.Blazor;
-using ShiftSoftware.ShiftIdentity.Blazor.Extensions;
-using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
 
 namespace StockPlusPlus.Web.Tests;
 
@@ -20,7 +16,6 @@ public class ShiftBlazorTestContext : TestContext
             config.ShiftConfiguration = options =>
             {
                 options.BaseAddress = "http://localhost";
-                options.ApiPath = "/api";
                 options.UserListEndpoint = "/odata/PublicUser";
             };
         });
@@ -34,7 +29,6 @@ public class ShiftBlazorTestContext : TestContext
         //#endif
 
         Services.AddTypeAuth(o => { });
-        Services.AddSyncfusionBlazor();
 
         this.AddTestAuthorization();
     }

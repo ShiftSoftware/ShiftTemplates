@@ -15,8 +15,6 @@ using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
 #endif
 #if (includeSampleApp)
 using StockPlusPlus.Shared.ActionTrees;
-using Syncfusion.Blazor;
-using Syncfusion.Licensing;
 #endif
 #if (includeSampleApp && internalShiftIdentityHosting)
 using System.Net.Http.Json;
@@ -49,11 +47,6 @@ shiftIdentityApiURL = string.IsNullOrWhiteSpace(shiftIdentityApiURL) ? baseUrl :
 var shiftIdentityFrontEndURL = builder.Configuration!.GetValue<string>("ShiftIdentityFrontEnd")!;
 shiftIdentityFrontEndURL = string.IsNullOrWhiteSpace(shiftIdentityFrontEndURL) ? baseUrl : shiftIdentityFrontEndURL; //Fallback to BaseURL if emtpy
 
-#if (includeSampleApp)
-builder.Services.AddSyncfusionBlazor();
-SyncfusionLicenseProvider.RegisterLicense("");
-#endif
-
 builder.Services.AddShiftBlazor(config =>
 {
     config.ShiftConfiguration = options =>
@@ -63,7 +56,6 @@ builder.Services.AddShiftBlazor(config =>
         {
             ["ShiftIdentityApi"] = shiftIdentityApiURL
         };
-        options.ApiPath = "/api";
         //options.ODataPath = "/odata";
         options.UserListEndpoint = shiftIdentityApiURL.AddUrlPath("IdentityPublicUser");
 #if (internalShiftIdentityHosting)
