@@ -15,12 +15,10 @@
 		<PackageReference Include="ShiftSoftware.ShiftEntity.Model" Version="$(ShiftFrameworkVersion)" />
 		<PackageReference Include="ShiftSoftware.ShiftIdentity.Core" Version="$(ShiftFrameworkVersion)" />
 		<PackageReference Include="ShiftSoftware.TypeAuth.Core" Version="$(TypeAuthVersion)" />
-		<PackageReference Include="ShiftSoftware.ShiftBlazor" Version="$(ShiftFrameworkVersion)" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<!--#if shiftFrameworkDevelopmentMode-->
-		<ProjectReference Include="..\..\..\..\ShiftBlazor\ShiftBlazor\ShiftBlazor.csproj" Condition="Exists('..\..\..\..\ShiftBlazor\ShiftBlazor\ShiftBlazor.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.CosmosDbReplication\ShiftEntity.CosmosDbReplication.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.CosmosDbReplication\ShiftEntity.CosmosDbReplication.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Model\ShiftEntity.Model.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.Model\ShiftEntity.Model.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Core\ShiftIdentity.Core.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Core\ShiftIdentity.Core.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />

@@ -1,6 +1,5 @@
 ﻿
 using ShiftSoftware.ShiftEntity.Model.Dtos;
-using ShiftSoftware.ShiftBlazor.Utils;
 
 #if (includeItemTemplateContent)
 using ShiftSoftware.ShiftEntity.Model;
