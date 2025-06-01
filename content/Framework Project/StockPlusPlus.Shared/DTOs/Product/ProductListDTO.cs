@@ -36,8 +36,6 @@ public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO
     [CityHashIdConverter]
     public string? CityID { get; set; }
     public CityListDTO? City { get; set; }
-
-    [ShiftListCustomColumnExport("Property.ID", "-", "Property.CityID", "-", "Property.City.Name")]
     public string? CustomID
     {
         get
