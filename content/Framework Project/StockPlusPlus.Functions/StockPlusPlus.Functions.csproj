@@ -4,7 +4,7 @@
 	<!--#endif -->
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<AzureFunctionsVersion>v4</AzureFunctionsVersion>
 		<!--<_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>-->
 		<UserSecretsId>1fad2a95-8f41-4ec1-bbd2-f40a3c3f86ac</UserSecretsId>
@@ -27,7 +27,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.22.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.2.0" />
-		<PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.17.2" />
+		<PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.0" />
 		<PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.22.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="1.2.0" />
 
