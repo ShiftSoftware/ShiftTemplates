@@ -250,7 +250,7 @@
       "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2024.12.24.4"
+        "value": "2025.5.31.2"
       },
       "datatype": "string",
       "generator": "constant"
@@ -260,7 +260,7 @@
       "description": "Replace AzureFunctionsAspNetCoreAuthorization Version",
       "replaces": "$(AzureFunctionsAspNetCoreAuthorizationVersion)",
       "parameters": {
-        "value": "0.0.11"
+        "value": "0.0.12"
       },
       "datatype": "string",
       "generator": "constant"
