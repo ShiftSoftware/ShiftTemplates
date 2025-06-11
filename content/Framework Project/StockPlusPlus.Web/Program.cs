@@ -48,9 +48,6 @@ shiftIdentityApiURL = string.IsNullOrWhiteSpace(shiftIdentityApiURL) ? baseUrl :
 var shiftIdentityFrontEndURL = builder.Configuration!.GetValue<string>("ShiftIdentityFrontEnd")!;
 shiftIdentityFrontEndURL = string.IsNullOrWhiteSpace(shiftIdentityFrontEndURL) ? baseUrl : shiftIdentityFrontEndURL; //Fallback to BaseURL if emtpy
 
-#if (includeSampleApp)
-#endif
-
 builder.Services.AddShiftBlazor(config =>
 {
     config.ShiftConfiguration = options =>
@@ -58,9 +55,9 @@ builder.Services.AddShiftBlazor(config =>
         options.BaseAddress = baseUrl!;
         options.ExternalAddresses = new Dictionary<string, string?>
         {
-            ["ShiftIdentityApi"] = shiftIdentityApiURL
+            ["ShiftIdentityApi"] = shiftIdentityApiURL,
+            ["StockPluPlus"] = baseUrl
         };
-        //options.ODataPath = "/odata";
         options.UserListEndpoint = shiftIdentityApiURL.AddUrlPath("IdentityPublicUser");
 #if (internalShiftIdentityHosting)
         options.AdditionalAssemblies = new[] { typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly };
@@ -92,8 +89,8 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
 
         await Task.WhenAll(new List<Task>
         {
-            Task.Run(async () => { brands = await httpService.GetFromJsonAsync<ODataDTO<ProductBrandListDTO>>("/api/ProductBrand"); }),
-            Task.Run(async () => { categories = await httpService.GetFromJsonAsync<ODataDTO<ProductCategoryListDTO>>("/api/ProductCategory"); })
+            Task.Run(async () => { brands = await httpService.GetFromJsonAsync<ODataDTO<ProductBrandListDTO>>("ProductBrand"); }),
+            Task.Run(async () => { categories = await httpService.GetFromJsonAsync<ODataDTO<ProductCategoryListDTO>>("ProductCategory"); })
         });
 
         StockPlusPlusActionTree.DataLevelAccess.ProductBrand.Expand(brands!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
@@ -106,7 +103,11 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
     x.AddCompanyCustomField("SomeExternalLink", "Some External Link")
     .AddCompanyCustomField("Password", "Password", true)
     .AddCompanyBranchCustomField("Username", "User Name")
-    .AddCompanyBranchCustomField("Password", true);
+    .AddCompanyBranchCustomField("Password", true)
+    .AddCompanyBranchPhoneTag("marketing")
+    .AddCompanyBranchPhoneTag("customer-service")
+    .AddCompanyBranchEmailTag("support")
+    .AddCompanyBranchEmailTag("help-desk");
 #endif
 });
 #endif

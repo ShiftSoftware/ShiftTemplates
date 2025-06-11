@@ -16,6 +16,7 @@ public class ShiftBlazorTestContext : TestContext
             config.ShiftConfiguration = options =>
             {
                 options.BaseAddress = "http://localhost";
+                //options.ApiPath = "/api";
                 options.UserListEndpoint = "/odata/PublicUser";
             };
         });
@@ -29,7 +30,7 @@ public class ShiftBlazorTestContext : TestContext
         //#endif
 
         Services.AddTypeAuth(o => { });
-
+        
         this.AddTestAuthorization();
     }
 }

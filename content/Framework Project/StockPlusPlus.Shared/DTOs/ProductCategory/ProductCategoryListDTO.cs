@@ -23,5 +23,5 @@ public class ProductCategoryListDTO : ShiftEntityListDTO, IHasBrandForeignColumn
     [ShiftSoftware.ShiftEntity.Model.HashIds.BrandHashIdConverter]
     public string? BrandID { get; set; }
 
-    public List<Product.ProductListDTO> Products { get; set; } = new();
+    //public List<Product.ProductListDTO> Products { get; set; } = new();
 }

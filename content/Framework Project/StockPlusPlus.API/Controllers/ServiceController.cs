@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Extensions;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Azure.Cosmos;
+using Microsoft.OData.UriParser;
+using ShiftSoftware.ShiftEntity.Web.Services;
 using ShiftSoftware.ShiftIdentity.Core;
+using ShiftSoftware.ShiftIdentity.Core.DTOs.Country;
 using ShiftSoftware.TypeAuth.AspNetCore;
 using ShiftSoftware.TypeAuth.Core;
-using StockPlusPlus.Shared.DTOs.Service;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,32 +24,40 @@ public class ServiceController : ControllerBase
         this.client = client;
     }
 
-    // GET: api/<ServiceController>
+   
     [HttpGet]
-    [CustomEnableQueryAttribute]
-    public IActionResult Get()
+    public async Task<IActionResult> Get(ODataQueryOptions<CountryDTO> oDataQueryOptions)
     {
-        var container = client.GetContainer("Identity", "Services");
-        var query = container.GetItemLinqQueryable<ServiceListDTO>(true);
 
-        return Ok(query);
-    }
-}
+        var container = client.GetContainer("Identity", "Countries");
 
-public class CustomEnableQueryAttribute : EnableQueryAttribute
-{
-    public override IQueryable ApplyQuery(IQueryable queryable, ODataQueryOptions queryOptions)
-    {
-        if (queryOptions.Count?.Value == true)
+        var query = container.GetItemLinqQueryable<CountryDTO>(true).Where(x => true);
+
+        //Copied directly from GetOdataListingNew in ShiftEntityWeb, below should be implemented on the framework level.
+
+        var typeAuthService = this.HttpContext.RequestServices.GetRequiredService<ITypeAuthService>();
+
+        if (!typeAuthService.CanRead(ShiftIdentityActions.Countries))
+            return Forbid();
+
+        bool isFilteringByIsDeleted = false;
+
+        FilterClause? filterClause = oDataQueryOptions.Filter?.FilterClause;
+
+        if (filterClause is not null)
         {
-            // Handle $count manually
-            var count = ((IQueryable<object>)queryable).Count(); // Convert to list before counting
-            queryOptions.Request.ODataFeature().TotalCount = (long)count; // Cast to long
+            var visitor = new SoftDeleteQueryNodeVisitor();
 
-            // Remove $count from the query options to prevent further processing
-            queryOptions = new ODataQueryOptions(queryOptions.Context, queryOptions.Request);
+            var visited = filterClause.Expression.Accept(visitor);
+
+            isFilteringByIsDeleted = visitor.IsFilteringByIsDeleted;
         }
 
-        return base.ApplyQuery(queryable, queryOptions);
+        if (!isFilteringByIsDeleted)
+            query = query.Where(x => x.IsDeleted == false);
+
+        var result = await ODataIqueryable.GetOdataDTOFromIQueryableAsync(query, oDataQueryOptions, Request, false);
+
+        return Ok(result);
     }
 }

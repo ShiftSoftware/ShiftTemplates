@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockPlusPlus.Data.DbContext;
 
@@ -11,9 +12,11 @@ using StockPlusPlus.Data.DbContext;
 namespace StockPlusPlus.Data.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20241224122943_addUniqueHashToProductBrand")]
+    partial class addUniqueHashToProductBrand
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -400,9 +403,6 @@ namespace StockPlusPlus.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("ParentCompanyID")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("PeriodEnd")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
@@ -416,12 +416,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<string>("ShortCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Website")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("ID");
-
-                    b.HasIndex("ParentCompanyID");
 
                     b.ToTable("Companies", "ShiftIdentity");
 
@@ -473,10 +468,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Emails")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("IntegrationId")
                         .HasColumnType("nvarchar(max)");
 
@@ -513,10 +504,6 @@ namespace StockPlusPlus.Data.Migrations
                         .HasColumnName("PeriodStart");
 
                     b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phones")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Photos")
@@ -1237,9 +1224,6 @@ namespace StockPlusPlus.Data.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<string>("Signature")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -1628,7 +1612,7 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.HasIndex("UniqueHash")
                         .IsUnique()
-                        .HasFilter("UniqueHash IS NOT NULL and IsDeleted = 0");
+                        .HasFilter("UniqueHash IS NOT NULL");
 
                     b.ToTable("Brands");
 
@@ -1739,16 +1723,6 @@ namespace StockPlusPlus.Data.Migrations
                         .HasForeignKey("RegionID");
 
                     b.Navigation("Region");
-                });
-
-            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Company", b =>
-                {
-                    b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.Company", "ParentCompany")
-                        .WithMany("ChildCompanies")
-                        .HasForeignKey("ParentCompanyID")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("ParentCompany");
                 });
 
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.CompanyBranch", b =>
@@ -1955,8 +1929,6 @@ namespace StockPlusPlus.Data.Migrations
 
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Company", b =>
                 {
-                    b.Navigation("ChildCompanies");
-
                     b.Navigation("CompanyBranches");
                 });
 

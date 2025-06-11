@@ -10,8 +10,10 @@
 <ShiftEntityForm @bind-Mode="Mode"
                  @bind-Value="TheItem"
                  @ref="FormContainer"
+                 AllowSaveAsNew
                  Action="ProductBrand"
                  Title="ProductBrand"
+                 BaseUrlKey="StockPluPlus"
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
                  @bind-Key="@Key">
     @*#if (includeItemTemplateContent)*@
