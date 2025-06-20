@@ -19,9 +19,7 @@ using ShiftSoftware.ShiftIdentity.Core.Entities;
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
 using ShiftSoftware.ShiftIdentity.AspNetCore;
 using ShiftSoftware.ShiftEntity.Model.Enums;
-using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Shared.Localization;
-using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 using Microsoft.Extensions.Azure;
 #endif
 #if (externalShiftIdentityHosting)
