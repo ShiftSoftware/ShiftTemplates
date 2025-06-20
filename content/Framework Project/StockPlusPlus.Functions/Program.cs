@@ -39,6 +39,8 @@ var host = new HostBuilder()
            h.Configuration.GetValue<string>("HMS:AppId")!);
 
         x.RequireValidModels(true);
+
+        x.UseRequestLocalization();
     })
     .ConfigureAppConfiguration(builder =>
     {
@@ -57,6 +59,8 @@ var host = new HostBuilder()
         services.AddSingleton<IOpenApiHttpTriggerAuthorization, OpenApiHttpTriggerAuthorization>(x => new OpenApiHttpTriggerAuthorization(openApiKey));
 
         services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
+
+        services.AddLocalization();
 
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
