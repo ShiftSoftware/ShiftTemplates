@@ -92,6 +92,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftSoftwareLocalization", "..\..\..\ShiftFrameworkLocalization\ShiftSoftwareLocalization\ShiftSoftwareLocalization.csproj", "{AF49ADB4-B36C-476B-AF0C-BC9277FFA8AF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockPlusPlus.Web.Tests", "StockPlusPlus.Web.Tests\StockPlusPlus.Web.Tests.csproj", "{8FF93190-7E36-4E40-9D1F-569CDAD1C752}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftIdentity.AzureFunctions", "..\..\..\ShiftIdentity\ShiftIdentity.AzureFunctions\ShiftIdentity.AzureFunctions.csproj", "{E828868F-585A-4B86-0785-F837CCC32C36}"
 EndProject
 <!--#endif -->
 
@@ -218,6 +219,10 @@ Global
 		{8FF93190-7E36-4E40-9D1F-569CDAD1C752}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FF93190-7E36-4E40-9D1F-569CDAD1C752}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8FF93190-7E36-4E40-9D1F-569CDAD1C752}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E828868F-585A-4B86-0785-F837CCC32C36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E828868F-585A-4B86-0785-F837CCC32C36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E828868F-585A-4B86-0785-F837CCC32C36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E828868F-585A-4B86-0785-F837CCC32C36}.Release|Any CPU.Build.0 = Release|Any CPU
 		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
@@ -252,6 +257,7 @@ Global
 		{5B117C1F-88F6-4B06-9ADE-C39A47EFAF58} = {221AA4A6-F48E-4605-90FC-ACCE31C9397D}
 		{4D85A86A-821A-4F93-B525-E3C22360EFC1} = {6B5137B3-F21C-483E-B131-54706EE91D55}
 		{AF49ADB4-B36C-476B-AF0C-BC9277FFA8AF} = {4D85A86A-821A-4F93-B525-E3C22360EFC1}
+		{E828868F-585A-4B86-0785-F837CCC32C36} = {628E8BC1-C04D-4681-90A3-5CD4DF6A4003}
 		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
