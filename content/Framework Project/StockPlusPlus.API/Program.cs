@@ -21,6 +21,7 @@ using ShiftSoftware.ShiftIdentity.AspNetCore;
 using ShiftSoftware.ShiftEntity.Model.Enums;
 using StockPlusPlus.Shared.Localization;
 using Microsoft.Extensions.Azure;
+using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore;
 #endif
 #if (externalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
@@ -45,6 +46,10 @@ var cosmosConnectionString = builder.Configuration.GetValue<string>("CosmosDb:Co
 if (!string.IsNullOrWhiteSpace(cosmosConnectionString))
     builder.Services.AddSingleton(new CosmosClient(cosmosConnectionString));
 
+
+var liveIdentitySQLServer = builder.Configuration.GetConnectionString("LiveIdentitySQLServer")!;
+if (!string.IsNullOrWhiteSpace(liveIdentitySQLServer))
+    builder.Services.AddDbContext<LiveShiftIdentityDbContext>(options => options.UseSqlServer(liveIdentitySQLServer));
 
 if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
 {

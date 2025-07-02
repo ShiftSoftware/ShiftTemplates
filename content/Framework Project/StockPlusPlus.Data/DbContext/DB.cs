@@ -18,7 +18,7 @@ public partial class DB : ShiftIdentityDbContext
 public partial class DB : ShiftDbContext
 #endif
 {
-    public DB(DbContextOptions option) : base(option)
+    public DB(DbContextOptions<DB> option) : base(option)
     {
     }
 
