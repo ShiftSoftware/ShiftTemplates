@@ -10,6 +10,7 @@ using System.Text.Json.Serialization;
 
 namespace StockPlusPlus.Shared.DTOs.Product;
 
+[ShiftEntityKeyAndName(nameof(ID), nameof(Name))]
 public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO>
 {
     [_ProductHashId]

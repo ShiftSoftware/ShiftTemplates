@@ -11,6 +11,7 @@ using ShiftSoftware.TypeAuth.Core;
 using StockPlusPlus.Data.Repositories;
 using StockPlusPlus.Shared.ActionTrees;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
+using System.Globalization;
 using System.Net;
 
 namespace StockPlusPlus.Functions
@@ -53,7 +54,8 @@ namespace StockPlusPlus.Functions
             return new OkObjectResult(new
             {
                 AllProducts = allProductCategories,
-                FirstProductCategory = productCategory is null ? null : item
+                FirstProductCategory = productCategory is null ? null : item,
+                Lang = CultureInfo.CurrentCulture.TwoLetterISOLanguageName,
             });
         }
     }
