@@ -46,14 +46,14 @@ var cosmosConnectionString = builder.Configuration.GetValue<string>("CosmosDb:Co
 if (!string.IsNullOrWhiteSpace(cosmosConnectionString))
     builder.Services.AddSingleton(new CosmosClient(cosmosConnectionString));
 
-
-var liveIdentitySQLServer = builder.Configuration.GetConnectionString("LiveIdentitySQLServer")!;
-if (!string.IsNullOrWhiteSpace(liveIdentitySQLServer))
-    builder.Services.AddDbContext<LiveShiftIdentityDbContext>(options => options.UseSqlServer(liveIdentitySQLServer));
-
 if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
 {
 #if (internalShiftIdentityHosting)
+
+    var liveIdentitySQLServer = builder.Configuration.GetConnectionString("LiveIdentitySQLServer")!;
+    if (!string.IsNullOrWhiteSpace(liveIdentitySQLServer))
+        builder.Services.AddDbContext<LiveShiftIdentityDbContext>(options => options.UseSqlServer(liveIdentitySQLServer));
+
     builder.Services.AddShiftEntityCosmosDbReplicationTrigger(x =>
     {
         string databaseId = "Identity";
