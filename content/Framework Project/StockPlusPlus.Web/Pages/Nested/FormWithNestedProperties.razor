@@ -1,0 +1,74 @@
+﻿@page "/nested"
+
+@using FluentValidation;
+@using ShiftSoftware.ShiftEntity.Model.Dtos;
+@using static StockPlusPlus.Web.Pages.Nested.FormWithNestedProperties
+
+@inherits ShiftForm<FormWithNestedProperties, ClassWithNestedListProperty>
+
+<ShiftEntityForm @bind-Mode="Mode"
+                 @bind-Value="TheItem"
+                 @ref="FormContainer"
+                 Action="Product"
+                 Title="Product"
+                 TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Product"
+                 AllowClone
+                 OnlyValidateOnSubmit
+                 Validator="new ClassWithNestedListPropertyValidator()"
+                 @bind-Key="@Key">
+
+    <MudTextField @bind-Value="@TheItem.Name" For="() => TheItem.Name"></MudTextField>
+    <ValidationMessage For="() => TheItem.Name"></ValidationMessage>
+
+    @foreach (var nested in TheItem.NestedClasses)
+    {
+        <div @key="nested">
+            <MudTextField @bind-Value="@nested.Name" For="() => nested.Name"></MudTextField>
+            <MudNumericField @bind-Value="@nested.Age" For="() => nested.Age"></MudNumericField>
+            
+            <ValidationMessage For="() => nested.Name"></ValidationMessage>
+            <ValidationMessage For="() => nested.Age"></ValidationMessage>
+        </div>
+    }
+
+    <MudButton OnClick="() => TheItem.NestedClasses.Add(new())">Add Nested</MudButton>
+
+
+</ShiftEntityForm>
+
+@code {
+
+    public class ClassWithNestedListProperty : ShiftEntityViewAndUpsertDTO
+    {
+        public string? Name { get; set; }
+
+        public List<NestedClass> NestedClasses { get; set; } = new List<NestedClass>() { new(), new(), };
+        public override string? ID { get; set; }
+
+    }
+
+    public class NestedClass
+    {
+        public string? Name { get; set; }
+        public int Age { get; set; }
+    }
+
+
+    public class ClassWithNestedListPropertyValidator : AbstractValidator<ClassWithNestedListProperty>
+    {
+        public ClassWithNestedListPropertyValidator()
+        {
+            RuleFor(x => x.Name).NotEmpty();
+            RuleForEach(x => x.NestedClasses).SetValidator(new NestedClassValidator());
+        }
+    }
+
+    public class NestedClassValidator : AbstractValidator<NestedClass>
+    {
+        public NestedClassValidator()
+        {
+            RuleFor(x => x.Name).NotEmpty().MinimumLength(3);
+            RuleFor(x => x.Age).NotEmpty();
+        }
+    }
+}

@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
-using StockPlusPlus.Web.Pages.FormTest;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 using static MudBlazor.Icons.Custom;
@@ -264,6 +263,55 @@ public class WarrantyClaimValidator : AbstractValidator<WarrantyClaimDTO>
         RuleFor(x => x.AcCurrentInvoiceNo)
             .NotNull()
             .When(x => x.WarrantyType == WarrantyTypes.P2.Key);
+
+        RuleForEach(x => x.WarrantyClaimSubletLines).SetValidator(new WarrantyClaimSubletLineValidator());
+        RuleForEach(x => x.WarrantyClaimLaborLines).SetValidator(new WarrantyClaimLaborLineValidator());
+        RuleForEach(x => x.WarrantyClaimPartLines).SetValidator(new WarrantyClaimPartLineValidator());
+    }
+}
+
+public class WarrantyClaimSubletLineValidator : AbstractValidator<WarrantyClaimSubletLineDTO>
+{
+    public WarrantyClaimSubletLineValidator()
+    {
+        RuleFor(x => x.InvoiceNo).NotEmpty();
+        RuleFor(x => x.PayCode).NotEmpty();
+        //RuleFor(x => x.OperationNumber)
+            //.NotEmpty()
+            //.WithMessage("Required");
+        //RuleFor(x => x.Hour).GreaterThan(0);
+        //RuleFor(x => x.TCAHour).GreaterThan(0);
+        RuleFor(x => x.Amount).GreaterThan(0);
+        //RuleFor(x => x.TCAAmount).GreaterThan(0);
+    }
+}
+
+public class WarrantyClaimLaborLineValidator : AbstractValidator<WarrantyClaimLaborLineDTO>
+{
+    public WarrantyClaimLaborLineValidator()
+    {
+        RuleFor(x => x.PayCode).NotEmpty();
+        RuleFor(x => x.OperationNumber)
+            .NotEmpty()
+            .WithMessage("Required");
+        RuleFor(x => x.Hour).GreaterThan(0);
+        RuleFor(x => x.TCAHour).GreaterThan(0);
+        //RuleFor(x => x.Amount).GreaterThan(0);
+        //RuleFor(x => x.TCAAmount).GreaterThan(0);
+    }
+}
+
+public class WarrantyClaimPartLineValidator : AbstractValidator<WarrantyClaimPartLineDTO>
+{
+    public WarrantyClaimPartLineValidator()
+    {
+        RuleFor(x => x.Price).NotEmpty();
+        RuleFor(x => x.Qty).NotEmpty();
+        RuleFor(x => x.PartDescription).NotEmpty();
+        RuleFor(x => x.PartNumber).NotEmpty();
+        RuleFor(x => x.LocalF).NotEmpty();
+        RuleFor(x => x.PayCode).NotEmpty();
+
     }
 }
 

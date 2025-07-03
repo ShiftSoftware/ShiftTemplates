@@ -1,5 +1,6 @@
 ﻿@*#if (includeSampleApp)*@
 @using ShiftSoftware.ShiftIdentity.Core
+@using StockPlusPlus.Web.Pages.Nested
 @using StockPlusPlus.Web.Pages.Product
 @using StockPlusPlus.Web.Pages.ProductBrand
 @using StockPlusPlus.Web.Pages.ProductCategory
@@ -31,6 +32,11 @@
                           Match="NavLinkMatch.All"
                           Icon="@Icons.Material.Outlined.Checklist"
                           TypeAuthAction="ShiftIdentityActions.Services">Services</AuthorizedMudNavLink>
+
+    <MudNavLink Href="@($"nested")"
+                          Match="NavLinkMatch.All"
+                Icon="@Icons.Material.Outlined.NestCamWiredStand">Nested</MudNavLink>
+
     @*#endif*@
 </MudNavMenu>
 

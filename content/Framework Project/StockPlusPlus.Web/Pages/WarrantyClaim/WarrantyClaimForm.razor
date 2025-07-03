@@ -14,6 +14,7 @@
                  TypeAuthAction="null"
                  ShowPrint
                  OnTaskFinished="OnTaskFinished"
+                 Validator="new WarrantyClaimValidator()"
                  @bind-Key="@Key">
 
     <MudGrid Spacing="4">
@@ -50,6 +51,7 @@
             <MudTextFieldExtended Label="TWC No."
                                   @bind-Value="TheItem.TWCNo"
                                   For="() => TheItem.TWCNo" />
+            @* <ValidationMessage For="() => TheItem.TWCNo"></ValidationMessage> *@
         </MudItem>
 
         @if(isDistributor)
@@ -977,7 +979,7 @@
 
                         @foreach (var line in TheItem.WarrantyClaimPartLines)
                         {
-                            <MudItem lg="11" md="11" sm="11" xs="11">
+                            <MudItem @key="line" lg="11" md="11" sm="11" xs="11">
                                 <MudGrid Spacing="3" Style="align-items: baseline;">
                                     <MudItem Class="pt-1 pb-1" lg="1" md="4" sm="6" xs="12">
                                         <MudSelectExtended OnlyValidateIfDirty="true"
@@ -989,6 +991,8 @@
                                             <MudSelectItem Value="@("2")" T="string">2</MudSelectItem>
                                             <MudSelectItem Value="@("3")" T="string">3</MudSelectItem>
                                         </MudSelectExtended>
+
+                                        <ValidationMessage For="@(() => line.PayCode)"/>
                                     </MudItem>
 
                                     <MudItem Class="pt-1 pb-1" lg="1" md="3" sm="6" xs="12">
@@ -996,6 +1000,7 @@
                                                              @bind-Value="line.OFP"
                                                              For="@(() => line.OFP)"
                                                              Size="Size.Small" />
+                                        <ValidationMessage For="@(() => line.OFP)"/>
                                     </MudItem>
 
                                     <MudItem Class="pt-1 pb-1" lg="1" md="4" sm="6" xs="12">
@@ -1005,6 +1010,7 @@
                                                            AnchorOrigin="Origin.BottomCenter">
                                             <MudSelectItem Value="@("J")" T="string">J</MudSelectItem>
                                             <MudSelectItem Value="@("L")" T="string">L</MudSelectItem>
+                                        <ValidationMessage For="@(() => line.LocalF)"/>
                                         </MudSelectExtended>
                                     </MudItem>
 
@@ -1016,12 +1022,14 @@
                                                               DebounceInterval="300"
                                                               ValueChanged="(string newValue) => PartChanged(line, newValue)"
                                                               For="() => line.PartNumber" />
+                                        <ValidationMessage For="@(() => line.PartNumber)"/>
                                     </MudItem>
 
                                     <MudItem Class="pt-1 pb-1" lg="4" md="4" sm="6" xs="12">
                                         <MudTextFieldExtended Label="Part Description"
                                                               @bind-Value="line.PartDescription"
                                                               For="() => line.PartDescription" />
+                                        <ValidationMessage For="@(() => line.PartDescription)"/>
                                     </MudItem>
 
                                     <MudItem Class="pt-1 pb-1" lg="1" md="4" sm="6" xs="12">
@@ -1030,6 +1038,7 @@
                                                                  Step="1"
                                                                  @bind-Value="line.Qty"
                                                                  For="() => line.Qty" />
+                                        <ValidationMessage For="@(() => line.Qty)"/>
                                     </MudItem>
 
                                     <MudItem Class="pt-1 pb-1" lg="1" md="4" sm="6" xs="12">
@@ -1040,6 +1049,7 @@
                                                                  Disabled="line.FoundInLookup"
                                                                  @bind-Value="line.Price"
                                                                  For="() => line.Price" />
+                                        <ValidationMessage For="@(() => line.Price)"/>
                                     </MudItem>
 
                                     @if (isDistributor)
