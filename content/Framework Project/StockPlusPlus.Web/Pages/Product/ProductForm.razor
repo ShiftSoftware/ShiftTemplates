@@ -27,8 +27,7 @@
                           @bind-Value="TheItem.Name"
                           For="@(() => TheItem.Name)" />
 
-    <ShiftDateTimePicker DateLabel="Date"
-                         TimeLabel="Time"
+    <ShiftDateTimePicker Label="Release Date"
                          @bind-DateTimeOffset="TheItem.ReleaseDate"
                          For="() => TheItem.ReleaseDate" />
 
