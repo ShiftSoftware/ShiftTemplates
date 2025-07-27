@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockPlusPlus.Data.DbContext;
 
@@ -11,9 +12,11 @@ using StockPlusPlus.Data.DbContext;
 namespace StockPlusPlus.Data.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20250727124307_AddTerminationDateToCompany")]
+    partial class AddTerminationDateToCompany
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -416,8 +419,8 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<string>("ShortCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("TerminationDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("TerminationDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Website")
                         .HasColumnType("nvarchar(max)");
