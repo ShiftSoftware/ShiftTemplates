@@ -12,12 +12,12 @@ public class ProductController : ShiftEntitySecureControllerAsync<ProductReposit
 {
     public ProductController() : base(StockPlusPlusActionTree.Product, x =>
     {
-        x.FilterBy(x => x.ID, StockPlusPlusActionTree.DataLevelAccess.ProductCategory)
-        .DecodeHashId<ProductCategoryListDTO>()
-        .IncludeCreatedByCurrentUser(x => x.CreatedByUserID);
+        //x.FilterBy(x => x.ID, StockPlusPlusActionTree.DataLevelAccess.ProductCategory)
+        //.DecodeHashId<ProductCategoryListDTO>()
+        //.IncludeCreatedByCurrentUser(x => x.CreatedByUserID);
 
-        x.FilterBy(x => x.ID, StockPlusPlusActionTree.DataLevelAccess.ProductBrand)
-        .IncludeCreatedByCurrentUser(x => x.CreatedByUserID);
+        //x.FilterBy(x => x.ID, StockPlusPlusActionTree.DataLevelAccess.ProductBrand)
+        //.IncludeCreatedByCurrentUser(x => x.CreatedByUserID);
     }
     )
     {
