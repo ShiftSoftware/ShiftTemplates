@@ -64,7 +64,10 @@ var host = new HostBuilder()
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
         services
-        .AddShiftEntity(x =>
+        .RegisterShiftEntityEfCoreTriggers()
+        .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")!));
+
+        services.AddMvc().AddShiftEntityWeb(x =>
         {
             x.AddDataAssembly(typeof(StockPlusPlus.Data.Marker).Assembly);
             x.HashId.RegisterHashId(false);
@@ -74,9 +77,7 @@ var host = new HostBuilder()
             hostBuilder.Configuration.Bind("AzureStorageAccounts", azureStorageAccounts);
 
             x.AddAzureStorage(azureStorageAccounts.ToArray());
-        })
-        .RegisterShiftEntityEfCoreTriggers()
-        .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")!));
+        });
 
 #if (includeSampleApp)
         //services.AddScoped<ProductCategoryRepository>()

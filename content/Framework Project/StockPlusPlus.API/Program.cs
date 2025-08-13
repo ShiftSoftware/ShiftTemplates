@@ -119,7 +119,6 @@ if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
 
 var mvcBuilder = builder.Services
     .AddLocalization()
-    .AddHttpContextAccessor()
     .AddControllers();
 
 builder.Services.AddShiftEntityPrint(x =>
