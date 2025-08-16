@@ -23,7 +23,7 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
     {
         var longId = ShiftEntityHashIdService.Decode<ProductCategoryDTO>(id);
 
-        var item = (await FindAsync(longId))!;
+        var item = (await FindAsync(longId, null, true))!;
 
         //Data source fo Fast Report
         var category = new
