@@ -16,9 +16,11 @@ public class ProductCategoryController : ShiftEntitySecureControllerAsync<Produc
     private readonly IConfiguration configuration;
 
     public ProductCategoryController(ProductCategoryRepository repository, IConfiguration configuration) : base(StockPlusPlusActionTree.ProductCategory, x =>
-        x.FilterBy(x => x.ID, StockPlusPlusActionTree.DataLevelAccess.ProductCategory)
-        .DecodeHashId<ProductCategoryListDTO>()
-        .IncludeCreatedByCurrentUser(x => x.CreatedByUserID)
+    {
+        //x.FilterBy(x => x.ID, StockPlusPlusActionTree.DataLevelAccess.ProductCategory)
+        //.DecodeHashId<ProductCategoryListDTO>()
+        //.IncludeCreatedByCurrentUser(x => x.CreatedByUserID)
+    }
     )
     {
         this.repository = repository;
