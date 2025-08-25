@@ -1,6 +1,6 @@
 ﻿
 
-using ShiftSoftware.ShiftEntity.Core.Flags;
+using ShiftSoftware.ShiftEntity.Model.Flags;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Shared.Enums;
 using System.ComponentModel.DataAnnotations;

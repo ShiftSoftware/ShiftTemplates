@@ -1,7 +1,9 @@
 ﻿
 using ShiftSoftware.ShiftEntity.Core;
-#if (includeItemTemplateContent)
 using ShiftSoftware.ShiftEntity.Core.Flags;
+
+#if (includeItemTemplateContent)
+using ShiftSoftware.ShiftEntity.Model.Flags;
 using ShiftSoftware.ShiftEntity.Model;
 #endif
 
