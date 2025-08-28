@@ -11,7 +11,11 @@ namespace StockPlusPlus.Data.Repositories;
 
 public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCategory, ProductCategoryListDTO, ProductCategoryDTO>
 {
-    public ProductCategoryRepository(DB db) : base(db)
+    public ProductCategoryRepository(DB db) : base(db, o => {
+        //o
+        //.FilterBy<List<long>>(x => x.Value.Contains(x.Entity.ID))
+        //.CustomValueProvider(x => { return new List<long>() { 1, 24 }; });
+    })
     {
     }
 
@@ -19,7 +23,7 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
     {
         var longId = ShiftEntityHashIdService.Decode<ProductCategoryDTO>(id);
 
-        var item = (await FindAsync(longId))!;
+        var item = (await FindAsync(longId, null, true))!;
 
         //Data source fo Fast Report
         var category = new

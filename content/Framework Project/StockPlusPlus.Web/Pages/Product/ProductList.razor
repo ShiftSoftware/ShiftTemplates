@@ -15,12 +15,15 @@
            Title="Product List"
            T="ProductListDTO"
            Dense
+           FilterPanelDefaultOpen
+           EnableFilterPanel
            ComponentType="typeof(ProductForm)"
            ShowIDColumn="true"
            TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Product"
            AddDialogParameters="AddDialogParameters"
-           EnableFilterPanel
            EnableExport>
+
+           <DateTimeFilter Label="Release Date" Property="x => x.ReleaseDate" lg="12" md="12" xl="12" sm="12" xs="12" />
 
     @if (ProductBrandID != null)
     {
@@ -35,16 +38,7 @@
     <PropertyColumn Property="x => x.Name" Title="Name" />
     <PropertyColumn Format="F" Property="x => x.LastSaveDate.DateTime" Title="SaveDate" />
 
-    @context.BrandForeignColumn
-
-    <PropertyColumn Format="F" Property="x => x.ReleaseDate.DateTime" Title="Release Date" Context="ColCtx">
-        <CellTemplate>
-            @if (ColCtx?.Item?.ReleaseDate.DateTime > DateTimeOffset.MinValue)
-            {
-                @ColCtx.Item.ReleaseDate.DateTime
-            }
-        </CellTemplate>
-    </PropertyColumn>
+    <PropertyColumn Format="F" Property="x => x.ReleaseDate" Title="Release Date" Filterable="false" />
 
     <ButtonColumn ComponentType="typeof(ProductBrandForm)" KeyPropertyName="@nameof(ProductListDTO.ProductBrandID)" Property="x => x.ProductBrand" Title="Brand">
         <ButtonTemplate Context="BtnCtx">

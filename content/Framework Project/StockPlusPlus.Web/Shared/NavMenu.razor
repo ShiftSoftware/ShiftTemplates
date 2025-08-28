@@ -27,10 +27,10 @@
                               Icon="@Icons.Material.Outlined.Category">Products</AuthorizedMudNavLink>
     </AuthorizedMudNavGroup>
 
-    <AuthorizedMudNavLink Href="@($"{nameof(ServiceList)}")"
+    <AuthorizedMudNavLink Href="@($"{nameof(CosmosCompanyList)}")"
                           Match="NavLinkMatch.All"
-                          Icon="@Icons.Material.Outlined.Checklist"
-                          TypeAuthAction="ShiftIdentityActions.Services">Services</AuthorizedMudNavLink>
+                          Icon="@Icons.Material.Outlined.Business"
+                          TypeAuthAction="ShiftSoftware.ShiftIdentity.Core.ShiftIdentityActions.Companies">Companies (Cosmos)</AuthorizedMudNavLink>
     @*#endif*@
 </MudNavMenu>
 

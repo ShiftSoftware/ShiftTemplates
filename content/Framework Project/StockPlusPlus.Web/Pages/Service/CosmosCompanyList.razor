@@ -1,0 +1,17 @@
+﻿@using StockPlusPlus.Shared.DTOs.Service
+@attribute [Authorize]
+@attribute [Route($"/{nameof(CosmosCompanyList)}")]
+
+<ShiftList EntitySet="CosmosCompany"
+           Title="Company List"
+           T="ShiftSoftware.ShiftIdentity.Core.DTOs.Company.CompanyListDTO"
+           Dense
+           DisableActionColumn
+           DisableAdd
+           ShowIDColumn="true"
+           TypeAuthAction="ShiftSoftware.ShiftIdentity.Core.ShiftIdentityActions.Companies"
+           EnableExport>
+
+    <PropertyColumn Property="x => x.Name" Title="Name" />
+
+</ShiftList>

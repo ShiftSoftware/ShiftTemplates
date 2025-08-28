@@ -92,6 +92,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftSoftwareLocalization", "..\..\..\ShiftFrameworkLocalization\ShiftSoftwareLocalization\ShiftSoftwareLocalization.csproj", "{AF49ADB4-B36C-476B-AF0C-BC9277FFA8AF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockPlusPlus.Web.Tests", "StockPlusPlus.Web.Tests\StockPlusPlus.Web.Tests.csproj", "{8FF93190-7E36-4E40-9D1F-569CDAD1C752}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftIdentity.AzureFunctions", "..\..\..\ShiftIdentity\ShiftIdentity.AzureFunctions\ShiftIdentity.AzureFunctions.csproj", "{E828868F-585A-4B86-0785-F837CCC32C36}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
@@ -103,6 +104,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docs.API", "..\..\..\ShiftFrameworkDocumentation\Docs.API\Docs.API.csproj", "{29F56928-2CEC-FA67-A5A4-468B7FD25145}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docs.Data", "..\..\..\ShiftFrameworkDocumentation\Docs.Data\Docs.Data.csproj", "{5A89825E-4826-2C7F-CA42-D5CCE221D310}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docs.SnippetGen", "..\..\..\ShiftFrameworkDocumentation\Docs.SnippetGen\Docs.SnippetGen.csproj", "{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654}"
 EndProject
 <!--#endif -->
 
@@ -249,6 +252,10 @@ Global
 		{5A89825E-4826-2C7F-CA42-D5CCE221D310}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A89825E-4826-2C7F-CA42-D5CCE221D310}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A89825E-4826-2C7F-CA42-D5CCE221D310}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654}.Release|Any CPU.Build.0 = Release|Any CPU
 		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
@@ -289,6 +296,7 @@ Global
 		{AE738989-C72B-A0B2-9318-DA7DC851150F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{29F56928-2CEC-FA67-A5A4-468B7FD25145} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{5A89825E-4826-2C7F-CA42-D5CCE221D310} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

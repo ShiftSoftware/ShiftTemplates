@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Azure.Cosmos;
 using Microsoft.OData.UriParser;
+using ShiftSoftware.ShiftEntity.Core;
+using ShiftSoftware.ShiftEntity.Model.Flags;
 using ShiftSoftware.ShiftEntity.Web.Services;
 using ShiftSoftware.ShiftIdentity.Core;
-using ShiftSoftware.ShiftIdentity.Core.DTOs.Country;
+using ShiftSoftware.ShiftIdentity.Core.DTOs.Company;
 using ShiftSoftware.TypeAuth.AspNetCore;
 using ShiftSoftware.TypeAuth.Core;
 
@@ -14,31 +16,31 @@ namespace StockPlusPlus.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[TypeAuth<ShiftIdentityActions>(nameof(ShiftIdentityActions.Services), Access.Read)]
-public class ServiceController : ControllerBase
+public class CosmosCompanyController : ControllerBase
 {
     private readonly CosmosClient client;
+    private readonly IDefaultDataLevelAccess defaultDataLevelAccess;
 
-    public ServiceController(CosmosClient client)
+    public CosmosCompanyController(CosmosClient client, IDefaultDataLevelAccess defaultDataLevelAccess)
     {
         this.client = client;
+        this.defaultDataLevelAccess = defaultDataLevelAccess;
     }
 
-   
-    [HttpGet]
-    public async Task<IActionResult> Get(ODataQueryOptions<CountryDTO> oDataQueryOptions)
+    public class CosmosCompanyListDTO : CompanyListDTO, IEntityHasCompany<CosmosCompanyListDTO>
     {
+        public long? CompanyID { get; set; }
+    }
 
-        var container = client.GetContainer("Identity", "Countries");
+    [HttpGet]
+    [TypeAuth<ShiftIdentityActions>(nameof(ShiftIdentityActions.Companies), Access.Read)]
+    public async Task<IActionResult> Get(ODataQueryOptions<CosmosCompanyListDTO> oDataQueryOptions)
+    {
+        var container = client.GetContainer("Identity", "Companies");
 
-        var query = container.GetItemLinqQueryable<CountryDTO>(true).Where(x => true);
+        var query = container.GetItemLinqQueryable<CosmosCompanyListDTO>(true).Where(x => true);
 
         //Copied directly from GetOdataListingNew in ShiftEntityWeb, below should be implemented on the framework level.
-
-        var typeAuthService = this.HttpContext.RequestServices.GetRequiredService<ITypeAuthService>();
-
-        if (!typeAuthService.CanRead(ShiftIdentityActions.Countries))
-            return Forbid();
 
         bool isFilteringByIsDeleted = false;
 
@@ -55,6 +57,8 @@ public class ServiceController : ControllerBase
 
         if (!isFilteringByIsDeleted)
             query = query.Where(x => x.IsDeleted == false);
+
+        query = this.defaultDataLevelAccess.ApplyDefaultFilterOnCompanies(query);
 
         var result = await ODataIqueryable.GetOdataDTOFromIQueryableAsync(query, oDataQueryOptions, Request, false);
 

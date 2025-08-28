@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockPlusPlus.Data.DbContext;
 
@@ -11,9 +12,11 @@ using StockPlusPlus.Data.DbContext;
 namespace StockPlusPlus.Data.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20250812080502_addTagsAndBranchToTeams")]
+    partial class addTagsAndBranchToTeams
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -283,11 +286,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<bool>("BuiltIn")
                         .HasColumnType("bit");
 
-                    b.Property<long?>("CityID")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bigint")
-                        .HasComputedColumnSql("ID");
-
                     b.Property<long?>("CountryID")
                         .HasColumnType("bigint");
 
@@ -358,11 +356,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<bool>("BuiltIn")
                         .HasColumnType("bit");
-
-                    b.Property<long?>("CompanyID")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bigint")
-                        .HasComputedColumnSql("ID");
 
                     b.Property<int>("CompanyType")
                         .HasColumnType("int");
@@ -467,11 +460,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<long?>("CityID")
                         .HasColumnType("bigint");
-
-                    b.Property<long?>("CompanyBranchID")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bigint")
-                        .HasComputedColumnSql("ID");
 
                     b.Property<long?>("CompanyID")
                         .HasColumnType("bigint");
@@ -782,11 +770,6 @@ namespace StockPlusPlus.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("CountryID")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bigint")
-                        .HasComputedColumnSql("ID");
-
                     b.Property<DateTimeOffset>("CreateDate")
                         .HasColumnType("datetimeoffset");
 
@@ -950,11 +933,6 @@ namespace StockPlusPlus.Data.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasColumnName("PeriodStart");
-
-                    b.Property<long?>("RegionID")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bigint")
-                        .HasComputedColumnSql("ID");
 
                     b.Property<string>("ShortCode")
                         .HasColumnType("nvarchar(max)");

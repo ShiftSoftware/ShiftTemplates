@@ -106,7 +106,11 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
     .AddCompanyBranchPhoneTag("marketing")
     .AddCompanyBranchPhoneTag("customer-service")
     .AddCompanyBranchEmailTag("support")
-    .AddCompanyBranchEmailTag("help-desk");
+    .AddCompanyBranchEmailTag("help-desk")
+    .AddTeamTag("tag-1")
+    .AddTeamTag("tag-2")
+    .AddTeamTag("tag-3")
+    .AddTeamTag("tag-4");
 #endif
 });
 #endif

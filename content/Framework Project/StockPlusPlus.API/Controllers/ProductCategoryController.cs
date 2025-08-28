@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShiftSoftware.ShiftEntity.Web;
 using StockPlusPlus.Data.Repositories;
 using StockPlusPlus.Shared.ActionTrees;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace StockPlusPlus.API.Controllers;
 
@@ -15,11 +12,7 @@ public class ProductCategoryController : ShiftEntitySecureControllerAsync<Produc
     private readonly ProductCategoryRepository repository;
     private readonly IConfiguration configuration;
 
-    public ProductCategoryController(ProductCategoryRepository repository, IConfiguration configuration) : base(StockPlusPlusActionTree.ProductCategory, x =>
-        x.FilterBy(x => x.ID, StockPlusPlusActionTree.DataLevelAccess.ProductCategory)
-        .DecodeHashId<ProductCategoryListDTO>()
-        .IncludeCreatedByCurrentUser(x => x.CreatedByUserID)
-    )
+    public ProductCategoryController(ProductCategoryRepository repository, IConfiguration configuration) : base(StockPlusPlusActionTree.ProductCategory)
     {
         this.repository = repository;
         this.configuration = configuration;

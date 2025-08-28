@@ -15,12 +15,7 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
 #if (includeItemTemplateContent)
     private readonly ProductBrandRepository brandRepository;
     private readonly ProductCategoryRepository productCategoryRepository;
-    public ProductBrandController(ProductBrandRepository brandRepository, ProductCategoryRepository productCategoryRepository) : base(StockPlusPlusActionTree.ProductBrand, x =>
-    {
-        x.FilterBy(x => x.ID, StockPlusPlusActionTree.DataLevelAccess.ProductBrand)
-        .IncludeCreatedByCurrentUser(x => x.CreatedByUserID);
-    }
-    )
+    public ProductBrandController(ProductBrandRepository brandRepository, ProductCategoryRepository productCategoryRepository) : base(StockPlusPlusActionTree.ProductBrand)
     {
         this.brandRepository = brandRepository;
         this.productCategoryRepository = productCategoryRepository;

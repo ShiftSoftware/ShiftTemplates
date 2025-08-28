@@ -2,10 +2,9 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using ShiftSoftware.ShiftEntity.Core.Services;
+using ShiftSoftware.ShiftEntity.Model.Dtos;
 using System.Net;
 using System.Text.Json;
-using ShiftSoftware.ShiftEntity.Functions.FileExplorer;
-using ShiftSoftware.ShiftEntity.Model.Dtos;
 
 namespace StockPlusPlus.Functions.Functions;
 
