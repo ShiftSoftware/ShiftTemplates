@@ -1,11 +1,13 @@
 ﻿@attribute [Authorize]
 @attribute [Route($"/{nameof(ProductList)}")]
 
+@using ShiftSoftware.ShiftBlazor.Filters.Models
 @using ShiftSoftware.ShiftIdentity.Core.DTOs.City
 @using StockPlusPlus.Shared.DTOs.ProductBrand;
 @using StockPlusPlus.Shared.DTOs.Product
 @using System.Linq.Expressions;
 @using StockPlusPlus.Shared.DTOs.ProductCategory;
+@using StockPlusPlus.Shared.Enums
 @using StockPlusPlus.Web.Pages.ProductBrand;
 @using StockPlusPlus.Web.Pages.ProductCategory;
 
@@ -17,6 +19,7 @@
            ShowIDColumn="true"
            TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Product"
            AddDialogParameters="AddDialogParameters"
+           EnableFilterPanel
            EnableExport>
 
     @if (ProductBrandID != null)
@@ -32,18 +35,20 @@
     <PropertyColumn Property="x => x.Name" Title="Name" />
     <PropertyColumn Format="F" Property="x => x.LastSaveDate.DateTime" Title="SaveDate" />
 
-    <PropertyColumn Format="F" Property="x => x.ReleaseDate.DateTime" Title="Release Date">
+    @context.BrandForeignColumn
+
+    <PropertyColumn Format="F" Property="x => x.ReleaseDate.DateTime" Title="Release Date" Context="ColCtx">
         <CellTemplate>
-            @if (context?.Item?.ReleaseDate.DateTime > DateTimeOffset.MinValue)
+            @if (ColCtx?.Item?.ReleaseDate.DateTime > DateTimeOffset.MinValue)
             {
-                @context.Item.ReleaseDate.DateTime
+                @ColCtx.Item.ReleaseDate.DateTime
             }
         </CellTemplate>
     </PropertyColumn>
 
     <ButtonColumn ComponentType="typeof(ProductBrandForm)" KeyPropertyName="@nameof(ProductListDTO.ProductBrandID)" Property="x => x.ProductBrand" Title="Brand">
-        <ButtonTemplate>
-            <MudChip T="string" Style="cursor: pointer;" Icon="@Icons.Material.Filled.BrandingWatermark" Variant="Variant.Outlined">@context</MudChip>
+        <ButtonTemplate Context="BtnCtx">
+            <MudChip T="string" Style="cursor: pointer;" Icon="@Icons.Material.Filled.BrandingWatermark" Variant="Variant.Outlined">@BtnCtx</MudChip>
         </ButtonTemplate>
     </ButtonColumn>
 
@@ -56,6 +61,10 @@
                    TProperty="string"
                    EntitySet="ProductCategory"
                    OpenMode="ModalOpenMode.NewTab" />
+
+
+    @context.DraftColumn
+
 
     <ForeignColumn Property="x => x.CityID"
                    Title="City"

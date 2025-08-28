@@ -5,36 +5,34 @@
 @using StockPlusPlus.Shared.Enums
 @*#endif*@
 
-@inherits ShiftForm<ProductBrandForm, ProductBrandDTO>
+@* @inherits ShiftForm<ProductBrandForm, ProductBrandDTO> *@
 
-<ShiftEntityForm @bind-Mode="Mode"
-                 @bind-Value="TheItem"
-                 @ref="FormContainer"
+<ShiftEntityForm T="ProductBrandDTO"
                  AllowSaveAsNew
-                 Action="ProductBrand"
+                 Endpoint="ProductBrand"
                  Title="ProductBrand"
                  BaseUrlKey="StockPluPlus"
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
                  @bind-Key="@Key">
-    @*#if (includeItemTemplateContent)*@
-    <LocalizedTextField @bind-Value="TheItem.Name"
-                        For="() => TheItem.Name"
+
+    <LocalizedTextField @bind-Value="context.Item.Name"
+                        For="() => context.Item.Name"
                         Label="Name" />
 
     <ShiftAutocomplete Label="Assigned Team"
-                       @bind-Value="TheItem.Team"
+                       @bind-Value="context.Item.Team"
                        TEntitySet="ShiftSoftware.ShiftIdentity.Core.DTOs.Team.TeamListDTO"
                        EntitySet="IdentityTeam"
-                       For="() => TheItem.Team" />
+                       For="() => context.Item.Team" />
 
-    @if (Mode == FormModes.View)
+    @if (context.Mode == FormModes.View)
     {
         <br />
         <br />
 
-        <StockPlusPlus.Web.Pages.Product.Product.ProductList ProductBrandID="@TheItem.ID" />
+        <ProductList ProductBrandID="@context.Item.ID" />
     }
-    @*#endif*@
+
 </ShiftEntityForm>
 
 @*#if (includeItemTemplateContent)*@
@@ -42,11 +40,16 @@
     [Parameter]
     public string? BrandName { get; set; }
 
+    [Parameter]
+    public object? Key { get; set; }
+
+    private ProductBrandDTO BrandItem = new ProductBrandDTO();
+
     protected override void OnInitialized()
     {
         if (!string.IsNullOrWhiteSpace(BrandName))
         {
-            TheItem.Name = BrandName;
+            BrandItem.Name = BrandName;
         }
     }
 }

@@ -9,7 +9,7 @@
                  @bind-Value="TheItem"
                  @ref="FormContainer"
                  ShowPrint
-                 Action="ProductCategory"
+                 Endpoint="ProductCategory"
                  Title="Product Category"
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory"
                  @bind-Key="@Key">
@@ -38,15 +38,9 @@
     <MudSelectExtended OnlyValidateIfDirty="true"
                        T="TrackingMethod"
                        Label="Tracking Method"
-                       AnchorOrigin="Origin.BottomCenter"
+                       AnchorOrigin="Origin.BottomLeft"
                        @bind-Value="TheItem.TrackingMethod"
-                       For="@(() => TheItem.TrackingMethod)">
-
-        @foreach (var x in Enum.GetValues<TrackingMethod>())
-        {
-            <MudSelectItem Value="@x">@x.Describe()</MudSelectItem>
-        }
-    </MudSelectExtended>
+                       For="@(() => TheItem.TrackingMethod)"/>
 
     @if (Mode == FormModes.View)
     {
