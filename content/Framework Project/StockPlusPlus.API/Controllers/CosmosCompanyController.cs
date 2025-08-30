@@ -40,25 +40,9 @@ public class CosmosCompanyController : ControllerBase
 
         var query = container.GetItemLinqQueryable<CosmosCompanyListDTO>(true).Where(x => true);
 
-        //Copied directly from GetOdataListingNew in ShiftEntityWeb, below should be implemented on the framework level.
-
-        bool isFilteringByIsDeleted = false;
-
-        FilterClause? filterClause = oDataQueryOptions.Filter?.FilterClause;
-
-        if (filterClause is not null)
-        {
-            var visitor = new SoftDeleteQueryNodeVisitor();
-
-            var visited = filterClause.Expression.Accept(visitor);
-
-            isFilteringByIsDeleted = visitor.IsFilteringByIsDeleted;
-        }
-
-        if (!isFilteringByIsDeleted)
-            query = query.Where(x => x.IsDeleted == false);
-
         query = this.defaultDataLevelAccess.ApplyDefaultFilterOnCompanies(query);
+
+        query = ODataIqueryable.ApplyDefaultSoftDeleteFilter(query, oDataQueryOptions);
 
         var result = await ODataIqueryable.GetOdataDTOFromIQueryableAsync(query, oDataQueryOptions, Request, false);
 
