@@ -1,9 +1,12 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using ShiftEntity.Print;
+using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
 using ShiftSoftware.ShiftEntity.Model.HashIds;
+using ShiftSoftware.ShiftIdentity.Core.DTOs.CompanyBranch;
 using StockPlusPlus.Data.DbContext;
+using StockPlusPlus.Shared.DTOs.ProductBrand;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.Enums;
 
@@ -11,10 +14,35 @@ namespace StockPlusPlus.Data.Repositories;
 
 public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCategory, ProductCategoryListDTO, ProductCategoryDTO>
 {
-    public ProductCategoryRepository(DB db) : base(db, o => {
-        //o
-        //.FilterBy<List<long>>(x => x.Value.Contains(x.Entity.ID))
-        //.CustomValueProvider(x => { return new List<long>() { 1, 24 }; });
+    public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider) : base(db, o =>
+    {
+        o.FilterBy<List<long>>(x => 
+                x.Value.Contains(x.Entity.ID) || 
+                (x.ClaimValues != null && x.ClaimValues.Contains(x.Entity.ID.ToString())) ||
+                (x.TypeAuthValues != null && x.TypeAuthValues.Contains(x.Entity.BrandID.ToString()!)) ||
+                x.WildCard
+        )
+        .CustomValueProvider(x => { return new List<long>() { 0 }; })
+        .ClaimValuesProvider<CompanyBranchDTO>(Constants.CompanyBranchIdClaim)
+        .TypeAuthValuesProvider<ProductBrandDTO>(Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand);
+
+        //o.TypeAuth(
+        //    Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand
+        //);
+
+        //o.TypeAuth<ProductBrandDTO>(
+        //    Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand
+        //);
+
+        //o.TypeAuth<ProductBrandDTO>(
+        //    Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand,
+        //    ShiftSoftware.ShiftEntity.Core.Constants.CompanyIdClaim
+        //);
+
+        //o.TypeAuth<ProductBrandDTO>(
+        //    Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand
+        //)
+        //.SelfClaimValueProvider(ShiftSoftware.ShiftEntity.Core.Constants.CompanyIdClaim);
     })
     {
     }
