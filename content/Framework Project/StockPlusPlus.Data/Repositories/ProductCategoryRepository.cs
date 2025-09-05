@@ -9,40 +9,34 @@ using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.Enums;
+using System.Security.Claims;
 
 namespace StockPlusPlus.Data.Repositories;
 
 public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCategory, ProductCategoryListDTO, ProductCategoryDTO>
 {
-    public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider) : base(db, o =>
+    public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider, IServiceProvider serviceProvider) : base(db, o =>
     {
-        o.FilterBy<List<long>>(x => 
-                x.Value.Contains(x.Entity.ID) || 
-                (x.ClaimValues != null && x.ClaimValues.Contains(x.Entity.ID.ToString())) ||
-                (x.TypeAuthValues != null && x.TypeAuthValues.Contains(x.Entity.BrandID.ToString()!)) ||
-                x.WildCard
+        o.FilterBy<List<long>>(x =>
+                x.Value.Contains(x.Entity.ID)
+        //|| (x.ClaimValues != null && x.ClaimValues.Contains(x.Entity.ID.ToString())) ||
+
+        //(x.WildCardRead || (x.ReadableTypeAuthValues != null && x.ReadableTypeAuthValues.Contains(x.Entity.BrandID.ToString()!))) ||
+        //(x.WildCardWrite || (x.WritableTypeAuthValues != null && x.WritableTypeAuthValues.Contains(x.Entity.BrandID.ToString()!))) ||
+        //(x.WildCardDelete || (x.DeletableTypeAuthValues != null && x.DeletableTypeAuthValues.Contains(x.Entity.BrandID.ToString()!))) ||
+        //(x.WildCardMaxAccess || (x.MaxAccessTypeAuthValues != null && x.MaxAccessTypeAuthValues.Contains(x.Entity.BrandID.ToString()!)))
         )
-        .CustomValueProvider(x => { return new List<long>() { 0 }; })
+        .CustomValueProvider(() =>
+        {
+            var user = currentUserProvider.GetUser();
+
+            return new List<long>() { user.GetCountryID()!.Value };
+        })
         .ClaimValuesProvider<CompanyBranchDTO>(Constants.CompanyBranchIdClaim)
-        .TypeAuthValuesProvider<ProductBrandDTO>(Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand);
-
-        //o.TypeAuth(
-        //    Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand
-        //);
-
-        //o.TypeAuth<ProductBrandDTO>(
-        //    Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand
-        //);
-
-        //o.TypeAuth<ProductBrandDTO>(
-        //    Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand,
-        //    ShiftSoftware.ShiftEntity.Core.Constants.CompanyIdClaim
-        //);
-
-        //o.TypeAuth<ProductBrandDTO>(
-        //    Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand
-        //)
-        //.SelfClaimValueProvider(ShiftSoftware.ShiftEntity.Core.Constants.CompanyIdClaim);
+        .TypeAuthValuesProvider<ProductBrandDTO>(
+            Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand,
+            Constants.CompanyBranchIdClaim
+        );
     })
     {
     }
