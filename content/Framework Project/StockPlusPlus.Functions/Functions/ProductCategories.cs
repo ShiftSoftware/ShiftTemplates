@@ -32,13 +32,15 @@ namespace StockPlusPlus.Functions
         public async Task<IActionResult> Get(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req)
         {
-            var allProductCategories = await this.productCategoryRepository.OdataList().ToArrayAsync();
+            var odataList = await this.productCategoryRepository.OdataList();
+
+            var allProductCategories = await odataList.ToArrayAsync();
 
             Data.Entities.ProductCategory? productCategory = null;
 
             if (allProductCategories.Count() > 0)
-            { 
-                var productCategoryId = long.Parse(allProductCategories.First().ID);
+            {
+                var productCategoryId = long.Parse(allProductCategories.First().ID!);
                 productCategory = await this.productCategoryRepository.FindAsync(productCategoryId);
             }
 

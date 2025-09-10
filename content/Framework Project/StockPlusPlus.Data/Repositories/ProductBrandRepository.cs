@@ -16,7 +16,7 @@ public class ProductBrandRepository : ShiftRepository<DB, Entities.ProductBrand,
     /// </summary>
     /// <param name="queryable"></param>
     /// <returns></returns>
-    public override IQueryable<ProductBrandListDTO> OdataList(IQueryable<Entities.ProductBrand>? queryable = null)
+    public override ValueTask<IQueryable<ProductBrandListDTO>> OdataList(IQueryable<Entities.ProductBrand>? queryable = null)
     {
         return base.OdataList(queryable);
     }

@@ -22,12 +22,11 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
         {
             var user = currentUserProvider.GetUser();
 
-            return new List<long>() { user.GetCountryID()!.Value };
+            return new ValueTask<List<long>>(new List<long>() { user.GetCountryID()!.Value });
         });
 
         o.FilterByClaimValues(x => x.ClaimValues != null && x.ClaimValues.Contains(x.Entity.ID.ToString()))
         .ValueProvider<CompanyBranchDTO>(Constants.CompanyBranchIdClaim);
-
 
         o.FilterByTypeAuthValues(x => (x.ReadableTypeAuthValues != null && x.ReadableTypeAuthValues.Contains(x.Entity.ID.ToString())) || x.WildCardRead)
         .ValueProvider<ProductBrandDTO>(
@@ -52,8 +51,10 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
             item.Code
         };
 
+        var q = await GetIQueryable();
+
         var otherCategories = await
-            GetIQueryable()
+            q
             .Where(x => x.ID != longId)
             .Select(x => new
             {
