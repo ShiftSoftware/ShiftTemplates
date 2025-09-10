@@ -41,7 +41,7 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
     {
         var longId = ShiftEntityHashIdService.Decode<ProductCategoryDTO>(id);
 
-        var item = (await FindAsync(longId, null, true))!;
+        var item = (await FindAsync(longId, null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true))!;
 
         //Data source fo Fast Report
         var category = new
@@ -51,7 +51,7 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
             item.Code
         };
 
-        var q = await GetIQueryable();
+        var q = await GetIQueryable(disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
 
         var otherCategories = await
             q
