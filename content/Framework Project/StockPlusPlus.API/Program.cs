@@ -203,7 +203,7 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
             UserFeatureIsLocked = false,
             TeamFeatureIsLocked = false,
         },
-        DynamicActionFilters = new DynamicActionFilters
+        DefaultDataLevelAccessOptions = new ShiftIdentityDefaultDataLevelAccessOptions
         {
             DisableDefaultCountryFilter = true
         }
