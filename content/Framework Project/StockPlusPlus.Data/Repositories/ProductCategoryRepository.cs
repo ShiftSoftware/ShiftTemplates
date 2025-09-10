@@ -18,7 +18,7 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
     public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider, IServiceProvider serviceProvider) : base(db, o =>
     {
         o.FilterByCustomValue<List<long>>(x => x.CustomValue.Contains(x.Entity.ID))
-        .CustomValueProvider(() =>
+        .ValueProvider(() =>
         {
             var user = currentUserProvider.GetUser();
 
@@ -26,11 +26,11 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
         });
 
         o.FilterByClaimValues(x => x.ClaimValues != null && x.ClaimValues.Contains(x.Entity.ID.ToString()))
-        .ClaimValuesProvider<CompanyBranchDTO>(Constants.CompanyBranchIdClaim);
+        .ValueProvider<CompanyBranchDTO>(Constants.CompanyBranchIdClaim);
 
 
         o.FilterByTypeAuthValues(x => (x.ReadableTypeAuthValues != null && x.ReadableTypeAuthValues.Contains(x.Entity.ID.ToString())) || x.WildCardRead)
-        .TypeAuthValuesProvider<ProductBrandDTO>(
+        .ValueProvider<ProductBrandDTO>(
             Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand,
             Constants.CompanyBranchIdClaim
         );
