@@ -10,6 +10,7 @@ public class CompanyBranch : Profile
     {
         CreateMap<CompanyBranchModel, CompanyBranchListDTO>()
             .ForMember(x => x.City, x => x.MapFrom(x => x.City.Name))
+            .ForMember(x => x.CityId, x => x.MapFrom(x => x.CityID == null ? null : x.CityID.ToString()))
             .ForMember(x => x.Company, x => x.MapFrom(x => x.Company.Name));
     }
 }
