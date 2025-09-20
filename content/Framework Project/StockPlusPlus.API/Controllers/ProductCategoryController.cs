@@ -48,7 +48,7 @@ public class ProductCategoryController : ShiftEntitySecureControllerAsync<Produc
                 this.repository.ShiftRepositoryOptions.DefaultDataLevelAccessOptions
             );
 
-        query = await query.ApplyRepositoryGloballFiltersAsync(this.repository.ShiftRepositoryOptions.GlobalFilters);
+        query = await query.ApplyGlobalRepositoryFiltersAsync(this.repository.ShiftRepositoryOptions.GlobalRepositoryFilters);
 
         var listDto = mapper
             .ProjectTo<ProductCategoryListDTO>(query)
