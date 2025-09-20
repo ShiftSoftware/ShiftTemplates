@@ -41,25 +41,17 @@ public class ProductCategoryController : ShiftEntitySecureControllerAsync<Produc
     [TypeAuth<StockPlusPlusActionTree>(nameof(StockPlusPlusActionTree.ProductCategory), Access.Read)]
     public async Task<IActionResult> CustomList([FromQuery] ODataQueryOptions<ProductCategoryListDTO> oDataQueryOptions)
     {
-        var query = db.ProductCategories
-            .AsQueryable()
+        var query = await db.ProductCategories
             .ApplyDefaultDataLevelAccessFilters(
                 this.defaultDataLevelAccess, 
                 this.repository.ShiftRepositoryOptions.DefaultDataLevelAccessOptions
-            );
+            )
+            .ApplyGlobalRepositoryFiltersAsync(this.repository.ShiftRepositoryOptions.GlobalRepositoryFilters);
 
-        query = await query.ApplyGlobalRepositoryFiltersAsync(this.repository.ShiftRepositoryOptions.GlobalRepositoryFilters);
-
-        var listDto = mapper
+        var result = await mapper
             .ProjectTo<ProductCategoryListDTO>(query)
-            .ApplyDefaultSoftDeleteFilter(oDataQueryOptions);
-
-        var result = await ODataIqueryable.GetOdataDTOFromIQueryableAsync(
-            listDto,
-            oDataQueryOptions,
-            Request,
-            false
-        );
+            .ApplyDefaultSoftDeleteFilter(oDataQueryOptions)
+            .ToOdataDTO(oDataQueryOptions, this.Request);
 
         return Ok(result);
     }

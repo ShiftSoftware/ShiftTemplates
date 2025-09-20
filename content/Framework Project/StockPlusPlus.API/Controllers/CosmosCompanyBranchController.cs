@@ -43,16 +43,10 @@ public class CosmosCompanyBranchController : ControllerBase
             .ApplyDefaultCompanyFilter(defaultDataLevelAccess)
             .ApplyDefaultBranchFilter(defaultDataLevelAccess);
 
-        var listDto = mapper
+        var result = await mapper
             .ProjectTo<CompanyBranchListDTO>(query)
-            .ApplyDefaultSoftDeleteFilter(oDataQueryOptions);
-
-        var result = await ODataIqueryable.GetOdataDTOFromIQueryableAsync(
-            listDto,
-            oDataQueryOptions,
-            Request,
-            false
-        );
+            .ApplyDefaultSoftDeleteFilter(oDataQueryOptions)
+            .ToOdataDTO(oDataQueryOptions, Request, false);
 
         return Ok(result);
     }
