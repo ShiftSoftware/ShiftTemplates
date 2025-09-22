@@ -6,7 +6,7 @@ namespace StockPlusPlus.API.Services;
 
 public class FileManagerAccessControl : IFileExplorerAccessControl
 {
-    string permissions = "/Extra/Downloads|/Extra/{dealer_name} Downloads/{branch_name}|/Extra/{dealer_name} Downloads/Shared|/Extra/TOS/{dealer_name}/{branch_name}|/Extra/TOS/{dealer_name}/Shared|/Extra/TOS/Shared|/Extra/Business Report/{dealer_name}|/Extra/Business Report/Shared|/Extra/Best Practices/{dealer_name}|/Extra/Best Practices/Shared";
+    readonly string permissions = "/Extra/Downloads|/Extra/{dealer_name} Downloads/{branch_name}|/Extra/{dealer_name} Downloads/Shared|/Extra/TOS/{dealer_name}/{branch_name}|/Extra/TOS/{dealer_name}/Shared|/Extra/TOS/Shared|/Extra/Business Report/{dealer_name}|/Extra/Business Report/Shared|/Extra/Best Practices/{dealer_name}|/Extra/Best Practices/Shared";
     
     public async Task<List<FileExplorerDirectoryContent>> FilterWithReadAccessAsync(BlobContainerClient container, List<FileExplorerDirectoryContent> details)
     {
@@ -14,7 +14,9 @@ public class FileManagerAccessControl : IFileExplorerAccessControl
 
         foreach (var item in details)
         {
-            var permission = UserCanRead_WritePath(item.Path, permissions, permissions, permissions, "Shift Software - HQ", "Shift Software", new List<string> { });
+            if (item.Path == null)
+                continue;
+            var permission = UserCanRead_WritePath(item.Path, permissions, permissions, permissions, "Shift Software - HQ", "Shift Software", []);
 
             if (!permission.Read)
                 continue;
@@ -22,7 +24,7 @@ public class FileManagerAccessControl : IFileExplorerAccessControl
             newDetails.Add(item);
         }
 
-        foreach (var item in details.Where(x => x.Path.EndsWith("info.deleted")).ToList())
+        foreach (var item in details.Where(x => x.Path?.EndsWith("info.deleted") == true).ToList())
         {
             newDetails.Remove(item);
 
@@ -37,7 +39,7 @@ public class FileManagerAccessControl : IFileExplorerAccessControl
 
             foreach (var deletedPath in deletedPaths)
             {
-                var deletedItem = newDetails.FirstOrDefault(x => x.Path.StartsWith(deletedPath) || $"/{x.Path}".StartsWith(deletedPath));
+                var deletedItem = newDetails.FirstOrDefault(x => x.Path?.StartsWith(deletedPath) == true || $"/{x.Path}".StartsWith(deletedPath));
 
                 if (deletedItem != null)
                 {
@@ -61,7 +63,7 @@ public class FileManagerAccessControl : IFileExplorerAccessControl
                 continue;
             }
 
-            var permission = UserCanRead_WritePath(item.Blob!, permissions, permissions, permissions, "Shift Software - HQ", "Shift Software", new List<string> { });
+            var permission = UserCanRead_WritePath(item.Blob!, permissions, permissions, permissions, "Shift Software - HQ", "Shift Software", []);
 
             if (!permission.Write)
                 continue;
@@ -78,7 +80,7 @@ public class FileManagerAccessControl : IFileExplorerAccessControl
 
         foreach (var item in data)
         {
-            var permission = UserCanRead_WritePath(item.Path!, permissions, permissions, permissions, "Shift Software - HQ", "Shift Software", new List<string> { });
+            var permission = UserCanRead_WritePath(item.Path!, permissions, permissions, permissions, "Shift Software - HQ", "Shift Software", []);
 
             if (!permission.Remove)
                 continue;

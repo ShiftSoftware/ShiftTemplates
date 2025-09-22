@@ -58,9 +58,9 @@ public class LoginDTO
 {
     [Required]
     [MaxLength(5)]
-    public string Username { get; set; }
+    public string? Username { get; set; }
 
-    public string Password { get; set; }
+    public string? Password { get; set; }
 }
 
 public class LoginValidator : AbstractValidator<LoginDTO>

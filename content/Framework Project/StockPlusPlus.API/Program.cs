@@ -337,9 +337,9 @@ if (app.Environment.EnvironmentName != "Test")
 
 var supportedCultures = new List<CultureInfo>
 {
-    new CultureInfo("en-US"),
-    new CultureInfo("ar-IQ"),
-    new CultureInfo("ku-IQ"),
+    new("en-US"),
+    new("ar-IQ"),
+    new("ku-IQ"),
 };
 
 app.UseRequestLocalization(options =>
@@ -347,7 +347,7 @@ app.UseRequestLocalization(options =>
     options.SetDefaultCulture("en-US");
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
-    options.RequestCultureProviders = new List<IRequestCultureProvider> { new AcceptLanguageHeaderRequestCultureProvider() };
+    options.RequestCultureProviders = [new AcceptLanguageHeaderRequestCultureProvider()];
     options.ApplyCurrentCultureToResponseHeaders = true;
 });
 

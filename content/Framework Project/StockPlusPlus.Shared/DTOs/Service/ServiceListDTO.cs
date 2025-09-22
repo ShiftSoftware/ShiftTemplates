@@ -9,5 +9,5 @@ public class ServiceListDTO : ShiftEntityListDTO
     public override string? ID { get; set; }
 
     [JsonConverter(typeof(LocalizedTextJsonConverter))]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 }

@@ -2,17 +2,13 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.EntityFrameworkCore;
-using ShiftSoftware.ShiftEntity.Core;
-using ShiftSoftware.ShiftEntity.Functions.ReCaptcha;
 using ShiftSoftware.TypeAuth.AspNetCore;
 using ShiftSoftware.TypeAuth.Core;
 using StockPlusPlus.Data.Repositories;
 using StockPlusPlus.Shared.ActionTrees;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using System.Globalization;
-using System.Net;
 
 namespace StockPlusPlus.Functions
 {
@@ -36,9 +32,9 @@ namespace StockPlusPlus.Functions
 
             Data.Entities.ProductCategory? productCategory = null;
 
-            if (allProductCategories.Count() > 0)
-            { 
-                var productCategoryId = long.Parse(allProductCategories.First().ID);
+            if (allProductCategories.Length != 0 && allProductCategories.First().ID is string id)
+            {
+                var productCategoryId = long.Parse(id);
                 productCategory = await this.productCategoryRepository.FindAsync(productCategoryId);
             }
 

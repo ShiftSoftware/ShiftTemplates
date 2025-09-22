@@ -60,7 +60,7 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
     public async Task<IActionResult> TestFindAndUpdate()
     {
         var updatedBrand = await brandRepository.UpsertAsync(
-            entity: await brandRepository.FindAsync(1),
+            entity: (await brandRepository.FindAsync(1))!,
             dto: new ProductBrandDTO { ID = "1", Name = "Updated" },
             actionType: ShiftSoftware.ShiftEntity.Core.ActionTypes.Update,
             userId: null
@@ -82,7 +82,7 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
     public async Task<IActionResult> TestDelete()
     {
         var deletedBrand = await brandRepository.DeleteAsync(
-            entity: await brandRepository.FindAsync(1),
+            entity: (await brandRepository.FindAsync(1))!,
             isHardDelete: false,
             userId: null
         );
