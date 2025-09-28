@@ -3,16 +3,38 @@
 
 @using StockPlusPlus.Shared.DTOs.ProductCategory
 
-<ShiftList EntitySet="ProductCategory"
-           Title="Product Category List"
-           T="ProductCategoryListDTO"
-           Dense
-           DisableActionColumn
-           ComponentType="typeof(ProductCategoryForm)"
-           ShowIDColumn="true"
-           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory"
-           EnableExport>
-    <ButtonColumn Property="x => x.Name" Title="Name" />
+<MudStack Spacing="4">
+    <MudPaper Elevation="3">
+        <ShiftList EntitySet="ProductCategory"
+                   Title="Product Category List"
+                   T="ProductCategoryListDTO"
+                   Dense
+                   PageSize="5"
+                   DisableActionColumn
+                   ComponentType="typeof(ProductCategoryForm)"
+                   ShowIDColumn="true"
+                   TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory"
+                   EnableExport>
+            <ButtonColumn Property="x => x.Name" Title="Name" />
 
-    <PropertyColumn Title="Tracking Method" Property="x=> x.TrackingMethod!.Describe()" />
-</ShiftList>
+            <PropertyColumn Title="Tracking Method" Property="x => x.TrackingMethod!.Describe()" />
+        </ShiftList>
+    </MudPaper>
+
+    <MudPaper Elevation="3">
+        <ShiftList EntitySet="ProductCategory/custom-list"
+                   Title="Product Category List"
+                   T="ProductCategoryListDTO"
+                   Dense
+                   PageSize="5"
+                   DisableActionColumn
+                   ComponentType="typeof(ProductCategoryForm)"
+                   ShowIDColumn="true"
+                   TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory"
+                   EnableExport>
+            <ButtonColumn Property="x => x.Name" Title="Name" />
+
+            <PropertyColumn Title="Tracking Method" Property="x => x.TrackingMethod!.Describe()" />
+        </ShiftList>
+    </MudPaper>
+</MudStack>

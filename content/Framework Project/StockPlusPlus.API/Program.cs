@@ -210,7 +210,7 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
             UserFeatureIsLocked = false,
             TeamFeatureIsLocked = false,
         },
-        DynamicActionFilters = new DynamicActionFilters
+        DefaultDataLevelAccessOptions = new ShiftIdentityDefaultDataLevelAccessOptions
         {
             DisableDefaultCountryFilter = true
         }
@@ -276,10 +276,10 @@ new string[]
 }
 #endif
 
-builder.Services.AddSwaggerGen(c =>
-{
-    c.DocInclusionPredicate(SwaggerService.DocInclusionPredicate);
-});
+//builder.Services.AddSwaggerGen(c =>
+//{
+
+//});
 
 builder.Services.AddTypeAuth((o) =>
 {
@@ -367,8 +367,8 @@ if (app.Environment.IsDevelopment())
     app.UseBlazorFrameworkFiles();
     app.UseStaticFiles();
 
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    //app.UseSwagger();
+    //app.UseSwaggerUI();
 
     app.MapRazorPages();
     app.MapFallbackToFile("index.html");

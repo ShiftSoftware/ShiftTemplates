@@ -5,8 +5,6 @@
 @using StockPlusPlus.Shared.Enums
 @*#endif*@
 
-@* @inherits ShiftForm<ProductBrandForm, ProductBrandDTO> *@
-
 <ShiftEntityForm T="ProductBrandDTO"
                  AllowSaveAsNew
                  Endpoint="ProductBrand"
@@ -14,7 +12,7 @@
                  BaseUrlKey="StockPluPlus"
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
                  @bind-Key="@Key">
-
+    @*#if (includeItemTemplateContent)*@
     <LocalizedTextField @bind-Value="context.Item.Name"
                         For="() => context.Item.Name"
                         Label="Name" />
@@ -32,7 +30,7 @@
 
         <ProductList ProductBrandID="@context.Item.ID" />
     }
-
+    @*#endif*@
 </ShiftEntityForm>
 
 @*#if (includeItemTemplateContent)*@

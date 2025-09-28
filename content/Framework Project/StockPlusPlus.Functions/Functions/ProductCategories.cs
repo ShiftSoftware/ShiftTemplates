@@ -28,7 +28,9 @@ namespace StockPlusPlus.Functions
         public async Task<IActionResult> Get(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req)
         {
-            var allProductCategories = await this.productCategoryRepository.OdataList().ToArrayAsync();
+            var odataList = await this.productCategoryRepository.OdataList();
+
+            var allProductCategories = await odataList.ToArrayAsync();
 
             Data.Entities.ProductCategory? productCategory = null;
 

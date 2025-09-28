@@ -1,0 +1,31 @@
+﻿@using ShiftSoftware.ShiftIdentity.Core.DTOs.City
+@using ShiftSoftware.ShiftIdentity.Core.DTOs.Company
+@using ShiftSoftware.ShiftIdentity.Core.Localization
+@attribute [Authorize]
+@attribute [Route($"/{nameof(CosmosCompanyBranchList)}")]
+
+@inject ShiftIdentityLocalizer Loc
+
+<ShiftList EntitySet="CosmosCompanyBranch"
+           Title="Company Branch List (Cosmos)"
+           T="ShiftSoftware.ShiftIdentity.Core.DTOs.CompanyBranch.CompanyBranchListDTO"
+           Dense
+           DisableActionColumn
+           DisableAdd
+           ShowIDColumn="true"
+           EnableFilterPanel
+           TypeAuthAction="ShiftSoftware.ShiftIdentity.Core.ShiftIdentityActions.CompanyBranches"
+           EnableExport>
+
+    <StringFilter Property="x => x.Name" Label="@Loc["Name"]" Operator="ShiftSoftware.ShiftBlazor.Enums.ODataOperator.Contains" lg="3" md="6" sm="12" xs="12" />
+    <ForeignFilter Property="x => x.CityId" Label="@Loc["City"]" DTOType="typeof(CityListDTO)" EntitySet="@($"{ShiftSoftware.ShiftIdentity.Core.Constants.IdentityRoutePreifix}City")" lg="3" md="6" sm="12" xs="12" />
+    <ForeignFilter Property="x => x.CompanyId" Label="@Loc["Company"]" DTOType="typeof(CompanyListDTO)" EntitySet="@($"{ShiftSoftware.ShiftIdentity.Core.Constants.IdentityRoutePreifix}Company")" lg="3" md="6" sm="12" xs="12" />
+    <StringFilter Property="x => x.IntegrationId" Label="@Loc["Integration ID"]" Operator="ShiftSoftware.ShiftBlazor.Enums.ODataOperator.Contains" lg="3" md="6" sm="12" xs="12" />
+
+    <PropertyColumn Title="@Loc["Name"]" Property="x => x.Name" />
+    <PropertyColumn Title="@Loc["Short Code"]" Property="x => x.ShortCode" />
+    <PropertyColumn Title="@Loc["City"]" Property="x => x.City" />
+    <PropertyColumn Title="@Loc["Company"]" Property="x => x.Company" />
+    <PropertyColumn Title="@Loc["Integration ID"]" Property="x => x.IntegrationId" />
+    <PropertyColumn Property="x => x.TerminationDate" Format="yyyy-MM-dd" Title="@Loc["TerminationDate"]" />
+</ShiftList>

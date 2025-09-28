@@ -1,20 +1,38 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using ShiftEntity.Print;
+using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
 using ShiftSoftware.ShiftEntity.Model.HashIds;
+using ShiftSoftware.ShiftIdentity.Core.DTOs.CompanyBranch;
 using StockPlusPlus.Data.DbContext;
+using StockPlusPlus.Shared.DTOs.ProductBrand;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.Enums;
+using System.Security.Claims;
 
 namespace StockPlusPlus.Data.Repositories;
 
 public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCategory, ProductCategoryListDTO, ProductCategoryDTO>
 {
-    public ProductCategoryRepository(DB db) : base(db, o => {
-        //o
-        //.FilterBy<List<long>>(x => x.Value.Contains(x.Entity.ID))
-        //.CustomValueProvider(x => { return new List<long>() { 1, 24 }; });
+    public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider, IServiceProvider serviceProvider) : base(db, o =>
+    {
+        o.FilterByCustomValue<List<long>>(x => x.CustomValue.Contains(x.Entity.ID))
+        .ValueProvider(() =>
+        {
+            var user = currentUserProvider.GetUser();
+
+            return new ValueTask<List<long>>(new List<long>() { user.GetCountryID()!.Value });
+        });
+
+        o.FilterByClaimValues(x => x.ClaimValues != null && x.ClaimValues.Contains(x.Entity.ID.ToString()))
+        .ValueProvider<CompanyBranchDTO>(Constants.CompanyBranchIdClaim);
+
+        o.FilterByTypeAuthValues(x => (x.ReadableTypeAuthValues != null && x.ReadableTypeAuthValues.Contains(x.Entity.ID.ToString())) || x.WildCardRead)
+        .ValueProvider<ProductBrandDTO>(
+            Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand,
+            Constants.CompanyBranchIdClaim
+        );
     })
     {
     }
@@ -23,7 +41,7 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
     {
         var longId = ShiftEntityHashIdService.Decode<ProductCategoryDTO>(id);
 
-        var item = (await FindAsync(longId, null, true))!;
+        var item = (await FindAsync(longId, null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true))!;
 
         //Data source fo Fast Report
         var category = new
@@ -33,8 +51,10 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
             item.Code
         };
 
+        var q = await GetIQueryable(disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
+
         var otherCategories = await
-            GetIQueryable()
+            q
             .Where(x => x.ID != longId)
             .Select(x => new
             {

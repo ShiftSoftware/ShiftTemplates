@@ -3,7 +3,7 @@
 @using StockPlusPlus.Web.Pages.Product
 @using StockPlusPlus.Web.Pages.ProductBrand
 @using StockPlusPlus.Web.Pages.ProductCategory
-@using StockPlusPlus.Web.Pages.Service
+@using StockPlusPlus.Web.Pages.CosmosCompanyBranch
 @*#endif*@
 <MudNavMenu>
     @*#if (includeSampleApp)*@
@@ -27,10 +27,10 @@
                               Icon="@Icons.Material.Outlined.Category">Products</AuthorizedMudNavLink>
     </AuthorizedMudNavGroup>
 
-    <AuthorizedMudNavLink Href="@($"{nameof(CosmosCompanyList)}")"
+    <AuthorizedMudNavLink Href="@($"{nameof(CosmosCompanyBranchList)}")"
                           Match="NavLinkMatch.All"
                           Icon="@Icons.Material.Outlined.Business"
-                          TypeAuthAction="ShiftSoftware.ShiftIdentity.Core.ShiftIdentityActions.Companies">Companies (Cosmos)</AuthorizedMudNavLink>
+                          TypeAuthAction="ShiftSoftware.ShiftIdentity.Core.ShiftIdentityActions.CompanyBranches">Branches (Cosmos)</AuthorizedMudNavLink>
     @*#endif*@
 </MudNavMenu>
 
