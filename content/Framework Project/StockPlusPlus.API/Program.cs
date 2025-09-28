@@ -22,6 +22,7 @@ using ShiftSoftware.ShiftEntity.Model.Enums;
 using StockPlusPlus.Shared.Localization;
 using Microsoft.Extensions.Azure;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore;
+using ShiftSoftware.ShiftEntity.Model;
 #endif
 #if (externalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
@@ -48,6 +49,12 @@ if (!string.IsNullOrWhiteSpace(cosmosConnectionString))
 
 if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
 {
+    builder.Services.AddOptions<FileExplorerConfiguration>().Configure(config =>
+    {
+        config.DatabaseId = builder.Configuration.GetValue<string>("CosmosDb:DefaultDatabaseName");
+        config.ContainerId = builder.Configuration.GetValue<string>("CosmosDb:FileExplorerContainerId");
+    });
+
 #if (internalShiftIdentityHosting)
 
     var liveIdentitySQLServer = builder.Configuration.GetConnectionString("LiveIdentitySQLServer")!;
