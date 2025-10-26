@@ -23,7 +23,7 @@
            AddDialogParameters="AddDialogParameters"
            EnableExport>
 
-           <DateTimeFilter Label="Release Date" Property="x => x.ReleaseDate" lg="12" md="12" xl="12" sm="12" xs="12" />
+    <DateTimeFilter Label="Release Date" Property="x => x.ReleaseDate" lg="12" md="12" xl="12" sm="12" xs="12" />
 
     @if (ProductBrandID != null)
     {
@@ -36,6 +36,8 @@
     }
 
     <PropertyColumn Property="x => x.Name" Title="Name" />
+    <PropertyColumn Property="x => x.Price" Title="Price" />
+    <PropertyColumn Property="x => x.TrackingMethod"/>
     <PropertyColumn Format="F" Property="x => x.LastSaveDate.DateTime" Title="SaveDate" />
 
     <PropertyColumn Format="F" Property="x => x.ReleaseDate" Title="Release Date" Filterable="false" />
@@ -47,26 +49,24 @@
     </ButtonColumn>
 
     <ForeignColumn IsButtonColumn
-                   ComponentType="typeof(ProductCategoryForm)"
-                   Property="x => x.ProductCategoryID"
-                   Title="Category"
-                   T="ProductListDTO"
-                   TEntity="ProductCategoryListDTO"
-                   TProperty="string"
-                   EntitySet="ProductCategory"
-                   OpenMode="ModalOpenMode.NewTab" />
-
+                    ComponentType="typeof(ProductCategoryForm)"
+                    Property="x => x.ProductCategoryID"
+                    Title="Category"
+                    T="ProductListDTO"
+                    TEntity="ProductCategoryListDTO"
+                    TProperty="string"
+                    EntitySet="ProductCategory"
+                    OpenMode="ModalOpenMode.NewTab" />
 
     @context.DraftColumn
 
-
     <ForeignColumn Property="x => x.CityID"
-                   Title="City"
-                   T="ProductListDTO"
-                   ForeignEntiyField="@nameof(ProductListDTO.City)"
-                   TEntity="CityListDTO"
-                   TProperty="string"
-                   EntitySet="IdentityCity" />
+                    Title="City"
+                    T="ProductListDTO"
+                    ForeignEntiyField="@nameof(ProductListDTO.City)"
+                    TEntity="CityListDTO"
+                    TProperty="string"
+                    EntitySet="IdentityCity" />
 
     <PropertyColumn Property="x => x.CustomID" Title="Custom ID" />
 

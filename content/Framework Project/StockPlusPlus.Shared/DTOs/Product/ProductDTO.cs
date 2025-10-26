@@ -20,6 +20,7 @@ public class ProductDTO : ShiftEntityViewAndUpsertDTO, IHasDraftCheckBox<Product
     public ShiftEntitySelectDTO ProductCategory { get; set; } = default!;
 
     public ShiftEntitySelectDTO ProductBrand { get; set; } = default!;
+    public int? Price { get; set; }
     public DateTimeOffset? ReleaseDate { get; set; }
 
     public ShiftEntitySelectDTO? CountryOfOrigin { get; set; } = default!;

@@ -17,6 +17,7 @@ public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO
     public override string? ID { get; set; }
     public string Name { get; set; } = default!;
 
+    public int? Price { get; set; }
     [JsonConverter(typeof(LocalizedTextJsonConverter))]
     public string? ProductBrand { get; set; }
 

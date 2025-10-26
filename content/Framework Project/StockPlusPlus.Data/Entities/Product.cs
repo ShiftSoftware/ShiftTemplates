@@ -20,6 +20,7 @@ public class Product : ShiftEntity<Product>,
     public string Name { get; set; } = default!;
 
     public TrackingMethod TrackingMethod { get; set; }
+    public int? Price { get; set; }
 
     public long ProductCategoryID { get; set; }
 

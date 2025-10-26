@@ -27,6 +27,8 @@
                           @bind-Value="TheItem.Name"
                           For="@(() => TheItem.Name)" />
 
+    <MudNumericFieldExtended @bind-Value="TheItem.Price" For="() => TheItem.Price"/>
+
     <ShiftDateTimePicker Label="Release Date"
                          @bind-DateTimeOffset="TheItem.ReleaseDate"
                          For="() => TheItem.ReleaseDate" />
@@ -55,6 +57,9 @@
                        QuickAddComponentType="typeof(CountryForm)"
                        QuickAddParameterName="@nameof(CountryForm.Name)"
                        For="()=> TheItem.CountryOfOrigin" />
+
+
+    <MudSelectExtended @bind-Value="TheItem.TrackingMethod" For="() => TheItem.TrackingMethod"></MudSelectExtended>
 
 </ShiftEntityForm>
 
