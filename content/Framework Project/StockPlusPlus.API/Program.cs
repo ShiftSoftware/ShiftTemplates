@@ -23,6 +23,7 @@ using StockPlusPlus.Shared.Localization;
 using Microsoft.Extensions.Azure;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore;
 using ShiftSoftware.ShiftEntity.Model;
+using ShiftSoftware.ShiftEntity.Web.Explorer;
 #endif
 #if (externalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
@@ -161,6 +162,8 @@ mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:Tok
 
 builder.Services.AddScoped<ISendEmailVerification, SendEmailService>();
 builder.Services.AddScoped<ISendEmailResetPassword, SendEmailService>();
+
+builder.Services.AddScoped<IFileProvider, BlobStorageFileProvider>();
 
 mvcBuilder.AddShiftIdentityDashboard<DB>(
     new ShiftIdentityConfiguration

@@ -1,6 +1,8 @@
 ﻿using Azure.Storage.Blobs;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
+using ShiftSoftware.ShiftEntity.Model.FileExplorer.Dtos;
 using ShiftSoftware.ShiftEntity.Web.Services;
+using System.Text.RegularExpressions;
 
 namespace StockPlusPlus.API.Services;
 
@@ -8,9 +10,9 @@ public class FileManagerAccessControl : IFileExplorerAccessControl
 {
     readonly string permissions = "/Extra/Downloads|/Extra/{dealer_name} Downloads/{branch_name}|/Extra/{dealer_name} Downloads/Shared|/Extra/TOS/{dealer_name}/{branch_name}|/Extra/TOS/{dealer_name}/Shared|/Extra/TOS/Shared|/Extra/Business Report/{dealer_name}|/Extra/Business Report/Shared|/Extra/Best Practices/{dealer_name}|/Extra/Best Practices/Shared";
     
-    public async Task<List<FileExplorerDirectoryContent>> FilterWithReadAccessAsync(BlobContainerClient container, List<FileExplorerDirectoryContent> details)
+    public async Task<List<FileExplorerItemDTO>> FilterWithReadAccessAsync(BlobContainerClient container, List<FileExplorerItemDTO> details)
     {
-        var newDetails = new List<FileExplorerDirectoryContent>();
+        var newDetails = new List<FileExplorerItemDTO>();
 
         foreach (var item in details)
         {
@@ -74,13 +76,39 @@ public class FileManagerAccessControl : IFileExplorerAccessControl
         return newFiles;
     }
 
-    public List<FileExplorerDirectoryContent> FilterWithDeleteAccess(FileExplorerDirectoryContent[] data)
+    public List<string> FilterWithWriteAccess(string[] files)
     {
-        var newDirectoryContent = new List<FileExplorerDirectoryContent>();
+        var newFiles = new List<string>();
+
+        foreach (var item in files)
+        {
+            if (!item!.StartsWith("Extra/"))
+            {
+                newFiles.Add(item);
+                continue;
+            }
+
+            var permission = UserCanRead_WritePath(item!, permissions, permissions, permissions, "Shift Software - HQ", "Shift Software", []);
+
+            if (!permission.Write)
+                continue;
+
+            newFiles.Add(item);
+        }
+
+        return newFiles;
+    }
+
+    public List<string> FilterWithDeleteAccess(string[] data)
+    {
+        var newDirectoryContent = new List<string>();
 
         foreach (var item in data)
         {
-            var permission = UserCanRead_WritePath(item.Path!, permissions, permissions, permissions, "Shift Software - HQ", "Shift Software", []);
+            if (item == null)
+                continue;
+
+            var permission = UserCanRead_WritePath(item, permissions, permissions, permissions, "Shift Software - HQ", "Shift Software", []);
 
             if (!permission.Remove)
                 continue;
@@ -106,7 +134,7 @@ public class FileManagerAccessControl : IFileExplorerAccessControl
     public static DownloadableFileAccess UserCanRead_WritePath(string path, string readAccessPaths, string writeAccessPaths, string removeAccessPaths, string userBranchName, string divisionName, List<string> deletedPaths)
     {
         string shouldStartWith = "Extra";
-        path = path.Replace("//", "/");
+        path = Regex.Replace(path, "/+", "/");
         path = path.TrimEnd('/');
         var readAccess = false;
         var writeAccess = false;
