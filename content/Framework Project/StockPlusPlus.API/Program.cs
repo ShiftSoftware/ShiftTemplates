@@ -24,6 +24,7 @@ using Microsoft.Extensions.Azure;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Web.Explorer;
+using ShiftSoftware.ShiftEntity.Model.Replication;
 #endif
 #if (externalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
@@ -68,41 +69,41 @@ if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
         var client = x.Services.GetRequiredService<CosmosClient>();
 
         x.SetUpReplication<DB, Service>(client, databaseId, null, false)
-            .Replicate<ServiceModel>(ReplicationConfiguration.ServiceContainerName, x => x.id)
-            .UpdateReference<CompanyBranchSubItemModel>(ReplicationConfiguration.CompanyBranchContainerName,
+            .Replicate<ServiceModel>(IdentityDatabaseAndContainerNames.ServiceContainerName, x => x.id)
+            .UpdateReference<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName,
                 (q, e) => q.Where(x => x.ItemType == CompanyBranchContainerItemTypes.Service && x.id == e.Entity.ID.ToString()));
 
         x.SetUpReplication<DB, CompanyBranchService>(client, databaseId, null, false)
-            .Replicate<CompanyBranchSubItemModel>(ReplicationConfiguration.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
+            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
 
         x.SetUpReplication<DB, CompanyBranchDepartment>(client, databaseId, null, false)
-            .Replicate<CompanyBranchSubItemModel>(ReplicationConfiguration.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
+            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
 
         x.SetUpReplication<DB, Department>(client, databaseId, null, false)
-            .Replicate<DepartmentModel>(ReplicationConfiguration.DepartmentContainerName, x => x.id)
-            .UpdateReference<CompanyBranchSubItemModel>(ReplicationConfiguration.CompanyBranchContainerName,
+            .Replicate<DepartmentModel>(IdentityDatabaseAndContainerNames.DepartmentContainerName, x => x.id)
+            .UpdateReference<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName,
                 (q, e) => q.Where(x => x.ItemType == CompanyBranchContainerItemTypes.Department && x.id == e.Entity.ID.ToString()));
 
         x.SetUpReplication<DB, Brand>(client, databaseId, null, false)
             .Replicate<BrandModel>("Brands", x => x.id)
-            .UpdateReference<CompanyBranchSubItemModel>(ReplicationConfiguration.CompanyBranchContainerName,
+            .UpdateReference<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName,
                 (q, e) => q.Where(x => x.id == e.Entity.ID.ToString() && x.ItemType == CompanyBranchContainerItemTypes.Brand));
 
         x.SetUpReplication<DB, CompanyBranchBrand>(client, databaseId)
-            .Replicate<CompanyBranchSubItemModel>(ReplicationConfiguration.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
+            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
 
         x.SetUpReplication<DB, Region>(client, databaseId)
-            .Replicate<RegionModel>(ReplicationConfiguration.CountryContainerName, x => x.CountryID, x => x.RegionID, x => x.ItemType)
+            .Replicate<RegionModel>(IdentityDatabaseAndContainerNames.CountryContainerName, x => x.CountryID, x => x.RegionID, x => x.ItemType)
             .UpdatePropertyReference<CityRegionModel, CompanyBranchModel>("CompanyBranches", x => x.City.Region,
             (q, e) => q.Where(x => x.City.Region.id == e.Entity.ID.ToString() && x.ItemType == "Branch"));
 
         x.SetUpReplication<DB, Country>(client, databaseId)
-            .Replicate<CountryModel>(ReplicationConfiguration.CountryContainerName, x => x.CountryID, x => x.RegionID, x => x.ItemType)
+            .Replicate<CountryModel>(IdentityDatabaseAndContainerNames.CountryContainerName, x => x.CountryID, x => x.RegionID, x => x.ItemType)
             .UpdatePropertyReference<CountryModel, CompanyBranchModel>("CompanyBranches", x => x.City.Region.Country,
             (q, e) => q.Where(x => x.City.Region.Country.id == e.Entity.ID.ToString() && x.ItemType == "Branch"));
 
         x.SetUpReplication<DB, City>(client, databaseId)
-            .Replicate<CityModel>(ReplicationConfiguration.CountryContainerName, x => x.CountryID, x => x.RegionID, x => x.ItemType,
+            .Replicate<CityModel>(IdentityDatabaseAndContainerNames.CountryContainerName, x => x.CountryID, x => x.RegionID, x => x.ItemType,
             e =>
             {
                 var mapper = e.Services.GetRequiredService<IMapper>();
