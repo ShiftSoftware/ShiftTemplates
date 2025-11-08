@@ -32,7 +32,7 @@ public class ProductBrand : ShiftEntity<ProductBrand>
 
     public string? CalculateUniqueHash()
     {
-        return $"{Name}|{Code}";
+        return $"{Name.ToUpper()}|{Code?.ToUpper()}";
     }
 #endif
 }

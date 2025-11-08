@@ -10,6 +10,7 @@
                  Endpoint="ProductBrand"
                  Title="ProductBrand"
                  BaseUrlKey="StockPluPlus"
+                 @bind-Value="BrandItem"
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
                  @bind-Key="@Key">
     @*#if (includeItemTemplateContent)*@
@@ -36,6 +37,7 @@
 @*#if (includeItemTemplateContent)*@
 @code {
     [Parameter]
+    [SupplyParameterFromQuery]
     public string? BrandName { get; set; }
 
     [Parameter]
@@ -47,7 +49,12 @@
     {
         if (!string.IsNullOrWhiteSpace(BrandName))
         {
-            BrandItem.Name = BrandName;
+            BrandItem.Name = System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, string>
+            {
+                ["en"] = BrandName,
+                ["ar"] = BrandName,
+                ["ku"] = BrandName
+            });
         }
     }
 }
