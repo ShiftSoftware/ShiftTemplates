@@ -50,7 +50,6 @@ public class ProductCategoryController : ShiftEntitySecureControllerAsync<Produc
 
         var result = await mapper
             .ProjectTo<ProductCategoryListDTO>(query)
-            .ApplyDefaultSoftDeleteFilter(oDataQueryOptions)
             .ToOdataDTO(oDataQueryOptions, this.Request);
 
         return Ok(result);

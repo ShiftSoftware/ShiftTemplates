@@ -45,7 +45,6 @@ public class CosmosCompanyBranchController : ControllerBase
 
         var result = await mapper
             .ProjectTo<CompanyBranchListDTO>(query)
-            .ApplyDefaultSoftDeleteFilter(oDataQueryOptions)
             .ToOdataDTO(oDataQueryOptions, Request, false);
 
         return Ok(result);
