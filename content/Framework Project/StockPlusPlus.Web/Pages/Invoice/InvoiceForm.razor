@@ -1,6 +1,7 @@
 @attribute [Route($"/{nameof(InvoiceForm)}/{{Key?}}")]
 
 @using ShiftSoftware.ShiftEntity.Model.Dtos
+@using StockPlusPlus.Shared.DTOs.Invoice
 @using StockPlusPlus.Shared.DTOs.Product
 @using StockPlusPlus.Shared.DTOs
 
@@ -16,7 +17,7 @@
                  @ref="FormContainer"
                  Endpoint="Invoice"
                  Title="Invoice"
-                 TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Product"
+                 TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice"
                  AllowClone
                  @bind-Key="@Key">
 
@@ -32,7 +33,7 @@
                          @bind-DateTimeOffset="TheItem.InvoiceDate"
                          For="() => TheItem.InvoiceDate" />
 
-    <MultiItemField Min="5" Max="3" Title="Lines"  @bind-Value="TheItem.InvoiceLines" T="List<InvoiceLineDTO>" TItem="InvoiceLineDTO">
+    <MultiItemField Min="3" Title="Lines" @bind-Value="TheItem.InvoiceLines" T="List<InvoiceLineDTO>" TItem="InvoiceLineDTO">
         
         <FieldHeader Context="Field">
             <MudGrid Spacing="3" Style="align-items: baseline;">
@@ -51,7 +52,7 @@
         </FieldHeader>
 
         <FieldBody Context="Item">
-            <MudGrid Spacing="3" Style="align-items: baseline;">
+            <MudGrid Spacing="3" Style="align-items: baseline; margin-top: 0;">
 
                 <MudItem Class="pt-1 pb-1" lg="4" md="4" sm="4" xs="4">
                     <ShiftAutocomplete Label="Product"

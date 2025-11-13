@@ -1,5 +1,6 @@
 ﻿@*#if (includeSampleApp)*@
 @using ShiftSoftware.ShiftIdentity.Core
+@using StockPlusPlus.Web.Pages.Invoice
 @using StockPlusPlus.Web.Pages.Product
 @using StockPlusPlus.Web.Pages.ProductBrand
 @using StockPlusPlus.Web.Pages.ProductCategory
@@ -26,6 +27,11 @@
                               Match="NavLinkMatch.All"
                               Icon="@Icons.Material.Outlined.Category">Products</AuthorizedMudNavLink>
     </AuthorizedMudNavGroup>
+
+    <AuthorizedMudNavLink Href="@($"{nameof(InvoiceList)}")"
+                          Match="NavLinkMatch.All"
+                          Icon="@Icons.Material.Outlined.Newspaper"
+                          TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice">Invoices</AuthorizedMudNavLink>
 
     <AuthorizedMudNavLink Href="@($"{nameof(CosmosCompanyBranchList)}")"
                           Match="NavLinkMatch.All"

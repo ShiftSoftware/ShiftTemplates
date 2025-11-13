@@ -49,14 +49,22 @@ var cosmosConnectionString = builder.Configuration.GetValue<string>("CosmosDb:Co
 if (!string.IsNullOrWhiteSpace(cosmosConnectionString))
     builder.Services.AddSingleton(new CosmosClient(cosmosConnectionString));
 
-if (builder.Configuration.GetValue<bool>("CosmosDb:Enabled"))
-{
-    builder.Services.AddOptions<FileExplorerConfiguration>().Configure(config =>
-    {
-        config.DatabaseId = builder.Configuration.GetValue<string>("CosmosDb:DefaultDatabaseName");
-        config.ContainerId = builder.Configuration.GetValue<string>("CosmosDb:FileExplorerContainerId");
-    });
+var IsCosmosEnabled = builder.Configuration.GetValue<bool>("CosmosDb:Enabled");
 
+builder.Services.AddFileExplorer(x =>
+{
+    x.UseAzureBlobStorage();
+
+    if (IsCosmosEnabled)
+    {
+        x.DatabaseId = builder.Configuration.GetValue<string>("CosmosDb:DefaultDatabaseName");
+        x.ContainerId = builder.Configuration.GetValue<string>("CosmosDb:FileExplorerContainerId");
+    }
+
+});
+
+if (IsCosmosEnabled)
+{
 #if (internalShiftIdentityHosting)
 
     var liveIdentitySQLServer = builder.Configuration.GetConnectionString("LiveIdentitySQLServer")!;
@@ -163,8 +171,6 @@ mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:Tok
 
 builder.Services.AddScoped<ISendEmailVerification, SendEmailService>();
 builder.Services.AddScoped<ISendEmailResetPassword, SendEmailService>();
-
-builder.Services.AddScoped<IFileProvider, BlobStorageFileProvider>();
 
 mvcBuilder.AddShiftIdentityDashboard<DB>(
     new ShiftIdentityConfiguration

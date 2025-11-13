@@ -28,6 +28,8 @@ public partial class DB : ShiftDbContext
     public DbSet<ProductCategory> ProductCategories { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Country> Countries { get; set; }
+    public DbSet<Invoice> Invoices { get; set; }
+    public DbSet<InvoiceLine> InvoiceLines { get; set; }
 #pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 #endif
 }

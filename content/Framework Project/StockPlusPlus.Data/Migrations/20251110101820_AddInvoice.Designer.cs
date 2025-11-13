@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockPlusPlus.Data.DbContext;
 
@@ -11,9 +12,11 @@ using StockPlusPlus.Data.DbContext;
 namespace StockPlusPlus.Data.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20251110101820_AddInvoice")]
+    partial class AddInvoice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1560,156 +1563,6 @@ namespace StockPlusPlus.Data.Migrations
                             }));
                 });
 
-            modelBuilder.Entity("StockPlusPlus.Data.Entities.Invoice", b =>
-                {
-                    b.Property<long>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
-
-                    b.Property<long?>("CityID")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("CompanyBranchID")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("CompanyID")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("CountryID")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTimeOffset>("CreateDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long?>("CreatedByUserID")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid?>("IdempotencyKey")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset?>("InvoiceDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long>("InvoiceNo")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LastReplicationDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("LastSaveDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long?>("LastSavedByUserID")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ManualReference")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("PeriodEnd")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("PeriodEnd");
-
-                    b.Property<DateTime>("PeriodStart")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("PeriodStart");
-
-                    b.Property<long?>("RegionID")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTimeOffset?>("ReleaseDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<byte[]>("UniqueHash")
-                        .HasColumnType("BINARY(32)");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("IdempotencyKey")
-                        .IsUnique()
-                        .HasFilter("IdempotencyKey IS NOT NULL");
-
-                    b.HasIndex("UniqueHash")
-                        .IsUnique()
-                        .HasFilter("UniqueHash IS NOT NULL and IsDeleted = 0");
-
-                    b.ToTable("Invoices");
-
-                    b.ToTable(tb => tb.IsTemporal(ttb =>
-                            {
-                                ttb.UseHistoryTable("InvoicesHistory");
-                                ttb
-                                    .HasPeriodStart("PeriodStart")
-                                    .HasColumnName("PeriodStart");
-                                ttb
-                                    .HasPeriodEnd("PeriodEnd")
-                                    .HasColumnName("PeriodEnd");
-                            }));
-                });
-
-            modelBuilder.Entity("StockPlusPlus.Data.Entities.InvoiceLine", b =>
-                {
-                    b.Property<long>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
-
-                    b.Property<DateTimeOffset>("CreateDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long?>("CreatedByUserID")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("IdempotencyKey")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long?>("InvoiceID")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LastReplicationDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("LastSaveDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long?>("LastSavedByUserID")
-                        .HasColumnType("bigint");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<long?>("ProductID")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("IdempotencyKey")
-                        .IsUnique()
-                        .HasFilter("IdempotencyKey IS NOT NULL");
-
-                    b.HasIndex("InvoiceID");
-
-                    b.HasIndex("ProductID");
-
-                    b.ToTable("InvoiceLines");
-                });
-
             modelBuilder.Entity("StockPlusPlus.Data.Entities.Product", b =>
                 {
                     b.Property<long>("ID")
@@ -2203,19 +2056,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("StockPlusPlus.Data.Entities.InvoiceLine", b =>
-                {
-                    b.HasOne("StockPlusPlus.Data.Entities.Invoice", null)
-                        .WithMany("InvoiceLines")
-                        .HasForeignKey("InvoiceID");
-
-                    b.HasOne("StockPlusPlus.Data.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductID");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("StockPlusPlus.Data.Entities.Product", b =>
                 {
                     b.HasOne("StockPlusPlus.Data.Entities.Country", "CountryOfOrigin")
@@ -2289,11 +2129,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Navigation("UserLog")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("StockPlusPlus.Data.Entities.Invoice", b =>
-                {
-                    b.Navigation("InvoiceLines");
                 });
 
             modelBuilder.Entity("StockPlusPlus.Data.Entities.ProductCategory", b =>

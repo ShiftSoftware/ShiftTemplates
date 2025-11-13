@@ -1,18 +1,33 @@
 ﻿using FluentValidation;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
+using ShiftSoftware.ShiftEntity.Model.HashIds;
+using StockPlusPlus.Shared.DTOs.Product;
 
-namespace StockPlusPlus.Shared.DTOs.Product;
+namespace StockPlusPlus.Shared.DTOs.Invoice;
 
 public class InvoiceDTO : ShiftEntityViewAndUpsertDTO
 {
     public override string? ID { get; set; }
     public string ManualReference { get; set; } = default!;
     public DateTimeOffset? InvoiceDate { get; set; }
+    public long InvoiceNo { get; set; }
+    [CompanyHashIdConverter]
+    public string? CompanyID { get; set; }
+
     public List<InvoiceLineDTO> InvoiceLines { get; set; } = new List<InvoiceLineDTO>();
 }
 
-public class InvoiceLineDTO
+public class InvoiceListDTO : ShiftEntityListDTO
 {
+    public override string? ID { get; set; }
+    public string ManualReference { get; set; } = default!;
+    public DateTimeOffset? InvoiceDate { get; set; }
+    public long InvoiceNo { get; set; }
+}
+
+public class InvoiceLineDTO : ShiftEntityViewAndUpsertDTO
+{
+    public override string? ID { get; set; }
     [_ProductHashId]
     public ShiftEntitySelectDTO Product { get; set; } = default!;
 

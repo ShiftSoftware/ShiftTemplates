@@ -11,6 +11,7 @@ public class StockPlusPlusActionTree
     public readonly static ReadWriteDeleteAction ProductBrand = new("Brand");
     public readonly static ReadWriteDeleteAction ProductCategory = new("Product Category");
     public readonly static ReadWriteDeleteAction Product = new("Product");
+    public readonly static ReadWriteDeleteAction Invoice = new("Invoice");
 
     public readonly static ReadWriteDeleteAction Country = new("Country");
 

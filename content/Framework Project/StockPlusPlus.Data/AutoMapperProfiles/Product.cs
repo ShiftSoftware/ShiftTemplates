@@ -44,7 +44,8 @@ public class Product : Profile
 
         CreateMap<Entities.Product, ProductModel>();
 
-        //When a custom mapping is written, the default mapping is not applied. So we need to call the default mapping methods.
+        //When a custom mapping is written, the default mapping is not applied.
+        //So we need to call the default mapping methods.
         CreateMap<Entities.Product, ProductDTO>()
             .DefaultEntityToDtoAfterMap()
             .ReverseMap()

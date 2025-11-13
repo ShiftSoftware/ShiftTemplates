@@ -31,7 +31,7 @@ public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public TrackingMethod TrackingMethod { get; set; }
-    public DateTimeOffset ReleaseDate { get; set; }
+    public DateTimeOffset? ReleaseDate { get; set; }
     public DateTimeOffset LastSaveDate { get; set; }
     public bool IsDraft { get; set; }
 
