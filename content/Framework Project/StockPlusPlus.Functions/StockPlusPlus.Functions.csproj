@@ -4,7 +4,7 @@
 	<!--#endif -->
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<AzureFunctionsVersion>v4</AzureFunctionsVersion>
 		<!--<_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>-->
 		<UserSecretsId>1fad2a95-8f41-4ec1-bbd2-f40a3c3f86ac</UserSecretsId>
@@ -26,7 +26,7 @@
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.OpenApi" Version="1.6.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.1" />
 		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage.Queues" Version="5.3.7" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.11" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.0" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.EFCore" Version="$(ShiftFrameworkVersion)" />
 	</ItemGroup>
 

@@ -42,10 +42,10 @@ builder.Services.AddScoped(sp =>
 var baseUrl = builder.Configuration!.GetValue<string>("BaseURL")!;
 
 var shiftIdentityApiURL = builder.Configuration!.GetValue<string>("ShiftIdentityApi")!;
-shiftIdentityApiURL = string.IsNullOrWhiteSpace(shiftIdentityApiURL) ? baseUrl : shiftIdentityApiURL; //Fallback to BaseURL if emtpy
+shiftIdentityApiURL = string.IsNullOrWhiteSpace(shiftIdentityApiURL) ? baseUrl : shiftIdentityApiURL; //Fallback to BaseURL if empty
 
 var shiftIdentityFrontEndURL = builder.Configuration!.GetValue<string>("ShiftIdentityFrontEnd")!;
-shiftIdentityFrontEndURL = string.IsNullOrWhiteSpace(shiftIdentityFrontEndURL) ? baseUrl : shiftIdentityFrontEndURL; //Fallback to BaseURL if emtpy
+shiftIdentityFrontEndURL = string.IsNullOrWhiteSpace(shiftIdentityFrontEndURL) ? baseUrl : shiftIdentityFrontEndURL; //Fallback to BaseURL if empty
 
 builder.Services.AddShiftBlazor(config =>
 {
