@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Bunit;
+using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using System.Reflection;
 using Xunit;
 
@@ -26,10 +28,10 @@ public class PageRenderTests : ShiftBlazorTestContext
 
         Assert.All(pages, componentType =>
         {
-            RenderComponent<IncludeMudProviders>(_params => _params.AddChildContent<DynamicComponent>(
-                parameters => parameters
-                    .Add(p => p.Type, componentType!)
-                ));
-            });
+            using var ctx = new ShiftBlazorTestContext();
+            ctx.RenderTree.Add<IncludeMudProviders>();
+            ctx.Render<DynamicComponent>(p => p.Add(c => c.Type, componentType));
+            ctx.DisposeAsync();
+        });
     }
 }

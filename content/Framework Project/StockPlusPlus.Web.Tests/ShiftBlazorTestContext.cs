@@ -1,11 +1,13 @@
 ﻿using Bunit;
-using Bunit.TestDoubles;
 using ShiftSoftware.ShiftBlazor.Extensions;
+using ShiftSoftware.ShiftIdentity.Blazor.Extensions;
+using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
 using ShiftSoftware.TypeAuth.Blazor.Extensions;
+using StockPlusPlus.Shared.Localization;
 
 namespace StockPlusPlus.Web.Tests;
 
-public class ShiftBlazorTestContext : TestContext
+public class ShiftBlazorTestContext : BunitContext
 {
     public ShiftBlazorTestContext()
     {
@@ -23,14 +25,13 @@ public class ShiftBlazorTestContext : TestContext
 
         JSInterop.Mode = JSRuntimeMode.Loose;
 
-        //Services.AddShiftIdentity("StockPlusPlus-Dev", "", "", false, typeof(Identity));
+//        Services.AddShiftIdentity("StockPlusPlus-Dev", "", "", false, typeof(Identity));
 
-        //#if (internalShiftIdentityHosting)
-        //Services.AddShiftIdentityDashboardBlazor(x => {});
-        //#endif
+//#if (internalShiftIdentityHosting)
+//        Services.AddShiftIdentityDashboardBlazor(x => { });
+//#endif
 
         Services.AddTypeAuth(o => { });
-        
-        this.AddTestAuthorization();
+        this.AddAuthorization();
     }
 }
