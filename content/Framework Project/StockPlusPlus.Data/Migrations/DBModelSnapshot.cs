@@ -17,7 +17,7 @@ namespace StockPlusPlus.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.11")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -70,7 +70,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -136,7 +136,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -216,7 +216,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -281,7 +281,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -357,7 +357,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -460,7 +460,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -779,7 +779,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -857,7 +857,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -917,7 +917,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -996,7 +996,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1056,7 +1056,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1130,7 +1130,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1193,7 +1193,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1256,7 +1256,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1406,7 +1406,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1469,7 +1469,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1510,7 +1510,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1574,7 +1574,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1668,7 +1668,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1682,10 +1682,7 @@ namespace StockPlusPlus.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("IdempotencyKey")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long?>("InvoiceID")
+                    b.Property<long>("InvoiceID")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsDeleted")
@@ -1708,10 +1705,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("IdempotencyKey")
-                        .IsUnique()
-                        .HasFilter("IdempotencyKey IS NOT NULL");
-
                     b.HasIndex("InvoiceID");
 
                     b.HasIndex("ProductID");
@@ -1724,7 +1717,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1830,7 +1823,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1919,7 +1912,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -2214,15 +2207,19 @@ namespace StockPlusPlus.Data.Migrations
 
             modelBuilder.Entity("StockPlusPlus.Data.Entities.InvoiceLine", b =>
                 {
-                    b.HasOne("StockPlusPlus.Data.Entities.Invoice", null)
+                    b.HasOne("StockPlusPlus.Data.Entities.Invoice", "Invoice")
                         .WithMany("InvoiceLines")
-                        .HasForeignKey("InvoiceID");
+                        .HasForeignKey("InvoiceID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("StockPlusPlus.Data.Entities.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Invoice");
 
                     b.Navigation("Product");
                 });

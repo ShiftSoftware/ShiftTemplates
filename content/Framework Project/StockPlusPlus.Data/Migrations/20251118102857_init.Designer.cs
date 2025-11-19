@@ -12,15 +12,15 @@ using StockPlusPlus.Data.DbContext;
 namespace StockPlusPlus.Data.Migrations
 {
     [DbContext(typeof(DB))]
-    [Migration("20241224122943_addUniqueHashToProductBrand")]
-    partial class addUniqueHashToProductBrand
+    [Migration("20251118102857_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -73,7 +73,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -139,7 +139,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -219,9 +219,14 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
+
+                    b.Property<long?>("BrandID")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bigint")
+                        .HasComputedColumnSql("ID");
 
                     b.Property<DateTimeOffset>("CreateDate")
                         .HasColumnType("datetimeoffset");
@@ -279,12 +284,17 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
                     b.Property<bool>("BuiltIn")
                         .HasColumnType("bit");
+
+                    b.Property<long?>("CityID")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bigint")
+                        .HasComputedColumnSql("ID");
 
                     b.Property<long?>("CountryID")
                         .HasColumnType("bigint");
@@ -350,12 +360,17 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
                     b.Property<bool>("BuiltIn")
                         .HasColumnType("bit");
+
+                    b.Property<long?>("CompanyID")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bigint")
+                        .HasComputedColumnSql("ID");
 
                     b.Property<int>("CompanyType")
                         .HasColumnType("int");
@@ -403,6 +418,9 @@ namespace StockPlusPlus.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long?>("ParentCompanyID")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("PeriodEnd")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
@@ -416,7 +434,15 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<string>("ShortCode")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("TerminationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Website")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("ID");
+
+                    b.HasIndex("ParentCompanyID");
 
                     b.ToTable("Companies", "ShiftIdentity");
 
@@ -437,7 +463,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -449,6 +475,11 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<long?>("CityID")
                         .HasColumnType("bigint");
+
+                    b.Property<long?>("CompanyBranchID")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bigint")
+                        .HasComputedColumnSql("ID");
 
                     b.Property<long?>("CompanyID")
                         .HasColumnType("bigint");
@@ -466,6 +497,10 @@ namespace StockPlusPlus.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Emails")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IntegrationId")
@@ -489,6 +524,9 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<string>("Longitude")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MobilePhotos")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -506,6 +544,10 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Phones")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Photos")
                         .HasColumnType("nvarchar(max)");
 
@@ -517,6 +559,9 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<string>("ShortPhone")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("TerminationDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("WorkingDays")
                         .HasColumnType("nvarchar(max)");
@@ -737,7 +782,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -748,11 +793,19 @@ namespace StockPlusPlus.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long?>("CountryID")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bigint")
+                        .HasComputedColumnSql("ID");
+
                     b.Property<DateTimeOffset>("CreateDate")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<long?>("CreatedByUserID")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("Flag")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IntegrationId")
                         .HasColumnType("nvarchar(max)");
@@ -807,7 +860,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -867,7 +920,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -882,6 +935,9 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<long?>("CreatedByUserID")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("Flag")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IntegrationId")
                         .HasColumnType("nvarchar(max)");
@@ -912,6 +968,11 @@ namespace StockPlusPlus.Data.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("PeriodStart");
 
+                    b.Property<long?>("RegionID")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bigint")
+                        .HasComputedColumnSql("ID");
+
                     b.Property<string>("ShortCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -938,7 +999,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -998,7 +1059,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1040,6 +1101,15 @@ namespace StockPlusPlus.Data.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("PeriodStart");
 
+                    b.Property<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("TeamID")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bigint")
+                        .HasComputedColumnSql("ID");
+
                     b.HasKey("ID");
 
                     b.HasIndex("CompanyID");
@@ -1058,12 +1128,75 @@ namespace StockPlusPlus.Data.Migrations
                             }));
                 });
 
+            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.TeamCompanyBranch", b =>
+                {
+                    b.Property<long>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasJsonPropertyName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
+
+                    b.Property<long>("CompanyBranchID")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreateDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("CreatedByUserID")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LastReplicationDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("LastSaveDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("LastSavedByUserID")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("PeriodEnd")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("PeriodEnd");
+
+                    b.Property<DateTime>("PeriodStart")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("PeriodStart");
+
+                    b.Property<long>("TeamID")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("CompanyBranchID");
+
+                    b.HasIndex("TeamID");
+
+                    b.ToTable("TeamBranches", "ShiftIdentity");
+
+                    b.ToTable(tb => tb.IsTemporal(ttb =>
+                            {
+                                ttb.UseHistoryTable("TeamBranchesHistory", "ShiftIdentity");
+                                ttb
+                                    .HasPeriodStart("PeriodStart")
+                                    .HasColumnName("PeriodStart");
+                                ttb
+                                    .HasPeriodEnd("PeriodEnd")
+                                    .HasColumnName("PeriodEnd");
+                            }));
+                });
+
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.TeamUser", b =>
                 {
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1126,7 +1259,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1224,6 +1357,9 @@ namespace StockPlusPlus.Data.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<string>("Signature")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -1273,7 +1409,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1336,7 +1472,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1377,7 +1513,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1436,12 +1572,155 @@ namespace StockPlusPlus.Data.Migrations
                             }));
                 });
 
+            modelBuilder.Entity("StockPlusPlus.Data.Entities.Invoice", b =>
+                {
+                    b.Property<long>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasJsonPropertyName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
+
+                    b.Property<long?>("CityID")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CompanyBranchID")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CompanyID")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CountryID")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreateDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("CreatedByUserID")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid?>("IdempotencyKey")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("InvoiceDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long>("InvoiceNo")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LastReplicationDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("LastSaveDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("LastSavedByUserID")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ManualReference")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PeriodEnd")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("PeriodEnd");
+
+                    b.Property<DateTime>("PeriodStart")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("PeriodStart");
+
+                    b.Property<long?>("RegionID")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("ReleaseDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("UniqueHash")
+                        .HasColumnType("BINARY(32)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique()
+                        .HasFilter("IdempotencyKey IS NOT NULL");
+
+                    b.HasIndex("UniqueHash")
+                        .IsUnique()
+                        .HasFilter("UniqueHash IS NOT NULL and IsDeleted = 0");
+
+                    b.ToTable("Invoices");
+
+                    b.ToTable(tb => tb.IsTemporal(ttb =>
+                            {
+                                ttb.UseHistoryTable("InvoicesHistory");
+                                ttb
+                                    .HasPeriodStart("PeriodStart")
+                                    .HasColumnName("PeriodStart");
+                                ttb
+                                    .HasPeriodEnd("PeriodEnd")
+                                    .HasColumnName("PeriodEnd");
+                            }));
+                });
+
+            modelBuilder.Entity("StockPlusPlus.Data.Entities.InvoiceLine", b =>
+                {
+                    b.Property<long>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasJsonPropertyName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
+
+                    b.Property<DateTimeOffset>("CreateDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("CreatedByUserID")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("InvoiceID")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LastReplicationDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("LastSaveDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("LastSavedByUserID")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long>("ProductID")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("InvoiceID");
+
+                    b.HasIndex("ProductID");
+
+                    b.ToTable("InvoiceLines");
+                });
+
             modelBuilder.Entity("StockPlusPlus.Data.Entities.Product", b =>
                 {
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1498,6 +1777,9 @@ namespace StockPlusPlus.Data.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("PeriodStart");
 
+                    b.Property<int?>("Price")
+                        .HasColumnType("int");
+
                     b.Property<long>("ProductBrandID")
                         .HasColumnType("bigint");
 
@@ -1544,7 +1826,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1612,7 +1894,7 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.HasIndex("UniqueHash")
                         .IsUnique()
-                        .HasFilter("UniqueHash IS NOT NULL");
+                        .HasFilter("UniqueHash IS NOT NULL and IsDeleted = 0");
 
                     b.ToTable("Brands");
 
@@ -1633,7 +1915,7 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("Relational:JsonPropertyName", "ID");
+                        .HasJsonPropertyName("ID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
@@ -1723,6 +2005,16 @@ namespace StockPlusPlus.Data.Migrations
                         .HasForeignKey("RegionID");
 
                     b.Navigation("Region");
+                });
+
+            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Company", b =>
+                {
+                    b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.Company", "ParentCompany")
+                        .WithMany("ChildCompanies")
+                        .HasForeignKey("ParentCompanyID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ParentCompany");
                 });
 
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.CompanyBranch", b =>
@@ -1821,6 +2113,25 @@ namespace StockPlusPlus.Data.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.TeamCompanyBranch", b =>
+                {
+                    b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.CompanyBranch", "CompanyBranch")
+                        .WithMany()
+                        .HasForeignKey("CompanyBranchID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.Team", "Team")
+                        .WithMany("TeamCompanyBranches")
+                        .HasForeignKey("TeamID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CompanyBranch");
+
+                    b.Navigation("Team");
+                });
+
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.TeamUser", b =>
                 {
                     b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.Team", "Team")
@@ -1897,6 +2208,25 @@ namespace StockPlusPlus.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("StockPlusPlus.Data.Entities.InvoiceLine", b =>
+                {
+                    b.HasOne("StockPlusPlus.Data.Entities.Invoice", "Invoice")
+                        .WithMany("InvoiceLines")
+                        .HasForeignKey("InvoiceID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("StockPlusPlus.Data.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("StockPlusPlus.Data.Entities.Product", b =>
                 {
                     b.HasOne("StockPlusPlus.Data.Entities.Country", "CountryOfOrigin")
@@ -1929,6 +2259,8 @@ namespace StockPlusPlus.Data.Migrations
 
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Company", b =>
                 {
+                    b.Navigation("ChildCompanies");
+
                     b.Navigation("CompanyBranches");
                 });
 
@@ -1955,6 +2287,8 @@ namespace StockPlusPlus.Data.Migrations
 
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Team", b =>
                 {
+                    b.Navigation("TeamCompanyBranches");
+
                     b.Navigation("TeamUsers");
                 });
 
@@ -1966,6 +2300,11 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Navigation("UserLog")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("StockPlusPlus.Data.Entities.Invoice", b =>
+                {
+                    b.Navigation("InvoiceLines");
                 });
 
             modelBuilder.Entity("StockPlusPlus.Data.Entities.ProductCategory", b =>
