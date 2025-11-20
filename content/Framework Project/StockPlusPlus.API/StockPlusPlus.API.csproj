@@ -25,7 +25,9 @@
 		<!--#if(externalShiftIdentityHosting)-->
 		<PackageReference Include="ShiftSoftware.ShiftIdentity.AspNetCore" Version="$(ShiftFrameworkVersion)" />
 		<!--#endif -->
-		
+		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.14.0" />
+
 	</ItemGroup>
 
 	<ItemGroup>
