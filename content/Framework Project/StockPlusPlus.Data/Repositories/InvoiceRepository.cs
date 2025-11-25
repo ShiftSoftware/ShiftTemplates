@@ -19,7 +19,7 @@ public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceLi
     {
     }
 
-    public override async ValueTask<Invoice> UpsertAsync(Invoice entity, InvoiceDTO dto, ActionTypes actionType, long? userId = null, Guid? idempotencyKey = null)
+    public override async ValueTask<Invoice> UpsertAsync(Invoice entity, InvoiceDTO dto, ActionTypes actionType, long? userId = null, Guid? idempotencyKey = null, bool disableDefaultDataLevelAccess = false)
     {
 
         if (actionType == ActionTypes.Update)
@@ -27,7 +27,7 @@ public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceLi
             db.InvoiceLines.RemoveRange(entity.InvoiceLines.ToList());
         }
 
-        var upserted = await base.UpsertAsync(entity, dto, actionType, userId, idempotencyKey);
+        var upserted = await base.UpsertAsync(entity, dto, actionType, userId, idempotencyKey, disableDefaultDataLevelAccess);
 
         if (actionType == ActionTypes.Insert)
         {
