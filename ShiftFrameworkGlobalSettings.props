@@ -2,8 +2,8 @@
 	<PropertyGroup>
 		<DefineConstants>shiftFrameworkDevelopmentMode;includeSampleApp;internalShiftIdentityHosting;includeItemTemplateContent</DefineConstants>
 		<ImportShiftFrameworkProjects>true</ImportShiftFrameworkProjects>
-		<ShiftFrameworkVersion>2025.11.24.2</ShiftFrameworkVersion>
-		<TypeAuthVersion>1.6.3</TypeAuthVersion>
-		<AzureFunctionsAspNetCoreAuthorizationVersion>0.0.19</AzureFunctionsAspNetCoreAuthorizationVersion>
+		<ShiftFrameworkVersion>2025.11.25.1</ShiftFrameworkVersion>
+		<TypeAuthVersion>1.6.4</TypeAuthVersion>
+		<AzureFunctionsAspNetCoreAuthorizationVersion>0.0.20</AzureFunctionsAspNetCoreAuthorizationVersion>
 	</PropertyGroup>
 </Project>
