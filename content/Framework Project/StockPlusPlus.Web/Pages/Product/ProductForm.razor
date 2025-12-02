@@ -75,12 +75,12 @@
     {
         if (!string.IsNullOrWhiteSpace(ProductCategoryID))
         {
-            TheItem.ProductCategory = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO(ProductCategoryID);
+            TheItem.ProductCategory = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO { Value = ProductCategoryID };
         }
 
         if (!string.IsNullOrWhiteSpace(ProductBrandID))
         {
-            TheItem.ProductBrand = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO(ProductBrandID);
+            TheItem.ProductBrand = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO { Value = ProductBrandID };
         }
     }
 }
