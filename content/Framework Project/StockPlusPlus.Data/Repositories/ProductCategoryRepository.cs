@@ -51,7 +51,7 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
             item.Code
         };
 
-        var q = await GetIQueryable(disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
+        var q = await GetIQueryable(asOf: null, includes: null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
 
         var otherCategories = await
             q

@@ -40,7 +40,10 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
             entity: new Data.Entities.ProductBrand(),
             dto: new ProductBrandDTO { Name = "One" },
             actionType: ShiftSoftware.ShiftEntity.Core.ActionTypes.Insert,
-            userId: null
+            userId: null,
+            idempotencyKey: null,
+            disableDefaultDataLevelAccess: false,
+            disableGlobalFilters: false
         );
 
         brandRepository.Add(createdBrand);
@@ -60,10 +63,13 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
     public async Task<IActionResult> TestFindAndUpdate()
     {
         var updatedBrand = await brandRepository.UpsertAsync(
-            entity: (await brandRepository.FindAsync(1))!,
+            entity: (await brandRepository.FindAsync(1, asOf: null, disableDefaultDataLevelAccess: false, disableGlobalFilters: false))!,
             dto: new ProductBrandDTO { ID = "1", Name = "Updated" },
             actionType: ShiftSoftware.ShiftEntity.Core.ActionTypes.Update,
-            userId: null
+            userId: null,
+            idempotencyKey: null,
+            disableDefaultDataLevelAccess: false,
+            disableGlobalFilters: false
         );
 
         await brandRepository.SaveChangesAsync();
@@ -82,9 +88,11 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
     public async Task<IActionResult> TestDelete()
     {
         var deletedBrand = await brandRepository.DeleteAsync(
-            entity: (await brandRepository.FindAsync(1))!,
+            entity: (await brandRepository.FindAsync(1, asOf: null, disableDefaultDataLevelAccess: false, disableGlobalFilters: false))!,
             isHardDelete: false,
-            userId: null
+            userId: null,
+            disableGlobalFilters: false,
+            disableDefaultDataLevelAccess: false
         );
 
         await brandRepository.SaveChangesAsync();

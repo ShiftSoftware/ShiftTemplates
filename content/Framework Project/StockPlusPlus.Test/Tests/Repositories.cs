@@ -35,7 +35,7 @@ public class Repositories
 
         await brandRepository.SaveChangesAsync();
 
-        var foundBrand = (await this.brandRepository.FindAsync(brand.ID))!;
+        var foundBrand = (await this.brandRepository.FindAsync(brand.ID, asOf: null, disableDefaultDataLevelAccess: false, disableGlobalFilters: false))!;
 
         var viewedBrand = await this.brandRepository.ViewAsync(foundBrand);
 
@@ -62,7 +62,7 @@ public class Repositories
 
         this.productRepository.db.ChangeTracker.Clear();
 
-        var foundProduct = (await this.productRepository.FindAsync(product.ID))!;
+        var foundProduct = (await this.productRepository.FindAsync(product.ID, asOf: null, disableDefaultDataLevelAccess: false, disableGlobalFilters: false))!;
 
         var viewedProduct = await productRepository.ViewAsync(foundProduct);
 

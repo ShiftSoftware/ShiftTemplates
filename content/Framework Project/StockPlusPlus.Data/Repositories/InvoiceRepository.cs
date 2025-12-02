@@ -1,13 +1,10 @@
 ﻿using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
-using ShiftSoftware.ShiftEntity.Model.HashIds;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.Invoice;
-using System.Text.Json;
 
 namespace StockPlusPlus.Data.Repositories;
 
@@ -19,7 +16,7 @@ public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceLi
     {
     }
 
-    public override async ValueTask<Invoice> UpsertAsync(Invoice entity, InvoiceDTO dto, ActionTypes actionType, long? userId = null, Guid? idempotencyKey = null, bool disableDefaultDataLevelAccess = false)
+    public override async ValueTask<Invoice> UpsertAsync(Invoice entity, InvoiceDTO dto, ActionTypes actionType, long? userId, Guid? idempotencyKey, bool disableDefaultDataLevelAccess, bool disableGlobalFilters)
     {
 
         if (actionType == ActionTypes.Update)
@@ -27,7 +24,7 @@ public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceLi
             db.InvoiceLines.RemoveRange(entity.InvoiceLines.ToList());
         }
 
-        var upserted = await base.UpsertAsync(entity, dto, actionType, userId, idempotencyKey, disableDefaultDataLevelAccess);
+        var upserted = await base.UpsertAsync(entity, dto, actionType, userId, idempotencyKey, disableDefaultDataLevelAccess, disableGlobalFilters);
 
         if (actionType == ActionTypes.Insert)
         {

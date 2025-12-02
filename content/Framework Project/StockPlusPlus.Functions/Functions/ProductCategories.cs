@@ -28,7 +28,7 @@ namespace StockPlusPlus.Functions
         public async Task<IActionResult> Get(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req)
         {
-            var odataList = await this.productCategoryRepository.OdataList();
+            var odataList = await this.productCategoryRepository.OdataList(queryable: null);
 
             var allProductCategories = await odataList.ToArrayAsync();
 
@@ -37,7 +37,7 @@ namespace StockPlusPlus.Functions
             if (allProductCategories.Length != 0 && allProductCategories.First().ID is string id)
             {
                 var productCategoryId = long.Parse(id);
-                productCategory = await this.productCategoryRepository.FindAsync(productCategoryId);
+                productCategory = await this.productCategoryRepository.FindAsync(productCategoryId, asOf: null, disableDefaultDataLevelAccess: false, disableGlobalFilters: false);
             }
 
             var configuration = new MapperConfiguration(cfg =>
