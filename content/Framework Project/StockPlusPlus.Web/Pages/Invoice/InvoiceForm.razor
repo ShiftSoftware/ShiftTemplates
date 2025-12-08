@@ -33,7 +33,7 @@
                          @bind-DateTimeOffset="TheItem.InvoiceDate"
                          For="() => TheItem.InvoiceDate" />
 
-    <MultiItemField Min="3" Title="Lines" @bind-Value="TheItem.InvoiceLines" T="List<InvoiceLineDTO>" TItem="InvoiceLineDTO">
+    <MultiItemField DisableDragAndDrop="false" ControlVariant="Variant.Filled" Min="3" Title="Lines" @bind-Value="TheItem.InvoiceLines" T="InvoiceLineDTO">
         
         <FieldHeader Context="Field">
             <MudGrid Spacing="3" Style="align-items: baseline;">
@@ -77,6 +77,29 @@
                 </MudItem>
             </MudGrid>
         </FieldBody>
+
+        <ControlTemplate Context="_context">
+
+            <MudButtonGroup Vertical>
+                <MudIconButton ButtonType="ButtonType.Button"
+                               Color="Color.Default"
+                               OnClick="_context.MoveUp"
+                               Icon="@Icons.Material.Filled.ArrowUpward" />
+                <MudIconButton ButtonType="ButtonType.Button"
+                               Color="Color.Default"
+                               OnClick="_context.MoveDown"
+                               Icon="@Icons.Material.Filled.ArrowDownward" />
+                <MudIconButton ButtonType="ButtonType.Button"
+                               Color="Color.Error"
+                               OnClick="_context.MarkForRemoval"
+                               Icon="@Icons.Material.Filled.Delete" />
+                <MudIconButton ButtonType="ButtonType.Button"
+                               Color="Color.Error"
+                               OnClick="_context.MarkAllForRemoval"
+                               Icon="@Icons.Material.Filled.Delete" />
+            </MudButtonGroup>
+
+        </ControlTemplate>
   
     </MultiItemField>
 </ShiftEntityForm>
