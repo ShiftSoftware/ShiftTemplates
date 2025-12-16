@@ -18,6 +18,7 @@
                  @ref="FormContainer"
                  Endpoint="Product"
                  Title="Product"
+                 ForceSaveAsNew="ForceSaveAsNew"
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Product"
                  AllowClone
                  @bind-Key="@Key">
@@ -27,7 +28,7 @@
                           @bind-Value="TheItem.Name"
                           For="@(() => TheItem.Name)" />
 
-    <MudNumericFieldExtended @bind-Value="TheItem.Price" For="() => TheItem.Price"/>
+    <MudNumericFieldExtended @bind-Value="TheItem.Price" For="() => TheItem.Price" />
 
     <ShiftDateTimePicker Label="Release Date"
                          @bind-DateTimeOffset="TheItem.ReleaseDate"
@@ -70,6 +71,10 @@
 
     [Parameter]
     public string? ProductBrandID { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public bool ForceSaveAsNew { get; set; }
 
     protected override void OnInitialized()
     {
