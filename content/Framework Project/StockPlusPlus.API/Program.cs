@@ -147,8 +147,7 @@ builder.Services.AddShiftEntityPrint(x =>
 
 mvcBuilder.AddShiftEntityWeb(x =>
 {
-    x.SetDefaultTop(500);
-    x.SetMaxTop(10000);
+    x.SetMaxTop(10_000);
 
     x.AddDataAssembly(typeof(StockPlusPlus.Data.Marker).Assembly);
     x.WrapValidationErrorResponseWithShiftEntityResponse(true);
