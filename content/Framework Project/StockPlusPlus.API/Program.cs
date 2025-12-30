@@ -26,6 +26,7 @@ using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Web.Explorer;
 using ShiftSoftware.ShiftEntity.Model.Replication;
 using Microsoft.AspNetCore.OData;
+using ShiftSoftware.TypeAuth.Core;
 #endif
 #if (externalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
@@ -148,6 +149,18 @@ builder.Services.AddShiftEntityPrint(x =>
 mvcBuilder.AddShiftEntityWeb(x =>
 {
     x.SetMaxTop(10_000);
+
+    x.SetMaxTopResolver(services =>
+    {
+        var typeAuth = services.GetRequiredService<ITypeAuthService>();
+
+        var maxTop = typeAuth.AccessValue(StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.MaxTop);
+
+        if (maxTop.HasValue)
+            return (int)maxTop.Value;
+
+        return null;
+    });
 
     x.AddDataAssembly(typeof(StockPlusPlus.Data.Marker).Assembly);
     x.WrapValidationErrorResponseWithShiftEntityResponse(true);

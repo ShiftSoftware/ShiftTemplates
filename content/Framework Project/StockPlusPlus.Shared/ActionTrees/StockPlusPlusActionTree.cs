@@ -15,11 +15,13 @@ public class StockPlusPlusActionTree
 
     public readonly static ReadWriteDeleteAction Country = new("Country");
 
+    public readonly static DecimalAction MaxTop = new("Max Top", null, 5, int.MaxValue);
+
     [ActionTree("Data Level Access", "Data Level or Row-Level Access")]
     public class DataLevelAccess
     {
-        public readonly static DynamicReadWriteDeleteAction ProductBrand = new("Brand"); 
-        public readonly static DynamicReadWriteDeleteAction ProductCategory = new("Product Category"); 
+        public readonly static DynamicReadWriteDeleteAction ProductBrand = new("Brand");
+        public readonly static DynamicReadWriteDeleteAction ProductCategory = new("Product Category");
     }
 #endif
 }
