@@ -15,8 +15,6 @@ public class StockPlusPlusActionTree
 
     public readonly static ReadWriteDeleteAction Country = new("Country");
 
-    public readonly static DecimalAction MaxTop = new("Max Top", null, 5, int.MaxValue);
-
     [ActionTree("Data Level Access", "Data Level or Row-Level Access")]
     public class DataLevelAccess
     {

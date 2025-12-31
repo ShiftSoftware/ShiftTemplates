@@ -148,20 +148,6 @@ builder.Services.AddShiftEntityPrint(x =>
 
 mvcBuilder.AddShiftEntityWeb(x =>
 {
-    x.SetMaxTop(10_000);
-
-    x.SetMaxTopResolver(services =>
-    {
-        var typeAuth = services.GetRequiredService<ITypeAuthService>();
-
-        var maxTop = typeAuth.AccessValue(StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.MaxTop);
-
-        if (maxTop.HasValue)
-            return (int)maxTop.Value;
-
-        return null;
-    });
-
     x.AddDataAssembly(typeof(StockPlusPlus.Data.Marker).Assembly);
     x.WrapValidationErrorResponseWithShiftEntityResponse(true);
     x.AddAutoMapper(typeof(StockPlusPlus.Data.Marker).Assembly);
@@ -309,6 +295,7 @@ new string[]
 builder.Services.AddTypeAuth((o) =>
 {
     o.AddActionTree<ShiftIdentityActions>();
+    o.AddActionTree<ShiftSoftware.ShiftEntity.Core.GeneralActionTree>();
     o.AddActionTree<ShiftSoftware.ShiftEntity.Core.AzureStorageActionTree>();
 #if (includeSampleApp)
     o.AddActionTree<StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree>();
