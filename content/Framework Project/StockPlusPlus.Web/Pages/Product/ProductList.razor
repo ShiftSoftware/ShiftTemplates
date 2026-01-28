@@ -22,76 +22,89 @@
            TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Product"
            AddDialogParameters="AddDialogParameters"
            HeaderNowrap
+           EnableSelection
            Context="listContext"
            EnableExport>
+           <ToolbarStartTemplate>
+               <ActionButton Color="Color.Error"
+                          Variant="Variant.Outlined"
+                          Size="Size.Small"
+                          StartIcon="@Icons.Material.Filled.Delete"
+                          Confirm
+                          DialogColor="Color.Error"
+                          Endpoint="@($"Product/bulk-delete")"
+                          T="ProductListDTO">
+                Remove Product And Category
+            </ActionButton>
+            </ToolbarStartTemplate>
 
-    <DateTimeFilter Label="Release Date" Property="x => x.ReleaseDate" lg="12" md="12" xl="12" sm="12" xs="12" />
+           <ChildContent>
+               <DateTimeFilter Label="Release Date" Property="x => x.ReleaseDate" lg="12" md="12" xl="12" sm="12" xs="12" />
 
-    @if (ProductBrandID != null)
-    {
-        <FilterComponent Property="x => x.ProductBrandID" Operator="ODataOperator.Equal" Value="ProductBrandID" />
-    }
+                @if (ProductBrandID != null)
+                {
+                    <FilterComponent Property="x => x.ProductBrandID" Operator="ODataOperator.Equal" Value="ProductBrandID" />
+                }
 
-    @if (ProductCategoryID != null)
-    {
-        <FilterComponent Property="x => x.ProductCategoryID" Operator="ODataOperator.Equal" Value="ProductCategoryID" />
-    }
+                @if (ProductCategoryID != null)
+                {
+                    <FilterComponent Property="x => x.ProductCategoryID" Operator="ODataOperator.Equal" Value="ProductCategoryID" />
+                }
 
-    
-    <PropertyColumnExtended Property="x => x.Name" Title="Name">
-        <CellTemplate>
-                @context.Item.Name
+                <PropertyColumnExtended Property="x => x.Name" Title="Name">
+                    <CellTemplate>
+                            @context.Item.Name
                 
-                <MudIconButton Variant="Variant.Text"
-                           Size="Size.Small"
-                           Icon="@Icons.Material.Filled.ContentCopy"
-                           ButtonType="ButtonType.Button"
-                           Color="Color.Info"
-                           OnClick="@(async () => {
-                                 var parameters = new Dictionary<string, object>
-                                 {
-                                      { "ForceSaveAsNew", true }
-                                 };
+                            <MudIconButton Variant="Variant.Text"
+                                       Size="Size.Small"
+                                       Icon="@Icons.Material.Filled.ContentCopy"
+                                       ButtonType="ButtonType.Button"
+                                       Color="Color.Info"
+                                       OnClick="@(async () => {
+                                             var parameters = new Dictionary<string, object>
+                                             {
+                                                  { "ForceSaveAsNew", true }
+                                             };
     
-                                 await listContext.Self.OpenDialog(typeof(ProductForm), context.Item.ID, ModalOpenMode.Popup, parameters);
-                       })" />
-        </CellTemplate>
-    </PropertyColumnExtended>
+                                             await listContext.Self.OpenDialog(typeof(ProductForm), context.Item.ID, ModalOpenMode.Popup, parameters);
+                                   })" />
+                    </CellTemplate>
+                </PropertyColumnExtended>
 
-    <PropertyColumn Property="x => x.Price" Title="Price" />
-    <PropertyColumn Property="x => x.TrackingMethod" />
-    <PropertyColumn Format="F" Property="x => x.LastSaveDate.DateTime" Title="SaveDate" />
+                <PropertyColumn Property="x => x.Price" Title="Price" />
+                <PropertyColumn Property="x => x.TrackingMethod" />
+                <PropertyColumn Format="F" Property="x => x.LastSaveDate.DateTime" Title="SaveDate" />
 
-    <PropertyColumn Format="F" Property="x => x.ReleaseDate" Title="Release Date" Filterable="false" />
+                <PropertyColumn Format="F" Property="x => x.ReleaseDate" Title="Release Date" Filterable="false" />
 
-    <ButtonColumn ComponentType="typeof(ProductBrandForm)" KeyPropertyName="@nameof(ProductListDTO.ProductBrandID)" Property="x => x.ProductBrand" Title="Brand">
-        <ButtonTemplate Context="BtnCtx">
-            <MudChip T="string" Style="cursor: pointer;" Icon="@Icons.Material.Filled.BrandingWatermark" Variant="Variant.Outlined">@BtnCtx</MudChip>
-        </ButtonTemplate>
-    </ButtonColumn>
+                <ButtonColumn ComponentType="typeof(ProductBrandForm)" KeyPropertyName="@nameof(ProductListDTO.ProductBrandID)" Property="x => x.ProductBrand" Title="Brand">
+                    <ButtonTemplate Context="BtnCtx">
+                        <MudChip T="string" Style="cursor: pointer;" Icon="@Icons.Material.Filled.BrandingWatermark" Variant="Variant.Outlined">@BtnCtx</MudChip>
+                    </ButtonTemplate>
+                </ButtonColumn>
 
-    <ForeignColumn IsButtonColumn
-                   ComponentType="typeof(ProductCategoryForm)"
-                   Property="x => x.ProductCategoryID"
-                   Title="Category"
-                   T="ProductListDTO"
-                   TEntity="ProductCategoryListDTO"
-                   TProperty="string"
-                   EntitySet="ProductCategory"
-                   OpenMode="ModalOpenMode.NewTab" />
+                <ForeignColumn IsButtonColumn
+                               ComponentType="typeof(ProductCategoryForm)"
+                               Property="x => x.ProductCategoryID"
+                               Title="Category"
+                               T="ProductListDTO"
+                               TEntity="ProductCategoryListDTO"
+                               TProperty="string"
+                               EntitySet="ProductCategory"
+                               OpenMode="ModalOpenMode.NewTab" />
 
-    @listContext.DraftColumn
+                @listContext.DraftColumn
 
-    <ForeignColumn Property="x => x.CityID"
-                   Title="City"
-                   T="ProductListDTO"
-                   ForeignEntityField="@nameof(ProductListDTO.City)"
-                   TEntity="CityListDTO"
-                   TProperty="string"
-                   EntitySet="IdentityCity" />
+                <ForeignColumn Property="x => x.CityID"
+                               Title="City"
+                               T="ProductListDTO"
+                               ForeignEntityField="@nameof(ProductListDTO.City)"
+                               TEntity="CityListDTO"
+                               TProperty="string"
+                               EntitySet="IdentityCity" />
 
-    <PropertyColumn Property="x => x.CustomID" Title="Custom ID" />
-
+                <PropertyColumn Property="x => x.CustomID" Title="Custom ID" />
+           </ChildContent>
 </ShiftList>
 
 @code {

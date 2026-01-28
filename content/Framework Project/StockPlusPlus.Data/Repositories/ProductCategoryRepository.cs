@@ -17,22 +17,22 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
 {
     public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider, IServiceProvider serviceProvider) : base(db, o =>
     {
-        o.FilterByCustomValue<List<long>>(x => x.CustomValue.Contains(x.Entity.ID))
-        .ValueProvider(() =>
-        {
-            var user = currentUserProvider.GetUser();
+        //o.FilterByCustomValue<List<long>>(x => x.CustomValue.Contains(x.Entity.ID))
+        //.ValueProvider(() =>
+        //{
+        //    var user = currentUserProvider.GetUser();
 
-            return new ValueTask<List<long>>(new List<long>() { user.GetCountryID()!.Value });
-        });
+        //    return new ValueTask<List<long>>(new List<long>() { user.GetCountryID()!.Value });
+        //});
 
-        o.FilterByClaimValues(x => x.ClaimValues != null && x.ClaimValues.Contains(x.Entity.ID.ToString()))
-        .ValueProvider<CompanyBranchDTO>(Constants.CompanyBranchIdClaim);
+        //o.FilterByClaimValues(x => x.ClaimValues != null && x.ClaimValues.Contains(x.Entity.ID.ToString()))
+        //.ValueProvider<CompanyBranchDTO>(Constants.CompanyBranchIdClaim);
 
-        o.FilterByTypeAuthValues(x => (x.ReadableTypeAuthValues != null && x.ReadableTypeAuthValues.Contains(x.Entity.ID.ToString())) || x.WildCardRead)
-        .ValueProvider<ProductBrandDTO>(
-            Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand,
-            Constants.CompanyBranchIdClaim
-        );
+        //o.FilterByTypeAuthValues(x => (x.ReadableTypeAuthValues != null && x.ReadableTypeAuthValues.Contains(x.Entity.ID.ToString())) || x.WildCardRead)
+        //.ValueProvider<ProductBrandDTO>(
+        //    Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand,
+        //    Constants.CompanyBranchIdClaim
+        //);
     })
     {
     }
