@@ -2,7 +2,7 @@
 
 namespace StockPlusPlus.Test.Tests;
 
-[TestCaseOrderer(Constants.OrdererTypeName, Constants.OrdererAssemblyName)]
+[TestCaseOrderer(typeof(PriorityOrderer))]
 public class TestPriority
 {
     private static int COUNT = 0;
@@ -22,7 +22,7 @@ public class TestPriority
     {
         COUNT++;
 
-        await Task.Delay(2000);
+        await Task.Delay(2000, TestContext.Current.CancellationToken);
 
         Assert.Equal(1, COUNT);
     }

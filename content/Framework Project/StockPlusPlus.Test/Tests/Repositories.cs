@@ -5,7 +5,7 @@ using StockPlusPlus.Data.Repositories;
 
 namespace StockPlusPlus.Test.Tests;
 
-[TestCaseOrderer(Constants.OrdererTypeName, Constants.OrdererAssemblyName)]
+[TestCaseOrderer(typeof(PriorityOrderer))]
 [Collection("API Collection")]
 public class Repositories
 {
@@ -35,7 +35,7 @@ public class Repositories
 
         await brandRepository.SaveChangesAsync();
 
-        var foundBrand = (await this.brandRepository.FindAsync(brand.ID, asOf: null, disableDefaultDataLevelAccess: false, disableGlobalFilters: false))!;
+        var foundBrand = (await this.brandRepository.FindAsync(brand.ID, asOf: null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true))!;
 
         var viewedBrand = await this.brandRepository.ViewAsync(foundBrand);
 
@@ -62,7 +62,7 @@ public class Repositories
 
         this.productRepository.db.ChangeTracker.Clear();
 
-        var foundProduct = (await this.productRepository.FindAsync(product.ID, asOf: null, disableDefaultDataLevelAccess: false, disableGlobalFilters: false))!;
+        var foundProduct = (await this.productRepository.FindAsync(product.ID, asOf: null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true))!;
 
         var viewedProduct = await productRepository.ViewAsync(foundProduct);
 
