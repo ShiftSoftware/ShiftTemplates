@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using ShiftSoftware.TypeAuth.AspNetCore;
 using ShiftSoftware.TypeAuth.Core;
 using StockPlusPlus.Data.Repositories;
@@ -16,11 +18,15 @@ namespace StockPlusPlus.Functions
     {
         private readonly ProductCategoryRepository productCategoryRepository;
         private readonly ITypeAuthService typeAuth;
+        private readonly ILoggerFactory loggerFactory;
+        private readonly IConfiguration configuration;
         
-        public ProductCategories(ProductCategoryRepository productCategoryRepository, ITypeAuthService typeAuth)
+        public ProductCategories(ProductCategoryRepository productCategoryRepository, ITypeAuthService typeAuth, ILoggerFactory loggerFactory, IConfiguration configuration)
         {
             this.productCategoryRepository = productCategoryRepository;
             this.typeAuth = typeAuth;
+            this.loggerFactory = loggerFactory;
+            this.configuration= configuration;
         }
 
         [Function("ProductCategories")]
@@ -43,7 +49,9 @@ namespace StockPlusPlus.Functions
             var configuration = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new ShiftSoftware.ShiftEntity.Core.DefaultAutoMapperProfile(typeof(StockPlusPlus.Data.Marker).Assembly));
-            });
+                cfg.LicenseKey = this.configuration.GetValue<string>("AutoMapperLicenseKey");
+            },
+            loggerFactory);
 
             var mapper = new Mapper(configuration);
 
