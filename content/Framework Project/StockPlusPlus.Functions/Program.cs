@@ -71,6 +71,7 @@ var host = new HostBuilder()
         {
             x.AddDataAssembly(typeof(StockPlusPlus.Data.Marker).Assembly);
             x.HashId.RegisterHashId(false);
+            x.AutoMapperLicenseKey = hostBuilder.Configuration.GetValue<string>("AutoMapperLicenseKey");
 
             var azureStorageAccounts = new List<ShiftSoftware.ShiftEntity.Core.Services.AzureStorageOption>();
 
