@@ -1,56 +1,26 @@
 using ShiftSoftware.ShiftEntity.Core;
-using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.Product;
+using static ShiftSoftware.ShiftEntity.Core.MappingHelpers;
 
 namespace StockPlusPlus.Data.Mappers;
 
-/// <summary>
-/// Manual IShiftEntityMapper implementation for Product.
-/// Demonstrates explicit mapping for an entity with:
-///   - ShiftEntitySelectDTO FK conventions (ProductCategory, ProductBrand, CountryOfOrigin)
-///   - Navigation properties via Includes (ProductBrand, CountryOfOrigin)
-///   - Enum properties (TrackingMethod)
-///   - Nullable FK (CountryOfOriginID)
-///   - Separate List vs View DTO shapes
-/// </summary>
 public class ProductMapper : IShiftEntityMapper<Product, ProductListDTO, ProductDTO>
 {
     public ProductDTO MapToView(Product entity)
     {
-        return new ProductDTO
+        return entity.MapBaseFieldsToView(new ProductDTO
         {
-            ID = entity.ID.ToString(),
             Name = entity.Name,
             TrackingMethod = entity.TrackingMethod,
             Price = entity.Price,
             ReleaseDate = entity.ReleaseDate,
             IsDraft = entity.IsDraft,
-            IsDeleted = entity.IsDeleted,
-            CreateDate = entity.CreateDate,
-            LastSaveDate = entity.LastSaveDate,
-            CreatedByUserID = entity.CreatedByUserID?.ToString(),
-            LastSavedByUserID = entity.LastSavedByUserID?.ToString(),
 
-            // FK → ShiftEntitySelectDTO (explicit, no reflection)
-            ProductCategory = new ShiftEntitySelectDTO
-            {
-                Value = entity.ProductCategoryID.ToString(),
-                Text = entity.ProductCategory?.Name
-            },
-            ProductBrand = new ShiftEntitySelectDTO
-            {
-                Value = entity.ProductBrandID.ToString(),
-                Text = entity.ProductBrand?.Name
-            },
-            CountryOfOrigin = entity.CountryOfOriginID.HasValue
-                ? new ShiftEntitySelectDTO
-                {
-                    Value = entity.CountryOfOriginID.Value.ToString(),
-                    Text = entity.CountryOfOrigin?.Name
-                }
-                : null,
-        };
+            ProductCategory = ToSelectDTO(entity.ProductCategoryID, entity.ProductCategory?.Name),
+            ProductBrand = ToSelectDTO(entity.ProductBrandID, entity.ProductBrand?.Name),
+            CountryOfOrigin = ToSelectDTO(entity.CountryOfOriginID, entity.CountryOfOrigin?.Name),
+        });
     }
 
     public Product MapToEntity(ProductDTO dto, Product existing)
@@ -61,14 +31,10 @@ public class ProductMapper : IShiftEntityMapper<Product, ProductListDTO, Product
         existing.ReleaseDate = dto.ReleaseDate;
         existing.IsDraft = dto.IsDraft ?? false;
 
-        // ShiftEntitySelectDTO → FK (explicit, no reflection)
-        existing.ProductCategoryID = long.Parse(dto.ProductCategory.Value);
-        existing.ProductBrandID = long.Parse(dto.ProductBrand.Value);
-        existing.CountryOfOriginID = dto.CountryOfOrigin != null && !string.IsNullOrWhiteSpace(dto.CountryOfOrigin.Value)
-            ? long.Parse(dto.CountryOfOrigin.Value)
-            : null;
+        existing.ProductCategoryID = dto.ProductCategory.ToForeignKey();
+        existing.ProductBrandID = dto.ProductBrand.ToForeignKey();
+        existing.CountryOfOriginID = dto.CountryOfOrigin.ToNullableForeignKey();
 
-        // Navigation properties are NOT touched — no risk of overwriting with null
         return existing;
     }
 
@@ -94,27 +60,6 @@ public class ProductMapper : IShiftEntityMapper<Product, ProductListDTO, Product
 
     public void CopyEntity(Product source, Product target)
     {
-        target.Name = source.Name;
-        target.TrackingMethod = source.TrackingMethod;
-        target.Price = source.Price;
-        target.ReleaseDate = source.ReleaseDate;
-        target.IsDraft = source.IsDraft;
-        target.ProductCategoryID = source.ProductCategoryID;
-        target.ProductBrandID = source.ProductBrandID;
-        target.CountryOfOriginID = source.CountryOfOriginID;
-        target.ProductCategory = source.ProductCategory;
-        target.ProductBrand = source.ProductBrand;
-        target.CountryOfOrigin = source.CountryOfOrigin;
-        target.RegionID = source.RegionID;
-        target.CompanyID = source.CompanyID;
-        target.CompanyBranchID = source.CompanyBranchID;
-        target.CountryID = source.CountryID;
-        target.CityID = source.CityID;
-        target.CreateDate = source.CreateDate;
-        target.LastSaveDate = source.LastSaveDate;
-        target.CreatedByUserID = source.CreatedByUserID;
-        target.LastSavedByUserID = source.LastSavedByUserID;
-        target.IsDeleted = source.IsDeleted;
-        // ReloadAfterSave is intentionally NOT copied
+        source.ShallowCopyTo(target);
     }
 }
