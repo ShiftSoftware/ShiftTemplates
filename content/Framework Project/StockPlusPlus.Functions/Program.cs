@@ -64,7 +64,6 @@ var host = new HostBuilder()
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
         services
-        .RegisterShiftEntityEfCoreTriggers()
         .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")!));
 
         services.AddMvc().AddShiftEntityWeb(x =>

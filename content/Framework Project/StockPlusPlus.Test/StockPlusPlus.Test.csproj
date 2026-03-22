@@ -16,6 +16,8 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
 		<PackageReference Include="ShiftSoftware.ShiftFrameworkTestingTools" Version="$(ShiftFrameworkVersion)" />
 		<PackageReference Include="xunit.v3" Version="3.2.2" />
+		<PackageReference Include="Riok.Mapperly" Version="4.1.1" />
+		<PackageReference Include="Mapster" Version="7.4.0" />
 	</ItemGroup>
 
 	<ItemGroup>

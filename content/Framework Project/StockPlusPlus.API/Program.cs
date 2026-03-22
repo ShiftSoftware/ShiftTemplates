@@ -42,6 +42,10 @@ Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
 
 builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
 
+// Manual mapper for Product — uncomment to use hand-written mapping instead of AutoMapper.
+// When registered, ProductRepository picks this up via DI instead of using AutoMapper.
+builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Product, StockPlusPlus.Shared.DTOs.Product.ProductListDTO, StockPlusPlus.Shared.DTOs.Product.ProductDTO>, StockPlusPlus.Data.Mappers.ProductMapper>();
+
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
 builder.Services.AddHttpClient();
 

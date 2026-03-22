@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/repos/ShiftSoftware/ShiftTemplates -maxdepth 2 -type f -name *.md -o -type f -name *.sln -o -type f -name CLAUDE.md -o -type f -name .cursorrules)",
+      "Bash(find /c/repos/ShiftSoftware/ShiftTemplates/content/ShiftEntity -type f -name *.json -o -name *.cs)",
+      "Bash(find /c/repos/ShiftSoftware/ShiftEntity -type f -name *.csproj)",
+      "Bash(grep -r \"IMapper\\\\|MapperConfiguration\\\\|CreateMap\\\\|ForMember\\\\|ReverseMap\\\\|ProjectTo\" /c/repos/ShiftSoftware/ShiftEntity --include=*.cs)",
+      "Bash(grep -r \"ProjectTo\\\\|ForMember\\\\|convention\\\\|Condition\" /c/repos/ShiftSoftware/ShiftEntity --include=*.cs)",
+      "Bash(find C:/repos/ShiftSoftware -type f -name *.cs -path */AutoMapperProfiles/*)",
+      "Bash(xargs grep:*)",
+      "Bash(grep -r Vehicle 'C:/repos/ShiftSoftware/ShiftTemplates/content/Framework Project' --include=*.cs)",
+      "Bash(find /c/repos/ShiftSoftware/ShiftEntity -path */Interfaces/* -name *.cs -type f)",
+      "Bash(find /c/repos/ShiftSoftware/ShiftIdentity -name \"*.cs\" -path \"*/AutoMapperProfiles*\" -exec wc -l {} +)",
+      "Bash(grep -r \"ITypeConverter\\\\|AfterMap\\\\|BeforeMap\\\\|ValueResolver\" /c/repos/ShiftSoftware/ShiftEntity --include=*.cs)",
+      "Bash(find /c/repos/ShiftSoftware/ShiftEntity -type f -name *.cs -path *Test*)",
+      "Bash(find C:/repos/ShiftSoftware/ADP -type f -path */AutoMapperProfiles/* -name *.cs)",
+      "Bash(grep -r \"VIN\\\\|Vehicle\" C:/repos/ShiftSoftware/ADP --include=*.cs)",
+      "Bash(grep -E \"ShiftEntity[^/]*\\\\.cs$\")",
+      "Bash(grep -r \"ShiftEntitySelectDTO\\\\|NavigationProperty\" 'C:/repos/ShiftSoftware/ShiftTemplates/content/Framework Project/StockPlusPlus.Data/Entities' --include=*.cs)",
+      "Bash(find /c/repos/ShiftSoftware/ShiftEntity/ShiftEntity.Web -type f -name *.cs)",
+      "Bash(grep -r \"Mapper\\\\|mapper\" /c/repos/ShiftSoftware/ShiftEntity/ShiftEntity.Web --include=*.cs)",
+      "Bash(grep -r \"\\\\.Map\\\\|ProjectTo\\\\|IMapper\" /c/repos/ShiftSoftware/ShiftEntity/ShiftEntity.Web --include=*.cs)",
+      "Bash(grep -r \"VehicleVIN\\\\|convention\\\\|Navigational\" /c/repos/ShiftSoftware/ShiftEntity --include=*.cs)",
+      "Bash(grep -r \"AddAutoMapper\\\\|AddShiftEntityWeb\" C:/repos/ShiftSoftware --include=*.cs)",
+      "Bash(find /c/repos/ShiftSoftware/ShiftTemplates -type f -name *.cs -exec grep -l \"IMapper\\\\|mapper.Map\\\\|mapper.ProjectTo\" {})",
+      "Bash(2)",
+      "Bash(grep -r \"ShiftRepository\\\\|AddShiftRepositories\" C:/repos/ShiftSoftware --include=*.cs)",
+      "Bash(find /c/repos/ShiftSoftware/ShiftTemplates -name *AutoMapper*Profile* -o -name *Profile.cs)",
+      "Bash(grep -r class.*Profile.*: /c/repos/ShiftSoftware/ShiftTemplates --include=*.cs)",
+      "Bash(grep -n AddShiftIdentityAutoMapper C:/repos/ShiftSoftware -r --include=*.cs)",
+      "Bash(grep -r \"AddAutoMapper\\\\|AddProfile\" /c/repos/ShiftSoftware/ShiftTemplates --include=*.cs)",
+      "Bash(grep -r \"RegisterShiftRepositories\\\\|AddShiftEntity\" /c/repos/ShiftSoftware/ShiftTemplates --include=*.cs)",
+      "Bash(find C:/repos/ShiftSoftware -type f -name *.csproj -exec grep -l AutoMapper {})",
+      "Bash(find C:/repos/ShiftSoftware/ShiftFrameworkDocumentation -type f -path */AutoMapperProfiles/* -name *.cs)",
+      "Bash(grep -r \"DefaultEntityToDtoAfterMap\\\\|DefaultDtoToEntityAfterMap\" C:/repos/ShiftSoftware/ShiftFrameworkDocumentation --include=*.cs)",
+      "Bash(grep -r \"class ShiftEntity\\\\|interface IShift\" /c/repos/ShiftSoftware/ShiftEntity/ShiftEntity.Core --include=*.cs)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet test:*)",
+      "Bash(dotnet run:*)"
+    ]
+  }
+}
