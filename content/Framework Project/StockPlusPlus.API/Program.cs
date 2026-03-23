@@ -46,6 +46,7 @@ builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Ass
 // When registered, the repository picks these up via DI instead of using AutoMapper.
 builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Product, StockPlusPlus.Shared.DTOs.Product.ProductListDTO, StockPlusPlus.Shared.DTOs.Product.ProductDTO>, StockPlusPlus.Data.Mappers.ProductMapper>();
 builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.ProductCategory, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryListDTO, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryDTO>, StockPlusPlus.Data.Mappers.ProductCategoryMapper>();
+builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Invoice, StockPlusPlus.Shared.DTOs.Invoice.InvoiceListDTO, StockPlusPlus.Shared.DTOs.Invoice.InvoiceDTO>, StockPlusPlus.Data.Mappers.InvoiceMapper>();
 
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
 builder.Services.AddHttpClient();
