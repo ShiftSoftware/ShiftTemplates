@@ -6,6 +6,7 @@ using ShiftSoftware.ShiftEntity.EFCore;
 using ShiftSoftware.ShiftEntity.Model.HashIds;
 using ShiftSoftware.ShiftIdentity.Core.DTOs.CompanyBranch;
 using StockPlusPlus.Data.DbContext;
+using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.Enums;
@@ -15,6 +16,12 @@ namespace StockPlusPlus.Data.Repositories;
 
 public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCategory, ProductCategoryListDTO, ProductCategoryDTO>
 {
+    // When an IShiftEntityMapper<ProductCategory, ...> is registered in DI, this constructor is used.
+    public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider, IServiceProvider serviceProvider, IShiftEntityMapper<ProductCategory, ProductCategoryListDTO, ProductCategoryDTO> mapper) : base(db, mapper)
+    {
+    }
+
+    // Fallback: when no IShiftEntityMapper is registered, DI uses this constructor (AutoMapper).
     public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider, IServiceProvider serviceProvider) : base(db, o =>
     {
         //o.FilterByCustomValue<List<long>>(x => x.CustomValue.Contains(x.Entity.ID))
