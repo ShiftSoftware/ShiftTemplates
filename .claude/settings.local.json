@@ -36,7 +36,8 @@
       "Bash(grep -r \"class ShiftEntity\\\\|interface IShift\" /c/repos/ShiftSoftware/ShiftEntity/ShiftEntity.Core --include=*.cs)",
       "Bash(dotnet build:*)",
       "Bash(dotnet test:*)",
-      "Bash(dotnet run:*)"
+      "Bash(dotnet run:*)",
+      "Bash(grep -E \"^d|\\\\.cs$\")"
     ]
   }
 }
