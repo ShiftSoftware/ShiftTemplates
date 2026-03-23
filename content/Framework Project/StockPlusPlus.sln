@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.6.33723.286
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11612.150
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockPlusPlus.API", "StockPlusPlus.API\StockPlusPlus.API.csproj", "{55183F24-9642-44F3-B930-D547980F3E97}"
 EndProject
@@ -17,6 +17,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftFramework", "ShiftFramework", "{6B5137B3-F21C-483E-B131-54706EE91D55}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\azure-pipeline.yml = ..\..\azure-pipeline.yml
+		..\..\CLAUDE.md = ..\..\CLAUDE.md
 		..\..\ImportAndReferenceAll.bat = ..\..\ImportAndReferenceAll.bat
 		..\..\RemoveAll.bat = ..\..\RemoveAll.bat
 		..\..\ShiftFrameworkGlobalSettings.props = ..\..\ShiftFrameworkGlobalSettings.props
@@ -107,8 +108,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docs.Data", "..\..\..\Shift
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docs.SnippetGen", "..\..\..\ShiftFrameworkDocumentation\Docs.SnippetGen\Docs.SnippetGen.csproj", "{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654}"
 EndProject
-<!--#endif -->
-
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{ECA9B174-291C-48BE-8C9D-1EF77628A1CD}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftEntity\docs\mapping-abstraction-plan.md = ..\..\..\ShiftEntity\docs\mapping-abstraction-plan.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -85,6 +85,28 @@ Template config lives in `content/Framework Project/.template.config/template.js
 
 Azure DevOps pipeline (`azure-pipeline.yml`) triggers on `release*` tags. It clones all framework sibling repos, builds everything, runs tests, then packs and publishes NuGet packages. Tag naming controls what gets published: `release-all`, `release-framework`, `release-typeauth`, `release-aspNetCore-authorization`.
 
+## Active Work: Mapping Abstraction
+
+We are actively decoupling `ShiftRepository` from AutoMapper by introducing `IShiftEntityMapper<TEntity, TListDTO, TViewDTO>` as a pluggable mapping abstraction. This is a cross-repo effort spanning ShiftEntity, ShiftTemplates, and ShiftIdentity.
+
+**Planning doc with full context, status, and iteration tracking:** `../ShiftEntity/docs/mapping-abstraction-plan.md`
+
+**IMPORTANT:** When making any mapping-related changes across ShiftEntity, ShiftTemplates, or ShiftIdentity, always update the planning doc to reflect what was done. This document is the single source of truth for the team — check it before starting work to see current status, and update it after completing work. Do not rely on memory or conversation context alone.
+
+Key files in this repo:
+- `content/Framework Project/StockPlusPlus.Data/Mappers/ProductMapper.cs` — manual mapper example for Product (the reference implementation)
+- `content/Framework Project/StockPlusPlus.Data/Repositories/ProductRepository.cs` — two-constructor pattern: DI picks `IShiftEntityMapper` when registered, falls back to AutoMapper
+- `content/Framework Project/StockPlusPlus.API/Program.cs` — one line to uncomment to swap Product to manual mapping
+- `content/Framework Project/StockPlusPlus.Test/Tests/MappingPOC/` — POC test files comparing Manual, Mapperly, and Mapster approaches (not production code)
+
+Key files in ShiftEntity (sibling repo):
+- `ShiftEntity.Core/IShiftEntityMapper.cs` — the interface (4 methods: MapToView, MapToEntity, MapToList, CopyEntity)
+- `ShiftEntity.Core/MappingHelpers.cs` — helpers to reduce manual mapping boilerplate (audit fields, FK ↔ ShiftEntitySelectDTO, ShallowCopyTo)
+- `ShiftEntity.EFCore/AutoMapperShiftEntityMapper.cs` — wraps AutoMapper as an IShiftEntityMapper implementation
+- `ShiftEntity.EFCore/ShiftRepository.cs` — unified on single `entityMapper` path, ReloadAfterSave handled inline
+
+When working on mapping-related changes, always check the planning doc for current iteration status before starting.
+
 ## Key Conventions
 
 - Conditional `#if` blocks throughout the sample project control what gets included in template output — be careful editing these as they affect both development mode and template generation
