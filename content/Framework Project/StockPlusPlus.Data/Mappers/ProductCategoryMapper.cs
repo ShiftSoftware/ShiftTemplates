@@ -1,7 +1,6 @@
 using ShiftSoftware.ShiftEntity.Core;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
-using static ShiftSoftware.ShiftEntity.Core.MappingHelpers;
 
 namespace StockPlusPlus.Data.Mappers;
 
@@ -9,19 +8,16 @@ public class ProductCategoryMapper : IShiftEntityMapper<ProductCategory, Product
 {
     public ProductCategoryDTO MapToView(ProductCategory entity)
     {
-        return entity.MapBaseFieldsToView(new ProductCategoryDTO
+        return new ProductCategoryDTO
         {
             Name = entity.Name,
             Description = entity.Description,
             Code = entity.Code,
             TrackingMethod = entity.TrackingMethod ?? 0,
 
-            // JSON string → List<ShiftFileDTO>
             Photos = entity.Photos.ToShiftFiles(),
-
-            // FK → ShiftEntitySelectDTO
-            Brand = ToSelectDTO(entity.BrandID),
-        });
+            Brand = entity.BrandID.ToSelectDTO(),
+        }.MapBaseFields(entity);
     }
 
     public ProductCategory MapToEntity(ProductCategoryDTO dto, ProductCategory existing)
@@ -31,10 +27,7 @@ public class ProductCategoryMapper : IShiftEntityMapper<ProductCategory, Product
         existing.Code = dto.Code;
         existing.TrackingMethod = dto.TrackingMethod;
 
-        // List<ShiftFileDTO> → JSON string
         existing.Photos = dto.Photos.ToJsonString();
-
-        // ShiftEntitySelectDTO → FK
         existing.BrandID = dto.Brand.ToNullableForeignKey();
 
         return existing;

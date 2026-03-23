@@ -1,7 +1,6 @@
 using ShiftSoftware.ShiftEntity.Core;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.Product;
-using static ShiftSoftware.ShiftEntity.Core.MappingHelpers;
 
 namespace StockPlusPlus.Data.Mappers;
 
@@ -9,7 +8,7 @@ public class ProductMapper : IShiftEntityMapper<Product, ProductListDTO, Product
 {
     public ProductDTO MapToView(Product entity)
     {
-        return entity.MapBaseFieldsToView(new ProductDTO
+        return new ProductDTO
         {
             Name = entity.Name,
             TrackingMethod = entity.TrackingMethod,
@@ -17,10 +16,10 @@ public class ProductMapper : IShiftEntityMapper<Product, ProductListDTO, Product
             ReleaseDate = entity.ReleaseDate,
             IsDraft = entity.IsDraft,
 
-            ProductCategory = ToSelectDTO(entity.ProductCategoryID, entity.ProductCategory?.Name),
-            ProductBrand = ToSelectDTO(entity.ProductBrandID, entity.ProductBrand?.Name),
-            CountryOfOrigin = ToSelectDTO(entity.CountryOfOriginID, entity.CountryOfOrigin?.Name),
-        });
+            ProductCategory = entity.ProductCategoryID.ToSelectDTO(entity.ProductCategory?.Name),
+            ProductBrand = entity.ProductBrandID.ToSelectDTO(entity.ProductBrand?.Name),
+            CountryOfOrigin = entity.CountryOfOriginID.ToSelectDTO(entity.CountryOfOrigin?.Name),
+        }.MapBaseFields(entity);
     }
 
     public Product MapToEntity(ProductDTO dto, Product existing)
