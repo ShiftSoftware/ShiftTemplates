@@ -4,4 +4,5 @@ public enum MappingStrategy
 {
     AutoMapper,
     Manual,
+    Mapperly,
 }

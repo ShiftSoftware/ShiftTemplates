@@ -94,10 +94,13 @@ We are actively decoupling `ShiftRepository` from AutoMapper by introducing `ISh
 **IMPORTANT:** When making any mapping-related changes across ShiftEntity, ShiftTemplates, or ShiftIdentity, always update the planning doc to reflect what was done. This document is the single source of truth for the team — check it before starting work to see current status, and update it after completing work. Do not rely on memory or conversation context alone.
 
 Key files in this repo:
-- `content/Framework Project/StockPlusPlus.Data/Mappers/` — manual mapper implementations: `ProductMapper.cs` (FKs, nullable FK, enum), `ProductCategoryMapper.cs` (ShiftFileDTO, nullable enum), `InvoiceMapper.cs` (collection mapping)
-- `content/Framework Project/StockPlusPlus.Data/Repositories/` — `ProductRepository.cs`, `ProductCategoryRepository.cs`, `InvoiceRepository.cs` — two-constructor pattern: DI picks `IShiftEntityMapper` when registered, falls back to AutoMapper
-- `content/Framework Project/StockPlusPlus.API/Program.cs` — DI registration for all three manual mappers (currently active)
-- `content/Framework Project/StockPlusPlus.Test/Tests/ManualMappingTests.cs` — 8 integration tests validating manual mappers end-to-end through repository CRUD
+- `content/Framework Project/StockPlusPlus.Data/Mappers/` — mapper implementations per strategy:
+  - Manual: `ProductMapper.cs`, `ProductCategoryMapper.cs`, `InvoiceMapper.cs`
+  - Mapperly: `ProductMapperlyMapper.cs`, `ProductCategoryMapperlyMapper.cs`, `InvoiceMapperlyMapper.cs`
+- `content/Framework Project/StockPlusPlus.Data/Repositories/` — two-constructor pattern: DI picks `IShiftEntityMapper` when registered, falls back to AutoMapper
+- `content/Framework Project/StockPlusPlus.API/Program.cs` — reads `MappingStrategy` from appsettings, conditionally registers mappers (`AutoMapper`, `Manual`, or `Mapperly`)
+- `content/Framework Project/StockPlusPlus.Shared/Enums/MappingStrategy.cs` — enum for the toggle
+- `content/Framework Project/StockPlusPlus.Test/Tests/ManualMappingTests.cs` — 8 integration tests validating `IShiftEntityMapper` path (pass with both Manual and Mapperly)
 - `content/Framework Project/StockPlusPlus.Test/Tests/MappingPOC/` — POC test files comparing Manual, Mapperly, and Mapster approaches (not production code)
 
 Key files in ShiftEntity (sibling repo):
