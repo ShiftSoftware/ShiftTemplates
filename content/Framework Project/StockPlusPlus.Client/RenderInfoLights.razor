@@ -1,0 +1,48 @@
+﻿<div class="trafficLight">
+    <span class="@(RendererInfo.Name == "Static" ? "red" : "")"></span>
+    <span class="@(RendererInfo.Name == "Server" ? "yellow" : "")"></span>
+    <span class="@(RendererInfo.Name == "WebAssembly" ? "green" : "")"></span>
+</div>
+
+<style>
+    .trafficLight {
+        background-color: black;
+        width: 50px;
+        height: 150px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 5px;
+        border-radius: 10px;
+    }
+
+        .trafficLight span {
+            width: 45px;
+            height: 45px;
+            border-radius: 100%;
+            background-color: gray;
+            animation-duration: 5s;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+            /* animation: red 5s linear infinite */
+            /* animation-fill-mode: forwards; */
+        }
+
+            .trafficLight span.red {
+                background-color: red !important;
+            }
+
+            .trafficLight span.yellow {
+                background-color: yellow !important;
+            }
+
+            .trafficLight span.green {
+                background-color: green !important;
+            }
+
+</style>
+
+@code {
+
+}

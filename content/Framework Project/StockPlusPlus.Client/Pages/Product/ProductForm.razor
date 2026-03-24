@@ -1,0 +1,134 @@
+﻿@attribute [Route($"/{nameof(ProductForm)}/{{Key?}}")]
+
+@using ShiftSoftware.ShiftEntity.Model.Dtos
+@using StockPlusPlus.Shared.DTOs.Product
+@using StockPlusPlus.Shared.DTOs.ProductBrand
+@using StockPlusPlus.Shared.DTOs.ProductCategory
+@using StockPlusPlus.Shared.DTOs
+
+@using Pages.ProductBrand
+@using Pages.ProductCategory
+@using Pages.Country
+
+@inherits ShiftForm<ProductForm, ProductDTO>
+@inject ODataQuery odataQuery
+
+<ShiftEntityForm @bind-Mode="Mode"
+                 @bind-Value="TheItem"
+                 @ref="FormContainer"
+                 Endpoint="Product"
+                 Title="Product"
+                 AllowClone
+                 @bind-Key="@Key">
+
+    <MudTextFieldExtended OnlyValidateIfDirty="true"
+                          Label="Name"
+                          @bind-Value="TheItem.Name"
+                          For="@(() => TheItem.Name)" />
+
+    <MudNumericFieldExtended @bind-Value="TheItem.Price" For="() => TheItem.Price"/>
+
+    <ShiftDateTimePicker Label="Release Date"
+                         @bind-DateTimeOffset="TheItem.ReleaseDate"
+                         For="() => TheItem.ReleaseDate" />
+
+    <ShiftAutocomplete Label="Product Brand"
+                       @bind-Value="TheItem.ProductBrand"
+                       TEntitySet="ProductBrandListDTO"
+                       EntitySet="ProductBrand"
+                       QuickAddComponentType="typeof(ProductBrandForm)"
+                       QuickAddParameterName="@nameof(ProductBrandForm.BrandName)"
+                       For="() => TheItem.ProductBrand" />
+
+    <ShiftAutocomplete Label="ProductCategory"
+                       @bind-Value="TheItem.ProductCategory"
+                       TEntitySet="ProductCategoryListDTO"
+                       EntitySet="ProductCategory"
+                       QuickAddComponentType="typeof(ProductCategoryForm)"
+                       QuickAddParameterName="@nameof(ProductCategoryForm.ProductCategoryName)"
+                       For="() => TheItem.ProductCategory" />
+
+
+    <ShiftAutocomplete Label="Country"
+                       @bind-Value="TheItem.CountryOfOrigin"
+                       TEntitySet="CountryDTO"
+                       EntitySet="Country"
+                       QuickAddComponentType="typeof(CountryForm)"
+                       QuickAddParameterName="@nameof(CountryForm.Name)"
+                       For="()=> TheItem.CountryOfOrigin" />
+
+
+    <MudSelectExtended @bind-Value="TheItem.TrackingMethod" For="() => TheItem.TrackingMethod"></MudSelectExtended>
+
+</ShiftEntityForm>
+
+<ShiftEntityForm @bind-Mode="Mode"
+                 @bind-Value="TheItem"
+                 @ref="FormContainer"
+                 Endpoint="Product"
+                 Title="Product"
+                 AllowClone
+                 @bind-Key="@Key">
+
+    <MudTextFieldExtended OnlyValidateIfDirty="true"
+                          Label="Name"
+                          @bind-Value="TheItem.Name"
+                          For="@(() => TheItem.Name)" />
+
+    <MudNumericFieldExtended @bind-Value="TheItem.Price" For="() => TheItem.Price" />
+
+    <ShiftDateTimePicker Label="Release Date"
+                         @bind-DateTimeOffset="TheItem.ReleaseDate"
+                         For="() => TheItem.ReleaseDate" />
+
+    <ShiftAutocomplete Label="Product Brand"
+                       @bind-Value="TheItem.ProductBrand"
+                       TEntitySet="ProductBrandListDTO"
+                       EntitySet="ProductBrand"
+                       QuickAddComponentType="typeof(ProductBrandForm)"
+                       QuickAddParameterName="@nameof(ProductBrandForm.BrandName)"
+                       For="() => TheItem.ProductBrand" />
+
+    <ShiftAutocomplete Label="ProductCategory"
+                       @bind-Value="TheItem.ProductCategory"
+                       TEntitySet="ProductCategoryListDTO"
+                       EntitySet="ProductCategory"
+                       QuickAddComponentType="typeof(ProductCategoryForm)"
+                       QuickAddParameterName="@nameof(ProductCategoryForm.ProductCategoryName)"
+                       For="() => TheItem.ProductCategory" />
+
+
+    <ShiftAutocomplete Label="Country"
+                       @bind-Value="TheItem.CountryOfOrigin"
+                       TEntitySet="CountryDTO"
+                       EntitySet="Country"
+                       QuickAddComponentType="typeof(CountryForm)"
+                       QuickAddParameterName="@nameof(CountryForm.Name)"
+                       For="()=> TheItem.CountryOfOrigin" />
+
+
+    <MudSelectExtended @bind-Value="TheItem.TrackingMethod" For="() => TheItem.TrackingMethod"></MudSelectExtended>
+
+</ShiftEntityForm>
+
+
+@code {
+    [Parameter]
+    public string? ProductCategoryID { get; set; }
+
+    [Parameter]
+    public string? ProductBrandID { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrWhiteSpace(ProductCategoryID))
+        {
+            TheItem.ProductCategory = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO { Value = ProductCategoryID };
+        }
+
+        if (!string.IsNullOrWhiteSpace(ProductBrandID))
+        {
+            TheItem.ProductBrand = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO { Value = ProductBrandID };
+        }
+    }
+}

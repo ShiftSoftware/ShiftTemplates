@@ -1,0 +1,41 @@
+﻿@attribute [Authorize]
+@attribute [Route($"/{nameof(ProductCategoryList)}")]
+
+@using StockPlusPlus.Shared.DTOs.ProductCategory
+
+<MudStack Spacing="4">
+    <MudPaper Elevation="3">
+        <ShiftList EntitySet="ProductCategory"
+                   Title="Product Category List"
+                   T="ProductCategoryListDTO"
+                   Dense
+                   PageSize="5"
+                   DisableActionColumn
+                   ComponentType="typeof(ProductCategoryForm)"
+                   ShowIDColumn="true"
+                   UniqueName="List1"
+                   EnableExport>
+            <ButtonColumn Property="x => x.Name" Title="Name" />
+
+            <PropertyColumn Title="Tracking Method" Property="x => x.TrackingMethod!.Describe()" />
+        </ShiftList>
+    </MudPaper>
+
+    <MudPaper Elevation="3">
+        <ShiftList EntitySet="ProductCategory/custom-list"
+                   Title="Product Category List"
+                   T="ProductCategoryListDTO"
+                   Dense
+                   PageSize="5"
+                   DisableActionColumn
+                   ComponentType="typeof(ProductCategoryForm)"
+                   ShowIDColumn="true"
+                   TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory"
+                   UniqueName="List2"
+                   EnableExport>
+            <ButtonColumn Property="x => x.Name" Title="Name" />
+
+            <PropertyColumn Title="Tracking Method" Property="x => x.TrackingMethod!.Describe()" />
+        </ShiftList>
+    </MudPaper>
+</MudStack>

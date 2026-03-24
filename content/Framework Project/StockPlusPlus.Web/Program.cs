@@ -22,6 +22,7 @@ using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 #endif
+using BitzArt.Blazor.Cookies;
 
 [assembly: RootNamespace("StockPlusPlus.Web")]
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -47,6 +48,8 @@ shiftIdentityApiURL = string.IsNullOrWhiteSpace(shiftIdentityApiURL) ? baseUrl :
 var shiftIdentityFrontEndURL = builder.Configuration!.GetValue<string>("ShiftIdentityFrontEnd")!;
 shiftIdentityFrontEndURL = string.IsNullOrWhiteSpace(shiftIdentityFrontEndURL) ? baseUrl : shiftIdentityFrontEndURL; //Fallback to BaseURL if empty
 
+builder.AddBlazorCookies();
+
 builder.Services.AddShiftBlazor(config =>
 {
     config.ShiftConfiguration = options =>
@@ -63,7 +66,6 @@ builder.Services.AddShiftBlazor(config =>
 #endif
         options.AddLanguage("en-US", "English")
                .AddLanguage("ar-IQ", "Arabic", true)
-               .AddLanguage("en-US", "English RTL", true)
                .AddLanguage("ku-IQ", "Kurdish", true);
     };
 
@@ -126,12 +128,7 @@ builder.Services.AddTypeAuth(x =>
 var host = builder.Build();
 
 var setMan = host.Services.GetRequiredService<SettingManager>();
-
-var culture = setMan.GetCulture();
-
-CultureInfo.DefaultThreadCurrentCulture = culture;
-CultureInfo.DefaultThreadCurrentUICulture = culture;
+await setMan.Setup(true);
 
 await host.RefreshTokenAsync(50);
-
 await host.RunAsync();

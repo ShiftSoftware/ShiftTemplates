@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	  <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+
+	  <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+	  <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+	  <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.2" />
+	  <PackageReference Include="BitzArt.Blazor.Cookies.Client" Version="1.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <ProjectReference Include="..\StockPlusPlus.Shared\StockPlusPlus.Shared.csproj" />
+	  <ProjectReference Include="..\..\..\..\ShiftBlazor\ShiftBlazor\ShiftBlazor.csproj" />
+	</ItemGroup>
+
+</Project>

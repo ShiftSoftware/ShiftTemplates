@@ -1,0 +1,38 @@
+﻿@*#if (includeSampleApp)*@
+@* @using ShiftSoftware.ShiftIdentity.Core *@
+@using StockPlusPlus.Client.Pages.Invoice
+@using StockPlusPlus.Client.Pages.Product
+@using StockPlusPlus.Client.Pages.ProductBrand
+@using StockPlusPlus.Client.Pages.ProductCategory
+@* @using StockPlusPlus.Client.Pages.CosmosCompanyBranch *@
+@*#endif*@
+<MudNavMenu>
+    @*#if (includeSampleApp)*@
+    <MudNavGroup Title="Products" Icon="@Icons.Material.Filled.Book" HideExpandIcon="!isDrawerOpen" >
+        <MudNavLink Href="@($"/{nameof(ProductBrandList)}")"
+                              Match="NavLinkMatch.All"
+                              Icon="@Icons.Material.Outlined.Bookmarks">Brands</MudNavLink>
+
+        <MudNavLink Href="@($"/{nameof(ProductCategoryList)}")"
+                              Match="NavLinkMatch.All"
+                              Icon="@Icons.Material.Outlined.Discount">Categories</MudNavLink>
+
+        <MudNavLink Href="@($"/{nameof(ProductList)}")"
+                              Match="NavLinkMatch.All"
+                              Icon="@Icons.Material.Outlined.Category">Products</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavLink Href="@($"{nameof(InvoiceList)}")"
+                          Match="NavLinkMatch.All"
+                          Icon="@Icons.Material.Outlined.Newspaper">Invoices</MudNavLink>
+
+    @* <MudNavLink Href="@($"{nameof(CosmosCompanyBranchList)}")"
+                          Match="NavLinkMatch.All"
+                          Icon="@Icons.Material.Outlined.Business"
+                          TypeAuthAction="ShiftSoftware.ShiftIdentity.Core.ShiftIdentityActions.CompanyBranches">Branches (Cosmos)</MudNavLink> *@
+    @*#endif*@
+</MudNavMenu>
+
+@code {
+    [Parameter] public bool isDrawerOpen { get; set; }
+}

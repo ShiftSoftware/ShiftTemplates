@@ -1,0 +1,41 @@
+﻿@page "/"
+@inject IDialogService DialogService
+@using System.Globalization
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+<PageTitle>Home</PageTitle>
+
+<CultureSelector/>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<RenderInfoLights/>  
+
+@RendererInfo.IsInteractive
+@RendererInfo.Name
+
+<h3>Culture Check</h3>
+<p>Current Culture: @CultureInfo.CurrentCulture.Name</p>
+<p>Current UI Culture: @CultureInfo.CurrentUICulture.Name</p>
+
+<p>Date Format Example: @DateTime.Now.ToLongDateString()</p>
+<p>Number Format Example: @(12345.67.ToString("N2"))</p>
+
+
+<MudButton Variant="Variant.Filled" OnClick="@(async () => { await DialogService.ShowAsync<Settings>(); })">Settings</MudButton>
+
+<MudProgressLinear Color="@Color.Primary" Class="mud-table-loading-progress" Indeterminate="true" />
+
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine($"Culture: {CultureInfo.CurrentCulture.Name}");
+        Console.WriteLine($"UI Culture: {CultureInfo.CurrentUICulture.Name}");
+    }
+}

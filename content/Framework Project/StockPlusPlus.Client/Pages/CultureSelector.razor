@@ -1,0 +1,49 @@
+﻿@page "/culture-selector"
+
+@using System.Globalization
+@inject NavigationManager Navigation
+
+<p>
+    <label>
+        Select your locale:
+        <select @bind="selectedCulture" @bind:after="ApplySelectedCultureAsync">
+            @foreach (var culture in supportedCultures)
+            {
+                <option value="@culture">@culture.ThreeLetterISOLanguageName</option>
+            }
+        </select>
+    </label>
+</p>
+
+@code {
+    private CultureInfo[] supportedCultures = new[]
+    {
+        new CultureInfo("en-US"),
+        new CultureInfo("ar-IQ"),
+        new CultureInfo("ku-IQ")
+    };
+
+    private CultureInfo? selectedCulture;
+
+    protected override void OnInitialized()
+    {
+        selectedCulture = CultureInfo.CurrentCulture;
+    }
+
+    private async Task ApplySelectedCultureAsync()
+    {
+        Console.WriteLine($"Selected Culture: {selectedCulture?.Name} {CultureInfo.CurrentCulture.Name}");
+
+        if (CultureInfo.CurrentCulture != selectedCulture)
+        {
+            var uri = new Uri(Navigation.Uri)
+                .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+            var cultureEscaped = Uri.EscapeDataString(selectedCulture!.Name);
+            var uriEscaped = Uri.EscapeDataString(uri);
+
+            Navigation.NavigateTo(
+                $"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}",
+                forceLoad: true);
+        }
+    }
+}

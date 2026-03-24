@@ -1,0 +1,60 @@
+﻿@attribute [Route($"/{nameof(ProductBrandForm)}/{{Key?}}")]
+
+@using StockPlusPlus.Shared.DTOs.ProductBrand
+@*#if (includeItemTemplateContent)*@
+@using StockPlusPlus.Shared.Enums
+@*#endif*@
+
+<ShiftEntityForm T="ProductBrandDTO"
+                 AllowSaveAsNew
+                 Endpoint="ProductBrand"
+                 Title="ProductBrand"
+                 BaseUrlKey="StockPluPlus"
+                 @bind-Value="BrandItem"
+                 @bind-Key="@Key">
+    @*#if (includeItemTemplateContent)*@
+    <LocalizedTextField @bind-Value="context.Item.Name"
+                        For="() => context.Item.Name"
+                        Label="Name" />
+
+    <ShiftAutocomplete Label="Assigned Team"
+                       @bind-Value="context.Item.Team"
+                       TEntitySet="ShiftSoftware.ShiftIdentity.Core.DTOs.Team.TeamListDTO"
+                       EntitySet="IdentityTeam"
+                       For="() => context.Item.Team" />
+
+    @if (context.Mode == FormModes.View)
+    {
+        <br />
+        <br />
+
+        <ProductList ProductBrandID="@context.Item.ID" />
+    }
+    @*#endif*@
+</ShiftEntityForm>
+
+@*#if (includeItemTemplateContent)*@
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? BrandName { get; set; }
+
+    [Parameter]
+    public object? Key { get; set; }
+
+    private ProductBrandDTO BrandItem = new ProductBrandDTO();
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrWhiteSpace(BrandName))
+        {
+            BrandItem.Name = System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, string>
+            {
+                ["en"] = BrandName,
+                ["ar"] = BrandName,
+                ["ku"] = BrandName
+            });
+        }
+    }
+}
+@*#endif*@

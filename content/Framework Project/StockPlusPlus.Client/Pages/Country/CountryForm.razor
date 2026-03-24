@@ -1,0 +1,32 @@
+﻿@attribute [Route($"/{nameof(CountryForm)}/{{Key?}}")]
+
+@using StockPlusPlus.Shared.DTOs
+
+@inherits ShiftForm<CountryForm, CountryDTO>
+
+<ShiftEntityForm @bind-Mode="Mode"
+                 @bind-Value="TheItem"
+                 @ref="FormContainer"
+                 Endpoint="Country"
+                 Title="Country"
+                 @bind-Key="@Key">
+
+    <MudTextFieldExtended OnlyValidateIfDirty="true"
+                          Label="Name"
+                          @bind-Value="TheItem.Name"
+                          For="@(() => TheItem.Name)" />
+</ShiftEntityForm>
+
+
+@code {
+    [Parameter]
+    public string? Name { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrWhiteSpace(Name))
+        {
+            TheItem.Name = Name;
+        }
+    }
+}

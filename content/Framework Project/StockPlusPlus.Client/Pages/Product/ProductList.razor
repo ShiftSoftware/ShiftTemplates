@@ -1,0 +1,100 @@
+﻿@attribute [Authorize]
+@attribute [Route($"/{nameof(ProductList)}")]
+
+@using ShiftSoftware.ShiftBlazor.Filters.Models
+@using ShiftSoftware.ShiftIdentity.Core.DTOs.City
+@using StockPlusPlus.Shared.DTOs.ProductBrand;
+@using StockPlusPlus.Shared.DTOs.Product
+@using System.Linq.Expressions;
+@using StockPlusPlus.Shared.DTOs.ProductCategory;
+@using StockPlusPlus.Shared.Enums
+@using StockPlusPlus.Client.Pages.ProductBrand;
+@using StockPlusPlus.Client.Pages.ProductCategory;
+
+<ShiftList EntitySet="Product"
+           Title="Product List"
+           T="ProductListDTO"
+           Dense
+           FilterPanelDefaultOpen
+           EnableFilterPanel
+           ComponentType="typeof(ProductForm)"
+           ShowIDColumn="true"
+           AddDialogParameters="AddDialogParameters"
+           HeaderNowrap
+           EnableExport>
+
+    <DateTimeFilter Label="Release Date" Property="x => x.ReleaseDate" lg="12" md="12" xl="12" sm="12" xs="12" />
+
+    @if (ProductBrandID != null)
+    {
+        <FilterComponent Property="x => x.ProductBrandID" Operator="ODataOperator.Equal" Value="ProductBrandID" />
+    }
+
+    @if (ProductCategoryID != null)
+    {
+        <FilterComponent Property="x => x.ProductCategoryID" Operator="ODataOperator.Equal" Value="ProductCategoryID" />
+    }
+
+    <PropertyColumn Property="x => x.Name" Title="Name" />
+    <PropertyColumn Property="x => x.Price" Title="Price" />
+    <PropertyColumn Property="x => x.TrackingMethod"/>
+    <PropertyColumn Format="F" Property="x => x.LastSaveDate.DateTime" Title="SaveDate" />
+
+    <PropertyColumn Format="F" Property="x => x.ReleaseDate" Title="Release Date" Filterable="false" />
+
+    <ButtonColumn ComponentType="typeof(ProductBrandForm)" KeyPropertyName="@nameof(ProductListDTO.ProductBrandID)" Property="x => x.ProductBrand" Title="Brand">
+        <ButtonTemplate Context="BtnCtx">
+            <MudChip T="string" Style="cursor: pointer;" Icon="@Icons.Material.Filled.BrandingWatermark" Variant="Variant.Outlined">@BtnCtx</MudChip>
+        </ButtonTemplate>
+    </ButtonColumn>
+
+    <ForeignColumn IsButtonColumn
+                    ComponentType="typeof(ProductCategoryForm)"
+                    Property="x => x.ProductCategoryID"
+                    Title="Category"
+                    T="ProductListDTO"
+                    TEntity="ProductCategoryListDTO"
+                    TProperty="string"
+                    EntitySet="ProductCategory"
+                    OpenMode="ModalOpenMode.NewTab" />
+
+    @context.DraftColumn
+
+    <ForeignColumn Property="x => x.CityID"
+                    Title="City"
+                    T="ProductListDTO"
+                    ForeignEntityField="@nameof(ProductListDTO.City)"
+                    TEntity="CityListDTO"
+                    TProperty="string"
+                    EntitySet="IdentityCity" />
+
+    <PropertyColumn Property="x => x.CustomID" Title="Custom ID" />
+
+</ShiftList>
+
+@code {
+    public Dictionary<string, object> AddDialogParameters = new();
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? ProductCategoryID { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? ProductBrandID { get; set; }
+
+    public string? Filters;
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrWhiteSpace(ProductCategoryID))
+        {
+            AddDialogParameters[nameof(ProductForm.ProductCategoryID)] = ProductCategoryID;
+        }
+
+        if (!string.IsNullOrWhiteSpace(ProductBrandID))
+        {
+            AddDialogParameters[nameof(ProductForm.ProductBrandID)] = ProductBrandID;
+        }
+    }
+}

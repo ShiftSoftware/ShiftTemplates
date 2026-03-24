@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+    <UserSecretsId>ff7ca4c1-902a-4e05-88c8-979b46c1a57f</UserSecretsId>
+  </PropertyGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.27.0" />
+		<PackageReference Include="Azure.Storage.Files.Shares" Version="12.23.0" />
+		<PackageReference Include="Azure.Storage.Queues" Version="12.23.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.2" />
+		<PackageReference Include="BitzArt.Blazor.Cookies.Server" Version="1.5.1" />
+		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.13.0" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\..\TypeAuth\TypeAuth.Blazor\TypeAuth.Blazor.csproj" />
+	  <ProjectReference Include="..\StockPlusPlus.Client\StockPlusPlus.Client.csproj" />
+	</ItemGroup>
+</Project>

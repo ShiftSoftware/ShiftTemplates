@@ -1,0 +1,46 @@
+﻿@attribute [Authorize]
+@attribute [Route($"/{nameof(ProductBrandList)}")]
+
+@using StockPlusPlus.Shared.DTOs.ProductBrand
+@using ShiftSoftware.ShiftIdentity.Core.DTOs.User
+
+<ShiftList EntitySet="ProductBrand"
+           Title="ProductBrand List"
+           T="ProductBrandListDTO"
+           Dense
+           DisableActionColumn
+           ComponentType="typeof(ProductBrandForm)"
+           ShowIDColumn="true"
+           HighlightSortedColumn
+           EnableFilterPanel
+           EnableExport>
+
+    <Sort Property="x => x.Name" Direction="SortDirection.Ascending"></Sort>
+    <Sort Property="x => x.Code" Direction="SortDirection.Ascending"></Sort>
+
+    <StringFilter Property="x => x.Name" Value="Round 2" Operator="ODataOperator.Contains"></StringFilter>
+
+        @*#if (includeItemTemplateContent)*@
+        <ButtonColumn Property="x => x.Name" Title="Name" />
+        <ButtonColumn Property="x => x.Code" Title="Code" />
+
+
+        <ForeignColumn Property="x => x.CreatedByUserID"
+                       Title="Created By"
+                       T="ProductBrandListDTO"
+                       TEntity="UserListDTO"
+                       TProperty="string"
+                       BaseUrlKey="ShiftIdentityApi"
+                       EntitySet="IdentityUser" />
+
+        <ForeignColumn Property="x => x.TeamID"
+                       Title="Assigned Team"
+                       T="ProductBrandListDTO"
+                       Hidden
+                       ForceExportIfHidden
+                       TEntity="ShiftSoftware.ShiftIdentity.Core.DTOs.Team.TeamListDTO"
+                       TProperty="string"
+                       BaseUrlKey="ShiftIdentityApi"
+                       EntitySet="IdentityTeam" />
+    @*#endif*@
+</ShiftList>

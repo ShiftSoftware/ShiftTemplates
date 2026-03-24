@@ -1,0 +1,8 @@
+﻿@attribute [Route($"/FileExplorer")]
+
+<FileExplorer ShowThumbnails MaxFileSizeInMegaBytes="64" Height="600px" @key="Root" Root="@Root" RootAliasName="@Root?.Split('/', StringSplitOptions.RemoveEmptyEntries).LastOrDefault()"></FileExplorer>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Root { get; set; } = string.Empty;
+}
