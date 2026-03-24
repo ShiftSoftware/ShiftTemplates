@@ -26,6 +26,7 @@ using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Web.Explorer;
 using ShiftSoftware.ShiftEntity.Model.Replication;
 using Microsoft.AspNetCore.OData;
+using ShiftSoftware.TypeAuth.Core;
 #endif
 #if (externalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
@@ -147,7 +148,6 @@ builder.Services.AddShiftEntityPrint(x =>
 
 mvcBuilder.AddShiftEntityWeb(x =>
 {
-
     x.AddDataAssembly(typeof(StockPlusPlus.Data.Marker).Assembly);
     x.WrapValidationErrorResponseWithShiftEntityResponse(true);
     x.AddAutoMapper(typeof(StockPlusPlus.Data.Marker).Assembly);
@@ -179,7 +179,7 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
         ShiftIdentityHostingType = ShiftIdentityHostingTypes.Internal,
         Token = new TokenSettingsModel
         {
-            ExpireSeconds = 60000,
+            ExpireSeconds = builder.Configuration.GetValue<int>("Settings:TokenSettings:TokenExpirySeconds")!,
             Issuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!,
             RSAPrivateKeyBase64 = builder.Configuration.GetValue<string>("Settings:TokenSettings:PrivateKey")!,
         },
@@ -295,6 +295,7 @@ new string[]
 builder.Services.AddTypeAuth((o) =>
 {
     o.AddActionTree<ShiftIdentityActions>();
+    o.AddActionTree<ShiftSoftware.ShiftEntity.Core.GeneralActionTree>();
     o.AddActionTree<ShiftSoftware.ShiftEntity.Core.AzureStorageActionTree>();
 #if (includeSampleApp)
     o.AddActionTree<StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree>();

@@ -1,7 +1,6 @@
-﻿
-using ShiftSoftware.ShiftFrameworkTestingTools;
+﻿using ShiftSoftware.ShiftFrameworkTestingTools;
+using ShiftSoftware.ShiftIdentity.Core;
 using StockPlusPlus.API;
-using StockPlusPlus.Data;
 using StockPlusPlus.Data.DbContext;
 
 #if (includeSampleApp)
@@ -17,12 +16,13 @@ public class CustomWebApplicationFactory : ShiftCustomWebApplicationFactory<WebM
         new ShiftCustomWebApplicationBearerAuthSettings
         {
             Enabled = true,
-            TokenKeySettingKey = "Settings:TokenSettings:Key",
+            TokenKeySettingKey = "Settings:TokenSettings:PublicKey",
             TokenIssuerSettingKey = "Settings:TokenSettings:Issuer",
             TypeAuthActions = new List<Type>()
             {
 #if (includeSampleApp)
-                typeof(StockPlusPlusActionTree)
+                typeof(StockPlusPlusActionTree),
+                typeof(ShiftIdentityActions)
 #endif
             }
         })

@@ -18,8 +18,8 @@ public class StockPlusPlusActionTree
     [ActionTree("Data Level Access", "Data Level or Row-Level Access")]
     public class DataLevelAccess
     {
-        public readonly static DynamicReadWriteDeleteAction ProductBrand = new("Brand"); 
-        public readonly static DynamicReadWriteDeleteAction ProductCategory = new("Product Category"); 
+        public readonly static DynamicReadWriteDeleteAction ProductBrand = new("Brand");
+        public readonly static DynamicReadWriteDeleteAction ProductCategory = new("Product Category");
     }
 #endif
 }
