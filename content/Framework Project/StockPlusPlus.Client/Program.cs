@@ -47,7 +47,7 @@ builder.Services.AddShiftBlazor(config =>
 
 });
 
-//builder.Services.AddScoped<AuthenticationStateProvider, TestAuthStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider, TestAuthStateProvider>();
 
 
 builder.Services.AddTypeAuth(x =>
