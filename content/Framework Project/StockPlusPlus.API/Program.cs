@@ -59,6 +59,12 @@ else if (mappingStrategy == StockPlusPlus.Shared.Enums.MappingStrategy.Mapperly)
     builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.ProductCategory, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryListDTO, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryDTO>, StockPlusPlus.Data.Mappers.ProductCategoryMapperlyMapper>();
     builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Invoice, StockPlusPlus.Shared.DTOs.Invoice.InvoiceListDTO, StockPlusPlus.Shared.DTOs.Invoice.InvoiceDTO>, StockPlusPlus.Data.Mappers.InvoiceMapperlyMapper>();
 }
+else if (mappingStrategy == StockPlusPlus.Shared.Enums.MappingStrategy.Mapster)
+{
+    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Product, StockPlusPlus.Shared.DTOs.Product.ProductListDTO, StockPlusPlus.Shared.DTOs.Product.ProductDTO>, StockPlusPlus.Data.Mappers.ProductMapsterMapper>();
+    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.ProductCategory, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryListDTO, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryDTO>, StockPlusPlus.Data.Mappers.ProductCategoryMapsterMapper>();
+    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Invoice, StockPlusPlus.Shared.DTOs.Invoice.InvoiceListDTO, StockPlusPlus.Shared.DTOs.Invoice.InvoiceDTO>, StockPlusPlus.Data.Mappers.InvoiceMapsterMapper>();
+}
 
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
 builder.Services.AddHttpClient();

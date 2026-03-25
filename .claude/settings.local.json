@@ -37,7 +37,14 @@
       "Bash(dotnet build:*)",
       "Bash(dotnet test:*)",
       "Bash(dotnet run:*)",
-      "Bash(grep -E \"^d|\\\\.cs$\")"
+      "Bash(grep -E \"^d|\\\\.cs$\")",
+      "Bash(1)",
+      "Bash(tee /tmp/mapster_results.txt)",
+      "Bash(tee /tmp/mapster2.txt)",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Read(//c/repos/ShiftSoftware/ShiftTemplates/content/Framework Project/StockPlusPlus.Test/**)",
+      "Bash(done)"
     ]
   }
 }

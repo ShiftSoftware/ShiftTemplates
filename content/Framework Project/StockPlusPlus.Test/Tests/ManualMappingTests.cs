@@ -198,7 +198,7 @@ public class ManualMappingTests
         Assert.Equal("List Test Product", item.Name);
         Assert.Equal(42, item.Price);
         Assert.Equal(TrackingMethod.NoTracking, item.TrackingMethod);
-        Assert.Equal(brand.Name, item.ProductBrand);
+        Assert.Equal(brand.Name, item.ProductBrandName);
         Assert.Equal(category.Name, item.Category);
         Assert.Equal(category.ID.ToString(), item.ProductCategoryID);
         Assert.Equal(brand.ID.ToString(), item.ProductBrandID);

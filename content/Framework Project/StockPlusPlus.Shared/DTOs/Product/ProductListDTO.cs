@@ -19,7 +19,7 @@ public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO
 
     public int? Price { get; set; }
     [JsonConverter(typeof(LocalizedTextJsonConverter))]
-    public string? ProductBrand { get; set; }
+    public string? ProductBrandName { get; set; }
 
     [JsonConverter(typeof(LocalizedTextJsonConverter))]
     public string? Category { get; set; }

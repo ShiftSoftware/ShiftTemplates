@@ -109,7 +109,7 @@ public partial class ProductMapperlyMapper : IShiftEntityMapper<Product, Product
             LastSaveDate = p.LastSaveDate,
             IsDraft = p.IsDraft,
             IsDeleted = p.IsDeleted,
-            ProductBrand = p.ProductBrand != null ? p.ProductBrand.Name : null,
+            ProductBrandName = p.ProductBrand != null ? p.ProductBrand.Name : null,
             Category = p.ProductCategory != null ? p.ProductCategory.Name : null,
             ProductCategoryID = p.ProductCategoryID.ToString(),
             ProductBrandID = p.ProductBrandID.ToString(),

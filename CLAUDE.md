@@ -97,8 +97,9 @@ Key files in this repo:
 - `content/Framework Project/StockPlusPlus.Data/Mappers/` — mapper implementations per strategy:
   - Manual: `ProductMapper.cs`, `ProductCategoryMapper.cs`, `InvoiceMapper.cs`
   - Mapperly: `ProductMapperlyMapper.cs`, `ProductCategoryMapperlyMapper.cs`, `InvoiceMapperlyMapper.cs`
+  - Mapster: `ProductMapsterMapper.cs`, `ProductCategoryMapsterMapper.cs`, `InvoiceMapsterMapper.cs`
 - `content/Framework Project/StockPlusPlus.Data/Repositories/` — two-constructor pattern: DI picks `IShiftEntityMapper` when registered, falls back to AutoMapper
-- `content/Framework Project/StockPlusPlus.API/Program.cs` — reads `MappingStrategy` from appsettings, conditionally registers mappers (`AutoMapper`, `Manual`, or `Mapperly`)
+- `content/Framework Project/StockPlusPlus.API/Program.cs` — reads `MappingStrategy` from appsettings, conditionally registers mappers (`AutoMapper`, `Manual`, `Mapperly`, or `Mapster`)
 - `content/Framework Project/StockPlusPlus.Shared/Enums/MappingStrategy.cs` — enum for the toggle
 - `content/Framework Project/StockPlusPlus.Test/Tests/ManualMappingTests.cs` — 8 integration tests validating `IShiftEntityMapper` path (pass with both Manual and Mapperly)
 - `content/Framework Project/StockPlusPlus.Test/Tests/MappingPOC/` — POC test files comparing Manual, Mapperly, and Mapster approaches (not production code)
