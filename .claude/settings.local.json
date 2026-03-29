@@ -44,7 +44,11 @@
       "Bash(for f:*)",
       "Bash(do echo:*)",
       "Read(//c/repos/ShiftSoftware/ShiftTemplates/content/Framework Project/StockPlusPlus.Test/**)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(grep -r \"dbContextType\\\\|dbContexts\\\\|DbContext.*Type\" C:reposShiftSoftwareShiftEntityShiftEntity.CosmosDbReplication --include=*.cs)",
+      "Bash(grep -r \"AddTrigger\\\\|UseTriggers\\\\|IBeforeSaveTrigger\\\\|IAfterSaveTrigger\" C:reposShiftSoftwareShiftEntity --include=*.cs)",
+      "Bash(find C:reposShiftSoftwareShiftTemplates -name *DbContext*.cs -type f)",
+      "Bash(find C:reposShiftSoftwareShiftTemplates -name *.cs -path */Data/*Context*)"
     ]
   }
 }

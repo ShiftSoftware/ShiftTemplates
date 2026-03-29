@@ -97,7 +97,7 @@ if (IsCosmosEnabled)
     if (!string.IsNullOrWhiteSpace(liveIdentitySQLServer))
         builder.Services.AddDbContext<LiveShiftIdentityDbContext>(options => options.UseSqlServer(liveIdentitySQLServer));
 
-    builder.Services.AddShiftEntityCosmosDbReplicationTrigger(x =>
+    builder.Services.AddShiftEntityCosmosDbReplicationTrigger<DB>(x =>
     {
         string databaseId = "Identity";
         var client = x.Services.GetRequiredService<CosmosClient>();
