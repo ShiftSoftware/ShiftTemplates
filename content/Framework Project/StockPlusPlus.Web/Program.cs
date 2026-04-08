@@ -58,9 +58,7 @@ builder.Services.AddShiftBlazor(config =>
             ["StockPluPlus"] = baseUrl
         };
         options.UserListEndpoint = shiftIdentityApiURL.AddUrlPath("IdentityPublicUser");
-#if (internalShiftIdentityHosting)
-        options.AdditionalAssemblies = new[] { typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly };
-#endif
+
         options.AddLanguage("en-US", "English")
                .AddLanguage("ar-IQ", "Arabic", true)
                .AddLanguage("en-US", "English RTL", true)
