@@ -12,6 +12,7 @@ using StockPlusPlus.Shared.DTOs.Service;
 
 #if (internalShiftIdentityHosting)
 using StockPlusPlus.API.Services;
+using StockPlusPlus.API.Endpoints;
 using AutoMapper;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
@@ -395,6 +396,11 @@ app.UseRequestLocalization(options =>
 });
 
 app.MapControllers();
+
+// Minimal-API surface running side-by-side with the controllers, driven by the same
+// ShiftEntityCrudHandler — proves the refactor is lossless and demonstrates the
+// MapShiftEntitySecureCrud / RequireTypeAuth* extensions end-to-end.
+app.MapProductMinimalApi();
 
 app.UseCors(x => x.WithOrigins("*").AllowAnyMethod().AllowAnyHeader());
 

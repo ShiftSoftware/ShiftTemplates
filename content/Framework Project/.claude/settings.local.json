@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Nahro/source/repos/ShiftSoftware/ShiftEntity/**)",
+      "Bash(grep -E \"\\\\.\\(cs|csproj\\)$\")",
+      "Read(//c/Users/Nahro/source/repos/ShiftSoftware/TypeAuth/**)",
+      "Read(//c/Users/Nahro/source/repos/ShiftSoftware/AzureFunctionsAspNetCoreAuthorization/**)",
+      "Bash(xargs grep:*)",
+      "Read(//c/Users/Nahro/source/repos/ShiftSoftware/ShiftTemplates/**)",
+      "Read(//c/Users/Nahro/source/repos/ShiftSoftware/**)",
+      "Bash(grep \"\\\\.cs$\")",
+      "Bash(find /c/Users/Nahro/source/repos/ShiftSoftware/ShiftEntity -type f -name \"*.cs\" -exec grep -l \"MapGroup\" {} \\\\;)",
+      "Bash(dotnet build:*)",
+      "Bash(ls *.sln)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\Nahro\\source\\repos\\ShiftSoftware\\ShiftEntity\\ShiftEntity.Web",
+      "c:\\Users\\Nahro\\source\\repos\\ShiftSoftware\\TypeAuth\\TypeAuth.AspNetCore"
+    ]
+  }
+}
