@@ -384,6 +384,7 @@ var supportedCultures = new List<CultureInfo>
     new("en-US"),
     new("ar-IQ"),
     new("ku-IQ"),
+    new("fr-FR"),
 };
 
 app.UseRequestLocalization(options =>
