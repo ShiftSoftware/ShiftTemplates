@@ -87,7 +87,7 @@ var host = new HostBuilder()
         //.AddScoped<ProductRepository>();
 #endif
 
-        services.AddShiftEntityCosmosDbReplication();
+        services.AddShiftEntityCosmosDbReplication<DB>();
 
         services.AddTypeAuth((o) =>
         {

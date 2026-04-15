@@ -22,6 +22,7 @@ using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 #endif
+using ShiftSoftware.ShiftBlazor.Enums;
 
 [assembly: RootNamespace("StockPlusPlus.Web")]
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -60,8 +61,8 @@ builder.Services.AddShiftBlazor(config =>
         options.UserListEndpoint = shiftIdentityApiURL.AddUrlPath("IdentityPublicUser");
 
         options.AddLanguage("en-US", "English")
-               .AddLanguage("ar-IQ", "Arabic", true)
-               .AddLanguage("en-US", "English RTL", true)
+               .AddLanguage("fr-FR", "French", LanguageScope.Content)
+               .AddLanguage("ar-IQ", "Arabic", true, LanguageScope.UI)
                .AddLanguage("ku-IQ", "Kurdish", true);
     };
 
