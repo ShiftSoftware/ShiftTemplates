@@ -40,11 +40,15 @@
 		<PackageReference Include="ShiftSoftware.TypeAuth.AspNetCore" Version="$(TypeAuthVersion)" />
 		<PackageReference Include="ShiftSoftware.ShiftIdentity.AzureFunctions" Version="$(ShiftFrameworkVersion)" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.Functions" Version="$(ShiftFrameworkVersion)" />
+		<!--#if includeSampleApp-->
+		<PackageReference Include="ShiftSoftware.UnifiedAttestation.Functions" Version="1.0.6" />
+		<!--#endif -->
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\StockPlusPlus.Data\StockPlusPlus.Data.csproj" />
 		<!--#if shiftFrameworkDevelopmentMode-->
+		<ProjectReference Include="..\..\..\..\UnifiedAttestation\UnifiedAttestation.Functions\UnifiedAttestation.Functions.csproj"  Condition="Exists('..\..\..\..\UnifiedAttestation\UnifiedAttestation.Functions\UnifiedAttestation.Functions.csproj')" />
 		<ProjectReference Include="..\..\..\..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj" Condition="Exists('..\..\..\..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj')" />
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Functions\ShiftEntity.Functions.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.Functions\ShiftEntity.Functions.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.EFCore\ShiftEntity.EFCore.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.EFCore\ShiftEntity.EFCore.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
