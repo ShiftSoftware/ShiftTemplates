@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<!--#if shiftFrameworkDevelopmentMode-->
 	<Import Project="..\..\..\ShiftFrameworkGlobalSettings.props" />
 	<!--#endif -->
@@ -6,9 +6,19 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<StaticWebAssetBasePath>StockPlusPlus.Web</StaticWebAssetBasePath>
 		<UserSecretsId>9424fe73-f4dd-4d92-a137-deea3d0f1c46</UserSecretsId>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<!-- Implicit usings that Microsoft.NET.Sdk.Web normally provides -->
+	<ItemGroup>
+		<Using Include="Microsoft.Extensions.Configuration" />
+		<Using Include="Microsoft.Extensions.DependencyInjection" />
+		<Using Include="Microsoft.Extensions.Logging" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.5" />
@@ -34,7 +44,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\StockPlusPlus.Data\StockPlusPlus.Data.csproj" />
-		<ProjectReference Include="..\StockPlusPlus.Web\StockPlusPlus.Web.csproj" />
 		<!--#if shiftFrameworkDevelopmentMode-->
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Web\ShiftEntity.Web.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.Web\ShiftEntity.Web.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Print\ShiftEntity.Print.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.Print\ShiftEntity.Print.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />

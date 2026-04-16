@@ -1,7 +1,12 @@
-﻿@using ShiftSoftware.ShiftBlazor.Layouts
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using ShiftSoftware.ShiftBlazor.Layouts
+@inject ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboardBlazorOptions DashboardOptions
+
 
 <DefaultApp AppTitle="StockPlusPlus"
-            AppAssembly="@typeof(StockPlusPlus.Client._Imports).Assembly">
+            AppAssembly="@typeof(StockPlusPlus.Client._Imports).Assembly"
+            AdditionalAssemblies="@(new System.Reflection.Assembly[] { typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly, typeof(ShiftSoftware.ShiftIdentity.Blazor.Components.Token).Assembly })"
+            IdentityHostingType="@DashboardOptions.ShiftIdentityHostingType">
 
     <NavMenuTemplate>
         <NavMenu isDrawerOpen="context.IsDrawerOpen"/>

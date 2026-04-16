@@ -1,27 +1,55 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
-    <UserSecretsId>ff7ca4c1-902a-4e05-88c8-979b46c1a57f</UserSecretsId>
-  </PropertyGroup>
-
+	<!--#if shiftFrameworkDevelopmentMode-->
+	<Import Project="..\..\..\ShiftFrameworkGlobalSettings.props" />
+	<!--#endif -->
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+		<UserSecretsId>ff7ca4c1-902a-4e05-88c8-979b46c1a57f</UserSecretsId>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.27.0" />
 		<PackageReference Include="Azure.Storage.Files.Shares" Version="12.23.0" />
-		<PackageReference Include="Azure.Storage.Queues" Version="12.23.0" />
+		<PackageReference Include="Azure.Storage.Queues" Version="12.25.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.5" />
 		<PackageReference Include="BitzArt.Blazor.Cookies.Server" Version="1.5.1" />
-		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.13.0" />
+		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.13.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="ShiftSoftware.ShiftEntity.Web" Version="$(ShiftFrameworkVersion)" />
+		<PackageReference Include="ShiftSoftware.ShiftEntity.Print" Version="$(ShiftFrameworkVersion)" />
+		<!--#if(internalShiftIdentityHosting)-->
+		<PackageReference Include="ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore" Version="$(ShiftFrameworkVersion)" />
+		<PackageReference Include="ShiftSoftware.ShiftIdentity.Dashboard.Blazor" Version="$(ShiftFrameworkVersion)" />
+		<!--#endif -->
+		<!--#if(externalShiftIdentityHosting)-->
+		<PackageReference Include="ShiftSoftware.ShiftIdentity.AspNetCore" Version="$(ShiftFrameworkVersion)" />
+		<!--#endif -->
+
+		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="5.0.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="5.0.0" />
 	</ItemGroup>
 
-
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\..\TypeAuth\TypeAuth.Blazor\TypeAuth.Blazor.csproj" />
-	  <ProjectReference Include="..\StockPlusPlus.Client\StockPlusPlus.Client.csproj" />
+		<ProjectReference Include="..\..\..\..\TypeAuth\TypeAuth.AspNetCore\TypeAuth.AspNetCore.csproj" />
+		<ProjectReference Include="..\StockPlusPlus.Client\StockPlusPlus.Client.csproj" />
+		<ProjectReference Include="..\StockPlusPlus.Data\StockPlusPlus.Data.csproj" />
+		<ProjectReference Include="..\StockPlusPlus.API\StockPlusPlus.API.csproj" />
+		<!--#if shiftFrameworkDevelopmentMode-->
+		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Web\ShiftEntity.Web.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.Web\ShiftEntity.Web.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
+		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Print\ShiftEntity.Print.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.Print\ShiftEntity.Print.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
+		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.AspNetCore\ShiftIdentity.Dashboard.AspNetCore.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.AspNetCore\ShiftIdentity.Dashboard.AspNetCore.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
+		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.AspNetCore\ShiftIdentity.AspNetCore.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.AspNetCore\ShiftIdentity.AspNetCore.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
+		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.Blazor\ShiftIdentity.Dashboard.Blazor.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.Blazor\ShiftIdentity.Dashboard.Blazor.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
+		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Blazor.Server\ShiftIdentity.Blazor.Server.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Blazor.Server\ShiftIdentity.Blazor.Server.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
+		<!--#endif -->
 	</ItemGroup>
 </Project>

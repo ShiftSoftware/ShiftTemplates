@@ -43,7 +43,7 @@ namespace StockPlusPlus.Functions
             var configuration = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new ShiftSoftware.ShiftEntity.Core.DefaultAutoMapperProfile(typeof(StockPlusPlus.Data.Marker).Assembly));
-            });
+            }, null);
 
             var mapper = new Mapper(configuration);
 

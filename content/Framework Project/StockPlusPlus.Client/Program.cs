@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using ShiftSoftware.ShiftBlazor.Extensions;
 using ShiftSoftware.ShiftEntity.Core.Extensions;
+using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
 using ShiftSoftware.TypeAuth.Blazor.Extensions;
-using StockPlusPlus.Client;
+using StockPlusPlus.Shared.ActionTrees;
 using System.Globalization;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -47,7 +48,29 @@ builder.Services.AddShiftBlazor(config =>
 
 });
 
-builder.Services.AddScoped<AuthenticationStateProvider, TestAuthStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider,
+    ShiftSoftware.ShiftIdentity.Blazor.Providers.PersistentCookieAuthStateProvider>();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddShiftIdentityDashboardBlazor(x =>
+{
+    x.Title = "StockPlusPlus";
+    x.UseCookieAuth = true;
+#if (internalShiftIdentityHosting)
+    x.ShiftIdentityHostingType = ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.Internal;
+#else
+    x.ShiftIdentityHostingType = ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.External;
+    x.ExternalIdentityApiUrl = shiftIdentityApiURL;
+#endif
+});
+
+// ShiftIdentityLocalizer needed by Dashboard.Blazor components
+builder.Services.AddTransient(x => new ShiftSoftware.ShiftIdentity.Core.Localization.ShiftIdentityLocalizer(
+    x, typeof(ShiftSoftwareLocalization.Identity.Resource)));
+
+// No-op IIdentityStore — cookie auth handles token storage
+builder.Services.AddScoped<ShiftSoftware.ShiftIdentity.Blazor.IIdentityStore,
+    ShiftSoftware.ShiftIdentity.Blazor.Services.NoOpIdentityStore>();
 
 
 builder.Services.AddTypeAuth(x =>

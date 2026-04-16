@@ -2,6 +2,7 @@
 @inject IDialogService DialogService
 @using System.Globalization
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 
 @attribute [Authorize]
 
@@ -28,8 +29,24 @@ Welcome to your new app.
 
 <MudButton Variant="Variant.Filled" OnClick="@(async () => { await DialogService.ShowAsync<Settings>(); })">Settings</MudButton>
 
-<MudProgressLinear Color="@Color.Primary" Class="mud-table-loading-progress" Indeterminate="true" />
+@* <MudProgressLinear Color="@Color.Primary" Class="mud-table-loading-progress" Indeterminate="true" /> *@
 
+
+<MudNavLink Href="@($"FileExplorer")"
+            Match="NavLinkMatch.All"
+            Icon="@Icons.Material.Outlined.Newspaper">FileExplorer</MudNavLink>
+
+<MudPaper>
+    <MudText>User</MudText>
+    <AuthorizeView>
+        <Authorized>
+            <AuthTest/>
+        </Authorized>
+        <NotAuthorized>
+            <MudText>Not authorized</MudText>
+        </NotAuthorized>
+    </AuthorizeView>
+</MudPaper>
 
 @code {
 

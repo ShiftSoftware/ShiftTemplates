@@ -1,0 +1,31 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+<h3>AuthTest</h3>
+
+@if (state != null)
+{
+    <MudText>@state.User.Identity?.AuthenticationType</MudText>
+
+
+    foreach (var claim in state.User.Claims)
+    {
+        <MudText>@claim.Type: @claim.Value</MudText>
+    }
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+    // AuthenticationStateProvider? AuthStateProvider { get; set; }
+
+    private AuthenticationState? state;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateTask != null)
+        {
+            state = await AuthenticationStateTask;
+        }
+    }
+
+
+}

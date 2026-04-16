@@ -36,12 +36,10 @@
     [CascadingParameter]
     private HttpContext? HttpContext { get; set; }
 
-    private IComponentRenderMode RenderMode => new InteractiveAutoRenderMode();
+    private IComponentRenderMode RenderMode => new InteractiveWebAssemblyRenderMode();
 
     protected override void OnInitialized()
     {
-        Console.WriteLine($"HttpContext is null: {HttpContext == null}");
-
         HttpContext?.Response.Cookies.Append(
             CookieRequestCultureProvider.DefaultCookieName,
             CookieRequestCultureProvider.MakeCookieValue(

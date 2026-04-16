@@ -98,6 +98,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockPlusPlus.Server", "Sto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockPlusPlus.Client", "StockPlusPlus.Client\StockPlusPlus.Client.csproj", "{127E0392-CBB2-486C-AEB7-9B31FCF45109}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftIdentity.Blazor.Server", "..\..\..\ShiftIdentity\ShiftIdentity.Blazor.Server\ShiftIdentity.Blazor.Server.csproj", "{FB7F4CC5-AB55-2F01-29AE-20D90A3BBEBC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -244,6 +246,10 @@ Global
 		{127E0392-CBB2-486C-AEB7-9B31FCF45109}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{127E0392-CBB2-486C-AEB7-9B31FCF45109}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{127E0392-CBB2-486C-AEB7-9B31FCF45109}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB7F4CC5-AB55-2F01-29AE-20D90A3BBEBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB7F4CC5-AB55-2F01-29AE-20D90A3BBEBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB7F4CC5-AB55-2F01-29AE-20D90A3BBEBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB7F4CC5-AB55-2F01-29AE-20D90A3BBEBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -283,6 +289,7 @@ Global
 		{29F56928-2CEC-FA67-A5A4-468B7FD25145} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{5A89825E-4826-2C7F-CA42-D5CCE221D310} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{FB7F4CC5-AB55-2F01-29AE-20D90A3BBEBC} = {628E8BC1-C04D-4681-90A3-5CD4DF6A4003}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C409BB4-536D-4DA4-8127-17F75A5B4330}
