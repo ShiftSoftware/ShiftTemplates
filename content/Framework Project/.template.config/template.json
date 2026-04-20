@@ -200,10 +200,10 @@
     "externalShiftIdentityApi": {
       "type": "parameter",
       "datatype": "text",
-      "displayName": "External ShiftIdentity Api (Leave empty if using Internal ShiftIdentity)",
-      "description": "Base URL of the External ShiftIdentity API. e.g., http://localhost:5069",
+      "displayName": "External ShiftIdentity Api (Only set when using External ShiftIdentity hosting)",
+      "description": "Base URL of the External ShiftIdentity API. e.g., http://my-identity.example.com. Leave unset for Internal hosting — the local dev URL is used.",
       "isRequired": false,
-      "defaultValue": "",
+      "defaultValue": "http://localhost:5069",
       "isEnabled": true,
       "replaces": "http://localhost:5069",
       "onlyIf": [
@@ -215,10 +215,10 @@
     "externalShiftIdentityFrontEnd": {
       "type": "parameter",
       "datatype": "text",
-      "displayName": "External ShiftIdentity Front-End (Leave empty if using Internal ShiftIdentity)",
-      "description": "Base URL of the External ShiftIdentity Front-End. e.g., http://localhost:5069",
+      "displayName": "External ShiftIdentity Front-End (Only set when using External ShiftIdentity hosting)",
+      "description": "Base URL of the External ShiftIdentity Front-End. e.g., http://my-identity.example.com. Leave unset for Internal hosting — the local dev URL is used.",
       "isRequired": false,
-      "defaultValue": "",
+      "defaultValue": "http://localhost:5069",
       "isEnabled": true,
       "replaces": "http://localhost:5069",
       "onlyIf": [
