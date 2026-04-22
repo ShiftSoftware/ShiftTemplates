@@ -21,6 +21,16 @@ using System.Security.Claims;
 using Microsoft.Azure.Cosmos;
 #if (includeSampleApp)
 using StockPlusPlus.Shared.DTOs.Service;
+using StockPlusPlus.Shared.DTOs.ProductBrand;
+using StockPlusPlus.Shared.DTOs.ProductCategory;
+using ShiftSoftware.ShiftEntity.Model.Dtos;
+using StockPlusPlus.Shared.ActionTrees;
+using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
+
+
+
+
+
 #endif
 
 #if (internalShiftIdentityHosting)
@@ -341,7 +351,7 @@ builder.Services.AddShiftIdentityDashboard<DB>(
 #if (externalShiftIdentityHosting)
 if (builder.Environment.IsDevelopment())
 {
-    mvcBuilder.AddFakeIdentityEndPoints(
+    builder.Services.AddFakeIdentityEndPoints(
         new TokenSettingsModel
         {
             Issuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!,
@@ -357,7 +367,7 @@ if (builder.Environment.IsDevelopment())
         {
             AppId = "StockPlusPlus-Dev",
             DisplayName = "StockPlusPlus Dev",
-            RedirectUri = "http://localhost:5069/Auth/Token"
+            RedirectUri = "http://localhost:5069/"
         },
         "OneTwo",
 #if (includeSampleApp)
@@ -390,7 +400,7 @@ new string[]
 
 #region Cookie Authentication
 
-builder.AddShiftIdentityCookieAuth(options =>
+builder.Services.AddShiftIdentityBlazorServer(options =>
 {
     options.CookieName = ".StockPlusPlus.Auth";
 #if (internalShiftIdentityHosting)
