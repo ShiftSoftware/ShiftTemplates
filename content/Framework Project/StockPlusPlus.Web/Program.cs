@@ -23,6 +23,7 @@ using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 #endif
 using ShiftSoftware.ShiftBlazor.Enums;
+using StockPlusPlus.Web.Attention;
 
 [assembly: RootNamespace("StockPlusPlus.Web")]
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -69,6 +70,8 @@ builder.Services.AddShiftBlazor(config =>
 });
 
 builder.Services.AddShiftIdentity("StockPlusPlus-Dev", shiftIdentityApiURL, shiftIdentityFrontEndURL, false);
+
+builder.Services.AddSingleton<MockAttentionStore>();
 
 #if (internalShiftIdentityHosting)
 builder.Services.AddShiftIdentityDashboardBlazor(x =>

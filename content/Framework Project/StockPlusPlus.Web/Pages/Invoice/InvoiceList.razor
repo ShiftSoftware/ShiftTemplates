@@ -1,8 +1,12 @@
-﻿@attribute [Authorize]
+@attribute [Authorize]
 @attribute [Route($"/{nameof(InvoiceList)}")]
 
+@implements IDisposable
 
 @using StockPlusPlus.Shared.DTOs.Invoice
+@using StockPlusPlus.Web.Attention
+
+@inject MockAttentionStore Attention
 
 
 <ShiftList EntitySet="Invoice"
@@ -13,9 +17,59 @@
            EnableFilterPanel
            ComponentType="typeof(InvoiceForm)"
            TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice"
-           HeaderNowrap>
+           HeaderNowrap
+           Context="listContext">
 
-    <PropertyColumnExtended IsButtonColumn Property="x => x.InvoiceNo" Title="Invoice No"/>
+    <PropertyColumnExtended Property="x => x.InvoiceNo" Title="Invoice No">
+        <CellTemplate Context="cell">
+            @{
+                var signals = TrackAndGetSignals(cell.Item);
+                var highest = signals.Count == 0 ? (AttentionSeverity?)null : signals.Max(s => s.Severity);
+            }
+            <a href="javascript:void(0)"
+               @onclick="@(() => listContext.Self.OpenDialog(typeof(InvoiceForm), cell.Item.ID, ModalOpenMode.Popup))"
+               @onclick:preventDefault="true"
+               @onclick:stopPropagation="true"
+               style="text-decoration: none; color: inherit; display: inline-flex; align-items: center;">
+                <AttentionInlineIndicator Severity="highest" Tooltip="@BuildTooltip(signals)" />
+                <span class="button-column-button">@cell.Item.InvoiceNo</span>
+            </a>
+        </CellTemplate>
+    </PropertyColumnExtended>
     <PropertyColumnExtended Property="x => x.ManualReference" Title="Manual Reference" />
     <PropertyColumnExtended Format="F" Property="x => x.InvoiceDate" Title="Invoice Date" />
 </ShiftList>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Attention.Changed += OnAttentionChanged;
+    }
+
+    public void Dispose()
+    {
+        Attention.Changed -= OnAttentionChanged;
+    }
+
+    private async void OnAttentionChanged() => await InvokeAsync(StateHasChanged);
+
+    private IReadOnlyList<AttentionSignal> TrackAndGetSignals(InvoiceListDTO item)
+    {
+        var signals = Attention.GetActive("Invoice", item.ID);
+        if (!string.IsNullOrEmpty(item.ID))
+        {
+            Attention.Track(
+                "Invoice",
+                item.ID,
+                $"Invoice #{item.InvoiceNo}",
+                $"/{nameof(InvoiceForm)}/{item.ID}");
+        }
+        return signals;
+    }
+
+    private static string BuildTooltip(IReadOnlyList<AttentionSignal> signals)
+    {
+        if (signals.Count == 0) return string.Empty;
+        return string.Join("\n", signals.Select(s => $"• [{s.Severity}] {s.Category}: {s.Reason}"));
+    }
+}

@@ -382,6 +382,8 @@ if (app.Environment.EnvironmentName != "Test")
 #endif
 }
 
+await StockPlusPlus.API.DevSampleSeed.SeedAsync(app);
+
 var supportedCultures = new List<CultureInfo>
 {
     new("en-US"),

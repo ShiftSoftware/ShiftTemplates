@@ -1,0 +1,151 @@
+@attribute [Authorize]
+@attribute [Route("/NeedsAttention")]
+
+@using StockPlusPlus.Web.Attention
+@using StockPlusPlus.Web.Pages.Invoice
+@using StockPlusPlus.Web.Pages.Product
+
+@inject MockAttentionStore Attention
+@inject ShiftModal ShiftModal
+
+<PageTitle>Needs Attention</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <MudIcon Icon="@Icons.Material.Filled.NotificationsActive" Size="Size.Large" Color="Color.Warning" />
+        <MudText Typo="Typo.h5">Needs Attention</MudText>
+        <MudSpacer />
+        <MudText Typo="Typo.caption" Style="opacity: 0.7; margin-right: 8px;">
+            Cross-entity view of records flagged by attention evaluators
+        </MudText>
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Secondary"
+                   Size="Size.Small"
+                   StartIcon="@Icons.Material.Filled.Refresh"
+                   OnClick="ResetDemo">
+            Reset demo state
+        </MudButton>
+    </div>
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mb-4">
+        Prototype view. Browse the Invoices and Products lists first so this page can pick them up. Real implementation will read straight from the <code>AttentionSignals</code> table.
+    </MudAlert>
+
+    @{
+        var refs = Attention.AllActive();
+    }
+
+    @if (refs.Count == 0)
+    {
+        <MudPaper Class="pa-8" Elevation="0" Style="text-align: center; opacity: 0.7;">
+            <MudIcon Icon="@Icons.Material.Filled.CheckCircleOutline" Size="Size.Large" Color="Color.Success" />
+            <MudText Typo="Typo.h6" Class="mt-2">Nothing needs attention right now.</MudText>
+            <MudText Typo="Typo.body2">Either everything is clean, or nothing has been seeded. Browse a list to populate.</MudText>
+        </MudPaper>
+    }
+    else
+    {
+        <MudPaper Elevation="1">
+            <MudList T="string" Dense="false">
+                @foreach (var entry in refs)
+                {
+                    var highest = entry.Signals.Max(s => s.Severity);
+                    var mostRecent = entry.Signals.Max(s => s.RaisedAt);
+                    <MudListItem T="string" OnClick="@(() => OpenEntity(entry, ModalOpenMode.Popup))" Style="cursor: pointer;">
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 4px 0;">
+                            <AttentionBadge Severity="highest"
+                                            Count="entry.Signals.Count"
+                                            ShowLabel="true" />
+
+                            <div style="flex: 1; min-width: 0;">
+                                <MudText Typo="Typo.body1" Style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    @entry.EntityLabel
+                                </MudText>
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; align-items: center;">
+                                    @foreach (var signal in entry.Signals.OrderByDescending(s => s.Severity))
+                                    {
+                                        <MudChip T="string"
+                                                 Size="Size.Small"
+                                                 Variant="Variant.Outlined"
+                                                 Color="@ColorFor(signal.Severity)">
+                                            @signal.Category
+                                        </MudChip>
+                                    }
+                                    <MudText Typo="Typo.caption" Style="opacity: 0.7; margin-left: 4px;">
+                                        <MudIcon Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" Style="vertical-align: middle; margin-right: 2px;" />
+                                        @FormatRaisedAt(mostRecent) · @mostRecent.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                                    </MudText>
+                                </div>
+                            </div>
+
+                            <MudText Typo="Typo.caption" Style="opacity: 0.7; white-space: nowrap;">
+                                @entry.EntityType
+                            </MudText>
+
+                            <MudTooltip Text="Open in popup">
+                                <MudIconButton Icon="@Icons.Material.Filled.OpenInBrowser"
+                                               Size="Size.Small"
+                                               OnClick="@(() => OpenEntity(entry, ModalOpenMode.Popup))"
+                                               OnClickStopPropagation="true" />
+                            </MudTooltip>
+                            <MudTooltip Text="Open in new tab">
+                                <MudIconButton Icon="@Icons.Material.Filled.OpenInNew"
+                                               Size="Size.Small"
+                                               OnClick="@(() => OpenEntity(entry, ModalOpenMode.NewTab))"
+                                               OnClickStopPropagation="true" />
+                            </MudTooltip>
+                            <MudTooltip Text="Open in same tab">
+                                <MudIconButton Icon="@Icons.Material.Filled.ArrowForward"
+                                               Size="Size.Small"
+                                               OnClick="@(() => OpenEntity(entry, ModalOpenMode.Redirect))"
+                                               OnClickStopPropagation="true" />
+                            </MudTooltip>
+                        </div>
+                    </MudListItem>
+                    <MudDivider />
+                }
+            </MudList>
+        </MudPaper>
+    }
+
+</MudContainer>
+
+@code {
+    private async Task OpenEntity(EntityAttentionRef entry, ModalOpenMode mode)
+    {
+        var formType = ResolveFormType(entry.EntityType);
+        if (formType == null) return;
+
+        await ShiftModal.Open(formType, entry.EntityId, mode);
+    }
+
+    private static Type? ResolveFormType(string entityType) => entityType switch
+    {
+        "Invoice" => typeof(InvoiceForm),
+        "Product" => typeof(ProductForm),
+        _ => null,
+    };
+
+    private void ResetDemo()
+    {
+        Attention.ResetCleared();
+        StateHasChanged();
+    }
+
+    private static Color ColorFor(AttentionSeverity s) => s switch
+    {
+        AttentionSeverity.Critical => Color.Error,
+        AttentionSeverity.Warning => Color.Warning,
+        _ => Color.Info,
+    };
+
+    private static string FormatRaisedAt(DateTimeOffset raisedAt)
+    {
+        var span = DateTimeOffset.Now - raisedAt;
+        if (span.TotalMinutes < 1) return "just now";
+        if (span.TotalMinutes < 60) return $"{(int)span.TotalMinutes}m ago";
+        if (span.TotalHours < 24) return $"{(int)span.TotalHours}h ago";
+        return $"{(int)span.TotalDays}d ago";
+    }
+}

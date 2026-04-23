@@ -1,6 +1,8 @@
 ﻿@attribute [Authorize]
 @attribute [Route($"/{nameof(ProductList)}")]
 
+@implements IDisposable
+
 @using ShiftSoftware.ShiftBlazor.Filters.Models
 @using ShiftSoftware.ShiftIdentity.Core.DTOs.City
 @using StockPlusPlus.Shared.DTOs.ProductBrand;
@@ -8,8 +10,11 @@
 @using System.Linq.Expressions;
 @using StockPlusPlus.Shared.DTOs.ProductCategory;
 @using StockPlusPlus.Shared.Enums
+@using StockPlusPlus.Web.Attention
 @using StockPlusPlus.Web.Pages.ProductBrand;
 @using StockPlusPlus.Web.Pages.ProductCategory;
+
+@inject MockAttentionStore Attention
 
 <ShiftList EntitySet="Product"
            Title="Product List"
@@ -52,22 +57,29 @@
                 }
 
                 <PropertyColumnExtended Property="x => x.Name" Title="Name">
-                    <CellTemplate>
-                            @context.Item.Name
-                
-                            <MudIconButton Variant="Variant.Text"
-                                       Size="Size.Small"
-                                       Icon="@Icons.Material.Filled.ContentCopy"
-                                       ButtonType="ButtonType.Button"
-                                       Color="Color.Info"
-                                       OnClick="@(async () => {
-                                             var parameters = new Dictionary<string, object>
-                                             {
-                                                  { "ForceSaveAsNew", true }
-                                             };
-    
-                                             await listContext.Self.OpenDialog(typeof(ProductForm), context.Item.ID, ModalOpenMode.Popup, parameters);
-                                   })" />
+                    <CellTemplate Context="cell">
+                            @{
+                                var signals = TrackAndGetSignals(cell.Item);
+                                var highest = signals.Count == 0 ? (AttentionSeverity?)null : signals.Max(s => s.Severity);
+                            }
+                            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                                <AttentionInlineIndicator Severity="highest" Tooltip="@BuildTooltip(signals)" />
+                                <span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@cell.Item.Name</span>
+                                <MudIconButton Variant="Variant.Text"
+                                           Size="Size.Small"
+                                           Icon="@Icons.Material.Filled.ContentCopy"
+                                           ButtonType="ButtonType.Button"
+                                           Color="Color.Info"
+                                           Style="margin-left: 8px;"
+                                           OnClick="@(async () => {
+                                                 var parameters = new Dictionary<string, object>
+                                                 {
+                                                      { "ForceSaveAsNew", true }
+                                                 };
+
+                                                 await listContext.Self.OpenDialog(typeof(ProductForm), cell.Item.ID, ModalOpenMode.Popup, parameters);
+                                       })" />
+                            </div>
                     </CellTemplate>
                 </PropertyColumnExtended>
 
@@ -109,6 +121,33 @@
 
 @code {
 
+    public void Dispose()
+    {
+        Attention.Changed -= OnAttentionChanged;
+    }
+
+    private async void OnAttentionChanged() => await InvokeAsync(StateHasChanged);
+
+    private IReadOnlyList<AttentionSignal> TrackAndGetSignals(ProductListDTO item)
+    {
+        var signals = Attention.GetActive("Product", item.ID);
+        if (!string.IsNullOrEmpty(item.ID))
+        {
+            Attention.Track(
+                "Product",
+                item.ID,
+                $"Product — {item.Name}",
+                $"/{nameof(ProductForm)}/{item.ID}");
+        }
+        return signals;
+    }
+
+    private static string BuildTooltip(IReadOnlyList<AttentionSignal> signals)
+    {
+        if (signals.Count == 0) return string.Empty;
+        return string.Join("\n", signals.Select(s => $"• [{s.Severity}] {s.Category}: {s.Reason}"));
+    }
+
     public Dictionary<string, object> AddDialogParameters = new();
 
     [Parameter]
@@ -123,6 +162,8 @@
 
     protected override void OnInitialized()
     {
+        Attention.Changed += OnAttentionChanged;
+
         if (!string.IsNullOrWhiteSpace(ProductCategoryID))
         {
             AddDialogParameters[nameof(ProductForm.ProductCategoryID)] = ProductCategoryID;

@@ -8,9 +8,15 @@
 @using Pages.ProductBrand
 @using Pages.ProductCategory
 @using Pages.Country
+@using StockPlusPlus.Web.Attention
+@using Microsoft.AspNetCore.Components.Forms
+
+@implements IDisposable
 
 @inherits ShiftForm<InvoiceForm, InvoiceDTO>
 @inject ODataQuery odataQuery
+@inject MockAttentionStore Attention
+@inject IDialogService DialogService
 
 <ShiftEntityForm @bind-Mode="Mode"
                  @bind-Value="TheItem"
@@ -20,6 +26,26 @@
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice"
                  AllowClone
                  @bind-Key="@Key">
+
+    <ToolbarEndTemplate>
+        @if (!string.IsNullOrEmpty(Key?.ToString()))
+        {
+            <MudTooltip Text="Signal history">
+                <MudButtonExtended Variant="Variant.Text"
+                                   Color="Color.Tertiary"
+                                   Style="min-width:40px;"
+                                   aria-label="Signal history"
+                                   OnClick="ShowSignalHistory">
+                    <MudIcon Size="Size.Medium" Icon="@Icons.Material.Filled.NotificationsActive" />
+                </MudButtonExtended>
+            </MudTooltip>
+        }
+    </ToolbarEndTemplate>
+
+    <ChildContent>
+    <AttentionBanner Signals="ActiveSignals"
+                     ShowAcknowledgeButton="true"
+                     OnAcknowledge="HandleAcknowledge" />
 
     <MudTextFieldExtended OnlyValidateIfDirty="true"
                           Label="Manual Reference"
@@ -102,4 +128,83 @@
         </ControlTemplate>
   
     </MultiItemField>
+    </ChildContent>
 </ShiftEntityForm>
+
+@code {
+    private EditContext? gracePeriodContext;
+    private DateTimeOffset graceEnd;
+
+    private IReadOnlyList<AttentionSignal> ActiveSignals =>
+        Attention.GetActive("Invoice", Key?.ToString());
+
+    private void HandleAcknowledge()
+    {
+        Attention.Clear("Invoice", Key?.ToString());
+        StateHasChanged();
+    }
+
+    private async Task ShowSignalHistory()
+    {
+        var id = Key?.ToString();
+        if (string.IsNullOrEmpty(id)) return;
+
+        var parameters = new DialogParameters
+        {
+            { "EntityType", "Invoice" },
+            { "EntityId", id },
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseOnEscapeKey = true,
+        };
+
+        await DialogService.ShowAsync<AttentionHistoryDialog>("Signal history", parameters, options);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        TryStartDirtyGracePeriod();
+    }
+
+    // See ProductForm — same workaround for the EditContext being spuriously marked modified
+    // by input components firing ValueChanged on their initial post-load render.
+    private void TryStartDirtyGracePeriod()
+    {
+        if (gracePeriodContext != null) return;
+        if (string.IsNullOrEmpty(TheItem?.ID)) return;
+        if (FormContainer?.EditContext is not { } ctx) return;
+
+        gracePeriodContext = ctx;
+        graceEnd = DateTimeOffset.Now.AddSeconds(3);
+        ctx.MarkAsUnmodified();
+        ctx.OnFieldChanged += HandleFieldChangedDuringGrace;
+    }
+
+    private void HandleFieldChangedDuringGrace(object? sender, FieldChangedEventArgs e)
+    {
+        if (sender is not EditContext ctx) return;
+
+        if (DateTimeOffset.Now >= graceEnd)
+        {
+            ctx.OnFieldChanged -= HandleFieldChangedDuringGrace;
+            gracePeriodContext = null;
+            return;
+        }
+
+        ctx.MarkAsUnmodified();
+    }
+
+    public void Dispose()
+    {
+        if (gracePeriodContext != null)
+        {
+            gracePeriodContext.OnFieldChanged -= HandleFieldChangedDuringGrace;
+            gracePeriodContext = null;
+        }
+    }
+}

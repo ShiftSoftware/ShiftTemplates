@@ -9,9 +9,15 @@
 @using Pages.ProductBrand
 @using Pages.ProductCategory
 @using Pages.Country
+@using StockPlusPlus.Web.Attention
+@using Microsoft.AspNetCore.Components.Forms
+
+@implements IDisposable
 
 @inherits ShiftForm<ProductForm, ProductDTO>
 @inject ODataQuery odataQuery
+@inject MockAttentionStore Attention
+@inject IDialogService DialogService
 
 <ShiftEntityForm @bind-Mode="Mode"
                  @bind-Value="TheItem"
@@ -22,6 +28,26 @@
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Product"
                  AllowClone
                  @bind-Key="@Key">
+
+    <ToolbarEndTemplate>
+        @if (!string.IsNullOrEmpty(Key?.ToString()))
+        {
+            <MudTooltip Text="Signal history">
+                <MudButtonExtended Variant="Variant.Text"
+                                   Color="Color.Tertiary"
+                                   Style="min-width:40px;"
+                                   aria-label="Signal history"
+                                   OnClick="ShowSignalHistory">
+                    <MudIcon Size="Size.Medium" Icon="@Icons.Material.Filled.NotificationsActive" />
+                </MudButtonExtended>
+            </MudTooltip>
+        }
+    </ToolbarEndTemplate>
+
+    <ChildContent>
+    <AttentionBanner Signals="snapshotSignals"
+                     ShowAcknowledgeButton="false"
+                     FooterNote="Automatically acknowledged on open" />
 
     <MudTextFieldExtended OnlyValidateIfDirty="true"
                           Label="Name"
@@ -61,6 +87,7 @@
 
 
     <MudSelectExtended @bind-Value="TheItem.TrackingMethod" For="() => TheItem.TrackingMethod"></MudSelectExtended>
+    </ChildContent>
 
 </ShiftEntityForm>
 
@@ -76,6 +103,11 @@
     [SupplyParameterFromQuery]
     public bool ForceSaveAsNew { get; set; }
 
+    private IReadOnlyList<AttentionSignal> snapshotSignals = Array.Empty<AttentionSignal>();
+    private bool attentionCleared;
+    private EditContext? gracePeriodContext;
+    private DateTimeOffset graceEnd;
+
     protected override void OnInitialized()
     {
         if (!string.IsNullOrWhiteSpace(ProductCategoryID))
@@ -87,5 +119,80 @@
         {
             TheItem.ProductBrand = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO { Value = ProductBrandID };
         }
+
+        snapshotSignals = Attention.GetActive("Product", Key?.ToString());
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (firstRender && !attentionCleared && snapshotSignals.Count > 0)
+        {
+            attentionCleared = true;
+            Attention.Clear("Product", Key?.ToString());
+        }
+
+        TryStartDirtyGracePeriod();
+    }
+
+    // Subscribe once to OnFieldChanged. During a short grace period after load, every field
+    // change is assumed to be a spurious initial render from an input component (e.g. a
+    // ShiftAutocomplete resolving its label async) and we re-mark the form as unmodified.
+    // After the grace period expires, real user edits are honored normally.
+    private void TryStartDirtyGracePeriod()
+    {
+        if (gracePeriodContext != null) return;
+        if (string.IsNullOrEmpty(TheItem?.ID)) return;
+        if (FormContainer?.EditContext is not { } ctx) return;
+
+        gracePeriodContext = ctx;
+        graceEnd = DateTimeOffset.Now.AddSeconds(3);
+        ctx.MarkAsUnmodified();
+        ctx.OnFieldChanged += HandleFieldChangedDuringGrace;
+    }
+
+    private void HandleFieldChangedDuringGrace(object? sender, FieldChangedEventArgs e)
+    {
+        if (sender is not EditContext ctx) return;
+
+        if (DateTimeOffset.Now >= graceEnd)
+        {
+            ctx.OnFieldChanged -= HandleFieldChangedDuringGrace;
+            gracePeriodContext = null;
+            return;
+        }
+
+        ctx.MarkAsUnmodified();
+    }
+
+    public void Dispose()
+    {
+        if (gracePeriodContext != null)
+        {
+            gracePeriodContext.OnFieldChanged -= HandleFieldChangedDuringGrace;
+            gracePeriodContext = null;
+        }
+    }
+
+    private async Task ShowSignalHistory()
+    {
+        var id = Key?.ToString();
+        if (string.IsNullOrEmpty(id)) return;
+
+        var parameters = new DialogParameters
+        {
+            { "EntityType", "Product" },
+            { "EntityId", id },
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseOnEscapeKey = true,
+        };
+
+        await DialogService.ShowAsync<AttentionHistoryDialog>("Signal history", parameters, options);
     }
 }
