@@ -250,8 +250,8 @@ builder.Services
         builder.Configuration.GetValue<string>("Settings:TokenSettings:PublicKey")!,
         setAsDefaultScheme: false);
 
-#endregion
 
+#endregion
 
 
 #region ShiftIdentity Dashboard
@@ -411,6 +411,9 @@ builder.Services.AddShiftIdentityBlazorServer(options =>
 #endif
     options.JwtIssuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!;
     options.JwtPublicKeyBase64 = builder.Configuration.GetValue<string>("Settings:TokenSettings:PublicKey")!;
+    options.AppId = "StockPlusPlus-Dev";
+    options.BaseUrl = shiftIdentityApiURL!;
+    options.FrontEndBaseUrl = shiftIdentityFrontEndURL!;
 });
 
 #endregion
@@ -442,6 +445,8 @@ builder.Services.AddAzureClients(clientBuilder =>
 #endregion
 
 var app = builder.Build();
+
+app.UseRateLimiter();
 
 #region Identity Seeding & Fake Endpoints
 

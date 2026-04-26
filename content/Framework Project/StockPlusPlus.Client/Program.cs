@@ -1,8 +1,8 @@
 using BitzArt.Blazor.Cookies;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using ShiftSoftware.ShiftBlazor.Extensions;
 using ShiftSoftware.ShiftEntity.Core.Extensions;
+using ShiftSoftware.ShiftIdentity.Blazor.Extensions;
 using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
 using ShiftSoftware.TypeAuth.Blazor.Extensions;
 using StockPlusPlus.Shared.ActionTrees;
@@ -48,10 +48,11 @@ builder.Services.AddShiftBlazor(config =>
 
 });
 
-builder.Services.AddScoped<AuthenticationStateProvider,
-    ShiftSoftware.ShiftIdentity.Blazor.Providers.PersistentCookieAuthStateProvider>();
-builder.Services.AddAuthorizationCore();
-builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddShiftIdentityBlazorClient(
+    appId: "StockPlusPlus-Dev",
+    baseUrl: shiftIdentityApiURL!,
+    frontEndBaseUrl: shiftIdentityFrontEndURL!);
+
 builder.Services.AddShiftIdentityDashboardBlazor(x =>
 {
     x.Title = "StockPlusPlus";
@@ -63,14 +64,6 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
     x.ExternalIdentityApiUrl = shiftIdentityApiURL;
 #endif
 });
-
-// ShiftIdentityLocalizer needed by Dashboard.Blazor components
-builder.Services.AddTransient(x => new ShiftSoftware.ShiftIdentity.Core.Localization.ShiftIdentityLocalizer(
-    x, typeof(ShiftSoftwareLocalization.Identity.Resource)));
-
-// No-op IIdentityStore — cookie auth handles token storage
-builder.Services.AddScoped<ShiftSoftware.ShiftIdentity.Blazor.IIdentityStore,
-    ShiftSoftware.ShiftIdentity.Blazor.Services.NoOpIdentityStore>();
 
 
 builder.Services.AddTypeAuth(x =>

@@ -71,7 +71,7 @@ builder.Services.AddShiftBlazor(config =>
 
 });
 
-builder.Services.AddShiftIdentity("StockPlusPlus-Dev", shiftIdentityApiURL, shiftIdentityFrontEndURL, false);
+builder.Services.AddShiftIdentity("StockPlusPlus-Dev", shiftIdentityApiURL, shiftIdentityFrontEndURL);
 
 #if (internalShiftIdentityHosting)
 builder.Services.AddShiftIdentityDashboardBlazor(x =>
