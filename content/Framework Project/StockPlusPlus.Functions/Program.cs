@@ -13,6 +13,7 @@ using StockPlusPlus.Functions;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
 using ShiftSoftware.ShiftEntity.Functions.Services;
 #if (includeSampleApp)
+using ShiftSoftware.UnifiedAttestation.Functions.Extensions;
 using StockPlusPlus.Data.Repositories;
 
 #endif
@@ -30,12 +31,14 @@ var host = new HostBuilder()
         x.AddShiftIdentity(issuer, key);
         x.AddGoogleReCaptcha("");
 
-        x.AddFirebaseAppCheck(
-           h.Configuration.GetValue<string>("FirebaseAppCheck:ProjectNumber")!,
-           h.Configuration.GetValue<string>("FirebaseAppCheck:ServiceAccount")!,
-           h.Configuration.GetValue<string>("HMS:ClientID")!,
-           h.Configuration.GetValue<string>("HMS:ClientSecret")!,
-           h.Configuration.GetValue<string>("HMS:AppId")!);
+#if (includeSampleApp)
+        x.AddAttestationVerification(config =>
+        {
+            h.Configuration.GetSection("FirebaseAppCheck").Bind(config.Firebase);
+            h.Configuration.GetSection("HMS").Bind(config.HMS);
+            config.UseFakeServices = true;
+        });
+#endif
 
         x.RequireValidModels(true);
 
@@ -84,7 +87,7 @@ var host = new HostBuilder()
         //.AddScoped<ProductRepository>();
 #endif
 
-        services.AddShiftEntityCosmosDbReplication();
+        services.AddShiftEntityCosmosDbReplication<DB>();
 
         services.AddTypeAuth((o) =>
         {

@@ -157,6 +157,9 @@ if (IsCosmosEnabled)
 
         x.SetUpReplication<DB, Team>(client, databaseId)
             .Replicate<TeamModel>("Teams", x => x.id);
+
+        x.SetUpReplication<DB, ShiftSoftware.ShiftIdentity.Core.Entities.User>(client, databaseId)
+            .Replicate<UserModel>("Users", x => x.id);
     });
 #endif
 }
@@ -384,6 +387,7 @@ var supportedCultures = new List<CultureInfo>
     new("en-US"),
     new("ar-IQ"),
     new("ku-IQ"),
+    new("fr-FR"),
 };
 
 app.UseRequestLocalization(options =>

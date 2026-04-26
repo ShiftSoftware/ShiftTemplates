@@ -89,7 +89,7 @@ Azure DevOps pipeline (`azure-pipeline.yml`) triggers on `release*` tags. It clo
 
 We are actively decoupling `ShiftRepository` from AutoMapper by introducing `IShiftEntityMapper<TEntity, TListDTO, TViewDTO>` as a pluggable mapping abstraction. This is a cross-repo effort spanning ShiftEntity, ShiftTemplates, and ShiftIdentity.
 
-**Planning doc with full context, status, and iteration tracking:** `../ShiftEntity/docs/mapping-abstraction-plan.md`
+**Planning doc with full context, status, and iteration tracking:** `.shift/repos/shift-entity/mapping-abstraction-plan.md` (in the `.shift` repo).
 
 **IMPORTANT:** When making any mapping-related changes across ShiftEntity, ShiftTemplates, or ShiftIdentity, always update the planning doc to reflect what was done. This document is the single source of truth for the team — check it before starting work to see current status, and update it after completing work. Do not rely on memory or conversation context alone.
 
