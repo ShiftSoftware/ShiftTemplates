@@ -76,7 +76,6 @@ builder.Services.AddShiftIdentity("StockPlusPlus-Dev", shiftIdentityApiURL, shif
 #if (internalShiftIdentityHosting)
 builder.Services.AddShiftIdentityDashboardBlazor(x =>
 {
-    x.ShiftIdentityHostingType = ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.External;
     x.LogoPath = "/img/shift-full.png";
     x.Title = "StockPlusPlus";
     x.DynamicTypeAuthActionExpander = async () =>

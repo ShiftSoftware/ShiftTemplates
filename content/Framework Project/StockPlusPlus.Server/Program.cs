@@ -260,10 +260,6 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
 {
     x.LogoPath = "/img/shift-full.png";
     x.Title = "StockPlusPlus";
-    x.UseCookieAuth = true;
-#if (externalShiftIdentityHosting)
-    x.ExternalIdentityApiUrl = shiftIdentityApiURL;
-#endif
 
     x.DynamicTypeAuthActionExpander = async () =>
     {
@@ -400,21 +396,23 @@ new string[]
 
 #region Cookie Authentication
 
-builder.Services.AddShiftIdentityBlazorServer(options =>
-{
-    options.CookieName = ".StockPlusPlus.Auth";
+builder.Services.AddShiftIdentityBlazorServer(
+    appId: "StockPlusPlus-Dev",
+    baseUrl: shiftIdentityApiURL!,
+    frontEndBaseUrl: shiftIdentityFrontEndURL!,
 #if (internalShiftIdentityHosting)
-    options.HostingType = ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.Internal;
+    hostingType: ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.Internal,
+    externalIdentityApiUrl: null,
 #else
-    options.HostingType = ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.External;
-    options.ExternalIdentityApiUrl = shiftIdentityApiURL;
+    hostingType: ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.External,
+    externalIdentityApiUrl: shiftIdentityApiURL,
 #endif
-    options.JwtIssuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!;
-    options.JwtPublicKeyBase64 = builder.Configuration.GetValue<string>("Settings:TokenSettings:PublicKey")!;
-    options.AppId = "StockPlusPlus-Dev";
-    options.BaseUrl = shiftIdentityApiURL!;
-    options.FrontEndBaseUrl = shiftIdentityFrontEndURL!;
-});
+    configure: options =>
+    {
+        options.CookieName = ".StockPlusPlus.Auth";
+        options.JwtIssuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!;
+        options.JwtPublicKeyBase64 = builder.Configuration.GetValue<string>("Settings:TokenSettings:PublicKey")!;
+    });
 
 #endregion
 

@@ -51,18 +51,17 @@ builder.Services.AddShiftBlazor(config =>
 builder.Services.AddShiftIdentityBlazorClient(
     appId: "StockPlusPlus-Dev",
     baseUrl: shiftIdentityApiURL!,
-    frontEndBaseUrl: shiftIdentityFrontEndURL!);
+    frontEndBaseUrl: shiftIdentityFrontEndURL!,
+#if (internalShiftIdentityHosting)
+    hostingType: ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.Internal);
+#else
+    hostingType: ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.External,
+    externalIdentityApiUrl: shiftIdentityApiURL);
+#endif
 
 builder.Services.AddShiftIdentityDashboardBlazor(x =>
 {
     x.Title = "StockPlusPlus";
-    x.UseCookieAuth = true;
-#if (internalShiftIdentityHosting)
-    x.ShiftIdentityHostingType = ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.Internal;
-#else
-    x.ShiftIdentityHostingType = ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.External;
-    x.ExternalIdentityApiUrl = shiftIdentityApiURL;
-#endif
 });
 
 
