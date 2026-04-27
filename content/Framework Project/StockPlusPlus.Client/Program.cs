@@ -61,6 +61,7 @@ builder.Services.AddShiftIdentityBlazorClient(
 
 builder.Services.AddShiftIdentityDashboardBlazor(x =>
 {
+    x.LogoPath = "/img/shift-full.png";
     x.Title = "StockPlusPlus";
 });
 
