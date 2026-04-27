@@ -55,8 +55,7 @@ builder.Services.AddShiftIdentityBlazorClient(
 #if (internalShiftIdentityHosting)
     hostingType: ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.Internal);
 #else
-    hostingType: ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.External,
-    externalIdentityApiUrl: shiftIdentityApiURL);
+    hostingType: ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.External);
 #endif
 
 builder.Services.AddShiftIdentityDashboardBlazor(x =>

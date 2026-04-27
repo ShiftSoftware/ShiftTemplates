@@ -402,10 +402,8 @@ builder.Services.AddShiftIdentityBlazorServer(
     frontEndBaseUrl: shiftIdentityFrontEndURL!,
 #if (internalShiftIdentityHosting)
     hostingType: ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.Internal,
-    externalIdentityApiUrl: null,
 #else
     hostingType: ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.External,
-    externalIdentityApiUrl: shiftIdentityApiURL,
 #endif
     configure: options =>
     {
