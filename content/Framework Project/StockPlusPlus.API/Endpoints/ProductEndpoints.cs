@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using ShiftSoftware.ShiftEntity.Web.Endpoints;
@@ -16,9 +17,9 @@ namespace StockPlusPlus.API.Endpoints;
 /// <see cref="Controllers.ProductController"/> (which is kept around with
 /// <c>[NonController]</c> for reference but no longer registered by MVC).
 ///
-/// Uses <c>MapShiftEntitySecureCrud</c> as a drop-in replacement for inheriting
-/// <c>ShiftEntitySecureControllerAsync</c>, plus one hand-written endpoint
-/// (<c>bulk-delete</c>) demonstrating the <c>RequireTypeAuthDelete</c> helper.
+/// Uses <c>MapShiftEntitySecureCrud</c> with an endpoint override to demonstrate
+/// the override pattern — the minimal-API equivalent of overriding a virtual
+/// controller method and calling <c>base.Post()</c>.
 /// </summary>
 public static class ProductEndpoints
 {
@@ -26,9 +27,24 @@ public static class ProductEndpoints
     {
         // Drop-in counterpart of ProductController's base class: same generics,
         // same TypeAuth action, same URL prefix as the (now disabled) controller.
+        //
+        // The configure action demonstrates overriding the GET-single endpoint,
+        // equivalent to overriding GetSingle() in a controller and calling base.GetSingle().
         endpoints.MapShiftEntitySecureCrud<ProductRepository, Data.Entities.Product, ProductListDTO, ProductDTO>(
             "api/product",
-            StockPlusPlusActionTree.Product);
+            StockPlusPlusActionTree.Product,
+            crud =>
+            {
+                crud.OverrideGetSingle(async (original, ctx, key, asOf) =>
+                {
+                    // Example: set a flag on the repository before the default handler runs
+                    var repo = ctx.RequestServices.GetRequiredService<ProductRepository>();
+                    repo.IncludeProductCategoryOnGetIquery = true;
+
+                    // Call the original (default) handler — like base.GetSingle()
+                    return await original(ctx, key, asOf);
+                });
+            });
 
         // Hand-written custom endpoint mirroring ProductController.BulkDelete,
         // showing the TypeAuth endpoint filter used directly.

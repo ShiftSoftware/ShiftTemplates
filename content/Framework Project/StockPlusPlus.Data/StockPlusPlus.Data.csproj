@@ -24,7 +24,7 @@
 		<PackageReference Include="Azure.Storage.Queues" Version="12.25.0" />
 		<PackageReference Include="Mapster" Version="10.0.7" />
 		<PackageReference Include="Riok.Mapperly" Version="4.3.1" />
-		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.13.1" />
+		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.14.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.EFCore" Version="$(ShiftFrameworkVersion)" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.Print" Version="$(ShiftFrameworkVersion)" />
