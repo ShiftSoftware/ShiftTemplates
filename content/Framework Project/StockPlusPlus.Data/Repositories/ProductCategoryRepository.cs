@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using ShiftEntity.Print;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
-using ShiftSoftware.ShiftEntity.Model.HashIds;
 using ShiftSoftware.ShiftIdentity.Core.DTOs.CompanyBranch;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
@@ -16,13 +15,16 @@ namespace StockPlusPlus.Data.Repositories;
 
 public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCategory, ProductCategoryListDTO, ProductCategoryDTO>
 {
+    private readonly IHashIdService hashIdService;
+
     // When an IShiftEntityMapper<ProductCategory, ...> is registered in DI, this constructor is used.
-    public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider, IServiceProvider serviceProvider, IShiftEntityMapper<ProductCategory, ProductCategoryListDTO, ProductCategoryDTO> mapper) : base(db, mapper)
+    public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider, IServiceProvider serviceProvider, IHashIdService hashIdService, IShiftEntityMapper<ProductCategory, ProductCategoryListDTO, ProductCategoryDTO> mapper) : base(db, mapper)
     {
+        this.hashIdService = hashIdService;
     }
 
     // Fallback: when no IShiftEntityMapper is registered, DI uses this constructor (AutoMapper).
-    public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider, IServiceProvider serviceProvider) : base(db, o =>
+    public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider, IServiceProvider serviceProvider, IHashIdService hashIdService) : base(db, o =>
     {
         //o.FilterByCustomValue<List<long>>(x => x.CustomValue.Contains(x.Entity.ID))
         //.ValueProvider(() =>
@@ -42,11 +44,12 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
         //);
     })
     {
+        this.hashIdService = hashIdService;
     }
 
     public override async Task<Stream> PrintAsync(string id)
     {
-        var longId = ShiftEntityHashIdService.Decode<ProductCategoryDTO>(id);
+        var longId = hashIdService.Decode<ProductCategoryDTO>(id);
 
         var item = (await FindAsync(longId, null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true))!;
 
