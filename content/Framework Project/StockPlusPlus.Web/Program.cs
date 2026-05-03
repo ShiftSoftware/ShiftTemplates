@@ -32,7 +32,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp =>
 {
-    var httpClient = new HttpClient(sp.GetRequiredService<TokenMessageHandlerWithAutoRefresh>())
+    var httpClient = new HttpClient(sp.GetRequiredService<TokenMessageHandler>())
     {
         BaseAddress = new Uri(builder.Configuration!.GetValue<string>("BaseURL")!)
     };

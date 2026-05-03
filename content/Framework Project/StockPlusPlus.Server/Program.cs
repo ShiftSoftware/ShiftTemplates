@@ -301,7 +301,7 @@ builder.Services.AddShiftIdentityDashboard<DB>(
         {
             LockDownInMinutes = 0,
             LoginAttemptsForLockDown = 1000000,
-            RequirePasswordChange = false
+            RequirePasswordChange = true
         },
         RefreshToken = new RefreshTokenSettingsModel
         {

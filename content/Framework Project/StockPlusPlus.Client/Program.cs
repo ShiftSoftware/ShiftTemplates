@@ -18,7 +18,9 @@ shiftIdentityFrontEndURL ??= baseUrl; //Fallback to BaseURL if empty
 
 builder.Services.AddScoped(sp =>
 {
-    return new HttpClient()
+    var handler401 = sp.GetRequiredService<ShiftSoftware.ShiftIdentity.Blazor.Handlers.Auth401Handler>();
+    handler401.InnerHandler = new HttpClientHandler();
+    return new HttpClient(handler401)
     {
         BaseAddress = new Uri(baseUrl!)
     };
@@ -79,5 +81,7 @@ var app = builder.Build();
 
 var settingManager = app.Services.GetRequiredService<ShiftSoftware.ShiftBlazor.Services.SettingManager>();
 await settingManager.Setup(true);
+
+await app.RefreshTokenAsync(50);
 
 await app.RunAsync();
