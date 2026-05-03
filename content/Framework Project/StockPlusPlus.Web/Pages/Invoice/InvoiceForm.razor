@@ -9,9 +9,6 @@
 @using Pages.ProductCategory
 @using Pages.Country
 @using StockPlusPlus.Web.Attention
-@using Microsoft.AspNetCore.Components.Forms
-
-@implements IDisposable
 
 @inherits ShiftForm<InvoiceForm, InvoiceDTO>
 @inject ODataQuery odataQuery
@@ -132,9 +129,6 @@
 </ShiftEntityForm>
 
 @code {
-    private EditContext? gracePeriodContext;
-    private DateTimeOffset graceEnd;
-
     private IReadOnlyList<AttentionSignal> ActiveSignals =>
         Attention.GetActive("Invoice", Key?.ToString());
 
@@ -163,48 +157,5 @@
         };
 
         await DialogService.ShowAsync<AttentionHistoryDialog>("Signal history", parameters, options);
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        base.OnAfterRender(firstRender);
-        TryStartDirtyGracePeriod();
-    }
-
-    // See ProductForm — same workaround for the EditContext being spuriously marked modified
-    // by input components firing ValueChanged on their initial post-load render.
-    private void TryStartDirtyGracePeriod()
-    {
-        if (gracePeriodContext != null) return;
-        if (string.IsNullOrEmpty(TheItem?.ID)) return;
-        if (FormContainer?.EditContext is not { } ctx) return;
-
-        gracePeriodContext = ctx;
-        graceEnd = DateTimeOffset.Now.AddSeconds(3);
-        ctx.MarkAsUnmodified();
-        ctx.OnFieldChanged += HandleFieldChangedDuringGrace;
-    }
-
-    private void HandleFieldChangedDuringGrace(object? sender, FieldChangedEventArgs e)
-    {
-        if (sender is not EditContext ctx) return;
-
-        if (DateTimeOffset.Now >= graceEnd)
-        {
-            ctx.OnFieldChanged -= HandleFieldChangedDuringGrace;
-            gracePeriodContext = null;
-            return;
-        }
-
-        ctx.MarkAsUnmodified();
-    }
-
-    public void Dispose()
-    {
-        if (gracePeriodContext != null)
-        {
-            gracePeriodContext.OnFieldChanged -= HandleFieldChangedDuringGrace;
-            gracePeriodContext = null;
-        }
     }
 }
