@@ -49,14 +49,12 @@ using ShiftSoftware.ShiftEntity.Web.Explorer;
 using ShiftSoftware.ShiftEntity.Model.Replication;
 using Microsoft.AspNetCore.OData;
 using ShiftSoftware.TypeAuth.Core;
-using StockPlusPlus.Shared.DTOs.ProductCategory;
-using StockPlusPlus.Shared.DTOs.ProductBrand;
-using ShiftSoftware.ShiftEntity.Model.Dtos;
-using StockPlusPlus.Shared.ActionTrees;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extensions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 #endif
 #if (externalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
+using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 #endif
 
 var builder = WebApplication.CreateBuilder(args);
@@ -287,8 +285,11 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
 builder.Services.AddScoped<ISendEmailVerification, SendEmailService>();
 builder.Services.AddScoped<ISendEmailResetPassword, SendEmailService>();
 
+builder.Services.AddScoped<ShiftSoftware.ShiftIdentity.AspNetCore.Services.TokenService>();
+builder.Services.AddScoped<ShiftSoftware.ShiftIdentity.Core.HashService>();
+
 builder.Services.AddShiftIdentityDashboard<DB>(
-    new ShiftIdentityConfiguration
+    new ShiftSoftware.ShiftIdentity.AspNetCore.ShiftIdentityConfiguration
     {
         ShiftIdentityHostingType = ShiftIdentityHostingTypes.Internal,
         Token = new TokenSettingsModel
@@ -310,7 +311,7 @@ builder.Services.AddShiftIdentityDashboard<DB>(
             Issuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!,
             Key = builder.Configuration.GetValue<string>("Settings:TokenSettings:RefreshTokenKey")!,
         },
-        HashIdSettings = new HashIdSettings
+        HashIdSettings = new ShiftSoftware.ShiftIdentity.AspNetCore.HashIdSettings
         {
             AcceptUnencodedIds = true,
             UserIdsSalt = "k02iUHSb2ier9fiui02349AbfJEI",
@@ -408,8 +409,6 @@ builder.Services.AddShiftIdentityBlazorServer(
     configure: options =>
     {
         options.CookieName = ".StockPlusPlus.Auth";
-        options.JwtIssuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!;
-        options.JwtPublicKeyBase64 = builder.Configuration.GetValue<string>("Settings:TokenSettings:PublicKey")!;
     });
 
 #endregion
@@ -517,10 +516,10 @@ else
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
 }
 
-app.UseAntiforgery();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseAntiforgery();
 
 app.UseCors(x => x.WithOrigins("*").AllowAnyMethod().AllowAnyHeader());
 
@@ -534,7 +533,10 @@ app.MapRazorComponents<StockPlusPlus.Server.Components.App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(
         typeof(StockPlusPlus.Client._Imports).Assembly,
-        typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly);
+#if (internalShiftIdentityHosting)
+        typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly,
+#endif
+        typeof(ShiftSoftware.ShiftIdentity.Blazor.Server.ShiftIdentityBlazorServerMaker).Assembly);
 
 #endregion
 

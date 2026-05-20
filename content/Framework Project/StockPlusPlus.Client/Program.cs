@@ -2,8 +2,11 @@ using BitzArt.Blazor.Cookies;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using ShiftSoftware.ShiftBlazor.Extensions;
 using ShiftSoftware.ShiftEntity.Core.Extensions;
+using ShiftSoftware.ShiftIdentity.Blazor.AuthRefresh;
 using ShiftSoftware.ShiftIdentity.Blazor.Extensions;
+#if (internalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
+#endif
 using ShiftSoftware.TypeAuth.Blazor.Extensions;
 using StockPlusPlus.Shared.ActionTrees;
 using System.Globalization;
@@ -18,7 +21,7 @@ shiftIdentityFrontEndURL ??= baseUrl; //Fallback to BaseURL if empty
 
 builder.Services.AddScoped(sp =>
 {
-    var handler401 = sp.GetRequiredService<ShiftSoftware.ShiftIdentity.Blazor.Handlers.Auth401Handler>();
+    var handler401 = sp.GetRequiredService<ShiftSoftware.ShiftIdentity.Blazor.AuthRefresh.Auth401Handler>();
     handler401.InnerHandler = new HttpClientHandler();
     return new HttpClient(handler401)
     {
@@ -60,11 +63,13 @@ builder.Services.AddShiftIdentityBlazorClient(
     hostingType: ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.External);
 #endif
 
+#if (internalShiftIdentityHosting)
 builder.Services.AddShiftIdentityDashboardBlazor(x =>
 {
     x.LogoPath = "/img/shift-full.png";
     x.Title = "StockPlusPlus";
 });
+#endif
 
 
 builder.Services.AddTypeAuth(x =>

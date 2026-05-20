@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Localization
 @using System.Globalization
 <!DOCTYPE html>
 <html lang="en">
@@ -15,13 +15,13 @@
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     <link href="_content/ShiftSoftware.ShiftBlazor/main.css" rel="stylesheet" />
     <ImportMap />
-    <HeadOutlet @rendermode="RenderMode"/>
+    <HeadOutlet @rendermode="PageRenderMode"/>
 </head>
 
 <body>
-    <Routes @rendermode="RenderMode"/>
+    <Routes @rendermode="PageRenderMode"/>
     <div style="position:fixed; top: 20px; right: 20px; transform:scale(0.5);">
-        <RenderInfoLights @rendermode="RenderMode" />
+        <RenderInfoLights @rendermode="PageRenderMode" />
     </div>
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
@@ -34,9 +34,22 @@
 
 @code {
     [CascadingParameter]
-    private HttpContext? HttpContext { get; set; }
+    private HttpContext HttpContext { get; set; } = default!;
 
-    private IComponentRenderMode RenderMode => new InteractiveWebAssemblyRenderMode();
+    // Pages marked [ExcludeFromInteractiveRouting] (e.g. the cookie-auth login page in
+    // ShiftIdentity.Blazor.Server) get a null render mode so they render with static SSR.
+    // Static SSR is the only render mode where SignInAsync's Set-Cookie header reaches
+    // the browser; everything else runs interactive.
+#if (webAssemblyRenderMode)
+    private IComponentRenderMode? PageRenderMode =>
+        HttpContext.AcceptsInteractiveRouting() ? new InteractiveWebAssemblyRenderMode() : null;
+#elif (autoRenderMode)
+    private IComponentRenderMode? PageRenderMode =>
+        HttpContext.AcceptsInteractiveRouting() ? new InteractiveAutoRenderMode() : null;
+#else
+    private IComponentRenderMode? PageRenderMode =>
+        HttpContext.AcceptsInteractiveRouting() ? new InteractiveServerRenderMode() : null;
+#endif
 
     protected override void OnInitialized()
     {

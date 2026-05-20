@@ -88,7 +88,8 @@
             "**/StockPlusPlus.Shared/Enums/*.cs",
             "**/StockPlusPlus.Test/Tests/*/**",
             "**/StockPlusPlus.Test/Tests/*.cs",
-            "**/StockPlusPlus.Web/Pages/*/**"
+            "**/StockPlusPlus.Web/Pages/*/**",
+            "**/StockPlusPlus.Client/Pages/*/**"
           ],
           "condition": "(!includeSampleApp)"
         },
@@ -197,6 +198,44 @@
       "type": "computed",
       "value": "(shiftIdentityHostingType == External)"
     },
+    "renderMode": {
+      "type": "parameter",
+      "datatype": "choice",
+      "displayName": "Blazor Render Mode",
+      "description": "Controls the interactive render mode used by Blazor Web App pages (StockPlusPlus.Server/Components/App.razor).",
+      "isRequired": false,
+      "defaultValue": "WebAssembly",
+      "choices": [
+        {
+          "choice": "Server",
+          "displayName": "Interactive Server",
+          "description": "Pages render interactively over a SignalR circuit."
+        },
+        {
+          "choice": "WebAssembly",
+          "displayName": "Interactive WebAssembly",
+          "description": "Pages render interactively in the browser via WebAssembly."
+        },
+        {
+          "choice": "Auto",
+          "displayName": "Interactive Auto",
+          "description": "Pages start on the server via SignalR, then switch to WebAssembly on subsequent visits once the runtime has downloaded."
+        }
+      ],
+      "isEnabled": true
+    },
+    "serverRenderMode": {
+      "type": "computed",
+      "value": "(renderMode == \u0022Server\u0022)"
+    },
+    "webAssemblyRenderMode": {
+      "type": "computed",
+      "value": "(renderMode == \u0022WebAssembly\u0022)"
+    },
+    "autoRenderMode": {
+      "type": "computed",
+      "value": "(renderMode == \u0022Auto\u0022)"
+    },
     "externalShiftIdentityApi": {
       "type": "parameter",
       "datatype": "text",
@@ -250,7 +289,7 @@
       "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2025.5.31.2"
+        "value": "2026.01.31.1"
       },
       "datatype": "string",
       "generator": "constant"
@@ -260,7 +299,7 @@
       "description": "Replace AzureFunctionsAspNetCoreAuthorization Version",
       "replaces": "$(AzureFunctionsAspNetCoreAuthorizationVersion)",
       "parameters": {
-        "value": "0.0.12"
+        "value": "0.0.22"
       },
       "datatype": "string",
       "generator": "constant"
@@ -270,12 +309,19 @@
       "description": "Replace TypeAuth Version",
       "replaces": "$(TypeAuthVersion)",
       "parameters": {
-        "value": "1.5.8"
+        "value": "1.6.6"
       },
       "datatype": "string",
       "generator": "constant"
     },
     "includeItemTemplateContent": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value": "true"
+      }
+    },
+    "shiftFrameworkDevelopmentMode": {
       "type": "generated",
       "generator": "constant",
       "parameters": {

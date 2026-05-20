@@ -18,12 +18,22 @@
   <ItemGroup>
 	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.5" />
 	  <PackageReference Include="BitzArt.Blazor.Cookies.Client" Version="1.5.1" />
+	  <PackageReference Include="ShiftSoftware.ShiftBlazor" Version="$(ShiftFrameworkVersion)" />
+	  <PackageReference Include="ShiftSoftware.ShiftIdentity.Blazor" Version="$(ShiftFrameworkVersion)" />
+	  <!--#if(internalShiftIdentityHosting)-->
+	  <PackageReference Include="ShiftSoftware.ShiftIdentity.Dashboard.Blazor" Version="$(ShiftFrameworkVersion)" />
+	  <!--#endif -->
   </ItemGroup>
 
   <ItemGroup>
 	  <ProjectReference Include="..\StockPlusPlus.Shared\StockPlusPlus.Shared.csproj" />
-	  <ProjectReference Include="..\..\..\..\ShiftBlazor\ShiftBlazor\ShiftBlazor.csproj" />
-	  <ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.Blazor\ShiftIdentity.Dashboard.Blazor.csproj" />
+	  <!--#if shiftFrameworkDevelopmentMode-->
+	  <!--#if(internalShiftIdentityHosting)-->
+	  <ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.Blazor\ShiftIdentity.Dashboard.Blazor.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.Blazor\ShiftIdentity.Dashboard.Blazor.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
+	  <!--#endif -->
+	  <ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Blazor\ShiftIdentity.Blazor.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Blazor\ShiftIdentity.Blazor.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
+	  <ProjectReference Include="..\..\..\..\ShiftBlazor\ShiftBlazor\ShiftBlazor.csproj" Condition="Exists('..\..\..\..\ShiftBlazor\ShiftBlazor\ShiftBlazor.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
+	  <!--#endif -->
 	</ItemGroup>
 
 </Project>

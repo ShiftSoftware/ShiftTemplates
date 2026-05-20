@@ -18,8 +18,8 @@
            EnableExport>
 
     <StringFilter Property="x => x.Name" Label="@Loc["Name"]" Operator="ShiftSoftware.ShiftBlazor.Enums.ODataOperator.Contains" lg="3" md="6" sm="12" xs="12" />
-    <ForeignFilter Property="x => x.CityId" Label="@Loc["City"]" DTOType="typeof(CityListDTO)" EntitySet="@($"{ShiftSoftware.ShiftIdentity.Core.Constants.IdentityRoutePreifix}City")" lg="3" md="6" sm="12" xs="12" />
-    <ForeignFilter Property="x => x.CompanyId" Label="@Loc["Company"]" DTOType="typeof(CompanyListDTO)" EntitySet="@($"{ShiftSoftware.ShiftIdentity.Core.Constants.IdentityRoutePreifix}Company")" lg="3" md="6" sm="12" xs="12" />
+    <ForeignFilter Property="x => x.CityId" Label="@Loc["City"]" DTOType="typeof(CityListDTO)" EntitySet="@($"{ShiftSoftware.ShiftIdentity.Core.Constants.IdentityRoutePrefix}City")" lg="3" md="6" sm="12" xs="12" />
+    <ForeignFilter Property="x => x.CompanyId" Label="@Loc["Company"]" DTOType="typeof(CompanyListDTO)" EntitySet="@($"{ShiftSoftware.ShiftIdentity.Core.Constants.IdentityRoutePrefix}Company")" lg="3" md="6" sm="12" xs="12" />
     <StringFilter Property="x => x.IntegrationId" Label="@Loc["Integration ID"]" Operator="ShiftSoftware.ShiftBlazor.Enums.ODataOperator.Contains" lg="3" md="6" sm="12" xs="12" />
 
     <PropertyColumn Title="@Loc["Name"]" Property="x => x.Name" />

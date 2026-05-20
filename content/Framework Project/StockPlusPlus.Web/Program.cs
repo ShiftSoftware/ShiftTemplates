@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Localization;
 using ShiftSoftware.ShiftBlazor.Extensions;
 using ShiftSoftware.ShiftBlazor.Services;
+using ShiftSoftware.ShiftIdentity.Blazor.AuthRefresh;
 using ShiftSoftware.ShiftIdentity.Blazor.Extensions;
 using ShiftSoftware.ShiftIdentity.Blazor.Handlers;
 using ShiftSoftware.TypeAuth.Blazor.Extensions;
