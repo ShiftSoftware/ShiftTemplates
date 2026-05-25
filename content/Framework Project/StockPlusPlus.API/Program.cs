@@ -6,6 +6,9 @@ using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Azure.Cosmos;
+using ShiftSoftware.ShiftEntity.Core.Attention;
+using ShiftSoftware.ShiftEntity.Web.Attention;
+using StockPlusPlus.Data.Evaluators;
 #if (includeSampleApp)
 using StockPlusPlus.Shared.DTOs.Service;
 #endif
@@ -42,6 +45,9 @@ Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
 };
 
 builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
+
+builder.Services.AddAttentionEvaluator<IHasDueDate, FrameworkOverdueEvaluator>();
+builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Invoice, InvoiceMissingReferenceEvaluator>();
 
 // Mapping strategy: controlled by "MappingStrategy" in appsettings.json.
 // "AutoMapper" (default) — uses AutoMapper via the repository's parameterless constructor.
@@ -400,6 +406,7 @@ app.UseRequestLocalization(options =>
 });
 
 app.MapControllers();
+app.MapAttentionEndpoints<DB>();
 
 // Minimal-API surface running side-by-side with the controllers, driven by the same
 // ShiftEntityCrudHandler — proves the refactor is lossless and demonstrates the

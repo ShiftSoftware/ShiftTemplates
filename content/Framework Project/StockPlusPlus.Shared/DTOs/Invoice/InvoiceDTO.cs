@@ -10,6 +10,8 @@ public class InvoiceDTO : ShiftEntityViewAndUpsertDTO
     public override string? ID { get; set; }
     public string ManualReference { get; set; } = default!;
     public DateTimeOffset? InvoiceDate { get; set; }
+    public DateTimeOffset? DueDate { get; set; }
+    public DateTimeOffset? ReleaseDate { get; set; }
     public long InvoiceNo { get; set; }
     [CompanyHashIdConverter]
     public string? CompanyID { get; set; }
@@ -17,12 +19,15 @@ public class InvoiceDTO : ShiftEntityViewAndUpsertDTO
     public List<InvoiceLineDTO> InvoiceLines { get; set; } = new List<InvoiceLineDTO>();
 }
 
-public class InvoiceListDTO : ShiftEntityListDTO
+public class InvoiceListDTO : ShiftEntityListDTO, IHasAttentionSummary
 {
     public override string? ID { get; set; }
     public string ManualReference { get; set; } = default!;
     public DateTimeOffset? InvoiceDate { get; set; }
     public long InvoiceNo { get; set; }
+    public bool HasActiveAttention { get; set; }
+    public int? HighestSeverity { get; set; }
+    public int ActiveSignalCount { get; set; }
 }
 
 public class InvoiceLineDTO : ShiftEntityViewAndUpsertDTO

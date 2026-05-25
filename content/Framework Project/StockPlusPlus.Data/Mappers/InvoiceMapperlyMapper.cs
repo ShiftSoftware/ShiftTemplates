@@ -37,7 +37,9 @@ public partial class InvoiceMapperlyMapper : IShiftEntityMapper<Invoice, Invoice
     [MapperIgnoreSource(nameof(Invoice.IdempotencyKey))]
     [MapperIgnoreSource(nameof(Invoice.CityID))]
     [MapperIgnoreSource(nameof(Invoice.CountryID))]
-    [MapperIgnoreSource(nameof(Invoice.ReleaseDate))]
+    [MapperIgnoreSource(nameof(Invoice.HasActiveAttention))]
+    [MapperIgnoreSource(nameof(Invoice.HighestSeverity))]
+    [MapperIgnoreSource(nameof(Invoice.ActiveSignalCount))]
     [MapperIgnoreSource(nameof(Invoice.CreatedByUserID))]
     [MapperIgnoreSource(nameof(Invoice.LastSavedByUserID))]
     [MapperIgnoreTarget(nameof(InvoiceDTO.ID))]
@@ -84,8 +86,10 @@ public partial class InvoiceMapperlyMapper : IShiftEntityMapper<Invoice, Invoice
     [MapperIgnoreTarget(nameof(Invoice.IdempotencyKey))]
     [MapperIgnoreTarget(nameof(Invoice.CityID))]
     [MapperIgnoreTarget(nameof(Invoice.CountryID))]
-    [MapperIgnoreTarget(nameof(Invoice.ReleaseDate))]
     [MapperIgnoreTarget(nameof(Invoice.InvoiceNo))]
+    [MapperIgnoreTarget(nameof(Invoice.HasActiveAttention))]
+    [MapperIgnoreTarget(nameof(Invoice.HighestSeverity))]
+    [MapperIgnoreTarget(nameof(Invoice.ActiveSignalCount))]
     [MapperIgnoreTarget(nameof(Invoice.CreatedByUserID))]
     [MapperIgnoreTarget(nameof(Invoice.LastSavedByUserID))]
     [MapperIgnoreSource(nameof(InvoiceDTO.ID))]
@@ -110,6 +114,8 @@ public partial class InvoiceMapperlyMapper : IShiftEntityMapper<Invoice, Invoice
             InvoiceDate = e.InvoiceDate,
             InvoiceNo = e.InvoiceNo,
             IsDeleted = e.IsDeleted,
+            HasActiveAttention = e.HasActiveAttention,
+            HighestSeverity = (int?)e.HighestSeverity,
         });
     }
 

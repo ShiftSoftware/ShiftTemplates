@@ -1,4 +1,5 @@
 ﻿using ShiftSoftware.ShiftEntity.Core;
+using ShiftSoftware.ShiftEntity.Core.Attention;
 using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model.Flags;
 using StockPlusPlus.Shared.Enums;
@@ -19,20 +20,27 @@ public class Invoice : ShiftEntity<Invoice>,
     IEntityHasCompanyBranch<Invoice>,
     IEntityHasIdempotencyKey<Invoice>,
     IEntityHasCity<Invoice>,
-    IEntityHasUniqueHash<Invoice>
+    IEntityHasUniqueHash<Invoice>,
+    IHasIndexedAttention,
+    IHasDueDate
 {
     public string? ManualReference { get; set; }
     public DateTimeOffset? InvoiceDate { get; set; }
     public long InvoiceNo { get; set; }
 
-
     public DateTimeOffset? ReleaseDate { get; set; }
+    public DateTimeOffset? DueDate { get; set; }
     public long? RegionID { get; set; }
     public long? CompanyID { get; set; }
     public long? CompanyBranchID { get; set; }
     public Guid? IdempotencyKey { get; set; }
     public long? CityID { get; set; }
     public long? CountryID { get; set; }
+
+    // IHasAttention — framework-maintained summary columns
+    public bool HasActiveAttention { get; set; }
+    public AttentionSeverity? HighestSeverity { get; set; }
+    public int ActiveSignalCount { get; set; }
 
     public virtual ICollection<InvoiceLine> InvoiceLines { get; set; } = new HashSet<InvoiceLine>();
 

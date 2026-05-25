@@ -12,6 +12,8 @@ public class InvoiceMapper : IShiftEntityMapper<Invoice, InvoiceListDTO, Invoice
         {
             ManualReference = entity.ManualReference ?? "",
             InvoiceDate = entity.InvoiceDate,
+            DueDate = entity.DueDate,
+            ReleaseDate = entity.ReleaseDate,
             InvoiceNo = entity.InvoiceNo,
             CompanyID = entity.CompanyID?.ToString(),
 
@@ -34,6 +36,8 @@ public class InvoiceMapper : IShiftEntityMapper<Invoice, InvoiceListDTO, Invoice
     {
         existing.ManualReference = dto.ManualReference;
         existing.InvoiceDate = dto.InvoiceDate;
+        existing.DueDate = dto.DueDate;
+        existing.ReleaseDate = dto.ReleaseDate;
 
         // Collection mapping: DTO children → entity children
         // Note: InvoiceRepository.UpsertAsync handles delete-and-recreate,
@@ -57,6 +61,8 @@ public class InvoiceMapper : IShiftEntityMapper<Invoice, InvoiceListDTO, Invoice
             InvoiceDate = e.InvoiceDate,
             InvoiceNo = e.InvoiceNo,
             IsDeleted = e.IsDeleted,
+            HasActiveAttention = e.HasActiveAttention,
+            HighestSeverity = (int?)e.HighestSeverity,
         });
     }
 

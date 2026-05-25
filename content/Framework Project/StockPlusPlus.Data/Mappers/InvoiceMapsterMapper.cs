@@ -29,7 +29,7 @@ public class InvoiceMapsterMapper : IShiftEntityMapper<Invoice, InvoiceListDTO, 
             }).ToList());
 
         config.ViewToEntity<InvoiceDTO, Invoice>()
-            .Ignore(d => d.ReleaseDate!, d => d.InvoiceNo)
+            .Ignore(d => d.InvoiceNo, d => d.HasActiveAttention, d => d.HighestSeverity!, d => d.ActiveSignalCount)
             .AfterMapping((dto, entity) =>
             {
                 entity.InvoiceLines = dto.InvoiceLines.Select(lineDto => new InvoiceLine
@@ -41,7 +41,8 @@ public class InvoiceMapsterMapper : IShiftEntityMapper<Invoice, InvoiceListDTO, 
             });
 
         config.EntityToList<Invoice, InvoiceListDTO>()
-            .Map(d => d.ManualReference, s => s.ManualReference ?? "");
+            .Map(d => d.ManualReference, s => s.ManualReference ?? "")
+            .Map(d => d.HighestSeverity, s => (int?)s.HighestSeverity);
 
         config.EntityCopy<Invoice>();
 
