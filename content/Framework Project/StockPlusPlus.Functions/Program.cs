@@ -67,11 +67,13 @@ var host = new HostBuilder()
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
         services
-        .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")!));
+        .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")!)
+            .UseTemporal(true));
 
         services.AddMvc().AddShiftEntityWeb(x =>
         {
             x.AddDataAssembly(typeof(StockPlusPlus.Data.Marker).Assembly);
+            x.AddAutoMapper(typeof(StockPlusPlus.Data.Marker).Assembly);
             x.HashId.RegisterHashId(false);
 
             var azureStorageAccounts = new List<ShiftSoftware.ShiftEntity.Core.Services.AzureStorageOption>();
@@ -79,6 +81,9 @@ var host = new HostBuilder()
             hostBuilder.Configuration.Bind("AzureStorageAccounts", azureStorageAccounts);
 
             x.AddAzureStorage(azureStorageAccounts.ToArray());
+#if (internalShiftIdentityHosting)
+            x.AddAutoMapper(typeof(ShiftSoftware.ShiftIdentity.Data.Marker).Assembly);
+#endif
         });
 
 #if (includeSampleApp)
