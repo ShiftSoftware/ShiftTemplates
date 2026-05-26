@@ -39,6 +39,9 @@ public partial class ProductMapperlyMapper : IShiftEntityMapper<Product, Product
     [MapperIgnoreSource(nameof(Product.CountryID))]
     [MapperIgnoreSource(nameof(Product.CreatedByUserID))]
     [MapperIgnoreSource(nameof(Product.LastSavedByUserID))]
+    [MapperIgnoreSource(nameof(Product.HasActiveAttention))]
+    [MapperIgnoreSource(nameof(Product.HighestSeverity))]
+    [MapperIgnoreSource(nameof(Product.ActiveSignalCount))]
     [MapperIgnoreTarget(nameof(ProductDTO.ID))]
     [MapperIgnoreTarget(nameof(ProductDTO.IsDeleted))]
     [MapperIgnoreTarget(nameof(ProductDTO.CreateDate))]
@@ -83,6 +86,9 @@ public partial class ProductMapperlyMapper : IShiftEntityMapper<Product, Product
     [MapperIgnoreTarget(nameof(Product.CountryID))]
     [MapperIgnoreTarget(nameof(Product.CreatedByUserID))]
     [MapperIgnoreTarget(nameof(Product.LastSavedByUserID))]
+    [MapperIgnoreTarget(nameof(Product.HasActiveAttention))]
+    [MapperIgnoreTarget(nameof(Product.HighestSeverity))]
+    [MapperIgnoreTarget(nameof(Product.ActiveSignalCount))]
     [MapperIgnoreSource(nameof(ProductDTO.ID))]
     [MapperIgnoreSource(nameof(ProductDTO.IsDeleted))]
     [MapperIgnoreSource(nameof(ProductDTO.CreateDate))]
@@ -114,6 +120,8 @@ public partial class ProductMapperlyMapper : IShiftEntityMapper<Product, Product
             ProductCategoryID = p.ProductCategoryID.ToString(),
             ProductBrandID = p.ProductBrandID.ToString(),
             CityID = p.CityID.HasValue ? p.CityID.Value.ToString() : null,
+            HasActiveAttention = p.HasActiveAttention,
+            HighestSeverity = (int?)p.HighestSeverity,
         });
     }
 

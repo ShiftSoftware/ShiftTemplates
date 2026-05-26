@@ -11,7 +11,7 @@ using System.Text.Json.Serialization;
 namespace StockPlusPlus.Shared.DTOs.Product;
 
 [ShiftEntityKeyAndName(nameof(ID), nameof(Name))]
-public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO>
+public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO>, IHasAttentionSummary
 {
     [_ProductHashId]
     public override string? ID { get; set; }
@@ -38,6 +38,10 @@ public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO
     [CityHashIdConverter]
     public string? CityID { get; set; }
     public CityListDTO? City { get; set; }
+    public bool HasActiveAttention { get; set; }
+    public int? HighestSeverity { get; set; }
+    public int ActiveSignalCount { get; set; }
+
     public string? CustomID
     {
         get

@@ -16,6 +16,7 @@ public class ProductMapsterMapper : IShiftEntityMapper<Product, ProductListDTO, 
         config.EntityToView<Product, ProductDTO>();
 
         config.ViewToEntity<ProductDTO, Product>()
+            .Ignore(d => d.HasActiveAttention, d => d.HighestSeverity!, d => d.ActiveSignalCount)
             .Map(d => d.IsDraft, s => s.IsDraft ?? false);
 
         // Only "Category" needs explicit mapping (name mismatch with ProductCategory.Name).
