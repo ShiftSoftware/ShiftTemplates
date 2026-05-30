@@ -2,8 +2,24 @@
 	<PropertyGroup>
 		<DefineConstants>shiftFrameworkDevelopmentMode;includeSampleApp;internalShiftIdentityHosting;includeItemTemplateContent</DefineConstants>
 		<ImportShiftFrameworkProjects>true</ImportShiftFrameworkProjects>
-		<ShiftFrameworkVersion>2026.05.30.2</ShiftFrameworkVersion>
+		<ShiftFrameworkVersion>2026.05.30.3</ShiftFrameworkVersion>
 		<TypeAuthVersion>1.6.17</TypeAuthVersion>
 		<AzureFunctionsAspNetCoreAuthorizationVersion>0.0.29</AzureFunctionsAspNetCoreAuthorizationVersion>
+	</PropertyGroup>
+
+	<!--
+		Emit an XML documentation file next to each assembly. SDK-style projects pack this
+		file into the NuGet package's lib/{tfm}/ folder automatically, so the doc comments
+		(summaries, parameter descriptions) surface in consumers' IntelliSense and feed the
+		docs site (Docs.Web's XmlDocService). Imported by every framework project, so this
+		turns docs on framework-wide in one place.
+
+		CS1591 (missing XML comment for a publicly visible member) is suppressed: enabling
+		doc generation across the whole framework would otherwise flood every build with a
+		warning per undocumented public member. We want the file generated, not enforced docs.
+	-->
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);CS1591</NoWarn>
 	</PropertyGroup>
 </Project>
