@@ -5,7 +5,7 @@ using StockPlusPlus.Shared.DTOs.Product;
 
 namespace StockPlusPlus.Shared.DTOs.Invoice;
 
-public class InvoiceDTO : ShiftEntityViewAndUpsertDTO
+public class InvoiceDTO : ShiftEntityViewAndUpsertDTO, IHasAttentionSignals
 {
     public override string? ID { get; set; }
     public string ManualReference { get; set; } = default!;

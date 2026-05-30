@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace StockPlusPlus.Shared.DTOs.Product;
 
-public class ProductDTO : ShiftEntityViewAndUpsertDTO, IHasDraftCheckBox<ProductDTO>
+public class ProductDTO : ShiftEntityViewAndUpsertDTO, IHasDraftCheckBox<ProductDTO>, IHasAttentionSignals
 {
     [_ProductHashId]
     public override string? ID { get; set; }
