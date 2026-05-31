@@ -48,7 +48,7 @@ public class CreateProject
         if (!string.IsNullOrWhiteSpace(externalIdentityFrontEnd))
             args += $" --externalShiftIdentityFrontEnd \"{externalIdentityFrontEnd}\"";
 
-        var process = Process.Start("dotnet", args);
+        using var process = Process.Start("dotnet", args);
         process!.WaitForExit(-1);
 
         PostProcessServer(outputFolder, serverPort, serverHostname, identityType);

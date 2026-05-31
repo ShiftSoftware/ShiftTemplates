@@ -29,9 +29,8 @@ public class PackAndInstallTemplate
         if (Directory.Exists($"{projectPath}/bin/packed"))
             Directory.Delete($"{projectPath}/bin/packed", true);
 
-        Process process = Process.Start("dotnet", $"pack {fullPath} --no-build --configuration Release --no-build --output {projectPath}/bin/packed");
-        //wait for the above process to complete before writing to console
-        process.WaitForExit(-1);
+        using var process = Process.Start("dotnet", $"pack {fullPath} --no-build --configuration Release --no-build --output {projectPath}/bin/packed");
+        process!.WaitForExit(-1);
 
         Console.WriteLine();
         Console.WriteLine();
@@ -44,9 +43,8 @@ public class PackAndInstallTemplate
         Console.WriteLine();
         Console.WriteLine();
 
-        Process process = Process.Start("dotnet", $"new uninstall ShiftSoftware.ShiftTemplates");
-        //wait for the above process to complete before writing to console
-        process.WaitForExit(-1);
+        using var process = Process.Start("dotnet", $"new uninstall ShiftSoftware.ShiftTemplates");
+        process!.WaitForExit(-1);
 
         Console.WriteLine();
         Console.WriteLine();
@@ -61,9 +59,8 @@ public class PackAndInstallTemplate
 
         var packagePath = System.IO.Directory.GetFiles($"{projectPath}/bin/packed").FirstOrDefault();
 
-        Process process = Process.Start("dotnet", $"new install {packagePath} --force");
-        //wait for the above process to complete before writing to console
-        process.WaitForExit(-1);
+        using var process = Process.Start("dotnet", $"new install {packagePath} --force");
+        process!.WaitForExit(-1);
 
         Console.WriteLine();
         Console.WriteLine();

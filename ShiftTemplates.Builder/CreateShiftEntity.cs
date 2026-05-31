@@ -17,9 +17,8 @@ public class CreateShiftEntity
 
         var project = Path.GetFullPath($"{path}/Test.sln");
 
-        Process process = Process.Start("dotnet", $"new shiftentity --project {project} --output {path} --solution Test --name ToDo");
-        //wait for the above process to complete before writing to console
-        process.WaitForExit(-1);
+        using var process = Process.Start("dotnet", $"new shiftentity --project {project} --output {path} --solution Test --name ToDo");
+        process!.WaitForExit(-1);
 
 
         Console.WriteLine();

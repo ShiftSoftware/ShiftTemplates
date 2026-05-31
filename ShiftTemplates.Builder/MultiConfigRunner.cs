@@ -76,50 +76,94 @@ public class MultiConfigRunner
             return;
         }
 
-        var processes = new List<(string label, string url, Process proc)>();
+        Console.WriteLine();
+        Console.WriteLine("=====================================================================");
+        Console.WriteLine("Building all projects before launch...");
+        Console.WriteLine("=====================================================================");
+        Console.WriteLine();
+
+        var projectsToBuild = new List<(string label, string folder)>();
 
         foreach (var cfg in configs)
         {
             var folder = ResolveFolder(projectPath, cfg.FolderSuffix);
-            var serverProject = Path.Combine(folder, "Test.Server");
-            var proc = StartDotnetRun(serverProject);
-            processes.Add(($"Server  {cfg.FolderSuffix}", $"https://{cfg.Hostname}:{cfg.Port}", proc));
+            projectsToBuild.Add(($"Server  {cfg.FolderSuffix}", Path.Combine(folder, "Test.Server")));
         }
 
-        // Standalone WASM Web runs from the Internal-Server folder, pointing at IntSrv:5101.
-        // Web itself stays http (JWT/localStorage; no Secure-cookie constraint).
+        projectsToBuild.Add(("Web     Standalone", Path.Combine(ResolveFolder(projectPath, "Internal-Server"), "Test.Web")));
+
+        foreach (var (label, folder) in projectsToBuild)
         {
-            var folder = ResolveFolder(projectPath, "Internal-Server");
-            var webProject = Path.Combine(folder, "Test.Web");
-            var proc = StartDotnetRun(webProject);
-            processes.Add(("Web     Standalone", $"http://{Web}:{WebPort}", proc));
+            Console.WriteLine($"  Building {label}...");
+            RunDotnet("build", workingDirectory: folder);
         }
 
         Console.WriteLine();
-        Console.WriteLine("=====================================================================");
-        Console.WriteLine("All 5 processes started. Press ENTER to stop them.");
-        Console.WriteLine("=====================================================================");
-        Console.WriteLine();
-        foreach (var p in processes)
-            Console.WriteLine($"  {p.label,-32}  {p.url}");
-        Console.WriteLine();
 
-        Console.ReadLine();
+        var processes = new List<(string label, string url, Process proc)>();
 
-        Console.WriteLine("Stopping processes...");
-        foreach (var p in processes)
+        void KillAll()
         {
-            try
+            foreach (var p in processes)
             {
-                if (!p.proc.HasExited)
-                    p.proc.Kill(entireProcessTree: true);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"  Failed to kill {p.label}: {ex.Message}");
+                try
+                {
+                    if (!p.proc.HasExited)
+                        p.proc.Kill(entireProcessTree: true);
+                }
+                catch { }
+                finally
+                {
+                    p.proc.Dispose();
+                }
             }
         }
-        Console.WriteLine("Done.");
+
+        Console.CancelKeyPress += (_, e) =>
+        {
+            e.Cancel = true;
+            KillAll();
+            Environment.Exit(0);
+        };
+
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => KillAll();
+
+        try
+        {
+            foreach (var cfg in configs)
+            {
+                var folder = ResolveFolder(projectPath, cfg.FolderSuffix);
+                var serverProject = Path.Combine(folder, "Test.Server");
+                var proc = StartDotnetRun(serverProject);
+                processes.Add(($"Server  {cfg.FolderSuffix}", $"https://{cfg.Hostname}:{cfg.Port}", proc));
+            }
+
+            // Standalone WASM Web runs from the Internal-Server folder, pointing at IntSrv:5101.
+            // Web itself stays http (JWT/localStorage; no Secure-cookie constraint).
+            {
+                var folder = ResolveFolder(projectPath, "Internal-Server");
+                var webProject = Path.Combine(folder, "Test.Web");
+                var proc = StartDotnetRun(webProject);
+                processes.Add(("Web     Standalone", $"http://{Web}:{WebPort}", proc));
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("=====================================================================");
+            Console.WriteLine("All 5 processes started. Press ENTER or Ctrl+C to stop them.");
+            Console.WriteLine("=====================================================================");
+            Console.WriteLine();
+            foreach (var p in processes)
+                Console.WriteLine($"  {p.label,-32}  {p.url}");
+            Console.WriteLine();
+
+            Console.ReadLine();
+        }
+        finally
+        {
+            Console.WriteLine("Stopping processes...");
+            KillAll();
+            Console.WriteLine("Done.");
+        }
     }
 
     private static string ResolveFolder(string projectPath, string suffix)
@@ -248,7 +292,7 @@ public class MultiConfigRunner
         var psi = new ProcessStartInfo
         {
             FileName = "dotnet",
-            Arguments = "run",
+            Arguments = "run --no-build",
             WorkingDirectory = projectFolder,
             UseShellExecute = false,
             CreateNoWindow = false,
