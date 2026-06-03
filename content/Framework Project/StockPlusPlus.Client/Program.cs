@@ -54,7 +54,6 @@ builder.Services.AddShiftBlazor(config =>
 });
 
 builder.Services.AddShiftIdentityBlazorClient(
-    appId: "StockPlusPlus-Dev",
     baseUrl: shiftIdentityApiURL!,
     frontEndBaseUrl: shiftIdentityFrontEndURL!,
 #if (internalShiftIdentityHosting)
