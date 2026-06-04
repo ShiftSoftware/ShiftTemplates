@@ -39,7 +39,6 @@ using AutoMapper;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
 using ShiftSoftware.ShiftIdentity.Core.Entities;
-using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
 using ShiftSoftware.ShiftIdentity.AspNetCore;
 using ShiftSoftware.ShiftEntity.Model.Enums;
 using StockPlusPlus.Shared.Localization;
@@ -51,6 +50,7 @@ using Microsoft.AspNetCore.OData;
 using ShiftSoftware.TypeAuth.Core;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extensions;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using ShiftSoftware.ShiftIdentity.Dashboard.Blazor;
 #endif
 #if (externalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
@@ -254,7 +254,7 @@ builder.Services
 
 #region ShiftIdentity Dashboard
 
-builder.Services.AddShiftIdentityDashboardBlazor(x =>
+builder.Services.AddOptions<ShiftIdentityDashboardBlazorOptions>().Configure(x =>
 {
     x.LogoPath = "/img/shift-full.png";
     x.Title = "StockPlusPlus";
