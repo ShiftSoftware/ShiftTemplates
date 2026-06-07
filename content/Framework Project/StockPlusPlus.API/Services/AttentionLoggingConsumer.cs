@@ -18,8 +18,13 @@ public sealed class AttentionLoggingConsumer : IAttentionConsumer
 
     public Task HandleAsync(AttentionRaised attentionRaised, CancellationToken cancellationToken)
     {
+        // The ANSI escapes render a black-on-yellow " ⚡ ATTENTION " badge in any VT-capable
+        // terminal (Windows Terminal, VS Code), making the line easy to spot in a busy
+        // console. Demo-only trick: if this logger ever feeds a non-console sink (file,
+        // Seq, App Insights), the escapes arrive as raw garbage there — a real consumer
+        // should log plain text and leave highlighting to the sink/terminal.
         logger.LogInformation(
-            "Attention raised on {EntityType}/{EntityId}: [{Severity}] {Source}/{Category} — {Reason}",
+            "\x1b[1;30;43m ⚡ ATTENTION raised on {EntityType}/{EntityId}: [{Severity}] {Source}/{Category} — {Reason}\u001b[0m",
             attentionRaised.EntityType,
             attentionRaised.EntityId,
             attentionRaised.Signal.Severity,
