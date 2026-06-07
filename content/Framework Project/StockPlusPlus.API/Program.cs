@@ -49,6 +49,12 @@ builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Ass
 builder.Services.AddAttentionEvaluator<IHasDueDate, FrameworkOverdueEvaluator>();
 builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Invoice, InvoiceMissingReferenceEvaluator>();
 
+// Phase 2 emission: once a save that raised attention signals commits, the framework
+// publishes one AttentionRaised event per new signal to the registered consumers (on a
+// background drain loop — consumer latency never affects the save). This sample consumer
+// just logs each event; a real one would send email / push / audit instead.
+builder.Services.AddAttentionConsumer<StockPlusPlus.API.Services.AttentionLoggingConsumer>();
+
 // Mapping strategy: controlled by "MappingStrategy" in appsettings.json.
 // "AutoMapper" (default) — uses AutoMapper via the repository's parameterless constructor.
 // "Manual" — registers hand-written IShiftEntityMapper implementations; DI injects them into repositories.
