@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.Core.Attention;
 using ShiftSoftware.ShiftEntity.EFCore.Entities;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Data.Repositories;
+using System.Net;
 
 namespace StockPlusPlus.Test.Tests;
 
@@ -348,6 +350,61 @@ public class AttentionTests
 
         Assert.NotEmpty(activeSignals);
         Assert.Contains(activeSignals, s => s.Category == "Overdue");
+    }
+
+    [Fact]
+    public async Task ClearEndpoint_ReturnsFreshStamp_SoSubsequentPutDoesNotConflict()
+    {
+        // Stabilization regression: clearing attention updates the entity row, advancing
+        // LastSaveDate — which doubles as the optimistic-concurrency version. A form that
+        // loaded the entity before the clear holds the stale stamp, so its save (PUT) was
+        // rejected as a conflict. The clear endpoint now returns the post-clear stamp;
+        // patching it onto the loaded DTO (what ShiftEntityForm does) makes the save pass.
+
+        using var scope = factory.Services.CreateScope();
+        var repo = scope.ServiceProvider.GetRequiredService<InvoiceRepository>();
+
+        var invoice = new Invoice
+        {
+            InvoiceDate = DateTimeOffset.UtcNow.AddDays(-10),
+            DueDate = DateTimeOffset.UtcNow.AddDays(-5),
+            ManualReference = "ATT-CLEAR-STAMP",
+            InvoiceNo = DateTimeOffset.UtcNow.Ticks + 900,
+        };
+
+        repo.Add(invoice);
+        await repo.SaveChangesAsync();
+        Assert.True(invoice.HasActiveAttention);
+
+        var key = scope.ServiceProvider.GetRequiredService<IHashIdService>()
+            .Encode<StockPlusPlus.Shared.DTOs.Invoice.InvoiceDTO>(invoice.ID);
+
+        var client = factory.CreateClient();
+
+        // 1. Load the DTO as a form would — it carries the pre-clear concurrency stamp.
+        var getRes = await client.GetAsync($"api/Invoice/{key}");
+        Assert.Equal(HttpStatusCode.OK, getRes.StatusCode);
+        var dto = JsonNode.Parse(await getRes.Content.ReadAsStringAsync())!["entity"]!;
+
+        // 2. Clear attention — the row changes, so its stamp advances past the loaded one.
+        var clearRes = await client.PostAsync($"api/Invoice/{key}/attention/clear", null);
+        Assert.Equal(HttpStatusCode.OK, clearRes.StatusCode);
+        var clearBody = JsonNode.Parse(await clearRes.Content.ReadAsStringAsync())!;
+        var freshStamp = clearBody["lastSaveDate"];
+        Assert.NotNull(freshStamp);
+
+        // 3. Saving with the stale stamp is the reported bug — a version conflict.
+        using var stalePut = await client.PutAsync($"api/Invoice/{key}",
+            new StringContent(dto.ToJsonString(), Encoding.UTF8, "application/json"));
+        output.WriteLine($"PUT with stale stamp: {(int)stalePut.StatusCode}");
+        Assert.Equal(HttpStatusCode.Conflict, stalePut.StatusCode);
+
+        // 4. Patch the stamp from the clear response → the same save passes.
+        dto["lastSaveDate"] = freshStamp.DeepClone();
+        using var patchedPut = await client.PutAsync($"api/Invoice/{key}",
+            new StringContent(dto.ToJsonString(), Encoding.UTF8, "application/json"));
+        output.WriteLine($"PUT with patched stamp: {(int)patchedPut.StatusCode}");
+        Assert.Equal(HttpStatusCode.OK, patchedPut.StatusCode);
     }
 
     [Fact]
