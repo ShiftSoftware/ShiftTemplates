@@ -7,6 +7,12 @@ using StockPlusPlus.Shared.DTOs.Product;
 
 namespace StockPlusPlus.API.Controllers;
 
+// Disabled — served by StockPlusPlus.API.Endpoints.ProductEndpoints (minimal API)
+// at the exact same /api/product URLs. [NonController] tells MVC's controller
+// discovery to skip this class, so MapControllers() never registers its routes.
+// The class is kept (not deleted) for reference while the minimal-API surface
+// proves itself in production.
+[NonController]
 [Route("api/[controller]")]
 public class ProductController(ProductRepository productRepository) :
     ShiftEntitySecureControllerAsync<ProductRepository, Data.Entities.Product, ProductListDTO, ProductDTO>(StockPlusPlusActionTree.Product)

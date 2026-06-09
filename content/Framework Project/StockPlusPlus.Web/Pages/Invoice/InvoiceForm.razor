@@ -27,11 +27,19 @@
                           For="@(() => TheItem.ManualReference)" />
 
     <ShiftDateTimePicker Clearable
-                         Label="DateTime Picker"
-                         Adornment="Adornment.End"
-                         OnAdornmentClick="() => Console.WriteLine(234)"
+                         Label="Invoice Date"
                          @bind-DateTimeOffset="TheItem.InvoiceDate"
                          For="() => TheItem.InvoiceDate" />
+
+    <ShiftDateTimePicker Clearable
+                         Label="Due Date"
+                         @bind-DateTimeOffset="TheItem.DueDate"
+                         For="() => TheItem.DueDate" />
+
+    <ShiftDateTimePicker Clearable
+                         Label="Release Date"
+                         @bind-DateTimeOffset="TheItem.ReleaseDate"
+                         For="() => TheItem.ReleaseDate" />
 
     <MultiItemField DisableDragAndDrop="false" ControlVariant="Variant.Filled" Min="3" Title="Lines" @bind-Value="TheItem.InvoiceLines" T="InvoiceLineDTO">
         

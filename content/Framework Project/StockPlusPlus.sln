@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.1.11312.151
+VisualStudioVersion = 18.4.11612.150
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockPlusPlus.API", "StockPlusPlus.API\StockPlusPlus.API.csproj", "{55183F24-9642-44F3-B930-D547980F3E97}"
 EndProject
@@ -14,6 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftFramework", "ShiftFramework", "{6B5137B3-F21C-483E-B131-54706EE91D55}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\azure-pipeline.yml = ..\..\azure-pipeline.yml
+		..\..\CLAUDE.md = ..\..\CLAUDE.md
 		..\..\ImportAndReferenceAll.bat = ..\..\ImportAndReferenceAll.bat
 		..\..\RemoveAll.bat = ..\..\RemoveAll.bat
 		..\..\ShiftFrameworkGlobalSettings.props = ..\..\ShiftFrameworkGlobalSettings.props
@@ -37,6 +38,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftEntity.CosmosDbReplication", "..\..\..\ShiftEntity\ShiftEntity.CosmosDbReplication\ShiftEntity.CosmosDbReplication.csproj", "{466D04A7-5091-4749-81DE-1368B700387C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftEntity.Print", "..\..\..\ShiftEntity\ShiftEntity.Print\ShiftEntity.Print.csproj", "{6B77774B-52DB-43BF-BE14-7D43F87B1878}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftEntity.Tests", "..\..\..\ShiftEntity\ShiftEntity.Tests\ShiftEntity.Tests.csproj", "{7A3C1E9D-4B82-4F16-9C5A-2E8D6B1F0A77}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftBlazor", "ShiftBlazor", "{1910940D-D140-4B3F-A2F5-6D322EFAC152}"
 EndProject
@@ -93,6 +96,17 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docs.Data", "..\..\..\ShiftFrameworkDocumentation\Docs.Data\Docs.Data.csproj", "{5A89825E-4826-2C7F-CA42-D5CCE221D310}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docs.SnippetGen", "..\..\..\ShiftFrameworkDocumentation\Docs.SnippetGen\Docs.SnippetGen.csproj", "{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{ECA9B174-291C-48BE-8C9D-1EF77628A1CD}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftEntity\docs\mapping-abstraction-plan.md = ..\..\..\ShiftEntity\docs\mapping-abstraction-plan.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnifiedAttestation", "UnifiedAttestation", "{56C29A79-3285-4154-B35B-C452EC980EB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnifiedAttestation", "..\..\..\UnifiedAttestation\UnifiedAttestation\UnifiedAttestation.csproj", "{1DD3F99C-1A0D-364A-44D2-847659E74ADB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnifiedAttestation.Functions", "..\..\..\UnifiedAttestation\UnifiedAttestation.Functions\UnifiedAttestation.Functions.csproj", "{8F23E4DA-4EBE-32D3-9B8E-DF68CEC2B273}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockPlusPlus.Server", "StockPlusPlus.Server\StockPlusPlus.Server.csproj", "{CF2FF704-DE5D-4B2E-B398-578D3CB0AF8B}"
 EndProject
@@ -154,6 +168,10 @@ Global
 		{6B77774B-52DB-43BF-BE14-7D43F87B1878}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B77774B-52DB-43BF-BE14-7D43F87B1878}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B77774B-52DB-43BF-BE14-7D43F87B1878}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A3C1E9D-4B82-4F16-9C5A-2E8D6B1F0A77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A3C1E9D-4B82-4F16-9C5A-2E8D6B1F0A77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A3C1E9D-4B82-4F16-9C5A-2E8D6B1F0A77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A3C1E9D-4B82-4F16-9C5A-2E8D6B1F0A77}.Release|Any CPU.Build.0 = Release|Any CPU
 		{744DA0F0-87B2-438A-A729-BAED65C9B780}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{744DA0F0-87B2-438A-A729-BAED65C9B780}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{744DA0F0-87B2-438A-A729-BAED65C9B780}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -238,6 +256,14 @@ Global
 		{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DD3F99C-1A0D-364A-44D2-847659E74ADB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DD3F99C-1A0D-364A-44D2-847659E74ADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DD3F99C-1A0D-364A-44D2-847659E74ADB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DD3F99C-1A0D-364A-44D2-847659E74ADB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F23E4DA-4EBE-32D3-9B8E-DF68CEC2B273}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F23E4DA-4EBE-32D3-9B8E-DF68CEC2B273}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F23E4DA-4EBE-32D3-9B8E-DF68CEC2B273}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F23E4DA-4EBE-32D3-9B8E-DF68CEC2B273}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CF2FF704-DE5D-4B2E-B398-578D3CB0AF8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CF2FF704-DE5D-4B2E-B398-578D3CB0AF8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF2FF704-DE5D-4B2E-B398-578D3CB0AF8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -262,6 +288,7 @@ Global
 		{30B28AC2-8CB0-45D7-AD5A-51914178971E} = {221AA4A6-F48E-4605-90FC-ACCE31C9397D}
 		{466D04A7-5091-4749-81DE-1368B700387C} = {221AA4A6-F48E-4605-90FC-ACCE31C9397D}
 		{6B77774B-52DB-43BF-BE14-7D43F87B1878} = {221AA4A6-F48E-4605-90FC-ACCE31C9397D}
+		{7A3C1E9D-4B82-4F16-9C5A-2E8D6B1F0A77} = {221AA4A6-F48E-4605-90FC-ACCE31C9397D}
 		{1910940D-D140-4B3F-A2F5-6D322EFAC152} = {6B5137B3-F21C-483E-B131-54706EE91D55}
 		{744DA0F0-87B2-438A-A729-BAED65C9B780} = {1910940D-D140-4B3F-A2F5-6D322EFAC152}
 		{40E199E8-B4F0-4E38-9431-BAAD775F1FCD} = {6B5137B3-F21C-483E-B131-54706EE91D55}
@@ -289,7 +316,9 @@ Global
 		{29F56928-2CEC-FA67-A5A4-468B7FD25145} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{5A89825E-4826-2C7F-CA42-D5CCE221D310} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{FB7F4CC5-AB55-2F01-29AE-20D90A3BBEBC} = {628E8BC1-C04D-4681-90A3-5CD4DF6A4003}
+		{56C29A79-3285-4154-B35B-C452EC980EB4} = {6B5137B3-F21C-483E-B131-54706EE91D55}
+		{1DD3F99C-1A0D-364A-44D2-847659E74ADB} = {56C29A79-3285-4154-B35B-C452EC980EB4}
+		{8F23E4DA-4EBE-32D3-9B8E-DF68CEC2B273} = {56C29A79-3285-4154-B35B-C452EC980EB4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9C409BB4-536D-4DA4-8127-17F75A5B4330}

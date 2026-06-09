@@ -19,6 +19,9 @@ using System.Globalization;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using Microsoft.Azure.Cosmos;
+using ShiftSoftware.ShiftEntity.Core.Attention;
+using ShiftSoftware.ShiftEntity.Web.Attention;
+using StockPlusPlus.Data.Evaluators;
 #if (includeSampleApp)
 using StockPlusPlus.Shared.DTOs.Service;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
@@ -35,6 +38,7 @@ using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 
 #if (internalShiftIdentityHosting)
 using StockPlusPlus.API.Services;
+using StockPlusPlus.API.Endpoints;
 using AutoMapper;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
@@ -68,6 +72,40 @@ Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
 };
 
 builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
+
+builder.Services.AddAttentionEvaluator<IHasDueDate, FrameworkOverdueEvaluator>();
+builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Invoice, InvoiceMissingReferenceEvaluator>();
+
+// Phase 2 emission: once a save that raised attention signals commits, the framework
+// publishes one AttentionRaised event per new signal to the registered consumers (on a
+// background drain loop — consumer latency never affects the save). This sample consumer
+// just logs each event; a real one would send email / push / audit instead.
+builder.Services.AddAttentionConsumer<StockPlusPlus.API.Services.AttentionLoggingConsumer>();
+
+// Mapping strategy: controlled by "MappingStrategy" in appsettings.json.
+// "AutoMapper" (default) — uses AutoMapper via the repository's parameterless constructor.
+// "Manual" — registers hand-written IShiftEntityMapper implementations; DI injects them into repositories.
+var mappingStrategy = builder.Configuration.GetValue<StockPlusPlus.Shared.Enums.MappingStrategy>("MappingStrategy");
+
+if (mappingStrategy == StockPlusPlus.Shared.Enums.MappingStrategy.Manual)
+{
+    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Product, StockPlusPlus.Shared.DTOs.Product.ProductListDTO, StockPlusPlus.Shared.DTOs.Product.ProductDTO>, StockPlusPlus.Data.Mappers.ProductMapper>();
+    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.ProductCategory, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryListDTO, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryDTO>, StockPlusPlus.Data.Mappers.ProductCategoryMapper>();
+    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Invoice, StockPlusPlus.Shared.DTOs.Invoice.InvoiceListDTO, StockPlusPlus.Shared.DTOs.Invoice.InvoiceDTO>, StockPlusPlus.Data.Mappers.InvoiceMapper>();
+}
+else if (mappingStrategy == StockPlusPlus.Shared.Enums.MappingStrategy.Mapperly)
+{
+    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Product, StockPlusPlus.Shared.DTOs.Product.ProductListDTO, StockPlusPlus.Shared.DTOs.Product.ProductDTO>, StockPlusPlus.Data.Mappers.ProductMapperlyMapper>();
+    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.ProductCategory, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryListDTO, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryDTO>, StockPlusPlus.Data.Mappers.ProductCategoryMapperlyMapper>();
+    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Invoice, StockPlusPlus.Shared.DTOs.Invoice.InvoiceListDTO, StockPlusPlus.Shared.DTOs.Invoice.InvoiceDTO>, StockPlusPlus.Data.Mappers.InvoiceMapperlyMapper>();
+}
+else if (mappingStrategy == StockPlusPlus.Shared.Enums.MappingStrategy.Mapster)
+{
+    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Product, StockPlusPlus.Shared.DTOs.Product.ProductListDTO, StockPlusPlus.Shared.DTOs.Product.ProductDTO>, StockPlusPlus.Data.Mappers.ProductMapsterMapper>();
+    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.ProductCategory, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryListDTO, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryDTO>, StockPlusPlus.Data.Mappers.ProductCategoryMapsterMapper>();
+    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Invoice, StockPlusPlus.Shared.DTOs.Invoice.InvoiceListDTO, StockPlusPlus.Shared.DTOs.Invoice.InvoiceDTO>, StockPlusPlus.Data.Mappers.InvoiceMapsterMapper>();
+}
+
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
 builder.Services.AddHttpClient();
 
@@ -155,6 +193,9 @@ if (IsCosmosEnabled)
 
         x.SetUpReplication<DB, Team>(client, databaseId)
             .Replicate<TeamModel>("Teams", x => x.id);
+
+        x.SetUpReplication<DB, ShiftSoftware.ShiftIdentity.Core.Entities.User>(client, databaseId)
+            .Replicate<UserModel>("Users", x => x.id);
     });
 #endif
 }
@@ -524,6 +565,12 @@ app.UseAntiforgery();
 app.UseCors(x => x.WithOrigins("*").AllowAnyMethod().AllowAnyHeader());
 
 app.MapControllers();
+app.MapAttentionEndpoints<DB>();
+
+// Minimal-API surface running side-by-side with the controllers, driven by the same
+// ShiftEntityCrudHandler — proves the refactor is lossless and demonstrates the
+// MapShiftEntitySecureCrud / RequireTypeAuth* extensions end-to-end.
+app.MapProductMinimalApi();
 
 app.MapShiftIdentityCookieEndpoints();
 

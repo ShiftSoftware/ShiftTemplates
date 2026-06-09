@@ -77,7 +77,7 @@
 
                 <PropertyColumn Format="F" Property="x => x.ReleaseDate" Title="Release Date" Filterable="false" />
 
-                <ButtonColumn ComponentType="typeof(ProductBrandForm)" KeyPropertyName="@nameof(ProductListDTO.ProductBrandID)" Property="x => x.ProductBrand" Title="Brand">
+                <ButtonColumn ComponentType="typeof(ProductBrandForm)" KeyPropertyName="@nameof(ProductListDTO.ProductBrandID)" Property="x => x.ProductBrandName" Title="Brand">
                     <ButtonTemplate Context="BtnCtx">
                         <MudChip T="string" Style="cursor: pointer;" Icon="@Icons.Material.Filled.BrandingWatermark" Variant="Variant.Outlined">@BtnCtx</MudChip>
                     </ButtonTemplate>

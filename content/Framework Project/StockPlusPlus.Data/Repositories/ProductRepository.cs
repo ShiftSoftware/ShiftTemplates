@@ -1,5 +1,6 @@
-﻿
+
 using Microsoft.EntityFrameworkCore;
+using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
@@ -11,13 +12,22 @@ public class ProductRepository : ShiftRepository<DB, Entities.Product, ProductLi
 {
     public bool IncludeProductCategoryOnGetIquery { get; set; }
 
+    private static readonly Action<ShiftRepositoryOptions<Product>> IncludeOptions =
+        x => x.IncludeRelatedEntitiesWithFindAsync(
+            y => y.Include(z => z.ProductBrand),
+            y => y.Include(z => z.CountryOfOrigin)
+        );
+
+    // When an IShiftEntityMapper<Product, ...> is registered in DI, this constructor is used.
+    public ProductRepository(DB db, IShiftEntityMapper<Product, ProductListDTO, ProductDTO> mapper)
+        : base(db, mapper, IncludeOptions)
+    {
+    }
+
+    // Fallback: when no IShiftEntityMapper is registered, DI uses this constructor (AutoMapper).
     //The ProductCategory is intentionally not included to show that the ShiftAutoComplete can handle this asynchronously by making a get request to the oData endpoint.
     public ProductRepository(DB db) :
-        base(db,
-                x => x.IncludeRelatedEntitiesWithFindAsync(
-                    y => y.Include(z => z.ProductBrand),
-                    y => y.Include(z => z.CountryOfOrigin)
-                ))
+        base(db, IncludeOptions)
     {
     }
 

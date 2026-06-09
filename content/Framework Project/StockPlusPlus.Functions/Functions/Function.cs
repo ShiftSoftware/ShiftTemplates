@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using ShiftSoftware.ShiftEntity.Functions.AppCheck;
 using ShiftSoftware.ShiftEntity.Functions.ReCaptcha;
+#if (includeSampleApp)
+using ShiftSoftware.UnifiedAttestation.Attributes;
+#endif
 using System.ComponentModel.DataAnnotations;
 
 namespace StockPlusPlus.Functions.Functions;
@@ -33,25 +35,24 @@ public class Function
         _logger.LogInformation("C# HTTP trigger function processed a request.");
         return new OkObjectResult(dto);
     }
-
-    [Function("AppCheck")]
-    [CheckAppCheck]
-    public IActionResult AppCheck([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
+#if (includeSampleApp)
+    [Function(nameof(Attested))]
+    [ValidateAttestation]
+    public IActionResult Attested([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
-        /*
-        POST / v1beta / projects / 905344726828 / apps / 1:905344726828:android: d5cf8f1b298a7695: exchangeDebugToken? key = {your-key} HTTP / 1.1
-        Host: firebaseappcheck.googleapis.com
-        Content - Type: application / json
-        Content - Length: 62
-
-        {
-            "debugToken": "9DBDE480-B818-4F60-B13A-F4B360B5E98D"
-        }
-        */
 
         _logger.LogInformation("C# HTTP trigger function processed a request.");
         return new OkObjectResult("Welcome to Azure Functions!");
     }
+
+    [Function(nameof(AttestedWithReplayProtection))]
+    [ValidateAttestation(true)]
+    public IActionResult AttestedWithReplayProtection([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
+    {
+        _logger.LogInformation("C# HTTP trigger function processed a request.");
+        return new OkObjectResult("Welcome to Azure Functions!");
+    }
+#endif
 }
 
 public class LoginDTO

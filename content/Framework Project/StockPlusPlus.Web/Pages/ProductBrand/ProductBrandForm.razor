@@ -16,6 +16,7 @@
     @*#if (includeItemTemplateContent)*@
     <LocalizedTextField @bind-Value="context.Item.Name"
                         For="() => context.Item.Name"
+                        Languages="@([new () { CultureName = "en-US", Label = "English" }, new () { CultureName = "tr-TR", Label = "Turkish" } ])"
                         Label="Name" />
 
     <ShiftAutocomplete Label="Assigned Team"

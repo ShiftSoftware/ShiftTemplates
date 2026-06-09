@@ -43,7 +43,7 @@ builder.Services.AddShiftBlazor(config =>
         };
         options.UserListEndpoint = shiftIdentityApiURL.AddUrlPath("IdentityPublicUser");
 #if (internalShiftIdentityHosting)
-        options.AdditionalAssemblies = new[] { typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly };
+        //options.AdditionalAssemblies = new[] { typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly };
 #endif
         options.AddLanguage("en-US", "English", false)
                .AddLanguage("ar-IQ", "Arabic", true)

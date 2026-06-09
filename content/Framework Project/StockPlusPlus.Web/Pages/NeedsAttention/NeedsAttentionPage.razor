@@ -1,0 +1,16 @@
+@attribute [Authorize]
+@attribute [Route($"/{nameof(NeedsAttentionPage)}")]
+
+@using StockPlusPlus.Web.Pages.Invoice
+
+<MudText Typo="Typo.h5" Class="mb-4">Needs Attention</MudText>
+
+<NeedsAttentionList Endpoint="attention/active"
+                    EntityRoutes="@entityRoutes" />
+
+@code {
+    private Dictionary<string, string> entityRoutes = new()
+    {
+        ["Invoice"] = $"/{nameof(InvoiceForm)}"
+    };
+}

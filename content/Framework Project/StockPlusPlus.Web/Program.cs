@@ -24,6 +24,7 @@ using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 #endif
 using BitzArt.Blazor.Cookies;
+using ShiftSoftware.ShiftBlazor.Enums;
 
 [assembly: RootNamespace("StockPlusPlus.Web")]
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -62,11 +63,10 @@ builder.Services.AddShiftBlazor(config =>
             ["StockPluPlus"] = baseUrl
         };
         options.UserListEndpoint = shiftIdentityApiURL.AddUrlPath("IdentityPublicUser");
-#if (internalShiftIdentityHosting)
-        options.AdditionalAssemblies = new[] { typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly };
-#endif
+
         options.AddLanguage("en-US", "English")
-               .AddLanguage("ar-IQ", "Arabic", true)
+               .AddLanguage("fr-FR", "French", LanguageScope.Content)
+               .AddLanguage("ar-IQ", "Arabic", true, LanguageScope.UI)
                .AddLanguage("ku-IQ", "Kurdish", true);
     };
 

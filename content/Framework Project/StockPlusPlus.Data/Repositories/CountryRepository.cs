@@ -1,4 +1,4 @@
-﻿using ShiftSoftware.ShiftEntity.EFCore;
+using ShiftSoftware.ShiftEntity.EFCore;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs;

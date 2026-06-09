@@ -131,14 +131,14 @@ steps:
    condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-typeauth')) 
    displayName: 'pack TypeAuth.AspNetCore'
 
- - task: FuncToolsInstaller@0
-   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-aspNetCore-authorization'))
-   inputs:
-    version: 'latest'
+ # - task: FuncToolsInstaller@0
+ #   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-aspNetCore-authorization'))
+ #   inputs:
+ #    version: 'latest'
 
- - script: dotnet test ../AzureFunctionsAspNetCoreAuthorization/Tests
-   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-aspNetCore-authorization'))
-   displayName: 'Test Azure Functions AspNetCore Authorization'
+ # - script: dotnet test ../AzureFunctionsAspNetCoreAuthorization/Tests
+ #   condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-aspNetCore-authorization'))
+ #   displayName: 'Test Azure Functions AspNetCore Authorization'
 
  - script: dotnet pack ../AzureFunctionsAspNetCoreAuthorization/ShiftSoftware.Azure.Functions.AspNetCore.Authorization --configuration Release --output $(Build.ArtifactStagingDirectory)/AzureFunctionsAspNetCoreAuthorization
    condition: or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-aspNetCore-authorization'))

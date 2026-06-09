@@ -1,6 +1,7 @@
 ﻿@*#if (includeSampleApp)*@
 @using ShiftSoftware.ShiftIdentity.Core
 @using StockPlusPlus.Web.Pages.Invoice
+@using StockPlusPlus.Web.Pages.NeedsAttention
 @using StockPlusPlus.Web.Pages.Product
 @using StockPlusPlus.Web.Pages.ProductBrand
 @using StockPlusPlus.Web.Pages.ProductCategory
@@ -8,6 +9,10 @@
 @*#endif*@
 <MudNavMenu>
     @*#if (includeSampleApp)*@
+    <MudNavLink Href="@($"/{nameof(NeedsAttentionPage)}")"
+                Match="NavLinkMatch.All"
+                Icon="@Icons.Material.Outlined.NotificationsActive">Needs Attention</MudNavLink>
+
     <AuthorizedMudNavGroup Title="Products" Icon="@Icons.Material.Filled.Book" HideExpandIcon="!isDrawerOpen" TypeAuthActions="new List<ShiftSoftware.TypeAuth.Core.Actions.Action> {
         StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand,
         StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory,
