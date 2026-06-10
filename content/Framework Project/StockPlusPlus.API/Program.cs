@@ -55,6 +55,12 @@ builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Invoice, Invo
 // just logs each event; a real one would send email / push / audit instead.
 builder.Services.AddAttentionConsumer<StockPlusPlus.API.Services.AttentionLoggingConsumer>();
 
+// Phase 2 real-time (Iteration 8, server side): registers SignalR + AttentionRealtimeNotifier,
+// which fans each raised signal to the AttentionHub group for its entity type. The matching
+// app.MapAttentionHub() below exposes the hub endpoint. The ShiftList / ShiftEntityForm client
+// switches that subscribe and react land in Iteration 9.
+builder.Services.AddAttentionHub();
+
 // Mapping strategy: controlled by "MappingStrategy" in appsettings.json.
 // "AutoMapper" (default) — uses AutoMapper via the repository's parameterless constructor.
 // "Manual" — registers hand-written IShiftEntityMapper implementations; DI injects them into repositories.
@@ -413,6 +419,7 @@ app.UseRequestLocalization(options =>
 
 app.MapControllers();
 app.MapAttentionEndpoints<DB>();
+app.MapAttentionHub();
 
 // Minimal-API surface running side-by-side with the controllers, driven by the same
 // ShiftEntityCrudHandler — proves the refactor is lossless and demonstrates the

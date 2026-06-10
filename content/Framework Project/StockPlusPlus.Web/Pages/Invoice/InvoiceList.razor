@@ -11,9 +11,11 @@
            EnableFilterPanel
            ComponentType="typeof(InvoiceForm)"
            TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice"
+           ListenForAttentionUpdates
+           ShowAttentionToast
            HeaderNowrap>
 
-    <PropertyColumnExtended IsButtonColumn Property="x => x.InvoiceNo" Title="Invoice No"/>
+    <PropertyColumnExtended IsButtonColumn Property="x => x.InvoiceNo" Title="Invoice No" />
     <PropertyColumnExtended Property="x => x.ManualReference" Title="Manual Reference" />
     <PropertyColumnExtended Format="F" Property="x => x.InvoiceDate" Title="Invoice Date" />
 </ShiftList>
