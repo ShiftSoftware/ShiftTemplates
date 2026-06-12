@@ -8,6 +8,24 @@
 	</PropertyGroup>
 
 	<!--
+		RunDocsBuildHooks gates the ShiftFrameworkDocumentation build-time hooks
+		(Docs.Web's RunSnippetGenerator / CopyShiftFrameworkXmlDocs and
+		Docs.SnippetGen's RunSelfAfterBuild). The generator rewrites files under
+		Docs.Web/wwwroot on every run, which permanently defeats incremental builds
+		of Docs.Web and Docs.API and taxes every StockPlusPlus.sln build — even
+		no-change ones — with several seconds of snippet generation and a nested
+		`dotnet run` restore/build.
+
+		Set to true (or build with -p:RunDocsBuildHooks=true) when working on the
+		docs site so snippets and the search index regenerate. The targets only
+		check for the explicit value 'false', so standalone clones of the docs repo
+		(where this props file doesn't exist) keep generating snippets as before.
+	-->
+	<PropertyGroup>
+		<RunDocsBuildHooks>false</RunDocsBuildHooks>
+	</PropertyGroup>
+
+	<!--
 		Emit an XML documentation file next to each assembly. SDK-style projects pack this
 		file into the NuGet package's lib/{tfm}/ folder automatically, so the doc comments
 		(summaries, parameter descriptions) surface in consumers' IntelliSense and feed the
