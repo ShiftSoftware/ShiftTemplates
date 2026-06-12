@@ -179,6 +179,8 @@ if (IsCosmosEnabled)
         x.SetUpReplication<DB, ShiftSoftware.ShiftIdentity.Core.Entities.User>(client, databaseId)
             .Replicate<UserModel>("Users", x => x.id);
     });
+
+    builder.Services.AddShiftEntityCosmosDbReplication<DB>();
 #endif
 }
 
