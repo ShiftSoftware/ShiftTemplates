@@ -121,23 +121,23 @@ if (IsCosmosEnabled)
         string databaseId = "Identity";
         var client = x.Services.GetRequiredService<CosmosClient>();
 
-        x.SetUpReplication<DB, Service>(client, databaseId, null, false)
+        x.SetUpReplication<DB, Service>(client, databaseId, null)
             .Replicate<ServiceModel>(IdentityDatabaseAndContainerNames.ServiceContainerName, x => x.id)
             .UpdateReference<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName,
                 (q, e) => q.Where(x => x.ItemType == CompanyBranchContainerItemTypes.Service && x.id == e.Entity.ID.ToString()));
 
-        x.SetUpReplication<DB, CompanyBranchService>(client, databaseId, null, false)
+        x.SetUpReplication<DB, CompanyBranchService>(client, databaseId, null)
             .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
 
-        x.SetUpReplication<DB, CompanyBranchDepartment>(client, databaseId, null, false)
+        x.SetUpReplication<DB, CompanyBranchDepartment>(client, databaseId, null)
             .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
 
-        x.SetUpReplication<DB, Department>(client, databaseId, null, false)
+        x.SetUpReplication<DB, Department>(client, databaseId, null)
             .Replicate<DepartmentModel>(IdentityDatabaseAndContainerNames.DepartmentContainerName, x => x.id)
             .UpdateReference<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName,
                 (q, e) => q.Where(x => x.ItemType == CompanyBranchContainerItemTypes.Department && x.id == e.Entity.ID.ToString()));
 
-        x.SetUpReplication<DB, Brand>(client, databaseId, null, false)
+        x.SetUpReplication<DB, Brand>(client, databaseId, null)
             .Replicate<BrandModel>("Brands", x => x.id)
             .UpdateReference<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName,
                 (q, e) => q.Where(x => x.id == e.Entity.ID.ToString() && x.ItemType == CompanyBranchContainerItemTypes.Brand));
