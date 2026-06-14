@@ -26,7 +26,7 @@
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.OpenApi" Version="1.6.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.1" />
 		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage.Queues" Version="5.3.7" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.8" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.9" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.EFCore" Version="$(ShiftFrameworkVersion)" />
 	</ItemGroup>
 
@@ -34,9 +34,6 @@
 		<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.52.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.3.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.7" />
-		<PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.23.0" />
-		<PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="2.50.0" />
-
 		<PackageReference Include="ShiftSoftware.TypeAuth.AspNetCore" Version="$(TypeAuthVersion)" />
 		<PackageReference Include="ShiftSoftware.ShiftIdentity.AzureFunctions" Version="$(ShiftFrameworkVersion)" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.Functions" Version="$(ShiftFrameworkVersion)" />
