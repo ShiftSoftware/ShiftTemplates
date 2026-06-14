@@ -64,8 +64,6 @@ var host = new HostBuilder()
 
         services.AddLocalization();
 
-        services.AddApplicationInsightsTelemetryWorkerService();
-        services.ConfigureFunctionsApplicationInsights();
         services
         .AddDbContext<DB>(options => options.UseSqlServer(hostBuilder.Configuration.GetConnectionString("SQLServer")!)
             .UseTemporal(true));

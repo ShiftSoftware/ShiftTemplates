@@ -89,7 +89,6 @@ public class ProductBrandController : ShiftEntitySecureControllerAsync<ProductBr
     {
         var deletedBrand = await brandRepository.DeleteAsync(
             entity: (await brandRepository.FindAsync(1, asOf: null, disableDefaultDataLevelAccess: false, disableGlobalFilters: false))!,
-            isHardDelete: false,
             userId: null,
             disableGlobalFilters: false,
             disableDefaultDataLevelAccess: false

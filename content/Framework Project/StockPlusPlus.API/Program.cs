@@ -56,6 +56,18 @@ builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Invoice, Invo
 builder.Services.AddShiftTagging<DB>(StockPlusPlusActionTree.Tags);
 #endif
 
+// Phase 2 emission: once a save that raised attention signals commits, the framework
+// publishes one AttentionRaised event per new signal to the registered consumers (on a
+// background drain loop — consumer latency never affects the save). This sample consumer
+// just logs each event; a real one would send email / push / audit instead.
+builder.Services.AddAttentionConsumer<StockPlusPlus.API.Services.AttentionLoggingConsumer>();
+
+// Phase 2 real-time (Iteration 8, server side): registers SignalR + AttentionRealtimeNotifier,
+// which fans each raised signal to the AttentionHub group for its entity type. The matching
+// app.MapAttentionHub() below exposes the hub endpoint. The ShiftList / ShiftEntityForm client
+// switches that subscribe and react land in Iteration 9.
+builder.Services.AddAttentionHub();
+
 // Mapping strategy: controlled by "MappingStrategy" in appsettings.json.
 // "AutoMapper" (default) — uses AutoMapper via the repository's parameterless constructor.
 // "Manual" — registers hand-written IShiftEntityMapper implementations; DI injects them into repositories.
@@ -116,23 +128,23 @@ if (IsCosmosEnabled)
         string databaseId = "Identity";
         var client = x.Services.GetRequiredService<CosmosClient>();
 
-        x.SetUpReplication<DB, Service>(client, databaseId, null, false)
+        x.SetUpReplication<DB, Service>(client, databaseId, null)
             .Replicate<ServiceModel>(IdentityDatabaseAndContainerNames.ServiceContainerName, x => x.id)
             .UpdateReference<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName,
                 (q, e) => q.Where(x => x.ItemType == CompanyBranchContainerItemTypes.Service && x.id == e.Entity.ID.ToString()));
 
-        x.SetUpReplication<DB, CompanyBranchService>(client, databaseId, null, false)
+        x.SetUpReplication<DB, CompanyBranchService>(client, databaseId, null)
             .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
 
-        x.SetUpReplication<DB, CompanyBranchDepartment>(client, databaseId, null, false)
+        x.SetUpReplication<DB, CompanyBranchDepartment>(client, databaseId, null)
             .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
 
-        x.SetUpReplication<DB, Department>(client, databaseId, null, false)
+        x.SetUpReplication<DB, Department>(client, databaseId, null)
             .Replicate<DepartmentModel>(IdentityDatabaseAndContainerNames.DepartmentContainerName, x => x.id)
             .UpdateReference<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName,
                 (q, e) => q.Where(x => x.ItemType == CompanyBranchContainerItemTypes.Department && x.id == e.Entity.ID.ToString()));
 
-        x.SetUpReplication<DB, Brand>(client, databaseId, null, false)
+        x.SetUpReplication<DB, Brand>(client, databaseId, null)
             .Replicate<BrandModel>("Brands", x => x.id)
             .UpdateReference<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName,
                 (q, e) => q.Where(x => x.id == e.Entity.ID.ToString() && x.ItemType == CompanyBranchContainerItemTypes.Brand));
@@ -174,6 +186,8 @@ if (IsCosmosEnabled)
         x.SetUpReplication<DB, ShiftSoftware.ShiftIdentity.Core.Entities.User>(client, databaseId)
             .Replicate<UserModel>("Users", x => x.id);
     });
+
+    builder.Services.AddShiftEntityCosmosDbReplication<DB>();
 #endif
 }
 
@@ -414,6 +428,7 @@ app.UseRequestLocalization(options =>
 
 app.MapControllers();
 app.MapAttentionEndpoints<DB>();
+app.MapAttentionHub();
 
 #if (includeSampleApp)
 app.MapShiftTaggingEndpoints<DB>();

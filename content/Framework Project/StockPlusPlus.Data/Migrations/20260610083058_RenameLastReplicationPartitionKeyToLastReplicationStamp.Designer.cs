@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockPlusPlus.Data.DbContext;
 
@@ -11,9 +12,11 @@ using StockPlusPlus.Data.DbContext;
 namespace StockPlusPlus.Data.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20260610083058_RenameLastReplicationPartitionKeyToLastReplicationStamp")]
+    partial class RenameLastReplicationPartitionKeyToLastReplicationStamp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,78 +25,6 @@ namespace StockPlusPlus.Data.Migrations
                 .HasAnnotation("ShiftEntity:HistoryIndexedTables", "ShiftIdentity|AccessTreesHistory|ID;ShiftIdentity|AppsHistory|ID;ShiftIdentity|BrandsHistory|ID;ShiftIdentity|CitiesHistory|ID;ShiftIdentity|CompaniesHistory|ID;ShiftIdentity|CompanyBranchBrandsHistory|ID;ShiftIdentity|CompanyBranchDepartmentsHistory|ID;ShiftIdentity|CompanyBranchServicesHistory|ID;ShiftIdentity|CompanyBranchesHistory|ID;ShiftIdentity|CompanyCalendarsHistory|ID;ShiftIdentity|CountriesHistory|ID;ShiftIdentity|DepartmentsHistory|ID;ShiftIdentity|RegionsHistory|ID;ShiftIdentity|ServicesHistory|ID;ShiftIdentity|TeamBranchesHistory|ID;ShiftIdentity|TeamUsersHistory|ID;ShiftIdentity|TeamsHistory|ID;ShiftIdentity|UserAccessTreesHistory|ID;ShiftIdentity|UsersHistory|ID;dbo|BrandsHistory|ID;dbo|CountriesHistory|ID;dbo|InvoicesHistory|ID;dbo|ProductCategoriesHistory|ID;dbo|ProductsHistory|ID");
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("ProductTags", b =>
-                {
-                    b.Property<long>("ProductID")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("TagsID")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("ProductID", "TagsID");
-
-                    b.HasIndex("TagsID");
-
-                    b.ToTable("ProductTags");
-                });
-
-            modelBuilder.Entity("ShiftSoftware.ShiftEntity.Core.Tagging.Tag", b =>
-                {
-                    b.Property<long>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasJsonPropertyName("ID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
-
-                    b.Property<string>("Color")
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<DateTimeOffset>("CreateDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long?>("CreatedByUserID")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)");
-
-                    b.Property<string>("IntegrationID")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LastReplicationDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("LastSaveDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long?>("LastSavedByUserID")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("IntegrationID")
-                        .IsUnique()
-                        .HasFilter("IntegrationID IS NOT NULL AND IsDeleted = 0");
-
-                    b.HasIndex("Name")
-                        .IsUnique()
-                        .HasFilter("IsDeleted = 0");
-
-                    b.ToTable("Tags");
-                });
 
             modelBuilder.Entity("ShiftSoftware.ShiftEntity.EFCore.Entities.AttentionSignalEntry", b =>
                 {
@@ -2324,21 +2255,6 @@ namespace StockPlusPlus.Data.Migrations
                                     .HasPeriodEnd("PeriodEnd")
                                     .HasColumnName("PeriodEnd");
                             }));
-                });
-
-            modelBuilder.Entity("ProductTags", b =>
-                {
-                    b.HasOne("StockPlusPlus.Data.Entities.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ShiftSoftware.ShiftEntity.Core.Tagging.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.City", b =>

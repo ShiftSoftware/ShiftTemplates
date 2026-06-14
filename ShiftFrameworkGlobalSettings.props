@@ -2,9 +2,27 @@
 	<PropertyGroup>
 		<DefineConstants>shiftFrameworkDevelopmentMode;includeSampleApp;internalShiftIdentityHosting;includeItemTemplateContent</DefineConstants>
 		<ImportShiftFrameworkProjects>true</ImportShiftFrameworkProjects>
-		<ShiftFrameworkVersion>2026.05.30.4</ShiftFrameworkVersion>
-		<TypeAuthVersion>1.6.18</TypeAuthVersion>
-		<AzureFunctionsAspNetCoreAuthorizationVersion>0.0.29</AzureFunctionsAspNetCoreAuthorizationVersion>
+		<ShiftFrameworkVersion>2026.06.14.1</ShiftFrameworkVersion>
+		<TypeAuthVersion>1.6.23</TypeAuthVersion>
+		<AzureFunctionsAspNetCoreAuthorizationVersion>0.0.34</AzureFunctionsAspNetCoreAuthorizationVersion>
+	</PropertyGroup>
+
+	<!--
+		RunDocsBuildHooks gates the ShiftFrameworkDocumentation build-time hooks
+		(Docs.Web's RunSnippetGenerator / CopyShiftFrameworkXmlDocs and
+		Docs.SnippetGen's RunSelfAfterBuild). The generator rewrites files under
+		Docs.Web/wwwroot on every run, which permanently defeats incremental builds
+		of Docs.Web and Docs.API and taxes every StockPlusPlus.sln build — even
+		no-change ones — with several seconds of snippet generation and a nested
+		`dotnet run` restore/build.
+
+		Set to true (or build with -p:RunDocsBuildHooks=true) when working on the
+		docs site so snippets and the search index regenerate. The targets only
+		check for the explicit value 'false', so standalone clones of the docs repo
+		(where this props file doesn't exist) keep generating snippets as before.
+	-->
+	<PropertyGroup>
+		<RunDocsBuildHooks>false</RunDocsBuildHooks>
 	</PropertyGroup>
 
 	<!--
