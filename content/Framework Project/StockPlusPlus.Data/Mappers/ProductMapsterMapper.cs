@@ -1,5 +1,7 @@
 using Mapster;
 using ShiftSoftware.ShiftEntity.Core;
+using ShiftSoftware.ShiftEntity.Core.Tagging;
+using ShiftSoftware.ShiftEntity.Model.Dtos.Tagging;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.Product;
 
@@ -13,10 +15,15 @@ public class ProductMapsterMapper : IShiftEntityMapper<Product, ProductListDTO, 
     {
         var config = MapsterShiftEntityDefaults.CreateConfig();
 
+        // Tag ↔ TagDTO — shared by Product and any other taggable entity in this app.
+        config.NewConfig<Tag, TagDTO>()
+            .Map(d => d.ID, s => s.ID.ToString());
+
         config.EntityToView<Product, ProductDTO>();
 
         config.ViewToEntity<ProductDTO, Product>()
             .Ignore(d => d.HasActiveAttention, d => d.HighestSeverity!, d => d.ActiveSignalCount)
+            .Ignore(d => d.Tags)
             .Map(d => d.IsDraft, s => s.IsDraft ?? false);
 
         // Only "Category" needs explicit mapping (name mismatch with ProductCategory.Name).
@@ -25,7 +32,8 @@ public class ProductMapsterMapper : IShiftEntityMapper<Product, ProductListDTO, 
             //.Map(d => d.ProductBrand, s => s.ProductBrand != null ? s.ProductBrand : null)
             .Map(d => d.Category, s => s.ProductCategory != null ? s.ProductCategory.Name : null);
 
-        config.EntityCopy<Product>();
+        config.EntityCopy<Product>()
+            .Ignore(d => d.Tags);
 
         return config;
     }

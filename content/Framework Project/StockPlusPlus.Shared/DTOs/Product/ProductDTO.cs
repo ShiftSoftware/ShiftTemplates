@@ -1,13 +1,14 @@
 ﻿
 using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
+using ShiftSoftware.ShiftEntity.Model.Dtos.Tagging;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.Enums;
 using System.Text.Json.Serialization;
 
 namespace StockPlusPlus.Shared.DTOs.Product;
 
-public class ProductDTO : ShiftEntityViewAndUpsertDTO, IHasDraftCheckBox<ProductDTO>, IHasAttentionSignals
+public class ProductDTO : ShiftEntityViewAndUpsertDTO, IHasDraftCheckBox<ProductDTO>, IHasAttentionSignals, IShiftEntityTaggableDTO
 {
     [_ProductHashId]
     public override string? ID { get; set; }
@@ -25,4 +26,6 @@ public class ProductDTO : ShiftEntityViewAndUpsertDTO, IHasDraftCheckBox<Product
 
     public ShiftEntitySelectDTO? CountryOfOrigin { get; set; } = default!;
     public bool? IsDraft { get; set; }
+
+    public List<TagDTO> Tags { get; set; } = new();
 }

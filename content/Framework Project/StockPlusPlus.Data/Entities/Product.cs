@@ -3,6 +3,7 @@ using System.Text.Json;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.Core.Attention;
 using ShiftSoftware.ShiftEntity.Core.Flags;
+using ShiftSoftware.ShiftEntity.Core.Tagging;
 using ShiftSoftware.ShiftEntity.Model.Flags;
 using StockPlusPlus.Shared.Enums;
 
@@ -18,7 +19,8 @@ public class Product : ShiftEntity<Product>,
     IEntityHasIdempotencyKey<Product>,
     IEntityHasCity<Product>,
     IHasAttention,
-    IHasAttentionEvaluator<Product>
+    IHasAttentionEvaluator<Product>,
+    IShiftEntityTaggable
 {
     public string Name { get; set; } = default!;
 
@@ -48,6 +50,9 @@ public class Product : ShiftEntity<Product>,
     public bool HasActiveAttention { get; set; }
     public AttentionSeverity? HighestSeverity { get; set; }
     public int ActiveSignalCount { get; set; }
+
+    // IShiftEntityTaggable — framework auto-wires the M:N join table "ProductTags"
+    public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 
     public AttentionSignal? EvaluateAttention(AttentionContext<Product> context)
     {

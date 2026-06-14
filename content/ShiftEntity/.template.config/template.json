@@ -19,6 +19,13 @@
       "fileRename": "TheSolutionName",
       "replaces": "StockPlusPlus"
     },
+    "taggable": {
+      "displayName": "Make Entity Taggable",
+      "type": "parameter",
+      "description": "Opt the scaffolded entity into the framework tagging system. Adds IShiftEntityTaggable on the entity, IShiftEntityTaggableDTO on the upsert DTO, and an Include for tags in the repository. Requires services.AddShiftTagging<DB>(...) at startup.",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
     "typeAuthAction": {
       "type": "generated",
       "generator": "constant",

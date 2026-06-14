@@ -38,6 +38,11 @@
                           Icon="@Icons.Material.Outlined.Newspaper"
                           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice">Invoices</AuthorizedMudNavLink>
 
+    <AuthorizedMudNavLink Href="/tags"
+                          Match="NavLinkMatch.All"
+                          Icon="@Icons.Material.Outlined.Label"
+                          TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Tags">Tags</AuthorizedMudNavLink>
+
     <AuthorizedMudNavLink Href="@($"{nameof(CosmosCompanyBranchList)}")"
                           Match="NavLinkMatch.All"
                           Icon="@Icons.Material.Outlined.Business"

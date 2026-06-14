@@ -7,9 +7,12 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Azure.Cosmos;
 using ShiftSoftware.ShiftEntity.Core.Attention;
+using ShiftSoftware.ShiftEntity.EFCore.Tagging;
 using ShiftSoftware.ShiftEntity.Web.Attention;
+using ShiftSoftware.ShiftEntity.Web.Tagging;
 using StockPlusPlus.Data.Evaluators;
 #if (includeSampleApp)
+using StockPlusPlus.Shared.ActionTrees;
 using StockPlusPlus.Shared.DTOs.Service;
 #endif
 
@@ -48,6 +51,10 @@ builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Ass
 
 builder.Services.AddAttentionEvaluator<IHasDueDate, FrameworkOverdueEvaluator>();
 builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Invoice, InvoiceMissingReferenceEvaluator>();
+
+#if (includeSampleApp)
+builder.Services.AddShiftTagging<DB>(StockPlusPlusActionTree.Tags);
+#endif
 
 // Mapping strategy: controlled by "MappingStrategy" in appsettings.json.
 // "AutoMapper" (default) — uses AutoMapper via the repository's parameterless constructor.
@@ -407,6 +414,10 @@ app.UseRequestLocalization(options =>
 
 app.MapControllers();
 app.MapAttentionEndpoints<DB>();
+
+#if (includeSampleApp)
+app.MapShiftTaggingEndpoints<DB>();
+#endif
 
 // Minimal-API surface running side-by-side with the controllers, driven by the same
 // ShiftEntityCrudHandler — proves the refactor is lossless and demonstrates the

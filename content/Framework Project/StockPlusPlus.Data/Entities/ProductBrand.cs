@@ -6,6 +6,9 @@ using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model.Flags;
 using ShiftSoftware.ShiftEntity.Model;
 #endif
+#if (taggable)
+using ShiftSoftware.ShiftEntity.Core.Tagging;
+#endif
 
 namespace StockPlusPlus.Data.Entities;
 
@@ -16,6 +19,9 @@ namespace StockPlusPlus.Data.Entities;
 public class ProductBrand : ShiftEntity<ProductBrand>
 #if (includeItemTemplateContent)
     ,IEntityHasTeam<ProductBrand>, IEntityHasRegion<ProductBrand>, IEntityHasCompany<ProductBrand>, IEntityHasCompanyBranch<ProductBrand>, IEntityHasIdempotencyKey<ProductBrand>, IEntityHasUniqueHash<ProductBrand>
+#endif
+#if (taggable)
+    ,IShiftEntityTaggable
 #endif
 {
 #if (includeItemTemplateContent)
@@ -34,5 +40,8 @@ public class ProductBrand : ShiftEntity<ProductBrand>
     {
         return $"{Name.ToUpper()}|{Code?.ToUpper()}";
     }
+#endif
+#if (taggable)
+    public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 #endif
 }

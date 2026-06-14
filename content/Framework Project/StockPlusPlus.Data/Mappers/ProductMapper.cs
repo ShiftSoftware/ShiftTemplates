@@ -1,4 +1,5 @@
 using ShiftSoftware.ShiftEntity.Core;
+using ShiftSoftware.ShiftEntity.Model.Dtos.Tagging;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.Product;
 
@@ -19,6 +20,15 @@ public class ProductMapper : IShiftEntityMapper<Product, ProductListDTO, Product
             ProductCategory = entity.ProductCategoryID.ToSelectDTO(entity.ProductCategory?.Name),
             ProductBrand = entity.ProductBrandID.ToSelectDTO(entity.ProductBrand?.Name),
             CountryOfOrigin = entity.CountryOfOriginID.ToSelectDTO(entity.CountryOfOrigin?.Name),
+
+            Tags = entity.Tags?.Select(t => new TagDTO
+            {
+                ID = t.ID.ToString(),
+                Name = t.Name,
+                Color = t.Color,
+                Description = t.Description,
+                IntegrationID = t.IntegrationID,
+            }).ToList() ?? new(),
         }.MapBaseFields(entity);
     }
 
@@ -33,6 +43,9 @@ public class ProductMapper : IShiftEntityMapper<Product, ProductListDTO, Product
         existing.ProductCategoryID = dto.ProductCategory.ToForeignKey();
         existing.ProductBrandID = dto.ProductBrand.ToForeignKey();
         existing.CountryOfOriginID = dto.CountryOfOrigin.ToNullableForeignKey();
+
+        // Tags intentionally NOT mapped here — the framework's TaggingPipeline (invoked
+        // by ShiftRepository.UpsertAsync) resolves and attaches tags from dto.Tags.
 
         return existing;
     }

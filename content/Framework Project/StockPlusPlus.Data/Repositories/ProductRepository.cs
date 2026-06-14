@@ -15,7 +15,8 @@ public class ProductRepository : ShiftRepository<DB, Entities.Product, ProductLi
     private static readonly Action<ShiftRepositoryOptions<Product>> IncludeOptions =
         x => x.IncludeRelatedEntitiesWithFindAsync(
             y => y.Include(z => z.ProductBrand),
-            y => y.Include(z => z.CountryOfOrigin)
+            y => y.Include(z => z.CountryOfOrigin),
+            y => y.Include(z => z.Tags)
         );
 
     // When an IShiftEntityMapper<Product, ...> is registered in DI, this constructor is used.

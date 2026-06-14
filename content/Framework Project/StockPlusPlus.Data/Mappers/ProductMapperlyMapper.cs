@@ -1,5 +1,7 @@
 using Riok.Mapperly.Abstractions;
 using ShiftSoftware.ShiftEntity.Core;
+using ShiftSoftware.ShiftEntity.Core.Tagging;
+using ShiftSoftware.ShiftEntity.Model.Dtos.Tagging;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.Product;
 
@@ -20,8 +22,19 @@ public partial class ProductMapperlyMapper : IShiftEntityMapper<Product, Product
         dto.ProductBrand = entity.ProductBrandID.ToSelectDTO(entity.ProductBrand?.Name);
         dto.CountryOfOrigin = entity.CountryOfOriginID.ToSelectDTO(entity.CountryOfOrigin?.Name);
 
+        dto.Tags = entity.Tags?.Select(MapTagToDTO).ToList() ?? new();
+
         return dto.MapBaseFields(entity);
     }
+
+    private TagDTO MapTagToDTO(Tag tag) => new()
+    {
+        ID = tag.ID.ToString(),
+        Name = tag.Name,
+        Color = tag.Color,
+        Description = tag.Description,
+        IntegrationID = tag.IntegrationID,
+    };
 
     [MapperIgnoreSource(nameof(Product.ProductCategory))]
     [MapperIgnoreSource(nameof(Product.ProductBrand))]
@@ -42,6 +55,7 @@ public partial class ProductMapperlyMapper : IShiftEntityMapper<Product, Product
     [MapperIgnoreSource(nameof(Product.HasActiveAttention))]
     [MapperIgnoreSource(nameof(Product.HighestSeverity))]
     [MapperIgnoreSource(nameof(Product.ActiveSignalCount))]
+    [MapperIgnoreSource(nameof(Product.Tags))]
     [MapperIgnoreTarget(nameof(ProductDTO.ID))]
     [MapperIgnoreTarget(nameof(ProductDTO.IsDeleted))]
     [MapperIgnoreTarget(nameof(ProductDTO.CreateDate))]
@@ -51,6 +65,7 @@ public partial class ProductMapperlyMapper : IShiftEntityMapper<Product, Product
     [MapperIgnoreTarget(nameof(ProductDTO.ProductCategory))]
     [MapperIgnoreTarget(nameof(ProductDTO.ProductBrand))]
     [MapperIgnoreTarget(nameof(ProductDTO.CountryOfOrigin))]
+    [MapperIgnoreTarget(nameof(ProductDTO.Tags))]
     private partial ProductDTO MapToViewGenerated(Product entity);
 
     // --- MapToEntity: DTO → Entity ---
@@ -89,6 +104,7 @@ public partial class ProductMapperlyMapper : IShiftEntityMapper<Product, Product
     [MapperIgnoreTarget(nameof(Product.HasActiveAttention))]
     [MapperIgnoreTarget(nameof(Product.HighestSeverity))]
     [MapperIgnoreTarget(nameof(Product.ActiveSignalCount))]
+    [MapperIgnoreTarget(nameof(Product.Tags))]
     [MapperIgnoreSource(nameof(ProductDTO.ID))]
     [MapperIgnoreSource(nameof(ProductDTO.IsDeleted))]
     [MapperIgnoreSource(nameof(ProductDTO.CreateDate))]
@@ -98,6 +114,7 @@ public partial class ProductMapperlyMapper : IShiftEntityMapper<Product, Product
     [MapperIgnoreSource(nameof(ProductDTO.ProductCategory))]
     [MapperIgnoreSource(nameof(ProductDTO.ProductBrand))]
     [MapperIgnoreSource(nameof(ProductDTO.CountryOfOrigin))]
+    [MapperIgnoreSource(nameof(ProductDTO.Tags))]
     private partial void MapToEntityGenerated(ProductDTO dto, Product existing);
 
     // --- MapToList: IQueryable projection ---
@@ -130,5 +147,7 @@ public partial class ProductMapperlyMapper : IShiftEntityMapper<Product, Product
     [MapperIgnoreTarget(nameof(Product.ReloadAfterSave))]
     [MapperIgnoreTarget(nameof(Product.AuditFieldsAreSet))]
     [MapperIgnoreTarget(nameof(Product.ID))]
+    [MapperIgnoreTarget(nameof(Product.Tags))]
+    [MapperIgnoreSource(nameof(Product.Tags))]
     public partial void CopyEntity(Product source, Product target);
 }

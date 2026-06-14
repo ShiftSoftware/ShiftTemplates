@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Localization;
 using ShiftSoftware.ShiftBlazor.Extensions;
 using ShiftSoftware.ShiftBlazor.Services;
+using ShiftSoftware.ShiftBlazor.Tagging;
 using ShiftSoftware.ShiftIdentity.Blazor.Extensions;
 using ShiftSoftware.ShiftIdentity.Blazor.Handlers;
 using ShiftSoftware.TypeAuth.Blazor.Extensions;
@@ -122,6 +123,17 @@ builder.Services.AddTypeAuth(x =>
     .AddActionTree<StockPlusPlusActionTree>()
 #endif
 );
+
+#if (includeSampleApp)
+// Wire the framework's built-in TagListPage / TagFormPage (routes /tags and /tags/{Key?}).
+// Drop this call and remove the ShiftBlazor assembly from Router.AdditionalAssemblies
+// (see App.razor.cs) to use custom pages instead.
+builder.Services.AddShiftBlazorTagging(o =>
+{
+    o.BaseUrlKey = "StockPluPlus";
+    o.TypeAuthAction = StockPlusPlusActionTree.Tags;
+});
+#endif
 
 var host = builder.Build();
 

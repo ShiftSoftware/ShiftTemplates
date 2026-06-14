@@ -112,6 +112,36 @@ Key files in ShiftEntity (sibling repo):
 
 When working on mapping-related changes, always check the planning doc for current iteration status before starting.
 
+## Tagging
+
+Cross-cutting tag system. Opt-in per entity via `IShiftEntityTaggable` / `IShiftEntityTaggableDTO`. Per-microservice vocabulary — each service owns its `Tag` table, its action-tree node, its endpoints.
+
+**Planning doc:** `.shift/repos/shift-entity/tagging-plan.md` — full status, decisions, file inventory, programmer cheat sheet.
+
+Key files in this repo:
+- `content/Framework Project/StockPlusPlus.Shared/ActionTrees/StockPlusPlusActionTree.cs` — `Tags = new("Tags")` ReadWriteDeleteAction node
+- `content/Framework Project/StockPlusPlus.Data/Entities/Product.cs` — sample taggable entity (`IShiftEntityTaggable`)
+- `content/Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductDTO.cs` — sample taggable DTO (`IShiftEntityTaggableDTO`)
+- `content/Framework Project/StockPlusPlus.Data/Mappers/Product*Mapper.cs` — Manual/Mapperly/Mapster handle Tags on read, ignore on write (framework pipeline attaches)
+- `content/Framework Project/StockPlusPlus.API/Program.cs` — `AddShiftTagging<DB>(StockPlusPlusActionTree.Tags)` + `MapShiftTaggingEndpoints<DB>()`
+- `content/Framework Project/StockPlusPlus.Data/Migrations/20260604115251_Tagging.cs` — Tags + ProductTags tables
+- `content/Framework Project/StockPlusPlus.Web/Program.cs` — calls `AddShiftBlazorTagging(o => { o.BaseUrlKey = "StockPluPlus"; o.TypeAuthAction = StockPlusPlusActionTree.Tags; })`. This single call registers the options AND pushes the ShiftBlazor assembly into `AppStartupOptions.AdditionalAssemblies` so `DefaultApp`'s Router picks up `/tags` and `/tags/{Key?}` automatically. `App.razor.cs` is unchanged.
+- `content/Framework Project/StockPlusPlus.Test/Tests/TaggingTests.cs` — 7 integration tests
+- `content/ShiftEntity/.template.config/template.json` — `taggable` item-template flag (`dotnet new shiftentity --taggable`)
+
+Key files in sibling repos:
+- `ShiftEntity.Core/Tagging/` — `Tag` entity + `IShiftEntityTaggable` + `ShiftTagTableAttribute`
+- `ShiftEntity.Model/Dtos/Tagging/` — `TagDTO`, `TagListDTO`, `IShiftEntityTaggableDTO`
+- `ShiftEntity.EFCore/Tagging/` — `AddShiftTagging<TDbContext>()` registration, `ShiftTagRepository`, `TaggingPipeline` (upsert-on-save), AutoMapper profile
+- `ShiftEntity.EFCore/Extensions/ModelBuilderExtensions.cs` — `ConfigureTagging` auto-wires M:N for every `IShiftEntityTaggable` entity
+- `ShiftEntity.Web/Tagging/TaggingEndpoints.cs` — `MapShiftTaggingEndpoints<DB>()`
+- `ShiftBlazor/Components/Tagging/` — `ShiftTagPicker` + `ShiftTagDisplay`
+- `ShiftBlazor/Pages/Tagging/` — routable `TagListPage` (`/tags`) + `TagFormPage` (`/tags/{Key?}`); opt out by simply not calling `AddShiftBlazorTagging`
+- `ShiftBlazor/Tagging/` — `ShiftBlazorTaggingOptions` + `AddShiftBlazorTagging` registration extension (also pushes the ShiftBlazor assembly into `AppStartupOptions.AdditionalAssemblies` so the routes auto-activate without programmer touching `App.razor`)
+- `ShiftBlazor/Components/ShiftForm/ShiftEntityForm.razor` — auto-renders picker when DTO implements `IShiftEntityTaggableDTO`
+
+When making tagging-related changes across any of these repos, update the planning doc.
+
 ## Key Conventions
 
 - Conditional `#if` blocks throughout the sample project control what gets included in template output — be careful editing these as they affect both development mode and template generation
