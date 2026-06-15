@@ -12,11 +12,12 @@ public class ProductRepository : ShiftRepository<DB, Entities.Product, ProductLi
 {
     public bool IncludeProductCategoryOnGetIquery { get; set; }
 
+    // Tags are auto-included by the framework for IShiftEntityTaggable entities — no need to
+    // list them here.
     private static readonly Action<ShiftRepositoryOptions<Product>> IncludeOptions =
         x => x.IncludeRelatedEntitiesWithFindAsync(
             y => y.Include(z => z.ProductBrand),
-            y => y.Include(z => z.CountryOfOrigin),
-            y => y.Include(z => z.Tags)
+            y => y.Include(z => z.CountryOfOrigin)
         );
 
     // When an IShiftEntityMapper<Product, ...> is registered in DI, this constructor is used.

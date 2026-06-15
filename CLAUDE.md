@@ -122,8 +122,9 @@ Key files in this repo:
 - `content/Framework Project/StockPlusPlus.Shared/ActionTrees/StockPlusPlusActionTree.cs` — `Tags = new("Tags")` ReadWriteDeleteAction node
 - `content/Framework Project/StockPlusPlus.Data/Entities/Product.cs` — sample taggable entity (`IShiftEntityTaggable`)
 - `content/Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductDTO.cs` — sample taggable DTO (`IShiftEntityTaggableDTO`)
-- `content/Framework Project/StockPlusPlus.Data/Mappers/Product*Mapper.cs` — Manual/Mapperly/Mapster handle Tags on read, ignore on write (framework pipeline attaches)
-- `content/Framework Project/StockPlusPlus.API/Program.cs` — `AddShiftTagging<DB>(StockPlusPlusActionTree.Tags)` + `MapShiftTaggingEndpoints<DB>()`
+- `content/Framework Project/StockPlusPlus.Data/Mappers/Product*Mapper.cs` — mappers do NOT handle Tags; the framework auto-includes + auto-maps on read and the pipeline attaches on write. Mapperly/Mapster keep `Ignore` directives only so their generators skip the navigation.
+- `content/Framework Project/StockPlusPlus.Data/Repositories/ProductRepository.cs` — no manual `.Include(x => x.Tags)`; the framework auto-includes Tags for `IShiftEntityTaggable` entities
+- `content/Framework Project/StockPlusPlus.API/Program.cs` — `AddShiftTagging<DB>(StockPlusPlusActionTree.Tags)` (or `AddShiftTagging<DB>()` for anonymous endpoints) + `MapShiftTaggingEndpoints<DB>()`
 - `content/Framework Project/StockPlusPlus.Data/Migrations/20260604115251_Tagging.cs` — Tags + ProductTags tables
 - `content/Framework Project/StockPlusPlus.Web/Program.cs` — calls `AddShiftBlazorTagging(o => { o.BaseUrlKey = "StockPluPlus"; o.TypeAuthAction = StockPlusPlusActionTree.Tags; })`. This single call registers the options AND pushes the ShiftBlazor assembly into `AppStartupOptions.AdditionalAssemblies` so `DefaultApp`'s Router picks up `/tags` and `/tags/{Key?}` automatically. `App.razor.cs` is unchanged.
 - `content/Framework Project/StockPlusPlus.Test/Tests/TaggingTests.cs` — 7 integration tests
@@ -132,7 +133,8 @@ Key files in this repo:
 Key files in sibling repos:
 - `ShiftEntity.Core/Tagging/` — `Tag` entity + `IShiftEntityTaggable` + `ShiftTagTableAttribute`
 - `ShiftEntity.Model/Dtos/Tagging/` — `TagDTO`, `TagListDTO`, `IShiftEntityTaggableDTO`
-- `ShiftEntity.EFCore/Tagging/` — `AddShiftTagging<TDbContext>()` registration, `ShiftTagRepository`, `TaggingPipeline` (upsert-on-save), AutoMapper profile
+- `ShiftEntity.EFCore/Tagging/` — `AddShiftTagging<TDbContext>()` registration (action → secured endpoints; no action → anonymous), `ShiftTagRepository`, `TaggingPipeline` (upsert-on-save write), `TagProjection` (read-side Tag→TagDTO), AutoMapper profile
+- `ShiftEntity.EFCore/ShiftRepository.cs` — auto-includes Tags on find (`BaseFindAsync`) and auto-maps them onto the DTO (`ViewAsync`) for taggable entities
 - `ShiftEntity.EFCore/Extensions/ModelBuilderExtensions.cs` — `ConfigureTagging` auto-wires M:N for every `IShiftEntityTaggable` entity
 - `ShiftEntity.Web/Tagging/TaggingEndpoints.cs` — `MapShiftTaggingEndpoints<DB>()`
 - `ShiftBlazor/Components/Tagging/` — `ShiftTagPicker` + `ShiftTagDisplay`

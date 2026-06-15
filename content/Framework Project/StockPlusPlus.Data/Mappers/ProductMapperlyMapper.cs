@@ -1,7 +1,5 @@
 using Riok.Mapperly.Abstractions;
 using ShiftSoftware.ShiftEntity.Core;
-using ShiftSoftware.ShiftEntity.Core.Tagging;
-using ShiftSoftware.ShiftEntity.Model.Dtos.Tagging;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.Product;
 
@@ -13,6 +11,10 @@ public partial class ProductMapperlyMapper : IShiftEntityMapper<Product, Product
     // --- MapToView: Entity → DTO ---
     // Mapperly generates scalar property mapping. We handle FK→SelectDTO and base fields manually
     // because SelectDTO.Text requires the navigation property (e.g., ProductBrand?.Name).
+    //
+    // Tags are NOT handled here. The framework auto-includes + auto-maps Tags on read and
+    // attaches them on save. We only keep the [MapperIgnore*] directives for Tags so Mapperly's
+    // generator doesn't try to map the navigation itself.
 
     public ProductDTO MapToView(Product entity)
     {
@@ -22,19 +24,8 @@ public partial class ProductMapperlyMapper : IShiftEntityMapper<Product, Product
         dto.ProductBrand = entity.ProductBrandID.ToSelectDTO(entity.ProductBrand?.Name);
         dto.CountryOfOrigin = entity.CountryOfOriginID.ToSelectDTO(entity.CountryOfOrigin?.Name);
 
-        dto.Tags = entity.Tags?.Select(MapTagToDTO).ToList() ?? new();
-
         return dto.MapBaseFields(entity);
     }
-
-    private TagDTO MapTagToDTO(Tag tag) => new()
-    {
-        ID = tag.ID.ToString(),
-        Name = tag.Name,
-        Color = tag.Color,
-        Description = tag.Description,
-        IntegrationID = tag.IntegrationID,
-    };
 
     [MapperIgnoreSource(nameof(Product.ProductCategory))]
     [MapperIgnoreSource(nameof(Product.ProductBrand))]
