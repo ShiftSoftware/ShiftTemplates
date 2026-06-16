@@ -125,9 +125,9 @@ builder.Services.AddTypeAuth(x =>
 );
 
 #if (includeSampleApp)
-// Wire the framework's built-in TagListPage / TagFormPage (routes /tags and /tags/{Key?}).
-// Drop this call and remove the ShiftBlazor assembly from Router.AdditionalAssemblies
-// (see App.razor.cs) to use custom pages instead.
+// Shared config for the tag components (ShiftTagList / ShiftTagForm / ShiftTagPicker).
+// The pages that host them are app-owned: Pages/Tags/TagList.razor (/tags) and
+// Pages/Tags/TagForm.razor (/tags/{Key?}).
 builder.Services.AddShiftBlazorTagging(o =>
 {
     o.BaseUrlKey = "StockPluPlus";

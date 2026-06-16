@@ -1,0 +1,13 @@
+@page "/tags/{Key?}"
+@attribute [Authorize]
+
+@*
+    Hosts the framework's <ShiftTagForm /> component at an app-controlled route. The list and
+    the tag picker also open ShiftTagForm as a dialog; this page is for direct navigation.
+*@
+
+<ShiftTagForm Key="@Key" />
+
+@code {
+    [Parameter] public string? Key { get; set; }
+}

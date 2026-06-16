@@ -1,0 +1,9 @@
+@page "/tags"
+@attribute [Authorize]
+
+@*
+    The list itself lives in the framework as the <ShiftTagList /> component; this page just
+    hosts it at a route the app controls. Configure it via AddShiftBlazorTagging in Program.cs.
+*@
+
+<ShiftTagList />
