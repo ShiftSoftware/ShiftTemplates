@@ -121,7 +121,7 @@ Cross-cutting tag system. Opt-in per entity via `IShiftEntityTaggable` / `IShift
 Key files in this repo:
 - `content/Framework Project/StockPlusPlus.Shared/ActionTrees/StockPlusPlusActionTree.cs` — `Tags = new("Tags")` ReadWriteDeleteAction node
 - `content/Framework Project/StockPlusPlus.Data/Entities/Product.cs` — sample taggable entity (`IShiftEntityTaggable`)
-- `content/Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductDTO.cs` — sample taggable view DTO (`IShiftEntityTaggableDTO`); `StockPlusPlus.Web/Pages/Product/ProductForm.razor` places `<ShiftTagPicker @bind-Value="TheItem.Tags" QuickAddComponentType="typeof(TagFormPage)" QuickAddParameterName="@nameof(TagFormPage.TagName)" />` — same add(+)/view-on-double-click affordances as the other autocompletes
+- `content/Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductDTO.cs` — sample taggable view DTO (`IShiftEntityTaggableDTO`); `StockPlusPlus.Web/Pages/Product/ProductForm.razor` places just `<ShiftTagPicker @bind-Value="TheItem.Tags" />` — add(+) and view-on-double-click work by default (picker defaults QuickAdd to the framework `TagFormPage`)
 - `content/Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductListDTO.cs` — sample taggable list DTO (`IShiftEntityTaggableDTO` + `Tags` projected in `MapToList`); `StockPlusPlus.Web/Pages/Product/ProductList.razor` places `<ShiftTagColumn />` to show them
 - `content/Framework Project/StockPlusPlus.Data/Mappers/Product*Mapper.cs` — mappers do NOT handle Tags; the framework auto-includes + auto-maps on read and the pipeline attaches on write. Mapperly/Mapster keep `Ignore` directives only so their generators skip the navigation.
 - `content/Framework Project/StockPlusPlus.Data/Repositories/ProductRepository.cs` — no manual `.Include(x => x.Tags)`; the framework auto-includes Tags for `IShiftEntityTaggable` entities
@@ -134,14 +134,14 @@ Key files in this repo:
 Key files in sibling repos:
 - `ShiftEntity.Core/Tagging/` — `Tag` entity + `IShiftEntityTaggable` + `ShiftTagTableAttribute`
 - `ShiftEntity.Model/Dtos/Tagging/` — `TagDTO`, `TagListDTO`, `IShiftEntityTaggableDTO`
-- `ShiftEntity.EFCore/Tagging/` — `AddShiftTagging<TDbContext>()` registration (action → secured endpoints; no action → anonymous), `ShiftTagRepository`, `TaggingPipeline` (upsert-on-save write), `TagProjection` (read-side Tag→TagDTO), AutoMapper profile
+- `ShiftEntity.EFCore/Tagging/` — `AddShiftTagging<TDbContext>()` registration (action → secured endpoints; no action → anonymous), `ShiftTagRepository`, `TaggingPipeline` (upsert-on-save: attaches existing tags only — unknown ignored, no implicit create), `TagProjection` (read-side Tag→TagDTO), AutoMapper profile
 - `ShiftEntity.EFCore/ShiftRepository.cs` — auto-includes Tags on find (`BaseFindAsync`) and auto-maps them onto the DTO (`ViewAsync`) for taggable entities
 - `ShiftEntity.EFCore/Extensions/ModelBuilderExtensions.cs` — `ConfigureTagging` auto-wires M:N for every `IShiftEntityTaggable` entity
 - `ShiftEntity.Web/Tagging/TaggingEndpoints.cs` — `MapShiftTaggingEndpoints<DB>()`
 - `ShiftBlazor/Components/Tagging/` — `ShiftTagPicker` + `ShiftTagDisplay`
 - `ShiftBlazor/Pages/Tagging/` — routable `TagListPage` (`/tags`) + `TagFormPage` (`/tags/{Key?}`); opt out by simply not calling `AddShiftBlazorTagging`
 - `ShiftBlazor/Tagging/` — `ShiftBlazorTaggingOptions` + `AddShiftBlazorTagging` registration extension (also pushes the ShiftBlazor assembly into `AppStartupOptions.AdditionalAssemblies` so the routes auto-activate without programmer touching `App.razor`)
-- `ShiftBlazor/Components/Tagging/ShiftTagPicker.razor` — drop-in form picker; binds `List<TagDTO>` and forwards the full `ShiftAutocomplete` config via `CaptureUnmatchedValues`. Placed explicitly in forms (no auto-render).
+- `ShiftBlazor/Components/Tagging/ShiftTagPicker.razor` — drop-in form picker; binds `List<TagDTO>`, forwards the full `ShiftAutocomplete` config via `CaptureUnmatchedValues`. Existing tags only (no free-typed create); "+" add button + double-click-view default to the framework `TagFormPage` (`QuickAddComponentType`/`QuickAddParameterName` overridable, or null to hide). Placed explicitly in forms (no auto-render).
 - `ShiftBlazor/Components/ShiftList/ShiftTagColumn.razor` — drop-in `<ShiftTagColumn />` grid column the programmer places inside `<ShiftList>` (list DTO must be `IShiftEntityTaggableDTO`); renders read-only tag chips. Not used → render tags your own way.
 
 When making tagging-related changes across any of these repos, update the planning doc.

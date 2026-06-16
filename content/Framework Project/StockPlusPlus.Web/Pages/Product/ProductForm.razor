@@ -9,7 +9,6 @@
 @using Pages.ProductBrand
 @using Pages.ProductCategory
 @using Pages.Country
-@using ShiftSoftware.ShiftBlazor.Pages.Tagging
 
 @inherits ShiftForm<ProductForm, ProductDTO>
 @inject ODataQuery odataQuery
@@ -64,10 +63,9 @@
 
     <MudSelectExtended @bind-Value="TheItem.TrackingMethod" For="() => TheItem.TrackingMethod"></MudSelectExtended>
 
+    @* Add (+) and view (double-click) use the framework's TagFormPage by default — no config needed. *@
     <ShiftTagPicker Label="Tags"
-                    @bind-Value="TheItem.Tags"
-                    QuickAddComponentType="typeof(TagFormPage)"
-                    QuickAddParameterName="@nameof(TagFormPage.TagName)" />
+                    @bind-Value="TheItem.Tags" />
 
 </ShiftEntityForm>
 

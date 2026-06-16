@@ -211,20 +211,17 @@ public class TaggingTests
     }
 
     [Fact]
-    public async Task Product_InsertWithFreeTypedUnknownTag_IsRejected_WhenUserLacksTagsWrite()
+    public async Task Product_InsertWithUnknownTag_IgnoresIt()
     {
-        // Verifies the AutoCreateIfAuthorized policy: in this test scope there is no
-        // bearer-token user (the factory grants no Tags.Write), so submitting a free-typed
-        // unknown tag should be rejected with a Forbidden ShiftEntityException — preventing
-        // unprivileged callers from silently growing the vocabulary.
-        //
-        // The success path (auto-create when the saving user *does* have Tags.Write) is
-        // exercised end-to-end via the HTTP-level test suite, which authenticates first.
-
+        // There is no implicit "create tag on save": a submitted tag with no matching row in
+        // the vocabulary is dropped. Only existing tags are attached. (New tags are created
+        // explicitly via the tag form / ShiftTagPicker's "+" button.)
         using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<DB>();
         var brandRepo = scope.ServiceProvider.GetRequiredService<ProductBrandRepository>();
         var categoryRepo = scope.ServiceProvider.GetRequiredService<ProductCategoryRepository>();
         var productRepo = scope.ServiceProvider.GetRequiredService<ProductRepository>();
+        var tagRepo = scope.ServiceProvider.GetRequiredService<ShiftTagRepository<DB>>();
 
         var brand = new ProductBrand { Name = $"Brand2-{Guid.NewGuid():N}".Substring(0, 17) };
         brandRepo.Add(brand);
@@ -234,25 +231,43 @@ public class TaggingTests
         categoryRepo.Add(category);
         await categoryRepo.SaveChangesAsync();
 
+        // One real tag + one unknown (no ID, name not in the vocabulary).
+        var realTagEntity = new Tag();
+        tagRepo.Add(realTagEntity);
+        var realTag = await tagRepo.UpsertAsync(realTagEntity,
+            new TagDTO { Name = $"Real-{Guid.NewGuid():N}".Substring(0, 18) },
+            ActionTypes.Insert, null, null, true, true);
+        await tagRepo.SaveChangesAsync();
+
+        var unknownName = $"UnknownTag-{Guid.NewGuid():N}".Substring(0, 22);
+
         var productDto = new ProductDTO
         {
-            Name = "Free-typed Tag Product",
+            Name = "Unknown Tag Product",
             TrackingMethod = TrackingMethod.Batch_LOT,
             ProductBrand = new ShiftEntitySelectDTO { Value = brand.ID.ToString(), Text = brand.Name },
             ProductCategory = new ShiftEntitySelectDTO { Value = category.ID.ToString(), Text = category.Name },
             Tags = new List<TagDTO>
             {
-                new() { Name = $"UnknownTag-{Guid.NewGuid():N}".Substring(0, 22) }
+                new() { ID = realTag.ID.ToString(), Name = realTag.Name },
+                new() { Name = unknownName }, // unknown → dropped
             }
         };
 
         var product = new Product();
         productRepo.Add(product);
+        var inserted = await productRepo.UpsertAsync(product, productDto, ActionTypes.Insert, null, null, true, true);
+        await productRepo.SaveChangesAsync();
 
-        var ex = await Assert.ThrowsAsync<ShiftEntityException>(async () =>
-            await productRepo.UpsertAsync(product, productDto, ActionTypes.Insert, null, null, true, true));
+        // The unknown tag was NOT created.
+        db.ChangeTracker.Clear();
+        Assert.False(await db.Tags.AsNoTracking().AnyAsync(t => t.Name == unknownName));
 
-        Assert.Equal((int)System.Net.HttpStatusCode.Forbidden, ex.HttpStatusCode);
+        // Only the real tag is attached.
+        var found = await db.Set<Product>().Include(p => p.Tags).FirstOrDefaultAsync(p => p.ID == inserted.ID);
+        Assert.NotNull(found);
+        Assert.Single(found!.Tags);
+        Assert.Equal(realTag.ID, found.Tags.First().ID);
     }
 
     [Fact]
