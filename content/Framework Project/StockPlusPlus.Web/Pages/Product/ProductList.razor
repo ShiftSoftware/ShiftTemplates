@@ -2,6 +2,7 @@
 @attribute [Route($"/{nameof(ProductList)}")]
 
 @using ShiftSoftware.ShiftBlazor.Filters.Models
+@using ShiftSoftware.ShiftEntity.Model.Dtos.Tagging
 @using ShiftSoftware.ShiftIdentity.Core.DTOs.City
 @using StockPlusPlus.Shared.DTOs.ProductBrand;
 @using StockPlusPlus.Shared.DTOs.Product
@@ -41,8 +42,18 @@
            <ChildContent>
                <DateTimeFilter Label="Release Date" Property="x => x.ReleaseDate" lg="12" md="12" xl="12" sm="12" xs="12" />
 
-               @* Drop-in tag filter — multi-select tags, filters the list to rows having any of them. *@
+               @* Drop-in tag filter — multi-select tags (autocomplete), filters by tag ID. *@
                <ShiftTagFilter />
+
+               @* Custom tag *text* filter — type free text, filters rows whose tags' Name contains it:
+                  Tags/any(item: contains(item/Name, '...')). Plain StringFilter over the Tags M:N nav. *@
+               <StringFilter T="TagListDTO"
+                             TProperty="string"
+                             Property="x => x.Name"
+                             Label="Tag"
+                             Operator="ODataOperator.Contains"
+                             CollectionPrefix="@(new List<string> { "Tags" })"
+                             xs="12" sm="12" md="6" lg="3" xl="3" xxl="3" />
 
                 @if (ProductBrandID != null)
                 {
