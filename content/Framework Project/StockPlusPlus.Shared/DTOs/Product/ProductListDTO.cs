@@ -2,6 +2,7 @@
 using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
+using ShiftSoftware.ShiftEntity.Model.Dtos.Tagging;
 using ShiftSoftware.ShiftEntity.Model.HashIds;
 using ShiftSoftware.ShiftIdentity.Core.DTOs.City;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
@@ -11,7 +12,7 @@ using System.Text.Json.Serialization;
 namespace StockPlusPlus.Shared.DTOs.Product;
 
 [ShiftEntityKeyAndName(nameof(ID), nameof(Name))]
-public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO>, IHasAttentionSummary
+public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO>, IHasAttentionSummary, IShiftEntityTaggableDTO
 {
     [_ProductHashId]
     public override string? ID { get; set; }
@@ -41,6 +42,11 @@ public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO
     public bool HasActiveAttention { get; set; }
     public int? HighestSeverity { get; set; }
     public int ActiveSignalCount { get; set; }
+
+    // Implementing IShiftEntityTaggableDTO makes ShiftList auto-render a read-only Tags column.
+    // Populated by the mapper's MapToList projection (list responses are projections, so —
+    // unlike the single-entity view — tags must be projected here, not auto-mapped post-hoc).
+    public List<TagDTO> Tags { get; set; } = new();
 
     public string? CustomID
     {

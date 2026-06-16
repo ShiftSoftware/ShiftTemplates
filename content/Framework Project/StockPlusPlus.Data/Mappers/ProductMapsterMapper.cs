@@ -1,5 +1,7 @@
 using Mapster;
 using ShiftSoftware.ShiftEntity.Core;
+using ShiftSoftware.ShiftEntity.Core.Tagging;
+using ShiftSoftware.ShiftEntity.Model.Dtos.Tagging;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.Product;
 
@@ -13,9 +15,12 @@ public class ProductMapsterMapper : IShiftEntityMapper<Product, ProductListDTO, 
     {
         var config = MapsterShiftEntityDefaults.CreateConfig();
 
-        // Tags are NOT handled by the mapper — the framework auto-includes + auto-maps them on
-        // read and attaches them on save. Ignore Tags in every direction so Mapster leaves the
-        // navigation alone and the framework owns it.
+        // Tag → TagDTO projection — used by the LIST (EntityToList projects the Tags collection).
+        config.NewConfig<Tag, TagDTO>()
+            .Map(d => d.ID, s => s.ID.ToString());
+
+        // For the single-entity VIEW, the framework auto-includes + auto-maps Tags, so ignore
+        // them here (and on write/copy) to leave the navigation to the framework.
         config.EntityToView<Product, ProductDTO>()
             .Ignore(d => d.Tags);
 
@@ -25,7 +30,7 @@ public class ProductMapsterMapper : IShiftEntityMapper<Product, ProductListDTO, 
             .Map(d => d.IsDraft, s => s.IsDraft ?? false);
 
         // Only "Category" needs explicit mapping (name mismatch with ProductCategory.Name).
-        // Everything else — ID, ProductBrand, ProductCategoryID, etc. — handled by convention.
+        // Tags are projected by convention via the Tag → TagDTO config above.
         config.EntityToList<Product, ProductListDTO>()
             //.Map(d => d.ProductBrand, s => s.ProductBrand != null ? s.ProductBrand : null)
             .Map(d => d.Category, s => s.ProductCategory != null ? s.ProductCategory.Name : null);

@@ -151,6 +151,66 @@ public class TaggingTests
     }
 
     [Fact]
+    public async Task Product_OdataList_ProjectsTagsOntoListDto()
+    {
+        // The list grid shows tags via ProductListDTO.Tags, populated by the mapper's MapToList
+        // projection. This verifies that data path (ShiftList then auto-renders the column).
+        using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<DB>();
+        var brandRepo = scope.ServiceProvider.GetRequiredService<ProductBrandRepository>();
+        var categoryRepo = scope.ServiceProvider.GetRequiredService<ProductCategoryRepository>();
+        var productRepo = scope.ServiceProvider.GetRequiredService<ProductRepository>();
+        var tagRepo = scope.ServiceProvider.GetRequiredService<ShiftTagRepository<DB>>();
+
+        var brand = new ProductBrand { Name = $"LB-{Guid.NewGuid():N}".Substring(0, 17) };
+        brandRepo.Add(brand);
+        await brandRepo.SaveChangesAsync();
+
+        var category = new ProductCategory { Name = $"LC-{Guid.NewGuid():N}".Substring(0, 17) };
+        categoryRepo.Add(category);
+        await categoryRepo.SaveChangesAsync();
+
+        var tagSeed = new Tag();
+        tagRepo.Add(tagSeed);
+        var tag = await tagRepo.UpsertAsync(tagSeed,
+            new TagDTO { Name = $"LX-{Guid.NewGuid():N}".Substring(0, 18), Color = "#0099FF" },
+            ActionTypes.Insert, null, null, true, true);
+        await tagRepo.SaveChangesAsync();
+
+        var productName = $"ListTagged-{Guid.NewGuid():N}".Substring(0, 22);
+        var productDto = new ProductDTO
+        {
+            Name = productName,
+            TrackingMethod = TrackingMethod.Batch_LOT,
+            ProductBrand = new ShiftEntitySelectDTO { Value = brand.ID.ToString(), Text = brand.Name },
+            ProductCategory = new ShiftEntitySelectDTO { Value = category.ID.ToString(), Text = category.Name },
+            Tags = new List<TagDTO> { new() { ID = tag.ID.ToString(), Name = tag.Name } }
+        };
+
+        var product = new Product();
+        productRepo.Add(product);
+        var inserted = await productRepo.UpsertAsync(product, productDto, ActionTypes.Insert, null, null, true, true);
+        await productRepo.SaveChangesAsync();
+
+        db.ChangeTracker.Clear();
+
+        // The OData list path the grid consumes — MapToList projects Tags onto the list DTO.
+        // Bypass default data-level-access (no HTTP user in this scope, same as the other
+        // tagging tests) so the just-inserted product is visible; we're exercising the
+        // projection, not DLA.
+        var queryable = await productRepo.GetIQueryable(
+            asOf: null, includes: null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
+        var listQuery = await productRepo.OdataList(queryable);
+        var row = listQuery.FirstOrDefault(p => p.Name == productName);
+
+        Assert.NotNull(row);
+        Assert.NotNull(row!.Tags);
+        Assert.Single(row.Tags);
+        Assert.Equal(tag.Name, row.Tags[0].Name);
+        Assert.Equal("#0099FF", row.Tags[0].Color);
+    }
+
+    [Fact]
     public async Task Product_InsertWithFreeTypedUnknownTag_IsRejected_WhenUserLacksTagsWrite()
     {
         // Verifies the AutoCreateIfAuthorized policy: in this test scope there is no

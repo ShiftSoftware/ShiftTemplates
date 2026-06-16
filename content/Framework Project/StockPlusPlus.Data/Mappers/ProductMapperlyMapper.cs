@@ -1,5 +1,6 @@
 using Riok.Mapperly.Abstractions;
 using ShiftSoftware.ShiftEntity.Core;
+using ShiftSoftware.ShiftEntity.Model.Dtos.Tagging;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.Product;
 
@@ -130,6 +131,14 @@ public partial class ProductMapperlyMapper : IShiftEntityMapper<Product, Product
             CityID = p.CityID.HasValue ? p.CityID.Value.ToString() : null,
             HasActiveAttention = p.HasActiveAttention,
             HighestSeverity = (int?)p.HighestSeverity,
+            Tags = p.Tags.Select(t => new TagDTO
+            {
+                ID = t.ID.ToString(),
+                Name = t.Name,
+                Color = t.Color,
+                Description = t.Description,
+                IntegrationID = t.IntegrationID,
+            }).ToList(),
         });
     }
 

@@ -1,4 +1,5 @@
 using ShiftSoftware.ShiftEntity.Core;
+using ShiftSoftware.ShiftEntity.Model.Dtos.Tagging;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.Product;
 
@@ -6,9 +7,9 @@ namespace StockPlusPlus.Data.Mappers;
 
 public class ProductMapper : IShiftEntityMapper<Product, ProductListDTO, ProductDTO>
 {
-    // Tags are NOT handled by the mapper. The framework auto-includes the Tags navigation on
-    // read and auto-maps it onto the DTO (read), and the TaggingPipeline attaches them on save
-    // (write). A taggable entity's mapper looks exactly like a non-taggable one.
+    // For the single-entity VIEW, Tags are NOT handled by the mapper — the framework auto-includes
+    // and auto-maps them. For the LIST, tags must be projected here (list responses are OData
+    // IQueryable projections, so there's no post-projection hook to populate them).
     public ProductDTO MapToView(Product entity)
     {
         return new ProductDTO
@@ -62,6 +63,14 @@ public class ProductMapper : IShiftEntityMapper<Product, ProductListDTO, Product
             CityID = p.CityID.HasValue ? p.CityID.Value.ToString() : null,
             HasActiveAttention = p.HasActiveAttention,
             HighestSeverity = (int?)p.HighestSeverity,
+            Tags = p.Tags.Select(t => new TagDTO
+            {
+                ID = t.ID.ToString(),
+                Name = t.Name,
+                Color = t.Color,
+                Description = t.Description,
+                IntegrationID = t.IntegrationID,
+            }).ToList(),
         });
     }
 

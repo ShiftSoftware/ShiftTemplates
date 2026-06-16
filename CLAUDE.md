@@ -121,13 +121,14 @@ Cross-cutting tag system. Opt-in per entity via `IShiftEntityTaggable` / `IShift
 Key files in this repo:
 - `content/Framework Project/StockPlusPlus.Shared/ActionTrees/StockPlusPlusActionTree.cs` — `Tags = new("Tags")` ReadWriteDeleteAction node
 - `content/Framework Project/StockPlusPlus.Data/Entities/Product.cs` — sample taggable entity (`IShiftEntityTaggable`)
-- `content/Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductDTO.cs` — sample taggable DTO (`IShiftEntityTaggableDTO`)
+- `content/Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductDTO.cs` — sample taggable view DTO (`IShiftEntityTaggableDTO`) → form auto-renders the picker
+- `content/Framework Project/StockPlusPlus.Shared/DTOs/Product/ProductListDTO.cs` — sample taggable list DTO (`IShiftEntityTaggableDTO` + `Tags` projected in `MapToList`); `StockPlusPlus.Web/Pages/Product/ProductList.razor` places `<ShiftTagColumn />` to show them
 - `content/Framework Project/StockPlusPlus.Data/Mappers/Product*Mapper.cs` — mappers do NOT handle Tags; the framework auto-includes + auto-maps on read and the pipeline attaches on write. Mapperly/Mapster keep `Ignore` directives only so their generators skip the navigation.
 - `content/Framework Project/StockPlusPlus.Data/Repositories/ProductRepository.cs` — no manual `.Include(x => x.Tags)`; the framework auto-includes Tags for `IShiftEntityTaggable` entities
 - `content/Framework Project/StockPlusPlus.API/Program.cs` — `AddShiftTagging<DB>(StockPlusPlusActionTree.Tags)` (or `AddShiftTagging<DB>()` for anonymous endpoints) + `MapShiftTaggingEndpoints<DB>()`
 - `content/Framework Project/StockPlusPlus.Data/Migrations/20260604115251_Tagging.cs` — Tags + ProductTags tables
 - `content/Framework Project/StockPlusPlus.Web/Program.cs` — calls `AddShiftBlazorTagging(o => { o.BaseUrlKey = "StockPluPlus"; o.TypeAuthAction = StockPlusPlusActionTree.Tags; })`. This single call registers the options AND pushes the ShiftBlazor assembly into `AppStartupOptions.AdditionalAssemblies` so `DefaultApp`'s Router picks up `/tags` and `/tags/{Key?}` automatically. `App.razor.cs` is unchanged.
-- `content/Framework Project/StockPlusPlus.Test/Tests/TaggingTests.cs` — 7 integration tests
+- `content/Framework Project/StockPlusPlus.Test/Tests/TaggingTests.cs` — 10 integration tests (incl. list-projection + view-after-save)
 - `content/ShiftEntity/.template.config/template.json` — `taggable` item-template flag (`dotnet new shiftentity --taggable`)
 
 Key files in sibling repos:
@@ -140,7 +141,8 @@ Key files in sibling repos:
 - `ShiftBlazor/Components/Tagging/` — `ShiftTagPicker` + `ShiftTagDisplay`
 - `ShiftBlazor/Pages/Tagging/` — routable `TagListPage` (`/tags`) + `TagFormPage` (`/tags/{Key?}`); opt out by simply not calling `AddShiftBlazorTagging`
 - `ShiftBlazor/Tagging/` — `ShiftBlazorTaggingOptions` + `AddShiftBlazorTagging` registration extension (also pushes the ShiftBlazor assembly into `AppStartupOptions.AdditionalAssemblies` so the routes auto-activate without programmer touching `App.razor`)
-- `ShiftBlazor/Components/ShiftForm/ShiftEntityForm.razor` — auto-renders picker when DTO implements `IShiftEntityTaggableDTO`
+- `ShiftBlazor/Components/ShiftForm/ShiftEntityForm.razor` — auto-renders picker when the view DTO implements `IShiftEntityTaggableDTO`
+- `ShiftBlazor/Components/ShiftList/ShiftTagColumn.razor` — drop-in `<ShiftTagColumn />` grid column the programmer places inside `<ShiftList>` (list DTO must be `IShiftEntityTaggableDTO`); renders read-only tag chips. Not used → render tags your own way.
 
 When making tagging-related changes across any of these repos, update the planning doc.
 
