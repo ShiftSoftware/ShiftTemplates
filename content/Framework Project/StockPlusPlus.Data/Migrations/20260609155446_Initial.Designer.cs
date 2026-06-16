@@ -12,18 +12,70 @@ using StockPlusPlus.Data.DbContext;
 namespace StockPlusPlus.Data.Migrations
 {
     [DbContext(typeof(DB))]
-    [Migration("20260116201826_AddDescriptionAndWebsiteURLToCompanyBranch")]
-    partial class AddDescriptionAndWebsiteURLToCompanyBranch
+    [Migration("20260609155446_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.1")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("ProductVersion", "10.0.8")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("ShiftEntity:HistoryIndexedTables", "ShiftIdentity|AccessTreesHistory|ID;ShiftIdentity|BrandsHistory|ID;ShiftIdentity|CitiesHistory|ID;ShiftIdentity|CompaniesHistory|ID;ShiftIdentity|CompanyBranchBrandsHistory|ID;ShiftIdentity|CompanyBranchDepartmentsHistory|ID;ShiftIdentity|CompanyBranchServicesHistory|ID;ShiftIdentity|CompanyBranchesHistory|ID;ShiftIdentity|CompanyCalendarsHistory|ID;ShiftIdentity|CountriesHistory|ID;ShiftIdentity|DepartmentsHistory|ID;ShiftIdentity|RegionsHistory|ID;ShiftIdentity|ServicesHistory|ID;ShiftIdentity|TeamBranchesHistory|ID;ShiftIdentity|TeamUsersHistory|ID;ShiftIdentity|TeamsHistory|ID;ShiftIdentity|UserAccessTreesHistory|ID;ShiftIdentity|UsersHistory|ID;dbo|BrandsHistory|ID;dbo|CountriesHistory|ID;dbo|InvoicesHistory|ID;dbo|ProductCategoriesHistory|ID;dbo|ProductsHistory|ID");
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("ShiftSoftware.ShiftEntity.EFCore.Entities.AttentionSignalEntry", b =>
+                {
+                    b.Property<long>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTimeOffset?>("ClearedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("ClearedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("EntityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PayloadJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("RaisedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Severity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("EntityType", "EntityId", "ClearedAt");
+
+                    b.ToTable("AttentionSignals", (string)null);
+                });
 
             modelBuilder.Entity("ShiftSoftware.ShiftEntity.EFCore.Entities.DeletedRowLog", b =>
                 {
@@ -125,86 +177,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.ToTable(tb => tb.IsTemporal(ttb =>
                             {
                                 ttb.UseHistoryTable("AccessTreesHistory", "ShiftIdentity");
-                                ttb
-                                    .HasPeriodStart("PeriodStart")
-                                    .HasColumnName("PeriodStart");
-                                ttb
-                                    .HasPeriodEnd("PeriodEnd")
-                                    .HasColumnName("PeriodEnd");
-                            }));
-                });
-
-            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.App", b =>
-                {
-                    b.Property<long>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasJsonPropertyName("ID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
-
-                    b.Property<string>("AppId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("AppSecret")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTimeOffset>("CreateDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long?>("CreatedByUserID")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LastReplicationDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("LastSaveDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long?>("LastSavedByUserID")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("PeriodEnd")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("PeriodEnd");
-
-                    b.Property<DateTime>("PeriodStart")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("PeriodStart");
-
-                    b.Property<string>("RedirectUri")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("AppId")
-                        .IsUnique()
-                        .HasFilter("IsDeleted = 0");
-
-                    b.ToTable("Apps", "ShiftIdentity");
-
-                    b.ToTable(tb => tb.IsTemporal(ttb =>
-                            {
-                                ttb.UseHistoryTable("AppsHistory", "ShiftIdentity");
                                 ttb
                                     .HasPeriodStart("PeriodStart")
                                     .HasColumnName("PeriodStart");
@@ -585,9 +557,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTime?>("TerminationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("WebsiteURL")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("WorkingDays")
                         .HasColumnType("nvarchar(max)");
 
@@ -802,6 +771,109 @@ namespace StockPlusPlus.Data.Migrations
                                     .HasPeriodEnd("PeriodEnd")
                                     .HasColumnName("PeriodEnd");
                             }));
+                });
+
+            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.CompanyCalendar", b =>
+                {
+                    b.Property<long>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasJsonPropertyName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
+
+                    b.Property<long?>("CompanyID")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreateDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("CreatedByUserID")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EntryType")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LastReplicationDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("LastSaveDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("LastSavedByUserID")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("PeriodEnd")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("PeriodEnd");
+
+                    b.Property<DateTime>("PeriodStart")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("PeriodStart");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ShiftGroups")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WeekendGroups")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("StartDate", "EndDate", "CompanyID", "IsDeleted");
+
+                    b.ToTable("CompanyCalendars", "ShiftIdentity");
+
+                    b.ToTable(tb => tb.IsTemporal(ttb =>
+                            {
+                                ttb.UseHistoryTable("CompanyCalendarsHistory", "ShiftIdentity");
+                                ttb
+                                    .HasPeriodStart("PeriodStart")
+                                    .HasColumnName("PeriodStart");
+                                ttb
+                                    .HasPeriodEnd("PeriodEnd")
+                                    .HasColumnName("PeriodEnd");
+                            }));
+                });
+
+            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.CompanyCalendarBranch", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CompanyBranchID")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CompanyCalendarID")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyCalendarID");
+
+                    b.ToTable("CompanyCalendarBranches", "ShiftIdentity");
                 });
 
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Country", b =>
@@ -1336,6 +1408,9 @@ namespace StockPlusPlus.Data.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("IntegrationId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -1394,6 +1469,9 @@ namespace StockPlusPlus.Data.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<Guid>("SecurityStamp")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Signature")
                         .HasColumnType("nvarchar(max)");
 
@@ -1416,6 +1494,10 @@ namespace StockPlusPlus.Data.Migrations
                     b.HasIndex("Email")
                         .IsUnique()
                         .HasFilter("IsDeleted = 0 AND Email is not null");
+
+                    b.HasIndex("IntegrationId")
+                        .IsUnique()
+                        .HasFilter("IsDeleted = 0 AND IntegrationId is not null");
 
                     b.HasIndex("Phone")
                         .IsUnique()
@@ -1618,6 +1700,9 @@ namespace StockPlusPlus.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
+                    b.Property<int>("ActiveSignalCount")
+                        .HasColumnType("int");
+
                     b.Property<long?>("CityID")
                         .HasColumnType("bigint");
 
@@ -1635,6 +1720,15 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<long?>("CreatedByUserID")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("DueDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("HasActiveAttention")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("HighestSeverity")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("IdempotencyKey")
                         .HasColumnType("uniqueidentifier");
@@ -1761,6 +1855,12 @@ namespace StockPlusPlus.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
+                    b.Property<int>("ActiveSignalCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AttentionSignalsJson")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long?>("CityID")
                         .HasColumnType("bigint");
 
@@ -1781,6 +1881,12 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<long?>("CreatedByUserID")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("HasActiveAttention")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("HighestSeverity")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("IdempotencyKey")
                         .HasColumnType("uniqueidentifier");
@@ -2132,6 +2238,17 @@ namespace StockPlusPlus.Data.Migrations
                     b.Navigation("Service");
                 });
 
+            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.CompanyCalendarBranch", b =>
+                {
+                    b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.CompanyCalendar", "CompanyCalendar")
+                        .WithMany("Branches")
+                        .HasForeignKey("CompanyCalendarID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CompanyCalendar");
+                });
+
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Region", b =>
                 {
                     b.HasOne("ShiftSoftware.ShiftIdentity.Core.Entities.Country", "Country")
@@ -2310,6 +2427,11 @@ namespace StockPlusPlus.Data.Migrations
                     b.Navigation("CompanyBranchServices");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.CompanyCalendar", b =>
+                {
+                    b.Navigation("Branches");
                 });
 
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.Country", b =>

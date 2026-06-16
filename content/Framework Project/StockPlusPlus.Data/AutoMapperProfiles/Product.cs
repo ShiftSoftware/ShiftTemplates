@@ -40,7 +40,8 @@ public class Product : Profile
 
         CreateMap<Entities.Product, ProductListDTO>()
             //.ForMember(dest => dest.ProductBrandName, opt => opt.MapFrom(src => src.ProductBrand == null ? null : src.ProductBrand.Name))
-            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.ProductCategory == null ? null : src.ProductCategory.Name));
+            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.ProductCategory == null ? null : src.ProductCategory.Name))
+            .ForMember(dest => dest.HighestSeverity, opt => opt.MapFrom(src => (int?)src.HighestSeverity));
 
         CreateMap<Entities.Product, ProductModel>();
 

@@ -22,6 +22,7 @@ using Microsoft.Azure.Cosmos;
 using ShiftSoftware.ShiftEntity.Core.Attention;
 using ShiftSoftware.ShiftEntity.Web.Attention;
 using StockPlusPlus.Data.Evaluators;
+using StockPlusPlus.API.Endpoints;
 #if (includeSampleApp)
 using StockPlusPlus.Shared.DTOs.Service;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
@@ -38,9 +39,7 @@ using ShiftSoftware.ShiftIdentity.AspNetCore.Extensions;
 
 #if (internalShiftIdentityHosting)
 using StockPlusPlus.API.Services;
-using StockPlusPlus.API.Endpoints;
 using AutoMapper;
-using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
 using ShiftSoftware.ShiftIdentity.Core.Entities;
 using ShiftSoftware.ShiftIdentity.AspNetCore;
@@ -242,11 +241,6 @@ builder.Services.AddShiftBlazor(config =>
             ["StockPlusPlus"] = baseUrl
         };
         options.UserListEndpoint = shiftIdentityApiURL.AddUrlPath("IdentityPublicUser");
-#if (internalShiftIdentityHosting)
-        options.AdditionalAssemblies = new[] { typeof(StockPlusPlus.Client._Imports).Assembly, typeof(ShiftSoftware.ShiftIdentity.Dashboard.Blazor.ShiftIdentityDashboarBlazorMaker).Assembly };
-#else
-        options.AdditionalAssemblies = new[] { typeof(StockPlusPlus.Client._Imports).Assembly };
-#endif
         options.AddLanguage("en-US", "English", false)
                .AddLanguage("ar-IQ", "Arabic", true)
                .AddLanguage("ku-IQ", "Kurdish", true);
@@ -295,6 +289,8 @@ builder.Services
 
 #region ShiftIdentity Dashboard
 
+#if (internalShiftIdentityHosting)
+
 builder.Services.AddOptions<ShiftIdentityDashboardBlazorOptions>().Configure(x =>
 {
     x.LogoPath = "/img/shift-full.png";
@@ -321,15 +317,13 @@ builder.Services.AddOptions<ShiftIdentityDashboardBlazorOptions>().Configure(x =
     };
 });
 
-#if (internalShiftIdentityHosting)
-
 builder.Services.AddScoped<ISendEmailVerification, SendEmailService>();
 builder.Services.AddScoped<ISendEmailResetPassword, SendEmailService>();
 
 builder.Services.AddScoped<ShiftSoftware.ShiftIdentity.AspNetCore.Services.TokenService>();
 builder.Services.AddScoped<ShiftSoftware.ShiftIdentity.Core.HashService>();
 
-builder.Services.AddShiftIdentityDashboard<DB>(
+builder.Services.AddShiftIdentityDashboardApi<DB>(
     new ShiftSoftware.ShiftIdentity.AspNetCore.ShiftIdentityConfiguration
     {
         ShiftIdentityHostingType = ShiftIdentityHostingTypes.Internal,
@@ -401,12 +395,6 @@ if (builder.Environment.IsDevelopment())
             ID = "1",
             Username = "test"
         },
-        new ShiftSoftware.ShiftIdentity.Core.DTOs.App.AppDTO
-        {
-            AppId = "StockPlusPlus-Dev",
-            DisplayName = "StockPlusPlus Dev",
-            RedirectUri = "http://localhost:5069/"
-        },
         "OneTwo",
 #if (includeSampleApp)
         new string[]
@@ -450,6 +438,10 @@ builder.Services.AddShiftIdentityBlazorServer(
     configure: options =>
     {
         options.CookieName = ".StockPlusPlus.Auth";
+#if (externalShiftIdentityHosting)
+        options.JwtIssuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!;
+        options.JwtPublicKey = builder.Configuration.GetValue<string>("Settings:TokenSettings:PublicKey")!;
+#endif
     });
 
 #endregion

@@ -17,10 +17,62 @@ namespace ShiftTemplates.Builder.Migrator.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("ProductVersion", "10.0.8")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("ShiftEntity:HistoryIndexedTables", "ShiftIdentity|AccessTreesHistory|ID;ShiftIdentity|BrandsHistory|ID;ShiftIdentity|CitiesHistory|ID;ShiftIdentity|CompaniesHistory|ID;ShiftIdentity|CompanyBranchBrandsHistory|ID;ShiftIdentity|CompanyBranchDepartmentsHistory|ID;ShiftIdentity|CompanyBranchServicesHistory|ID;ShiftIdentity|CompanyBranchesHistory|ID;ShiftIdentity|CompanyCalendarsHistory|ID;ShiftIdentity|CountriesHistory|ID;ShiftIdentity|DepartmentsHistory|ID;ShiftIdentity|RegionsHistory|ID;ShiftIdentity|ServicesHistory|ID;ShiftIdentity|TeamBranchesHistory|ID;ShiftIdentity|TeamUsersHistory|ID;ShiftIdentity|TeamsHistory|ID;ShiftIdentity|UserAccessTreesHistory|ID;ShiftIdentity|UsersHistory|ID;dbo|BrandsHistory|ID;dbo|CountriesHistory|ID;dbo|InvoicesHistory|ID;dbo|ProductCategoriesHistory|ID;dbo|ProductsHistory|ID");
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("ShiftSoftware.ShiftEntity.EFCore.Entities.AttentionSignalEntry", b =>
+                {
+                    b.Property<long>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTimeOffset?>("ClearedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("ClearedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("EntityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PayloadJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("RaisedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Severity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("EntityType", "EntityId", "ClearedAt");
+
+                    b.ToTable("AttentionSignals", (string)null);
+                });
 
             modelBuilder.Entity("ShiftSoftware.ShiftEntity.EFCore.Entities.DeletedRowLog", b =>
                 {
@@ -122,86 +174,6 @@ namespace ShiftTemplates.Builder.Migrator.Migrations
                     b.ToTable(tb => tb.IsTemporal(ttb =>
                             {
                                 ttb.UseHistoryTable("AccessTreesHistory", "ShiftIdentity");
-                                ttb
-                                    .HasPeriodStart("PeriodStart")
-                                    .HasColumnName("PeriodStart");
-                                ttb
-                                    .HasPeriodEnd("PeriodEnd")
-                                    .HasColumnName("PeriodEnd");
-                            }));
-                });
-
-            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Core.Entities.App", b =>
-                {
-                    b.Property<long>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasJsonPropertyName("ID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
-
-                    b.Property<string>("AppId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("AppSecret")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTimeOffset>("CreateDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long?>("CreatedByUserID")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LastReplicationDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("LastSaveDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long?>("LastSavedByUserID")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("PeriodEnd")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("PeriodEnd");
-
-                    b.Property<DateTime>("PeriodStart")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("PeriodStart");
-
-                    b.Property<string>("RedirectUri")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("AppId")
-                        .IsUnique()
-                        .HasFilter("IsDeleted = 0");
-
-                    b.ToTable("Apps", "ShiftIdentity");
-
-                    b.ToTable(tb => tb.IsTemporal(ttb =>
-                            {
-                                ttb.UseHistoryTable("AppsHistory", "ShiftIdentity");
                                 ttb
                                     .HasPeriodStart("PeriodStart")
                                     .HasColumnName("PeriodStart");
@@ -825,8 +797,8 @@ namespace ShiftTemplates.Builder.Migrator.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("LastReplicationDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("LastReplicationDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
@@ -1494,6 +1466,9 @@ namespace ShiftTemplates.Builder.Migrator.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<Guid>("SecurityStamp")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Signature")
                         .HasColumnType("nvarchar(max)");
 
@@ -1722,6 +1697,9 @@ namespace ShiftTemplates.Builder.Migrator.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
+                    b.Property<int>("ActiveSignalCount")
+                        .HasColumnType("int");
+
                     b.Property<long?>("CityID")
                         .HasColumnType("bigint");
 
@@ -1739,6 +1717,15 @@ namespace ShiftTemplates.Builder.Migrator.Migrations
 
                     b.Property<long?>("CreatedByUserID")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("DueDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("HasActiveAttention")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("HighestSeverity")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("IdempotencyKey")
                         .HasColumnType("uniqueidentifier");
@@ -1865,6 +1852,12 @@ namespace ShiftTemplates.Builder.Migrator.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
+                    b.Property<int>("ActiveSignalCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AttentionSignalsJson")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long?>("CityID")
                         .HasColumnType("bigint");
 
@@ -1885,6 +1878,12 @@ namespace ShiftTemplates.Builder.Migrator.Migrations
 
                     b.Property<long?>("CreatedByUserID")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("HasActiveAttention")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("HighestSeverity")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("IdempotencyKey")
                         .HasColumnType("uniqueidentifier");

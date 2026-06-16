@@ -19,7 +19,7 @@ namespace StockPlusPlus.Data.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ShiftEntity:HistoryIndexedTables", "ShiftIdentity|AccessTreesHistory|ID;ShiftIdentity|AppsHistory|ID;ShiftIdentity|BrandsHistory|ID;ShiftIdentity|CitiesHistory|ID;ShiftIdentity|CompaniesHistory|ID;ShiftIdentity|CompanyBranchBrandsHistory|ID;ShiftIdentity|CompanyBranchDepartmentsHistory|ID;ShiftIdentity|CompanyBranchServicesHistory|ID;ShiftIdentity|CompanyBranchesHistory|ID;ShiftIdentity|CompanyCalendarsHistory|ID;ShiftIdentity|CountriesHistory|ID;ShiftIdentity|DepartmentsHistory|ID;ShiftIdentity|RegionsHistory|ID;ShiftIdentity|ServicesHistory|ID;ShiftIdentity|TeamBranchesHistory|ID;ShiftIdentity|TeamUsersHistory|ID;ShiftIdentity|TeamsHistory|ID;ShiftIdentity|UserAccessTreesHistory|ID;ShiftIdentity|UsersHistory|ID;dbo|BrandsHistory|ID;dbo|CountriesHistory|ID;dbo|InvoicesHistory|ID;dbo|ProductCategoriesHistory|ID;dbo|ProductsHistory|ID");
+                .HasAnnotation("ShiftEntity:HistoryIndexedTables", "ShiftIdentity|AccessTreesHistory|ID;ShiftIdentity|BrandsHistory|ID;ShiftIdentity|CitiesHistory|ID;ShiftIdentity|CompaniesHistory|ID;ShiftIdentity|CompanyBranchBrandsHistory|ID;ShiftIdentity|CompanyBranchDepartmentsHistory|ID;ShiftIdentity|CompanyBranchServicesHistory|ID;ShiftIdentity|CompanyBranchesHistory|ID;ShiftIdentity|CompanyCalendarsHistory|ID;ShiftIdentity|CountriesHistory|ID;ShiftIdentity|DepartmentsHistory|ID;ShiftIdentity|RegionsHistory|ID;ShiftIdentity|ServicesHistory|ID;ShiftIdentity|TeamBranchesHistory|ID;ShiftIdentity|TeamUsersHistory|ID;ShiftIdentity|TeamsHistory|ID;ShiftIdentity|UserAccessTreesHistory|ID;ShiftIdentity|UsersHistory|ID;dbo|BrandsHistory|ID;dbo|CountriesHistory|ID;dbo|InvoicesHistory|ID;dbo|ProductCategoriesHistory|ID;dbo|ProductsHistory|ID");
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
@@ -138,9 +138,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -215,9 +212,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -291,9 +285,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
@@ -387,9 +378,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
@@ -512,9 +500,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -625,9 +610,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -690,9 +672,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -751,9 +730,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
@@ -823,9 +799,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
@@ -942,9 +915,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -1009,9 +979,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
@@ -1085,9 +1052,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -1160,9 +1124,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -1225,9 +1186,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
@@ -1300,9 +1258,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -1362,9 +1317,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
@@ -1467,9 +1419,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
@@ -1595,9 +1544,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -1658,9 +1604,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -1704,9 +1647,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
@@ -1802,9 +1742,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -1885,9 +1822,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -1962,9 +1896,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
@@ -2066,9 +1997,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -2160,9 +2088,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LastReplicationDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationPartitionKey")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");

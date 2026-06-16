@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StockPlusPlus.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -45,37 +45,26 @@ namespace StockPlusPlus.Data.Migrations
                 .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
 
             migrationBuilder.CreateTable(
-                name: "Apps",
-                schema: "ShiftIdentity",
+                name: "AttentionSignals",
                 columns: table => new
                 {
                     ID = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DisplayName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    AppId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    AppSecret = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
-                    RedirectUri = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
-                    PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
-                        .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
-                    PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
-                        .Annotation("SqlServer:TemporalIsPeriodStartColumn", true),
-                    CreateDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastSaveDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastReplicationDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    CreatedByUserID = table.Column<long>(type: "bigint", nullable: true),
-                    LastSavedByUserID = table.Column<long>(type: "bigint", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    EntityType = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    EntityId = table.Column<long>(type: "bigint", nullable: false),
+                    Source = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Severity = table.Column<int>(type: "int", nullable: false),
+                    PayloadJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RaisedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    ClearedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    ClearedByUserId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Apps", x => x.ID);
-                })
-                .Annotation("SqlServer:IsTemporal", true)
-                .Annotation("SqlServer:TemporalHistoryTableName", "AppsHistory")
-                .Annotation("SqlServer:TemporalHistoryTableSchema", "ShiftIdentity")
-                .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+                    table.PrimaryKey("PK_AttentionSignals", x => x.ID);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Brands",
@@ -166,6 +155,7 @@ namespace StockPlusPlus.Data.Migrations
                     CustomFields = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ParentCompanyID = table.Column<long>(type: "bigint", nullable: true),
                     CompanyID = table.Column<long>(type: "bigint", nullable: true, computedColumnSql: "ID"),
+                    DisplayOrder = table.Column<int>(type: "int", nullable: true),
                     PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -190,6 +180,42 @@ namespace StockPlusPlus.Data.Migrations
                 })
                 .Annotation("SqlServer:IsTemporal", true)
                 .Annotation("SqlServer:TemporalHistoryTableName", "CompaniesHistory")
+                .Annotation("SqlServer:TemporalHistoryTableSchema", "ShiftIdentity")
+                .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
+                .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+
+            migrationBuilder.CreateTable(
+                name: "CompanyCalendars",
+                schema: "ShiftIdentity",
+                columns: table => new
+                {
+                    ID = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EntryType = table.Column<int>(type: "int", nullable: false),
+                    Priority = table.Column<int>(type: "int", nullable: false),
+                    CompanyID = table.Column<long>(type: "bigint", nullable: true),
+                    ShiftGroups = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    WeekendGroups = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
+                        .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
+                    PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
+                        .Annotation("SqlServer:TemporalIsPeriodStartColumn", true),
+                    CreateDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    LastSaveDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    LastReplicationDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedByUserID = table.Column<long>(type: "bigint", nullable: true),
+                    LastSavedByUserID = table.Column<long>(type: "bigint", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CompanyCalendars", x => x.ID);
+                })
+                .Annotation("SqlServer:IsTemporal", true)
+                .Annotation("SqlServer:TemporalHistoryTableName", "CompanyCalendarsHistory")
                 .Annotation("SqlServer:TemporalHistoryTableSchema", "ShiftIdentity")
                 .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
                 .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
@@ -237,6 +263,7 @@ namespace StockPlusPlus.Data.Migrations
                     BuiltIn = table.Column<bool>(type: "bit", nullable: false),
                     CountryID = table.Column<long>(type: "bigint", nullable: true, computedColumnSql: "ID"),
                     Flag = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DisplayOrder = table.Column<int>(type: "int", nullable: true),
                     PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -319,12 +346,16 @@ namespace StockPlusPlus.Data.Migrations
                     InvoiceDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     InvoiceNo = table.Column<long>(type: "bigint", nullable: false),
                     ReleaseDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    DueDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     RegionID = table.Column<long>(type: "bigint", nullable: true),
                     CompanyID = table.Column<long>(type: "bigint", nullable: true),
                     CompanyBranchID = table.Column<long>(type: "bigint", nullable: true),
                     IdempotencyKey = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CityID = table.Column<long>(type: "bigint", nullable: true),
                     CountryID = table.Column<long>(type: "bigint", nullable: true),
+                    HasActiveAttention = table.Column<bool>(type: "bit", nullable: false),
+                    HighestSeverity = table.Column<int>(type: "int", nullable: true),
+                    ActiveSignalCount = table.Column<int>(type: "int", nullable: false),
                     PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -454,6 +485,28 @@ namespace StockPlusPlus.Data.Migrations
                 .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
 
             migrationBuilder.CreateTable(
+                name: "CompanyCalendarBranches",
+                schema: "ShiftIdentity",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CompanyCalendarID = table.Column<long>(type: "bigint", nullable: false),
+                    CompanyBranchID = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CompanyCalendarBranches", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CompanyCalendarBranches_CompanyCalendars_CompanyCalendarID",
+                        column: x => x.CompanyCalendarID,
+                        principalSchema: "ShiftIdentity",
+                        principalTable: "CompanyCalendars",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Regions",
                 schema: "ShiftIdentity",
                 columns: table => new
@@ -467,6 +520,7 @@ namespace StockPlusPlus.Data.Migrations
                     CountryID = table.Column<long>(type: "bigint", nullable: true),
                     RegionID = table.Column<long>(type: "bigint", nullable: true, computedColumnSql: "ID"),
                     Flag = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DisplayOrder = table.Column<int>(type: "int", nullable: true),
                     PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -514,6 +568,10 @@ namespace StockPlusPlus.Data.Migrations
                     IdempotencyKey = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CityID = table.Column<long>(type: "bigint", nullable: true),
                     CountryID = table.Column<long>(type: "bigint", nullable: true),
+                    HasActiveAttention = table.Column<bool>(type: "bit", nullable: false),
+                    HighestSeverity = table.Column<int>(type: "int", nullable: true),
+                    ActiveSignalCount = table.Column<int>(type: "int", nullable: false),
+                    AttentionSignalsJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -565,6 +623,7 @@ namespace StockPlusPlus.Data.Migrations
                     BuiltIn = table.Column<bool>(type: "bit", nullable: false),
                     CountryID = table.Column<long>(type: "bigint", nullable: true),
                     CityID = table.Column<long>(type: "bigint", nullable: true, computedColumnSql: "ID"),
+                    DisplayOrder = table.Column<int>(type: "int", nullable: true),
                     PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -656,6 +715,10 @@ namespace StockPlusPlus.Data.Migrations
                     CompanyID = table.Column<long>(type: "bigint", nullable: true),
                     CountryID = table.Column<long>(type: "bigint", nullable: true),
                     CompanyBranchID = table.Column<long>(type: "bigint", nullable: true, computedColumnSql: "ID"),
+                    DisplayOrder = table.Column<int>(type: "int", nullable: true),
+                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PublishTargets = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
                         .Annotation("SqlServer:TemporalIsPeriodEndColumn", true),
                     PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -879,6 +942,7 @@ namespace StockPlusPlus.Data.Migrations
                     ID = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Username = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    IntegrationId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     Salt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     LoginAttempts = table.Column<int>(type: "int", nullable: false),
@@ -889,6 +953,7 @@ namespace StockPlusPlus.Data.Migrations
                     AccessTree = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RequireChangePassword = table.Column<bool>(type: "bit", nullable: false),
                     VerificationSASToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     EmailVerified = table.Column<bool>(type: "bit", nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
@@ -1071,12 +1136,9 @@ namespace StockPlusPlus.Data.Migrations
                 filter: "IsDeleted = 0");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Apps_AppId",
-                schema: "ShiftIdentity",
-                table: "Apps",
-                column: "AppId",
-                unique: true,
-                filter: "IsDeleted = 0");
+                name: "IX_AttentionSignals_EntityType_EntityId_ClearedAt",
+                table: "AttentionSignals",
+                columns: new[] { "EntityType", "EntityId", "ClearedAt" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Brands_IdempotencyKey",
@@ -1093,10 +1155,22 @@ namespace StockPlusPlus.Data.Migrations
                 filter: "UniqueHash IS NOT NULL and IsDeleted = 0");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Cities_DisplayOrder",
+                schema: "ShiftIdentity",
+                table: "Cities",
+                column: "DisplayOrder");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Cities_RegionID",
                 schema: "ShiftIdentity",
                 table: "Cities",
                 column: "RegionID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Companies_DisplayOrder",
+                schema: "ShiftIdentity",
+                table: "Companies",
+                column: "DisplayOrder");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Companies_ParentCompanyID",
@@ -1141,6 +1215,12 @@ namespace StockPlusPlus.Data.Migrations
                 column: "CompanyID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CompanyBranches_DisplayOrder",
+                schema: "ShiftIdentity",
+                table: "CompanyBranches",
+                column: "DisplayOrder");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CompanyBranches_RegionID",
                 schema: "ShiftIdentity",
                 table: "CompanyBranches",
@@ -1159,11 +1239,29 @@ namespace StockPlusPlus.Data.Migrations
                 column: "ServiceID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CompanyCalendarBranches_CompanyCalendarID",
+                schema: "ShiftIdentity",
+                table: "CompanyCalendarBranches",
+                column: "CompanyCalendarID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CompanyCalendars_StartDate_EndDate_CompanyID_IsDeleted",
+                schema: "ShiftIdentity",
+                table: "CompanyCalendars",
+                columns: new[] { "StartDate", "EndDate", "CompanyID", "IsDeleted" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Countries_IdempotencyKey",
                 table: "Countries",
                 column: "IdempotencyKey",
                 unique: true,
                 filter: "IdempotencyKey IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Countries_DisplayOrder",
+                schema: "ShiftIdentity",
+                table: "Countries",
+                column: "DisplayOrder");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DeletedRowLogs_ContainerName_LastReplicationDate",
@@ -1228,6 +1326,12 @@ namespace StockPlusPlus.Data.Migrations
                 schema: "ShiftIdentity",
                 table: "Regions",
                 column: "CountryID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Regions_DisplayOrder",
+                schema: "ShiftIdentity",
+                table: "Regions",
+                column: "DisplayOrder");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TeamBranches_CompanyBranchID",
@@ -1305,6 +1409,14 @@ namespace StockPlusPlus.Data.Migrations
                 filter: "IsDeleted = 0 AND Email is not null");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_IntegrationId",
+                schema: "ShiftIdentity",
+                table: "Users",
+                column: "IntegrationId",
+                unique: true,
+                filter: "IsDeleted = 0 AND IntegrationId is not null");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Phone",
                 schema: "ShiftIdentity",
                 table: "Users",
@@ -1325,19 +1437,59 @@ namespace StockPlusPlus.Data.Migrations
                 column: "Username",
                 unique: true,
                 filter: "IsDeleted = 0");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[AccessTreesHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_AccessTreesHistory_ID] ON [ShiftIdentity].[AccessTreesHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[BrandsHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_BrandsHistory_ID] ON [ShiftIdentity].[BrandsHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[CitiesHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_CitiesHistory_ID] ON [ShiftIdentity].[CitiesHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[CompaniesHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_CompaniesHistory_ID] ON [ShiftIdentity].[CompaniesHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[CompanyBranchBrandsHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_CompanyBranchBrandsHistory_ID] ON [ShiftIdentity].[CompanyBranchBrandsHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[CompanyBranchDepartmentsHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_CompanyBranchDepartmentsHistory_ID] ON [ShiftIdentity].[CompanyBranchDepartmentsHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[CompanyBranchServicesHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_CompanyBranchServicesHistory_ID] ON [ShiftIdentity].[CompanyBranchServicesHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[CompanyBranchesHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_CompanyBranchesHistory_ID] ON [ShiftIdentity].[CompanyBranchesHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[CompanyCalendarsHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_CompanyCalendarsHistory_ID] ON [ShiftIdentity].[CompanyCalendarsHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[CountriesHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_CountriesHistory_ID] ON [ShiftIdentity].[CountriesHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[DepartmentsHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_DepartmentsHistory_ID] ON [ShiftIdentity].[DepartmentsHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[RegionsHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_RegionsHistory_ID] ON [ShiftIdentity].[RegionsHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[ServicesHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_ServicesHistory_ID] ON [ShiftIdentity].[ServicesHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[TeamBranchesHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_TeamBranchesHistory_ID] ON [ShiftIdentity].[TeamBranchesHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[TeamUsersHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_TeamUsersHistory_ID] ON [ShiftIdentity].[TeamUsersHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[TeamsHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_TeamsHistory_ID] ON [ShiftIdentity].[TeamsHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[UserAccessTreesHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_UserAccessTreesHistory_ID] ON [ShiftIdentity].[UserAccessTreesHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[ShiftIdentity].[UsersHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_UsersHistory_ID] ON [ShiftIdentity].[UsersHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[dbo].[BrandsHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_BrandsHistory_ID] ON [dbo].[BrandsHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[dbo].[CountriesHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_CountriesHistory_ID] ON [dbo].[CountriesHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[dbo].[InvoicesHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_InvoicesHistory_ID] ON [dbo].[InvoicesHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[dbo].[ProductCategoriesHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_ProductCategoriesHistory_ID] ON [dbo].[ProductCategoriesHistory] ([ID]);");
+
+            migrationBuilder.Sql("IF NOT EXISTS (SELECT 1 FROM sys.indexes i INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id WHERE i.object_id = OBJECT_ID(N'[dbo].[ProductsHistory]') AND ic.key_ordinal = 1 AND c.name = N'ID') CREATE NONCLUSTERED INDEX [IX_ProductsHistory_ID] ON [dbo].[ProductsHistory] ([ID]);");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Apps",
-                schema: "ShiftIdentity")
-                .Annotation("SqlServer:IsTemporal", true)
-                .Annotation("SqlServer:TemporalHistoryTableName", "AppsHistory")
-                .Annotation("SqlServer:TemporalHistoryTableSchema", "ShiftIdentity")
-                .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
-                .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+                name: "AttentionSignals");
 
             migrationBuilder.DropTable(
                 name: "CompanyBranchBrands",
@@ -1365,6 +1517,10 @@ namespace StockPlusPlus.Data.Migrations
                 .Annotation("SqlServer:TemporalHistoryTableSchema", "ShiftIdentity")
                 .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
                 .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+
+            migrationBuilder.DropTable(
+                name: "CompanyCalendarBranches",
+                schema: "ShiftIdentity");
 
             migrationBuilder.DropTable(
                 name: "DeletedRowLogs");
@@ -1426,6 +1582,15 @@ namespace StockPlusPlus.Data.Migrations
                 schema: "ShiftIdentity")
                 .Annotation("SqlServer:IsTemporal", true)
                 .Annotation("SqlServer:TemporalHistoryTableName", "ServicesHistory")
+                .Annotation("SqlServer:TemporalHistoryTableSchema", "ShiftIdentity")
+                .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
+                .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+
+            migrationBuilder.DropTable(
+                name: "CompanyCalendars",
+                schema: "ShiftIdentity")
+                .Annotation("SqlServer:IsTemporal", true)
+                .Annotation("SqlServer:TemporalHistoryTableName", "CompanyCalendarsHistory")
                 .Annotation("SqlServer:TemporalHistoryTableSchema", "ShiftIdentity")
                 .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
                 .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
@@ -1541,6 +1706,52 @@ namespace StockPlusPlus.Data.Migrations
                 .Annotation("SqlServer:TemporalHistoryTableSchema", "ShiftIdentity")
                 .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
                 .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_AccessTreesHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[AccessTreesHistory]')) DROP INDEX [IX_AccessTreesHistory_ID] ON [ShiftIdentity].[AccessTreesHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_BrandsHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[BrandsHistory]')) DROP INDEX [IX_BrandsHistory_ID] ON [ShiftIdentity].[BrandsHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_CitiesHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[CitiesHistory]')) DROP INDEX [IX_CitiesHistory_ID] ON [ShiftIdentity].[CitiesHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_CompaniesHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[CompaniesHistory]')) DROP INDEX [IX_CompaniesHistory_ID] ON [ShiftIdentity].[CompaniesHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_CompanyBranchBrandsHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[CompanyBranchBrandsHistory]')) DROP INDEX [IX_CompanyBranchBrandsHistory_ID] ON [ShiftIdentity].[CompanyBranchBrandsHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_CompanyBranchDepartmentsHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[CompanyBranchDepartmentsHistory]')) DROP INDEX [IX_CompanyBranchDepartmentsHistory_ID] ON [ShiftIdentity].[CompanyBranchDepartmentsHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_CompanyBranchServicesHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[CompanyBranchServicesHistory]')) DROP INDEX [IX_CompanyBranchServicesHistory_ID] ON [ShiftIdentity].[CompanyBranchServicesHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_CompanyBranchesHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[CompanyBranchesHistory]')) DROP INDEX [IX_CompanyBranchesHistory_ID] ON [ShiftIdentity].[CompanyBranchesHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_CompanyCalendarsHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[CompanyCalendarsHistory]')) DROP INDEX [IX_CompanyCalendarsHistory_ID] ON [ShiftIdentity].[CompanyCalendarsHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_CountriesHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[CountriesHistory]')) DROP INDEX [IX_CountriesHistory_ID] ON [ShiftIdentity].[CountriesHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_DepartmentsHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[DepartmentsHistory]')) DROP INDEX [IX_DepartmentsHistory_ID] ON [ShiftIdentity].[DepartmentsHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_RegionsHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[RegionsHistory]')) DROP INDEX [IX_RegionsHistory_ID] ON [ShiftIdentity].[RegionsHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_ServicesHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[ServicesHistory]')) DROP INDEX [IX_ServicesHistory_ID] ON [ShiftIdentity].[ServicesHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_TeamBranchesHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[TeamBranchesHistory]')) DROP INDEX [IX_TeamBranchesHistory_ID] ON [ShiftIdentity].[TeamBranchesHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_TeamUsersHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[TeamUsersHistory]')) DROP INDEX [IX_TeamUsersHistory_ID] ON [ShiftIdentity].[TeamUsersHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_TeamsHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[TeamsHistory]')) DROP INDEX [IX_TeamsHistory_ID] ON [ShiftIdentity].[TeamsHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_UserAccessTreesHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[UserAccessTreesHistory]')) DROP INDEX [IX_UserAccessTreesHistory_ID] ON [ShiftIdentity].[UserAccessTreesHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_UsersHistory_ID' AND object_id = OBJECT_ID(N'[ShiftIdentity].[UsersHistory]')) DROP INDEX [IX_UsersHistory_ID] ON [ShiftIdentity].[UsersHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_BrandsHistory_ID' AND object_id = OBJECT_ID(N'[dbo].[BrandsHistory]')) DROP INDEX [IX_BrandsHistory_ID] ON [dbo].[BrandsHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_CountriesHistory_ID' AND object_id = OBJECT_ID(N'[dbo].[CountriesHistory]')) DROP INDEX [IX_CountriesHistory_ID] ON [dbo].[CountriesHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_InvoicesHistory_ID' AND object_id = OBJECT_ID(N'[dbo].[InvoicesHistory]')) DROP INDEX [IX_InvoicesHistory_ID] ON [dbo].[InvoicesHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_ProductCategoriesHistory_ID' AND object_id = OBJECT_ID(N'[dbo].[ProductCategoriesHistory]')) DROP INDEX [IX_ProductCategoriesHistory_ID] ON [dbo].[ProductCategoriesHistory];");
+
+            migrationBuilder.Sql("IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_ProductsHistory_ID' AND object_id = OBJECT_ID(N'[dbo].[ProductsHistory]')) DROP INDEX [IX_ProductsHistory_ID] ON [dbo].[ProductsHistory];");
         }
     }
 }
