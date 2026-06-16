@@ -41,6 +41,9 @@
            <ChildContent>
                <DateTimeFilter Label="Release Date" Property="x => x.ReleaseDate" lg="12" md="12" xl="12" sm="12" xs="12" />
 
+               @* Drop-in tag filter — multi-select tags, filters the list to rows having any of them. *@
+               <ShiftTagFilter />
+
                 @if (ProductBrandID != null)
                 {
                     <FilterComponent Property="x => x.ProductBrandID" Operator="ODataOperator.Equal" Value="ProductBrandID" />

@@ -144,6 +144,7 @@ Key files in sibling repos:
 - `ShiftBlazor/Tagging/` — `ShiftBlazorTaggingOptions` + `AddShiftBlazorTagging` registration extension (config only — the tag UI is components, so no router/assembly wiring)
 - `ShiftBlazor/Components/Tagging/ShiftTagPicker.razor` — drop-in form picker; binds `List<TagDTO>`, forwards the full `ShiftAutocomplete` config via `CaptureUnmatchedValues`. Existing tags only (no free-typed create); "+" add button + double-click-view default to the framework `ShiftTagForm` component (`QuickAddComponentType`/`QuickAddParameterName` overridable, or null to hide). Placed explicitly in forms (no auto-render).
 - `ShiftBlazor/Components/ShiftList/ShiftTagColumn.razor` — drop-in `<ShiftTagColumn />` grid column the programmer places inside `<ShiftList>` (list DTO must be `IShiftEntityTaggableDTO`); renders read-only tag chips. Not used → render tags your own way.
+- `ShiftBlazor/Components/Tagging/ShiftTagFilter.razor` — drop-in `<ShiftTagFilter />` (non-generic) placed in a `<ShiftList>` with `EnableFilterPanel`; adds a multi-select Tags filter to the filter panel. Thin preset over `ForeignFilter` + `CollectionPrefix=["Tags"]` (the framework's M:N filter pattern). Sample: `ProductList.razor`.
 
 When making tagging-related changes across any of these repos, update the planning doc.
 
