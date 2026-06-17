@@ -51,6 +51,9 @@ builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Ass
 
 builder.Services.AddAttentionEvaluator<IHasDueDate, FrameworkOverdueEvaluator>();
 builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Invoice, InvoiceMissingReferenceEvaluator>();
+// Composition: a second evaluator on Product raises a "Compliance"-scoped signal alongside
+// Product's own (default-scope) "ReleasedWithoutPrice" — demonstrates scoped clearing.
+builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Product, StockPlusPlus.Data.Evaluators.ProductComplianceEvaluator>();
 
 #if (includeSampleApp)
 builder.Services.AddShiftTagging<DB>(StockPlusPlusActionTree.Tags);

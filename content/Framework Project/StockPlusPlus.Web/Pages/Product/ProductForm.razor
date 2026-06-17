@@ -67,6 +67,20 @@
     <ShiftTagPicker Label="Tags"
                     @bind-Value="TheItem.Tags" />
 
+    @* Scoped-clear demo. Product's own "ReleasedWithoutPrice" signal is in the default scope and
+       auto-clears on open (ClearAttentionOnOpen above). The compliance signal raised by
+       ProductComplianceEvaluator is in the "Compliance" scope, so it survives open and is cleared
+       only by this explicit action — the same pattern a chat tab would use to clear "Chat".
+       (The banner also offers a per-signal dismiss on each row.) *@
+    <MudButton OnClick="MarkComplianceReviewed"
+               Variant="Variant.Outlined"
+               Color="Color.Warning"
+               StartIcon="@Icons.Material.Filled.Check"
+               Size="Size.Small"
+               Class="mt-2">
+        Mark compliance reviewed
+    </MudButton>
+
 </ShiftEntityForm>
 
 
@@ -92,5 +106,14 @@
         {
             TheItem.ProductBrand = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO { Value = ProductBrandID };
         }
+    }
+
+    // Scoped clear: clears only the "Compliance"-scoped signal(s), leaving any other active
+    // signals untouched. Mirrors the TIQ chat-tab pattern (a surface clears only its own scope).
+    // "Compliance" matches ProductComplianceEvaluator.Scope.
+    private async Task MarkComplianceReviewed()
+    {
+        if (FormContainer is not null)
+            await FormContainer.ClearAttention("Compliance");
     }
 }
