@@ -11,7 +11,10 @@
       "Bash(grep \"\\\\.cs$\")",
       "Bash(find /c/Users/Nahro/source/repos/ShiftSoftware/ShiftEntity -type f -name \"*.cs\" -exec grep -l \"MapGroup\" {} \\\\;)",
       "Bash(dotnet build:*)",
-      "Bash(ls *.sln)"
+      "Bash(ls *.sln)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch",
+      "WebFetch(domain:github.com)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Nahro\\source\\repos\\ShiftSoftware\\ShiftEntity\\ShiftEntity.Web",

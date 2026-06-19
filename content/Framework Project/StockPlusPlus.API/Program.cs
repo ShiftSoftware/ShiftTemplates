@@ -49,6 +49,11 @@ Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
 
 builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
 
+// Attribute-driven endpoints: scans the data assembly for entities decorated with
+// [ShiftEntityEndpoint<…>] / [ShiftEntitySecureEndpoint<…>] (e.g. Country) and registers their
+// repositories, default maps, and the endpoints themselves — no controller, no app.Map call.
+builder.Services.AddShiftEntityEndpoints<DB>(typeof(StockPlusPlus.Data.Marker).Assembly);
+
 builder.Services.AddAttentionEvaluator<IHasDueDate, FrameworkOverdueEvaluator>();
 builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Invoice, InvoiceMissingReferenceEvaluator>();
 // Composition: a second evaluator on Product raises a "Compliance"-scoped signal alongside

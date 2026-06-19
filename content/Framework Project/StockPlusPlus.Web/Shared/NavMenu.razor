@@ -1,5 +1,6 @@
 ﻿@*#if (includeSampleApp)*@
 @using ShiftSoftware.ShiftIdentity.Core
+@using StockPlusPlus.Web.Pages.Country
 @using StockPlusPlus.Web.Pages.Invoice
 @using StockPlusPlus.Web.Pages.NeedsAttention
 @using StockPlusPlus.Web.Pages.Product
@@ -37,6 +38,11 @@
                           Match="NavLinkMatch.All"
                           Icon="@Icons.Material.Outlined.Newspaper"
                           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice">Invoices</AuthorizedMudNavLink>
+
+    <AuthorizedMudNavLink Href="@($"/{nameof(CountryList)}")"
+                          Match="NavLinkMatch.All"
+                          Icon="@Icons.Material.Outlined.Public"
+                          TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Country">Countries</AuthorizedMudNavLink>
 
     <AuthorizedMudNavLink Href="/tags"
                           Match="NavLinkMatch.All"

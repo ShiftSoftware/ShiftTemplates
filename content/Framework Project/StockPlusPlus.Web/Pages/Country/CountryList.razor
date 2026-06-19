@@ -1,0 +1,17 @@
+﻿@attribute [Authorize]
+@attribute [Route($"/{nameof(CountryList)}")]
+
+@using StockPlusPlus.Shared.DTOs
+
+<ShiftList EntitySet="Country"
+           Title="Country List"
+           T="CountryDTO"
+           Dense
+           DisableActionColumn
+           ComponentType="typeof(CountryForm)"
+           ShowIDColumn="true"
+           HighlightSortedColumn
+           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Country"
+           EnableExport>
+    <ButtonColumn Property="x => x.Name" Title="Name" />
+</ShiftList>
