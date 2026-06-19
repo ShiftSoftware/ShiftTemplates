@@ -438,6 +438,10 @@ app.MapControllers();
 app.MapAttentionEndpoints<DB>();
 app.MapAttentionHub();
 
+// Maps the attribute-driven CRUD endpoints (entities decorated with [ShiftEntityEndpoint<…>] /
+// [ShiftEntitySecureEndpoint<…>], e.g. Country). Pairs with AddShiftEntityEndpoints<DB>() above.
+app.MapShiftEntityEndpoints<DB>(typeof(StockPlusPlus.Data.Marker).Assembly);
+
 #if (includeSampleApp)
 app.MapShiftTaggingEndpoints<DB>();
 #endif

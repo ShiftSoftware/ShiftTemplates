@@ -53,12 +53,12 @@ public class AttributeEndpointTests
         Assert.Equal("Testland", dto.Name);
     }
 
-    // The secure CRUD endpoints at "api/country" are generated and served WITHOUT any app.Map call —
-    // automatically, via the DI-registered EndpointDataSource. A mapped secure endpoint returns 200
-    // when authorized or 401/403 otherwise, but NEVER 404. (Bearer auth isn't exercisable in every
-    // environment, so we assert the route exists rather than a specific authorized status.)
+    // The secure CRUD endpoints at "api/country" are generated from the entity attribute and mapped by
+    // app.MapShiftEntityEndpoints<DB>(...). A mapped secure endpoint returns 200 when authorized or
+    // 401/403 otherwise, but NEVER 404. (Bearer auth isn't exercisable in every environment, so we
+    // assert the route exists rather than a specific authorized status.)
     [Fact]
-    public async Task AttributeEndpoint_IsMappedAutomatically_WithoutAppMapCall()
+    public async Task AttributeEndpoint_IsMapped()
     {
         var client = factory.CreateClient();
 
