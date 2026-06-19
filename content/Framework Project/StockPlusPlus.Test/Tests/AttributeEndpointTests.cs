@@ -11,9 +11,9 @@ namespace StockPlusPlus.Test.Tests;
 /// <summary>
 /// Integration tests for the attribute-driven endpoints. Country carries
 /// <c>[ShiftEntitySecureEndpoint&lt;CountryDTO, CountryDTO, StockPlusPlusActionTree&gt;("api/country", …)]</c>
-/// and has NO controller and NO repository — everything (built-in repository, default map, and the
-/// secure CRUD endpoints themselves) is wired by the single <c>AddShiftEntityEndpoints&lt;DB&gt;(…)</c>
-/// call in Program.cs, with no <c>app.Map…</c> call.
+/// and has NO controller and NO repository — the DI side (built-in repository, default map, DTO-map
+/// entry) is wired by <c>RegisterShiftRepositories(...)</c> and the routes are mapped by
+/// <c>app.MapShiftEntityEndpoints&lt;DB&gt;()</c>.
 /// </summary>
 [Collection("API Collection")]
 public class AttributeEndpointTests
@@ -25,7 +25,7 @@ public class AttributeEndpointTests
         this.factory = factory;
     }
 
-    // AddShiftEntityEndpoints<DB> registered the framework's built-in repository for the
+    // RegisterShiftRepositories registered the framework's built-in repository (open generic) for the
     // repository-less, attribute-driven Country endpoint, backed by the app's DB.
     [Fact]
     public void AttributeEndpoint_RegistersBuiltInRepository_ForRepositoryLessEntity()

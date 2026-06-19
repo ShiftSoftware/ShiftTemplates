@@ -47,12 +47,10 @@ Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
     .UseTemporal(true);
 };
 
+// Also wires attribute-driven endpoints: scans the given (data) assembly for entities decorated with
+// [ShiftEntityEndpoint<…>] / [ShiftEntitySecureEndpoint<…>] (e.g. Country) and registers their built-in
+// repository + default map + DTO-map entry. Map the routes below with app.MapShiftEntityEndpoints<DB>().
 builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
-
-// Attribute-driven endpoints: scans the data assembly for entities decorated with
-// [ShiftEntityEndpoint<…>] / [ShiftEntitySecureEndpoint<…>] (e.g. Country) and registers their
-// repositories, default maps, and the endpoints themselves — no controller, no app.Map call.
-builder.Services.AddShiftEntityEndpoints<DB>(typeof(StockPlusPlus.Data.Marker).Assembly);
 
 builder.Services.AddAttentionEvaluator<IHasDueDate, FrameworkOverdueEvaluator>();
 builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Invoice, InvoiceMissingReferenceEvaluator>();
@@ -439,8 +437,9 @@ app.MapAttentionEndpoints<DB>();
 app.MapAttentionHub();
 
 // Maps the attribute-driven CRUD endpoints (entities decorated with [ShiftEntityEndpoint<…>] /
-// [ShiftEntitySecureEndpoint<…>], e.g. Country). Pairs with AddShiftEntityEndpoints<DB>() above.
-app.MapShiftEntityEndpoints<DB>(typeof(StockPlusPlus.Data.Marker).Assembly);
+// [ShiftEntitySecureEndpoint<…>], e.g. Country). DI was wired by RegisterShiftRepositories above; with
+// no assemblies passed it discovers them from the registered data assemblies.
+app.MapShiftEntityEndpoints<DB>();
 
 #if (includeSampleApp)
 app.MapShiftTaggingEndpoints<DB>();
