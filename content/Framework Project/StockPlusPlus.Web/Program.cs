@@ -128,7 +128,9 @@ builder.Services.AddTypeAuth(x =>
 // Shared config for the tag components (ShiftTagList / ShiftTagForm / ShiftTagPicker).
 // The pages that host them are app-owned: Pages/Tags/TagList.razor (/tags) and
 // Pages/Tags/TagForm.razor (/tags/{Key?}).
-builder.Services.AddShiftBlazorTagging(o =>
+// Generic overload also registers StockPlusPlusActionTree with client-side TypeAuth (idempotent —
+// the explicit AddActionTree in AddTypeAuth below stays for the other entities; no duplicate).
+builder.Services.AddShiftBlazorTagging<StockPlusPlusActionTree>(o =>
 {
     o.BaseUrlKey = "StockPluPlus";
     o.TypeAuthAction = StockPlusPlusActionTree.Tags;

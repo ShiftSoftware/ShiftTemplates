@@ -59,7 +59,9 @@ builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Invoice, Invo
 builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Product, StockPlusPlus.Data.Evaluators.ProductComplianceEvaluator>();
 
 #if (includeSampleApp)
-builder.Services.AddShiftTagging<DB>(StockPlusPlusActionTree.Tags);
+// Generic overload also registers StockPlusPlusActionTree with TypeAuth (idempotent — the explicit
+// AddActionTree in AddTypeAuth below stays for the other entities; no duplicate).
+builder.Services.AddShiftTagging<DB, StockPlusPlusActionTree>(StockPlusPlusActionTree.Tags);
 #endif
 
 // Phase 2 emission: once a save that raised attention signals commits, the framework
