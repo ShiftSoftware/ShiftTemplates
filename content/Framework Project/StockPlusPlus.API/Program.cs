@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using ShiftSoftware.ShiftIdentity.Core;
 using StockPlusPlus.Data.DbContext;
 using ShiftSoftware.ShiftEntity.Web.Services;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
@@ -23,8 +22,8 @@ using AutoMapper;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
 using ShiftSoftware.ShiftIdentity.Core.Entities;
-using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
-using ShiftSoftware.ShiftIdentity.AspNetCore;
+using ShiftSoftware.ShiftIdentity.Core.Models;
+using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.ShiftEntity.Model.Enums;
 using StockPlusPlus.Shared.Localization;
 using Microsoft.Extensions.Azure;
@@ -250,7 +249,19 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
         {
             LockDownInMinutes = 0,
             LoginAttemptsForLockDown = 1000000,
-            RequirePasswordChange = false
+            RequirePasswordChange = true,
+        },
+        MfaSettings = new MfaSettingsModel
+        {
+            Enabled = true,
+            Mandatory = true,
+        },
+        TemporaryTokenSettings = new TemporaryTokenSettingsModel
+        {
+            Key = builder.Configuration.GetValue<string>("Settings:TokenSettings:TemporaryTokenKey")!,
+            Issuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!,
+            Audience = "stock-plus-plus",
+            ExpireSeconds = 100000,
         },
         RefreshToken = new RefreshTokenSettingsModel
         {
