@@ -253,8 +253,8 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
         },
         MfaSettings = new MfaSettingsModel
         {
-            Enabled = true,
-            Mandatory = true,
+            Enabled = builder.Configuration.GetValue<bool>("Settings:Mfa:Enabled", true),
+            Mandatory = builder.Configuration.GetValue<bool>("Settings:Mfa:Mandatory", false),
         },
         TemporaryTokenSettings = new TemporaryTokenSettingsModel
         {
