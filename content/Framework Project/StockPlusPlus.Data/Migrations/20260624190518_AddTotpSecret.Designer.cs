@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockPlusPlus.Data.DbContext;
 
@@ -11,9 +12,11 @@ using StockPlusPlus.Data.DbContext;
 namespace StockPlusPlus.Data.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20260624190518_AddTotpSecret")]
+    partial class AddTotpSecret
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,12 +71,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<DateTimeOffset?>("LastReplicationDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationStamp")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -108,10 +105,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<string>("Category")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("ClearScope")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
