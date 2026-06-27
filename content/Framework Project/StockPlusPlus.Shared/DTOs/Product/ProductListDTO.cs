@@ -1,4 +1,5 @@
 ﻿
+using ShiftSoftware.ShiftEntity.Core.Attention;
 using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
@@ -40,7 +41,7 @@ public class ProductListDTO : ShiftEntityListDTO, IHasDraftColumn<ProductListDTO
     public string? CityID { get; set; }
     public CityListDTO? City { get; set; }
     public bool HasActiveAttention { get; set; }
-    public int? HighestSeverity { get; set; }
+    public AttentionSeverity? HighestSeverity { get; set; }
     public int ActiveSignalCount { get; set; }
 
     // Implementing IShiftEntityTaggableDTO makes ShiftList auto-render a read-only Tags column.

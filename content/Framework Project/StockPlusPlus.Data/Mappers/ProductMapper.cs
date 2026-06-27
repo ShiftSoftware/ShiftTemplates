@@ -64,7 +64,7 @@ public class ProductMapper : IShiftEntityMapper<Product, ProductListDTO, Product
             ProductBrandID = p.ProductBrandID.ToString(),
             CityID = p.CityID.HasValue ? p.CityID.Value.ToString() : null,
             HasActiveAttention = p.HasActiveAttention,
-            HighestSeverity = (int?)p.HighestSeverity,
+            HighestSeverity = p.HighestSeverity,
         });
     }
 

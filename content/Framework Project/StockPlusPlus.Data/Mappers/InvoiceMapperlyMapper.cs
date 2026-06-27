@@ -115,7 +115,7 @@ public partial class InvoiceMapperlyMapper : IShiftEntityMapper<Invoice, Invoice
             InvoiceNo = e.InvoiceNo,
             IsDeleted = e.IsDeleted,
             HasActiveAttention = e.HasActiveAttention,
-            HighestSeverity = (int?)e.HighestSeverity,
+            HighestSeverity = e.HighestSeverity,
         });
     }
 

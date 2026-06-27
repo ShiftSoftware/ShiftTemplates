@@ -41,8 +41,7 @@ public class InvoiceMapsterMapper : IShiftEntityMapper<Invoice, InvoiceListDTO, 
             });
 
         config.EntityToList<Invoice, InvoiceListDTO>()
-            .Map(d => d.ManualReference, s => s.ManualReference ?? "")
-            .Map(d => d.HighestSeverity, s => (int?)s.HighestSeverity);
+            .Map(d => d.ManualReference, s => s.ManualReference ?? "");
 
         config.EntityCopy<Invoice>();
 
