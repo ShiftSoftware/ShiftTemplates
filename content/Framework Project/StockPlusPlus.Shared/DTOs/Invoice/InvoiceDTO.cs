@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using ShiftSoftware.ShiftEntity.Core.Attention;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using ShiftSoftware.ShiftEntity.Model.HashIds;
 using StockPlusPlus.Shared.DTOs.Product;
@@ -26,7 +27,7 @@ public class InvoiceListDTO : ShiftEntityListDTO, IHasAttentionSummary
     public DateTimeOffset? InvoiceDate { get; set; }
     public long InvoiceNo { get; set; }
     public bool HasActiveAttention { get; set; }
-    public int? HighestSeverity { get; set; }
+    public AttentionSeverity? HighestSeverity { get; set; }
     public int ActiveSignalCount { get; set; }
 }
 
