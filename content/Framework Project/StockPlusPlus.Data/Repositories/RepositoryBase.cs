@@ -11,7 +11,7 @@ public abstract class RepositoryBase<TEntity, TListDTO, TViewAndUpsertDTO> : Shi
     where TListDTO : ShiftEntityListDTO
     where TViewAndUpsertDTO : ShiftEntityViewAndUpsertDTO
 {
-    protected RepositoryBase(DB db, Action<ShiftRepositoryOptions<TEntity>>? shiftRepositoryBuilder = null) : base(db, shiftRepositoryBuilder)
+    protected RepositoryBase(DB db, Action<ShiftRepositoryOptions<TEntity, TListDTO, TViewAndUpsertDTO>>? shiftRepositoryBuilder = null) : base(db, shiftRepositoryBuilder)
     {
     }
 }

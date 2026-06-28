@@ -75,29 +75,11 @@ builder.Services.AddAttentionConsumer<StockPlusPlus.API.Services.AttentionLoggin
 // switches that subscribe and react land in Iteration 9.
 builder.Services.AddAttentionHub();
 
-// Mapping strategy: controlled by "MappingStrategy" in appsettings.json.
-// "AutoMapper" (default) — uses AutoMapper via the repository's parameterless constructor.
-// "Manual" — registers hand-written IShiftEntityMapper implementations; DI injects them into repositories.
-var mappingStrategy = builder.Configuration.GetValue<StockPlusPlus.Shared.Enums.MappingStrategy>("MappingStrategy");
-
-if (mappingStrategy == StockPlusPlus.Shared.Enums.MappingStrategy.Manual)
-{
-    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Product, StockPlusPlus.Shared.DTOs.Product.ProductListDTO, StockPlusPlus.Shared.DTOs.Product.ProductDTO>, StockPlusPlus.Data.Mappers.ProductMapper>();
-    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.ProductCategory, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryListDTO, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryDTO>, StockPlusPlus.Data.Mappers.ProductCategoryMapper>();
-    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Invoice, StockPlusPlus.Shared.DTOs.Invoice.InvoiceListDTO, StockPlusPlus.Shared.DTOs.Invoice.InvoiceDTO>, StockPlusPlus.Data.Mappers.InvoiceMapper>();
-}
-else if (mappingStrategy == StockPlusPlus.Shared.Enums.MappingStrategy.Mapperly)
-{
-    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Product, StockPlusPlus.Shared.DTOs.Product.ProductListDTO, StockPlusPlus.Shared.DTOs.Product.ProductDTO>, StockPlusPlus.Data.Mappers.ProductMapperlyMapper>();
-    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.ProductCategory, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryListDTO, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryDTO>, StockPlusPlus.Data.Mappers.ProductCategoryMapperlyMapper>();
-    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Invoice, StockPlusPlus.Shared.DTOs.Invoice.InvoiceListDTO, StockPlusPlus.Shared.DTOs.Invoice.InvoiceDTO>, StockPlusPlus.Data.Mappers.InvoiceMapperlyMapper>();
-}
-else if (mappingStrategy == StockPlusPlus.Shared.Enums.MappingStrategy.Mapster)
-{
-    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Product, StockPlusPlus.Shared.DTOs.Product.ProductListDTO, StockPlusPlus.Shared.DTOs.Product.ProductDTO>, StockPlusPlus.Data.Mappers.ProductMapsterMapper>();
-    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.ProductCategory, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryListDTO, StockPlusPlus.Shared.DTOs.ProductCategory.ProductCategoryDTO>, StockPlusPlus.Data.Mappers.ProductCategoryMapsterMapper>();
-    builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.IShiftEntityMapper<StockPlusPlus.Data.Entities.Invoice, StockPlusPlus.Shared.DTOs.Invoice.InvoiceListDTO, StockPlusPlus.Shared.DTOs.Invoice.InvoiceDTO>, StockPlusPlus.Data.Mappers.InvoiceMapsterMapper>();
-}
+// Mapping strategy is chosen per-repository — no global DI registration of mappers:
+//   - Product         -> overrides MapToView/MapToEntity/MapToList in ProductRepository
+//   - Invoice         -> hand-written manual InvoiceMapper plugged via options.UseMapper(...)
+//   - ProductCategory -> Mapster library mapper (ProductCategoryMapsterMapper) via options.UseMapper(...)
+//   - everything else -> default AutoMapper (AutoMapperProfiles)
 
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
 builder.Services.AddHttpClient();
