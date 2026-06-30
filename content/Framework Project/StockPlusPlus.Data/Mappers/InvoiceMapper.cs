@@ -6,7 +6,9 @@ namespace StockPlusPlus.Data.Mappers;
 
 public class InvoiceMapper : IShiftEntityMapper<Invoice, InvoiceListDTO, InvoiceDTO>
 {
-    public InvoiceDTO MapToView(Invoice entity)
+    // The optional IServiceProvider lets a mapper resolve services on demand (e.g. a lookup or
+    // localization service) without being registered in DI — the repository passes its own here.
+    public InvoiceDTO MapToView(Invoice entity, IServiceProvider? serviceProvider = null)
     {
         return new InvoiceDTO
         {
@@ -32,7 +34,7 @@ public class InvoiceMapper : IShiftEntityMapper<Invoice, InvoiceListDTO, Invoice
         }.MapBaseFields(entity);
     }
 
-    public Invoice MapToEntity(InvoiceDTO dto, Invoice existing)
+    public Invoice MapToEntity(InvoiceDTO dto, Invoice existing, IServiceProvider? serviceProvider = null)
     {
         existing.ManualReference = dto.ManualReference;
         existing.InvoiceDate = dto.InvoiceDate;
@@ -52,7 +54,7 @@ public class InvoiceMapper : IShiftEntityMapper<Invoice, InvoiceListDTO, Invoice
         return existing;
     }
 
-    public IQueryable<InvoiceListDTO> MapToList(IQueryable<Invoice> query)
+    public IQueryable<InvoiceListDTO> MapToList(IQueryable<Invoice> query, IServiceProvider? serviceProvider = null)
     {
         return query.Select(e => new InvoiceListDTO
         {
@@ -66,7 +68,7 @@ public class InvoiceMapper : IShiftEntityMapper<Invoice, InvoiceListDTO, Invoice
         });
     }
 
-    public void CopyEntity(Invoice source, Invoice target)
+    public void CopyEntity(Invoice source, Invoice target, IServiceProvider? serviceProvider = null)
     {
         source.ShallowCopyTo(target);
     }

@@ -21,23 +21,25 @@ public class ProductCategoryMapsterMapper : IShiftEntityMapper<ProductCategory, 
         return config;
     }
 
-    public ProductCategoryDTO MapToView(ProductCategory entity)
+    // The optional IServiceProvider lets a mapper resolve services on demand (e.g. a lookup or
+    // localization service) without being registered in DI — the repository passes its own here.
+    public ProductCategoryDTO MapToView(ProductCategory entity, IServiceProvider? serviceProvider = null)
     {
         return entity.Adapt<ProductCategoryDTO>(_config).MapBaseFields(entity);
     }
 
-    public ProductCategory MapToEntity(ProductCategoryDTO dto, ProductCategory existing)
+    public ProductCategory MapToEntity(ProductCategoryDTO dto, ProductCategory existing, IServiceProvider? serviceProvider = null)
     {
         dto.Adapt(existing, _config);
         return existing;
     }
 
-    public IQueryable<ProductCategoryListDTO> MapToList(IQueryable<ProductCategory> query)
+    public IQueryable<ProductCategoryListDTO> MapToList(IQueryable<ProductCategory> query, IServiceProvider? serviceProvider = null)
     {
         return query.ProjectToType<ProductCategoryListDTO>(_config);
     }
 
-    public void CopyEntity(ProductCategory source, ProductCategory target)
+    public void CopyEntity(ProductCategory source, ProductCategory target, IServiceProvider? serviceProvider = null)
     {
         source.Adapt(target, _config);
     }
