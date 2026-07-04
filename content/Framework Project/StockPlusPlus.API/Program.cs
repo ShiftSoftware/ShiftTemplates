@@ -237,6 +237,7 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
         {
             Enabled = builder.Configuration.GetValue<bool>("Settings:Mfa:Enabled", true),
             Mandatory = builder.Configuration.GetValue<bool>("Settings:Mfa:Mandatory", false),
+            Totp = new TotpSettingsModel { IssuerName = "identity.shift.software" }
         },
         TemporaryTokenSettings = new TemporaryTokenSettingsModel
         {
