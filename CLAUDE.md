@@ -104,6 +104,8 @@ Key files in this repo:
 - `content/Framework Project/StockPlusPlus.Test/Tests/ManualMappingTests.cs` — 8 integration tests validating `IShiftEntityMapper` path (pass with both Manual and Mapperly)
 - `content/Framework Project/StockPlusPlus.Test/Tests/MappingPOC/` — POC test files comparing Manual, Mapperly, and Mapster approaches (not production code)
 
+Attribute-driven endpoints can also take a mapper (iteration §20 in the planning doc). Alongside `[ShiftEntityEndpoint<…>]` / `[ShiftEntityEndpoint<…, TRepository>]`, there are `[ShiftEntityEndpointWithMapper<…, TMapper>]` / `[ShiftEntitySecureEndpointWithMapper<…, TActionTree, TMapper>]` where `TMapper : class, IShiftEntityMapper` (a non-generic marker; the exact `(entity,list,view)` triple is validated at discovery). A mapper keeps the built-in repository but replaces AutoMapper. Sample: `StockPlusPlus.Data/Entities/Country.cs` exposes `api/country` (AutoMapper) and `api/countrymapped` (`Mappers/CountryMapper.cs` + the distinct `Shared/DTOs/CountryMappedDTO.cs` — a distinct DTO is REQUIRED because the mapper is keyed by DTO type). UI to test it: `StockPlusPlus.Web/Pages/Country/CountryMappedList.razor` + `CountryMappedForm.razor` (EntitySet/Endpoint `CountryMapped`), linked from `Shared/NavMenu.razor` as "Countries (Mapped)". Tests: `Tests/AttributeEndpointMapperDiscoveryTests.cs` (DB-independent) + `Tests/AttributeEndpointTests.cs`.
+
 Key files in ShiftEntity (sibling repo):
 - `ShiftEntity.Core/IShiftEntityMapper.cs` — the interface (4 methods: MapToView, MapToEntity, MapToList, CopyEntity)
 - `ShiftEntity.Core/MappingHelpers.cs` — helpers to reduce manual mapping boilerplate (audit fields, FK ↔ ShiftEntitySelectDTO, ShallowCopyTo)

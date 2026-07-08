@@ -1,10 +1,13 @@
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
+using StockPlusPlus.Data.Mappers;
 using StockPlusPlus.Shared.DTOs;
 using System.Net;
+using System.Reflection;
 
 namespace StockPlusPlus.Test.Tests;
 
@@ -67,5 +70,67 @@ public class AttributeEndpointTests
         // 200 (authorized), 401, or 403 all prove the secure endpoint is mapped and its auth pipeline
         // ran. 404 would mean it wasn't generated/served; a 5xx would mean it's mis-wired.
         Assert.Contains(response.StatusCode, new[] { HttpStatusCode.OK, HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden });
+    }
+
+    // Country's SECOND attribute — [ShiftEntitySecureEndpointWithMapper<CountryMappedDTO, CountryMappedDTO,
+    // StockPlusPlusActionTree, CountryMapper>("api/countrymapped", …)] — passes a mapper. RegisterShiftRepositories(...)
+    // registers it as the IShiftEntityMapper for that (entity, DTO) triple, keeping the built-in repository.
+    [Fact]
+    public void AttributeEndpoint_WithMapper_RegistersCustomMapperInDI()
+    {
+        using var scope = factory.Services.CreateScope();
+
+        var mapper = scope.ServiceProvider
+            .GetRequiredService<IShiftEntityMapper<Country, CountryMappedDTO, CountryMappedDTO>>();
+
+        Assert.IsType<CountryMapper>(mapper);
+    }
+
+    // The built-in repository for the mapper endpoint resolves the registered CountryMapper and uses it as
+    // its inner mapper — i.e. the custom mapper is PREFERRED over the AutoMapper default (proving the
+    // trailing-generic mapper path, not just that the mapper is in DI).
+    [Fact]
+    public void AttributeEndpoint_WithMapper_BuiltInRepositoryPrefersCustomMapper()
+    {
+        using var scope = factory.Services.CreateScope();
+
+        var repo = scope.ServiceProvider
+            .GetRequiredService<ShiftRepository<DB, Country, CountryMappedDTO, CountryMappedDTO>>();
+
+        Assert.IsType<CountryMapper>(GetInnerMapper(repo));
+    }
+
+    // Isolation: the AutoMapper endpoint (api/country, CountryDTO) is unaffected by the mapper registered
+    // for the mapped endpoint — its built-in repository still falls back to the AutoMapper-backed mapper.
+    // This is only true because the mapper endpoint uses a DISTINCT DTO (the mapper is keyed on the DTO).
+    [Fact]
+    public void AttributeEndpoint_AutoMapperEndpoint_StillUsesAutoMapper()
+    {
+        using var scope = factory.Services.CreateScope();
+
+        var repo = scope.ServiceProvider
+            .GetRequiredService<ShiftRepository<DB, Country, CountryDTO, CountryDTO>>();
+
+        Assert.IsType<AutoMapperShiftEntityMapper<Country, CountryDTO, CountryDTO>>(GetInnerMapper(repo));
+    }
+
+    // The mapper endpoint's routes are generated and served (same assertion rationale as the AutoMapper one).
+    [Fact]
+    public async Task AttributeEndpoint_WithMapper_IsMapped()
+    {
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("api/countrymapped");
+
+        Assert.Contains(response.StatusCode, new[] { HttpStatusCode.OK, HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden });
+    }
+
+    // innerMapper is a protected member of ShiftRepository; the mapper chosen at construction (custom vs
+    // AutoMapper default) is exactly what we want to assert, so read it via reflection.
+    private static object? GetInnerMapper(object repository)
+    {
+        var prop = repository.GetType().GetProperty("innerMapper", BindingFlags.NonPublic | BindingFlags.Instance);
+        Assert.NotNull(prop);
+        return prop!.GetValue(repository);
     }
 }

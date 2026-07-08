@@ -1,0 +1,20 @@
+@attribute [Route($"/{nameof(CountryMappedForm)}/{{Key?}}")]
+
+@using StockPlusPlus.Shared.DTOs
+
+@inherits ShiftForm<CountryMappedForm, CountryMappedDTO>
+
+@* Create/edit form for the "api/countrymapped" endpoint (mapped via CountryMapper). *@
+<ShiftEntityForm @bind-Mode="Mode"
+                 @bind-Value="TheItem"
+                 @ref="FormContainer"
+                 Endpoint="CountryMapped"
+                 Title="Country (Mapped)"
+                 TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Country"
+                 @bind-Key="@Key">
+
+    <MudTextFieldExtended OnlyValidateIfDirty="true"
+                          Label="Name"
+                          @bind-Value="TheItem.Name"
+                          For="@(() => TheItem.Name)" />
+</ShiftEntityForm>
