@@ -3,7 +3,6 @@ using ShiftSoftware.ShiftEntity.Core.Flags;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Flags;
 using StockPlusPlus.Shared.Enums;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StockPlusPlus.Data.Entities;
 
@@ -12,7 +11,6 @@ namespace StockPlusPlus.Data.Entities;
 public class ProductCategory : ShiftEntity<ProductCategory>,
     IEntityHasBrand<ProductCategory>, IEntityHasRegion<ProductCategory>, IEntityHasCompany<ProductCategory>, IEntityHasCompanyBranch<ProductCategory>, IEntityHasIdempotencyKey<ProductCategory>
 {
-    [Column(TypeName = "json")]
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
     public string? Code { get; set; }

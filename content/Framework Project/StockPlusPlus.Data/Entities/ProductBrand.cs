@@ -1,8 +1,6 @@
 ﻿
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.Core.Flags;
-using System.ComponentModel.DataAnnotations.Schema;
-
 
 #if (includeItemTemplateContent)
 using ShiftSoftware.ShiftEntity.Model.Flags;
@@ -27,7 +25,6 @@ public class ProductBrand : ShiftEntity<ProductBrand>
 #endif
 {
 #if (includeItemTemplateContent)
-    [Column(TypeName = "json")]
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
     public string? Code { get; set; }

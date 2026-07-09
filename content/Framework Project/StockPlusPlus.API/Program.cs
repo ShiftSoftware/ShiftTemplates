@@ -42,7 +42,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
 {
-    x.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer")!, o => o.UseCompatibilityLevel(170))
+    x.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer")!)
     .UseTemporal(true);
 };
 
@@ -386,8 +386,6 @@ if (builder.Environment.IsDevelopment())
 //    await db.Database.EnsureCreatedAsync();
 //}
 
-var enCulture = new CultureInfo("en-US");
-
 if (app.Environment.EnvironmentName != "Test")
 {
 #if (internalShiftIdentityHosting)
@@ -406,9 +404,7 @@ if (app.Environment.EnvironmentName != "Test")
         CompanyType = CompanyTypes.NotSpecified,
 
         CompanyBranchExternalId = "-11",
-        CompanyBranchShortCode = "SFT-EBL",
-
-        DefaultCulture = enCulture,
+        CompanyBranchShortCode = "SFT-EBL"
     });
 
     await app.SetFullAccessAsync("t1", "t3");
@@ -417,7 +413,7 @@ if (app.Environment.EnvironmentName != "Test")
 
 var supportedCultures = new List<CultureInfo>
 {
-    enCulture,
+    new("en-US"),
     new("ar-IQ"),
     new("ku-IQ"),
     new("fr-FR"),
