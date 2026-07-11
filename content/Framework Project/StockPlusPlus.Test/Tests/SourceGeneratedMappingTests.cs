@@ -382,6 +382,19 @@ public class AutoDiscoveredSelectDtoAndFileDtoMappingTests
 public class MapperCustomizationTests
 {
     [Fact]
+    public void PartialClass_MethodTakeover_CanCallGeneratedBody_ThenTweak()
+    {
+        // ProductBrandMapper implements MapToEntity itself, calls MapToEntityGenerated (all
+        // conventions run), then trims Code — the partial-class analog of base.MapToEntity(...).
+        var existing = new ProductBrand();
+
+        new ProductBrandMapper().MapToEntity(new ProductBrandDTO { Name = "X", Code = "  GB-9  " }, existing);
+
+        Assert.Equal("GB-9", existing.Code);   // the takeover's post-processing
+        Assert.Equal("X", existing.Name);       // generated conventions still ran
+    }
+
+    [Fact]
     public void PartialClass_Configure_ForList_ReplacesConvention()
     {
         var list = new ProductBrandMapper()
