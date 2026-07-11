@@ -1,6 +1,7 @@
 ﻿
 using ShiftSoftware.ShiftEntity.EFCore;
 using StockPlusPlus.Data.DbContext;
+using StockPlusPlus.Data.Mappers;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 #if (taggable)
 using Microsoft.EntityFrameworkCore;
@@ -11,13 +12,19 @@ namespace StockPlusPlus.Data.Repositories;
 public class ProductBrandRepository : ShiftRepository<DB, Entities.ProductBrand, ProductBrandListDTO, ProductBrandDTO>
 {
 #if (taggable)
-    public ProductBrandRepository(DB db) : base(db, x => x.IncludeRelatedEntitiesWithFindAsync(
-        q => q.Include(e => e.Tags)
-    ))
+    // ProductBrand demonstrates SOURCE-GENERATED mapping: ProductBrandMapper is a [ShiftEntityMapper]
+    // partial class whose methods are filled in by the ShiftEntity source generator.
+    public ProductBrandRepository(DB db) : base(db, x =>
+    {
+        x.IncludeRelatedEntitiesWithFindAsync(q => q.Include(e => e.Tags));
+        x.UseMapper(new ProductBrandMapper());
+    })
     {
     }
 #else
-    public ProductBrandRepository(DB db) : base(db)
+    // ProductBrand demonstrates SOURCE-GENERATED mapping: ProductBrandMapper is a [ShiftEntityMapper]
+    // partial class whose methods are filled in by the ShiftEntity source generator.
+    public ProductBrandRepository(DB db) : base(db, x => x.UseMapper(new ProductBrandMapper()))
     {
     }
 #endif
