@@ -62,19 +62,28 @@
         "ShiftTemplates.Builder",
         "TestProject",
         "StockPlusPlus.WebComponents/**/*",
-        "StockPlusPlus.Store/**/*"
+        "StockPlusPlus.Store/**/*",
+        "StockPlusPlus.Web.Tests/**/*"
       ],
       "modifiers": [
         {
           "exclude": [
             "**/StockPlusPlus.API/Controllers/*/**",
             "**/StockPlusPlus.API/Controllers/*.cs",
+            "**/StockPlusPlus.API/Endpoints/*/**",
+            "**/StockPlusPlus.API/Endpoints/*.cs",
             "**/StockPlusPlus.API/Reports/*/**",
             "**/StockPlusPlus.API/Reports/*.frx",
             "**/StockPlusPlus.Data/AutoMapperProfiles/*/**",
             "**/StockPlusPlus.Data/AutoMapperProfiles/*.cs",
             "**/StockPlusPlus.Data/Entities/*/**",
             "**/StockPlusPlus.Data/Entities/*.cs",
+            "**/StockPlusPlus.Data/Evaluators/*/**",
+            "**/StockPlusPlus.Data/Evaluators/*.cs",
+            "**/StockPlusPlus.Data/Mappers/CountryMapper.cs",
+            "**/StockPlusPlus.Data/Mappers/InvoiceMapper.cs",
+            "**/StockPlusPlus.Data/Mappers/ProductCategoryMapsterMapper.cs",
+            "**/StockPlusPlus.E2ETests/**",
             "**/StockPlusPlus.Data/ReplicationModels/*/**",
             "**/StockPlusPlus.Data/ReplicationModels/*.cs",
             "**/StockPlusPlus.Data/Repositories/*/**",
@@ -250,7 +259,7 @@
       "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2025.5.31.2"
+        "value": "2026.7.4.1"
       },
       "datatype": "string",
       "generator": "constant"
@@ -260,7 +269,7 @@
       "description": "Replace AzureFunctionsAspNetCoreAuthorization Version",
       "replaces": "$(AzureFunctionsAspNetCoreAuthorizationVersion)",
       "parameters": {
-        "value": "0.0.12"
+        "value": "0.0.35"
       },
       "datatype": "string",
       "generator": "constant"
@@ -270,7 +279,7 @@
       "description": "Replace TypeAuth Version",
       "replaces": "$(TypeAuthVersion)",
       "parameters": {
-        "value": "1.5.8"
+        "value": "1.6.26"
       },
       "datatype": "string",
       "generator": "constant"
