@@ -6,7 +6,6 @@ using ShiftSoftware.ShiftEntity.EFCore;
 using ShiftSoftware.ShiftIdentity.Core.DTOs.CompanyBranch;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
-using StockPlusPlus.Data.Mappers;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 using StockPlusPlus.Shared.Enums;
@@ -18,8 +17,10 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
 {
     private readonly IHashIdService hashIdService;
 
-    // ProductCategory demonstrates plugging a decoupled mapper class that uses a mapping LIBRARY
-    // (Mapster) via the repository options: ProductCategoryMapsterMapper is passed to options.UseMapper(...).
+    // ProductCategory demonstrates SOURCE-GENERATED mapping on an entity with a relationship
+    // (Brand ↔ BrandID via ShiftEntitySelectDTO) AND file upload (Photos ↔ List<ShiftFileDTO> JSON):
+    // the generator auto-discovers this repository's triple, emits the mapper (using the MappingHelpers
+    // conventions), and UseGeneratedMapper() resolves it — no mapper class is declared anywhere.
     public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider, IServiceProvider serviceProvider, IHashIdService hashIdService) : base(db, o =>
     {
         //o.FilterByCustomValue<List<long>>(x => x.CustomValue.Contains(x.Entity.ID))
@@ -39,8 +40,8 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
         //    Constants.CompanyBranchIdClaim
         //);
 
-        // Plug the Mapster (library) mapper in (replaces the AutoMapper default for this repository).
-        o.UseMapper(new ProductCategoryMapsterMapper());
+        // Use the auto-generated mapper (replaces the AutoMapper default for this repository).
+        o.UseGeneratedMapper();
     })
     {
         this.hashIdService = hashIdService;

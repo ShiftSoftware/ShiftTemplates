@@ -78,7 +78,11 @@ builder.Services.AddAttentionHub();
 // Mapping strategy is chosen per-repository — no global DI registration of mappers:
 //   - Product         -> overrides MapToView/MapToEntity/MapToList in ProductRepository
 //   - Invoice         -> hand-written manual InvoiceMapper plugged via options.UseMapper(...)
-//   - ProductCategory -> Mapster library mapper (ProductCategoryMapsterMapper) via options.UseMapper(...)
+//   - ProductCategory -> SOURCE-GENERATED (auto-discovered) mapper via options.UseGeneratedMapper()
+//                        (covers the SelectDTO relationship + ShiftFileDTO file conventions)
+//   - ProductBrand    -> [ShiftEntityMapper] partial class (generator fills it) via options.UseMapper(...)
+//   - Country         -> zero-code source generation: CountryRepository (UseGeneratedMapper) and the
+//                        api/country-generated endpoint (UseGeneratedMapper = true)
 //   - everything else -> default AutoMapper (AutoMapperProfiles)
 
 builder.Services.AddDbContext<DB>(dbOptionBuilder);

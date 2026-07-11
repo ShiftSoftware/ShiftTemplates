@@ -15,7 +15,9 @@ namespace StockPlusPlus.Test.Tests;
 /// <summary>
 /// Integration tests validating the repository mapping layer end-to-end through CRUD operations,
 /// exercising the mapping strategies at once: Product (overrides the mapping methods),
-/// Invoice (hand-written manual mapper plugged via UseMapper), and ProductCategory (Mapster library mapper via UseMapper).
+/// Invoice (hand-written manual mapper plugged via UseMapper), and ProductCategory (SOURCE-GENERATED
+/// mapper via UseGeneratedMapper — its tests cover the SelectDTO relationship + ShiftFileDTO file conventions
+/// through generated code).
 /// </summary>
 [Collection("API Collection")]
 public class ManualMappingTests

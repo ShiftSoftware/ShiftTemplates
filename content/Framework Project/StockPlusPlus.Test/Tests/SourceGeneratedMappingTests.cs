@@ -8,6 +8,7 @@ using StockPlusPlus.Data.Mappers;
 using StockPlusPlus.Data.Repositories;
 using StockPlusPlus.Shared.DTOs;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
+using StockPlusPlus.Shared.DTOs.ProductCategory;
 
 namespace StockPlusPlus.Test.Tests;
 
@@ -276,5 +277,97 @@ public class SourceGeneratedMappingTests
         Assert.Single(listItems);
         Assert.Equal("SourceGen List Country", listItems[0].Name);
         Assert.Equal(entity.ID.ToString(), listItems[0].ID);
+    }
+}
+
+/// <summary>
+/// Proves the generated code uses the existing MappingHelpers for the two special conventions —
+/// ShiftEntitySelectDTO (FK ↔ SelectDTO via ToSelectDTO / ToNullableForeignKey) and ShiftFileDTO
+/// (string JSON ↔ List&lt;ShiftFileDTO&gt; via ToShiftFiles / ToJsonString) — using ProductCategory,
+/// whose DTO has BOTH (Photos + Brand). The mapper under test is the AUTO-generated one from the
+/// registry — the same one ProductCategoryRepository now uses in production via UseGeneratedMapper().
+/// </summary>
+public class AutoDiscoveredSelectDtoAndFileDtoMappingTests
+{
+    private static IShiftEntityMapper<ProductCategory, ProductCategoryListDTO, ProductCategoryDTO> ResolveMapper()
+    {
+        System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor(typeof(ProductCategory).Module.ModuleHandle);
+
+        var mapperType = ShiftEntityMapperRegistry.Find(typeof(ProductCategory), typeof(ProductCategoryListDTO), typeof(ProductCategoryDTO));
+        Assert.NotNull(mapperType);
+
+        return (IShiftEntityMapper<ProductCategory, ProductCategoryListDTO, ProductCategoryDTO>)Activator.CreateInstance(mapperType!)!;
+    }
+
+    [Fact]
+    public void MapToView_ConvertsPhotosJsonToFileList_AndBrandFkToSelectDTO()
+    {
+        var entity = new ProductCategory
+        {
+            Name = "Files & FK Category",
+            Photos = new List<ShiftFileDTO>
+            {
+                new ShiftFileDTO { Blob = "photos/cat1.jpg", Name = "cat1.jpg" },
+                new ShiftFileDTO { Blob = "photos/cat2.jpg", Name = "cat2.jpg" },
+            }.ToJsonString(),
+            BrandID = 9,
+        };
+
+        var dto = ResolveMapper().MapToView(entity);
+
+        // string (JSON) → List<ShiftFileDTO> via ToShiftFiles
+        Assert.NotNull(dto.Photos);
+        Assert.Equal(2, dto.Photos!.Count);
+        Assert.Equal("photos/cat1.jpg", dto.Photos[0].Blob);
+        Assert.Equal("cat1.jpg", dto.Photos[0].Name);
+        Assert.Equal("photos/cat2.jpg", dto.Photos[1].Blob);
+
+        // FK → ShiftEntitySelectDTO via ToSelectDTO
+        Assert.NotNull(dto.Brand);
+        Assert.Equal("9", dto.Brand!.Value);
+    }
+
+    [Fact]
+    public void MapToView_NullPhotos_YieldsEmptyList_AndNullBrand_YieldsNullSelectDTO()
+    {
+        var dto = ResolveMapper().MapToView(new ProductCategory { Name = "Empty", Photos = null, BrandID = null });
+
+        // ToShiftFiles(null) → empty list; ToSelectDTO((long?)null) → null
+        Assert.NotNull(dto.Photos);
+        Assert.Empty(dto.Photos!);
+        Assert.Null(dto.Brand);
+    }
+
+    [Fact]
+    public void MapToEntity_SerializesPhotos_AndParsesBrandFk()
+    {
+        var existing = new ProductCategory();
+
+        ResolveMapper().MapToEntity(new ProductCategoryDTO
+        {
+            Name = "Upserted",
+            Photos = new List<ShiftFileDTO> { new ShiftFileDTO { Blob = "photos/new.jpg", Name = "new.jpg" } },
+            Brand = new ShiftEntitySelectDTO { Value = "12" },
+        }, existing);
+
+        // List<ShiftFileDTO> → string (JSON) via ToJsonString (round-trip to assert)
+        Assert.NotNull(existing.Photos);
+        var roundTripped = existing.Photos.ToShiftFiles();
+        Assert.Single(roundTripped!);
+        Assert.Equal("photos/new.jpg", roundTripped![0].Blob);
+        Assert.Equal("new.jpg", roundTripped[0].Name);
+
+        // ShiftEntitySelectDTO → FK via ToNullableForeignKey
+        Assert.Equal(12, existing.BrandID);
+    }
+
+    [Fact]
+    public void MapToEntity_NullBrand_ClearsForeignKey()
+    {
+        var existing = new ProductCategory { BrandID = 5 };
+
+        ResolveMapper().MapToEntity(new ProductCategoryDTO { Name = "X", Brand = null }, existing);
+
+        Assert.Null(existing.BrandID);
     }
 }
