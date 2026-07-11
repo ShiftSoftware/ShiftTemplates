@@ -12,8 +12,9 @@ namespace StockPlusPlus.Data.Repositories;
 public class ProductBrandRepository : ShiftRepository<DB, Entities.ProductBrand, ProductBrandListDTO, ProductBrandDTO>
 {
 #if (taggable)
-    // ProductBrand demonstrates SOURCE-GENERATED mapping: ProductBrandMapper is a [ShiftEntityMapper]
-    // partial class whose methods are filled in by the ShiftEntity source generator.
+    // ProductBrand demonstrates the [ShiftEntityMapper] PARTIAL-CLASS form of source generation:
+    // ProductBrandMapper is a declared partial class the generator fills (the customization path —
+    // implement any method there to take it over), plugged explicitly via UseMapper.
     public ProductBrandRepository(DB db) : base(db, x =>
     {
         x.IncludeRelatedEntitiesWithFindAsync(q => q.Include(e => e.Tags));
@@ -22,8 +23,9 @@ public class ProductBrandRepository : ShiftRepository<DB, Entities.ProductBrand,
     {
     }
 #else
-    // ProductBrand demonstrates SOURCE-GENERATED mapping: ProductBrandMapper is a [ShiftEntityMapper]
-    // partial class whose methods are filled in by the ShiftEntity source generator.
+    // ProductBrand demonstrates the [ShiftEntityMapper] PARTIAL-CLASS form of source generation:
+    // ProductBrandMapper is a declared partial class the generator fills (the customization path —
+    // implement any method there to take it over), plugged explicitly via UseMapper.
     public ProductBrandRepository(DB db) : base(db, x => x.UseMapper(new ProductBrandMapper()))
     {
     }

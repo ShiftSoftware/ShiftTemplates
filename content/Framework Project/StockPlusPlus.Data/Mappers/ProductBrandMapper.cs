@@ -5,11 +5,12 @@ using StockPlusPlus.Shared.DTOs.ProductBrand;
 namespace StockPlusPlus.Data.Mappers;
 
 /// <summary>
-/// ProductBrand demonstrates SOURCE-GENERATED mapping: declare this partial class and the
-/// ShiftEntity source generator fills in the four IShiftEntityMapper methods by convention
-/// (scalars by name, FK ↔ ShiftEntitySelectDTO, audit fields via MapBaseFields, inline
-/// SQL-translatable list projection, generated property-by-property CopyEntity). Implement
-/// any of the methods here to take it over — the generator skips user-implemented methods.
+/// ProductBrand demonstrates the [ShiftEntityMapper] PARTIAL-CLASS form of source generation (the
+/// customization path): declaring this class makes the generator fill the four IShiftEntityMapper
+/// methods into it — instead of emitting an auto-named mapper for the triple — and register THIS class
+/// in the registry. Implement any of the four methods (or add [MapperIgnore]-style tweaks in future
+/// iterations) to customize; the generator skips user-implemented methods. Entities with nothing custom
+/// need no class at all — see Country (api/country-generated + CountryRepository).
 /// </summary>
 [ShiftEntityMapper]
 public partial class ProductBrandMapper : IShiftEntityMapper<ProductBrand, ProductBrandListDTO, ProductBrandDTO>

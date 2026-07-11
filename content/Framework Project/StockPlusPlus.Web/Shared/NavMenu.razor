@@ -49,6 +49,11 @@
                           Icon="@Icons.Material.Outlined.Map"
                           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Country">Countries (Mapped)</AuthorizedMudNavLink>
 
+    <AuthorizedMudNavLink Href="@($"/{nameof(CountryGeneratedList)}")"
+                          Match="NavLinkMatch.All"
+                          Icon="@Icons.Material.Outlined.AutoFixHigh"
+                          TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Country">Countries (Generated)</AuthorizedMudNavLink>
+
     <AuthorizedMudNavLink Href="/tags"
                           Match="NavLinkMatch.All"
                           Icon="@Icons.Material.Outlined.Label"

@@ -1,0 +1,21 @@
+@attribute [Authorize]
+@attribute [Route($"/{nameof(CountryGeneratedList)}")]
+
+@using StockPlusPlus.Shared.DTOs
+
+@* Lists the "api/country-generated" endpoint — the same Country table served through the
+   SOURCE-GENERATED mapper (UseGeneratedMapper = true on the endpoint attribute; no mapper class is
+   declared anywhere). It's a separate endpoint + DTO from "api/country" (AutoMapper) and
+   "api/countrymapped" (hand-written CountryMapper), so the three are fully isolated. *@
+<ShiftList EntitySet="country-generated"
+           Title="Country (Generated) List"
+           T="CountryGeneratedDTO"
+           Dense
+           DisableActionColumn
+           ComponentType="typeof(CountryGeneratedForm)"
+           ShowIDColumn="true"
+           HighlightSortedColumn
+           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Country"
+           EnableExport>
+    <ButtonColumn Property="x => x.Name" Title="Name" />
+</ShiftList>
