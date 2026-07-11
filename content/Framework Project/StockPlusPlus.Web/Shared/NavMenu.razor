@@ -15,29 +15,33 @@
                 Icon="@Icons.Material.Outlined.NotificationsActive">Needs Attention</MudNavLink>
 
     <AuthorizedMudNavGroup Title="Products" Icon="@Icons.Material.Filled.Book" HideExpandIcon="!isDrawerOpen" TypeAuthActions="new List<ShiftSoftware.TypeAuth.Core.Actions.Action> {
-        StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand,
-        StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory,
-    }">
-        <AuthorizedMudNavLink Href="@($"/{nameof(ProductBrandList)}")"
-                              TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
-                              Match="NavLinkMatch.All"
-                              Icon="@Icons.Material.Outlined.Bookmarks">Brands</AuthorizedMudNavLink>
+                                              StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand,
+                                              StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory,
+                                          }">
+<AuthorizedMudNavLink Href="@($"/{nameof(ProductBrandList)}")"
+                      TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
+                      Match="NavLinkMatch.All"
+                      Icon="@Icons.Material.Outlined.Bookmarks">Brands</AuthorizedMudNavLink>
 
         <AuthorizedMudNavLink Href="@($"/{nameof(ProductCategoryList)}")"
                               TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory"
                               Match="NavLinkMatch.All"
                               Icon="@Icons.Material.Outlined.Discount">Categories</AuthorizedMudNavLink>
 
+        @* AttentionNavBadge: shows how many records currently need attention. The count uses
+           the entity's normal list endpoint, so users only count records they are allowed to
+           see. It refreshes on real-time updates from the attention hub, and also right away
+           when a form in this same window clears a signal. *@
         <AuthorizedMudNavLink Href="@($"/{nameof(ProductList)}")"
                               TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Product"
                               Match="NavLinkMatch.All"
-                              Icon="@Icons.Material.Outlined.Category">Products</AuthorizedMudNavLink>
-    </AuthorizedMudNavGroup>
+                              Icon="@Icons.Material.Outlined.Category">Products <AttentionNavBadge EntitySet="Product" /></AuthorizedMudNavLink>
+</AuthorizedMudNavGroup>
 
     <AuthorizedMudNavLink Href="@($"{nameof(InvoiceList)}")"
                           Match="NavLinkMatch.All"
                           Icon="@Icons.Material.Outlined.Newspaper"
-                          TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice">Invoices</AuthorizedMudNavLink>
+                          TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice">Invoices <AttentionNavBadge EntitySet="Invoice" /></AuthorizedMudNavLink>
 
     <AuthorizedMudNavLink Href="@($"/{nameof(CountryList)}")"
                           Match="NavLinkMatch.All"

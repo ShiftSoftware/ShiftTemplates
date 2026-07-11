@@ -121,6 +121,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnifiedAttestation", "..\..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnifiedAttestation.Functions", "..\..\..\UnifiedAttestation\UnifiedAttestation.Functions\UnifiedAttestation.Functions.csproj", "{8F23E4DA-4EBE-32D3-9B8E-DF68CEC2B273}"
 EndProject
+<!--#endif -->
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -62,6 +62,17 @@ public class Product : ShiftEntity<Product>,
         if (context.Entity.Price is not null)
             return null;
 
+        // Do not raise a signal while someone has this product open on their screen. The
+        // product form reports viewing presence while the record is open: ProductForm sets
+        // ReportViewingPresence, so the form calls StartViewingEntity on the attention hub
+        // when the record loads and stops the report when the form closes. That person
+        // already sees the change, and opening the product would clear the signal right away
+        // anyway — raising it would only cause pointless refreshes in every list that listens
+        // for updates. When no tracker is registered, or nobody is viewing, HasActiveViewers
+        // returns false and the signal is raised as normal.
+        if (context.HasActiveViewers())
+            return null;
+
         return new AttentionSignal
         {
             Category = "ReleasedWithoutPrice",

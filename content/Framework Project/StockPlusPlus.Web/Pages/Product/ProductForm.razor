@@ -13,6 +13,11 @@
 @inherits ShiftForm<ProductForm, ProductDTO>
 @inject ODataQuery odataQuery
 
+@* Viewing presence demo: ReportViewingPresence makes the form tell the server, through the
+   attention hub, that this record's form is open right now. Product.EvaluateAttention reads
+   that presence (context.HasActiveViewers()) and skips raising "ReleasedWithoutPrice" while
+   someone has the record open. Best-effort: when the hub is unreachable, the server treats
+   the record as not viewed and raises signals as normal. *@
 <ShiftEntityForm @bind-Mode="Mode"
                  @bind-Value="TheItem"
                  @ref="FormContainer"
@@ -22,6 +27,7 @@
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Product"
                  AllowClone
                  ClearAttentionOnOpen="true"
+                 ReportViewingPresence="true"
                  @bind-Key="@Key">
 
     <MudTextFieldExtended OnlyValidateIfDirty="true"
@@ -109,7 +115,7 @@
     }
 
     // Scoped clear: clears only the "Compliance"-scoped signal(s), leaving any other active
-    // signals untouched. Mirrors the TIQ chat-tab pattern (a surface clears only its own scope).
+    // signals untouched. Each surface clears only its own scope.
     // "Compliance" matches ProductComplianceEvaluator.Scope.
     private async Task MarkComplianceReviewed()
     {

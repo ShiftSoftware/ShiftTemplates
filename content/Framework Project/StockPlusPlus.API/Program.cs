@@ -5,28 +5,28 @@ using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Azure;
 using ShiftSoftware.ShiftEntity.Core.Attention;
+using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.ShiftEntity.EFCore.Tagging;
 using ShiftSoftware.ShiftEntity.Web.Attention;
 using ShiftSoftware.ShiftEntity.Web.Tagging;
-using StockPlusPlus.Data.Evaluators;
 #if (includeSampleApp)
+using StockPlusPlus.API.Endpoints;
+using StockPlusPlus.Data.Evaluators;
 using StockPlusPlus.Shared.ActionTrees;
 using StockPlusPlus.Shared.DTOs.Service;
 #endif
 
 #if (internalShiftIdentityHosting)
 using StockPlusPlus.API.Services;
-using StockPlusPlus.API.Endpoints;
 using AutoMapper;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
 using ShiftSoftware.ShiftIdentity.Core.Entities;
 using ShiftSoftware.ShiftIdentity.Core.Models;
-using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.ShiftEntity.Model.Enums;
 using StockPlusPlus.Shared.Localization;
-using Microsoft.Extensions.Azure;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Web.Explorer;
@@ -35,7 +35,7 @@ using Microsoft.AspNetCore.OData;
 using ShiftSoftware.TypeAuth.Core;
 #endif
 #if (externalShiftIdentityHosting)
-using ShiftSoftware.ShiftIdentity.AspNetCore.Models;
+using ShiftSoftware.ShiftIdentity.Core.Models;
 #endif
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,10 +52,27 @@ Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
 builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
 
 builder.Services.AddAttentionEvaluator<IHasDueDate, FrameworkOverdueEvaluator>();
+#if (includeSampleApp)
 builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Invoice, InvoiceMissingReferenceEvaluator>();
 // Composition: a second evaluator on Product raises a "Compliance"-scoped signal alongside
 // Product's own (default-scope) "ReleasedWithoutPrice" — demonstrates scoped clearing.
 builder.Services.AddAttentionEvaluator<StockPlusPlus.Data.Entities.Product, StockPlusPlus.Data.Evaluators.ProductComplianceEvaluator>();
+#endif
+
+#if (includeSampleApp)
+// The standalone attention endpoints (app.MapAttentionEndpoints<DB>() below) decide access per
+// entity type through the ShiftEntityActionMap registry: the same TypeAuth action that secures
+// the entity's own endpoints. Signals of a type the registry does not know are denied by
+// default, so they are left out of GET api/attention/active. Three surfaces feed the registry:
+//   - Attribute endpoints ([ShiftEntitySecureEndpoint<…>], e.g. Country) feed it automatically
+//     through RegisterShiftRepositories above.
+//   - Minimal API (MapShiftEntitySecureCrud, e.g. Product in MapProductMinimalApi below) feeds
+//     it automatically at map time.
+//   - Classic controllers (ShiftEntitySecureControllerAsync, e.g. InvoiceController) need this
+//     explicit call. The controller receives its action through its constructor, so the
+//     framework cannot see the action at startup.
+builder.Services.AddShiftEntityAction<StockPlusPlus.Data.Entities.Invoice>(StockPlusPlusActionTree.Invoice);
+#endif
 
 #if (includeSampleApp)
 // Generic overload also registers StockPlusPlusActionTree with TypeAuth (idempotent — the explicit
@@ -213,7 +230,7 @@ mvcBuilder.AddShiftEntityWeb(x =>
 #endif
 });
 
-mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!, 
+mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!,
     builder.Configuration.GetValue<string>("Settings:TokenSettings:PublicKey")!);
 
 #if (internalShiftIdentityHosting)
@@ -445,10 +462,12 @@ app.MapShiftEntityEndpoints<DB>();
 app.MapShiftTaggingEndpoints<DB>();
 #endif
 
+#if (includeSampleApp)
 // Minimal-API surface running side-by-side with the controllers, driven by the same
 // ShiftEntityCrudHandler — proves the refactor is lossless and demonstrates the
 // MapShiftEntitySecureCrud / RequireTypeAuth* extensions end-to-end.
 app.MapProductMinimalApi();
+#endif
 
 app.UseCors(x => x.WithOrigins("*").AllowAnyMethod().AllowAnyHeader());
 
