@@ -19,6 +19,11 @@
                         Languages="@([new () { CultureName = "en-US", Label = "English" }, new () { CultureName = "tr-TR", Label = "Turkish" } ])"
                         Label="Name" />
 
+    <MudTextFieldExtended OnlyValidateIfDirty="true"
+                          Label="Code"
+                          @bind-Value="context.Item.Code"
+                          For="@(() => context.Item.Code)" />
+
     <ShiftAutocomplete Label="Assigned Team"
                        @bind-Value="context.Item.Team"
                        TEntitySet="ShiftSoftware.ShiftIdentity.Core.DTOs.Team.TeamListDTO"

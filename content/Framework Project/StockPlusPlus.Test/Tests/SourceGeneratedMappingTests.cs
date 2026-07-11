@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ShiftSoftware.ShiftEntity.Core;
+using ShiftSoftware.ShiftEntity.EFCore;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
@@ -369,5 +370,111 @@ public class AutoDiscoveredSelectDtoAndFileDtoMappingTests
         ResolveMapper().MapToEntity(new ProductCategoryDTO { Name = "X", Brand = null }, existing);
 
         Assert.Null(existing.BrandID);
+    }
+}
+
+/// <summary>
+/// Per-property customization (ShiftMapperBuilder). DB-independent: the partial-class Configure hook
+/// (ProductBrandMapper customizes Description — its convention is automatically suppressed), and
+/// ForEntity / ForList / ForCopy applied to the AUTO-generated Country mapper via AddConfiguration
+/// (the same path the repository's UseGeneratedMapper(configure) uses).
+/// </summary>
+public class MapperCustomizationTests
+{
+    [Fact]
+    public void PartialClass_Configure_ForList_ReplacesConvention()
+    {
+        var list = new ProductBrandMapper()
+            .MapToList(new[] { new ProductBrand { Name = "X", Code = null } }.AsQueryable())
+            .ToList();
+
+        Assert.Equal("(No Code)", list[0].Code);   // custom binding composed in, convention (null) replaced
+        Assert.Equal("X", list[0].Name);            // other bindings untouched
+    }
+
+    private static (IShiftEntityMapper<Country, CountryGeneratedDTO, CountryGeneratedDTO> Mapper,
+                    IShiftMapperConfigurable<Country, CountryGeneratedDTO, CountryGeneratedDTO> Configurable) CreateCountryMapper()
+    {
+        System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor(typeof(Country).Module.ModuleHandle);
+
+        var mapperType = ShiftEntityMapperRegistry.Find(typeof(Country), typeof(CountryGeneratedDTO), typeof(CountryGeneratedDTO));
+        Assert.NotNull(mapperType);
+
+        var mapper = (IShiftEntityMapper<Country, CountryGeneratedDTO, CountryGeneratedDTO>)Activator.CreateInstance(mapperType!)!;
+        return (mapper, (IShiftMapperConfigurable<Country, CountryGeneratedDTO, CountryGeneratedDTO>)mapper);
+    }
+
+    [Fact]
+    public void AddConfiguration_ForEntity_ReplacesConvention()
+    {
+        var (mapper, configurable) = CreateCountryMapper();
+        configurable.AddConfiguration(map => map.ForEntity(x => x.Name, (dto, _) => dto.Name.ToUpperInvariant()));
+
+        var existing = new Country();
+        mapper.MapToEntity(new CountryGeneratedDTO { Name = "abc" }, existing);
+
+        Assert.Equal("ABC", existing.Name);
+    }
+
+    [Fact]
+    public void AddConfiguration_ForList_ComposesIntoProjection_KeepingOtherBindings()
+    {
+        var (mapper, configurable) = CreateCountryMapper();
+        configurable.AddConfiguration(map => map.ForList(d => d.Name, x => x.Name + " [L]"));
+
+        var list = mapper.MapToList(new[] { new Country { Name = "Alpha" } }.AsQueryable()).ToList();
+
+        Assert.Single(list);
+        Assert.Equal("Alpha [L]", list[0].Name);   // customized binding
+        Assert.Equal("0", list[0].ID);              // convention binding intact
+    }
+
+    [Fact]
+    public void AddConfiguration_ForCopy_ReplacesConvention()
+    {
+        var (mapper, configurable) = CreateCountryMapper();
+        configurable.AddConfiguration(map => map.ForCopy(x => x.Name, (source, _) => source.Name + " [C]"));
+
+        var target = new Country();
+        mapper.CopyEntity(new Country { Name = "N" }, target);
+
+        Assert.Equal("N [C]", target.Name);
+    }
+}
+
+/// <summary>
+/// Repo-site configuration: UseGeneratedMapper(configure) applies AFTER the mapper's own Configure
+/// hook, so the repository (closest to the use site) wins when both customize the same member.
+/// </summary>
+[Collection("API Collection")]
+public class MapperRepoConfigurationTests
+{
+    private readonly CustomWebApplicationFactory factory;
+
+    public MapperRepoConfigurationTests(CustomWebApplicationFactory factory)
+    {
+        this.factory = factory;
+    }
+
+    private class BrandRepoWithConfig : ShiftRepository<DB, ProductBrand, ProductBrandListDTO, ProductBrandDTO>
+    {
+        public BrandRepoWithConfig(DB db) : base(db, x => x.UseGeneratedMapper(map =>
+            map.ForView(d => d.Description, (entity, _) => "repo override")))
+        {
+        }
+    }
+
+    [Fact]
+    public void RepoConfiguration_Overrides_PartialClassConfigure()
+    {
+        using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<DB>();
+
+        var repo = new BrandRepoWithConfig(db);
+        var dto = repo.MapToView(new ProductBrand { Name = "X", Description = null });
+
+        // The repo's UseGeneratedMapper(configure) customization is applied on top of the mapper's
+        // own Configure hook (later wins) — Description comes from the repo config, not the convention.
+        Assert.Equal("repo override", dto.Description);
     }
 }

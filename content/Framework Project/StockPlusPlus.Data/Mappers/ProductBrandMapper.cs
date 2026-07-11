@@ -15,4 +15,12 @@ namespace StockPlusPlus.Data.Mappers;
 [ShiftEntityMapper]
 public partial class ProductBrandMapper : IShiftEntityMapper<ProductBrand, ProductBrandListDTO, ProductBrandDTO>
 {
+    // Per-property customization hook: registering a member automatically suppresses the generated
+    // convention for it (everything else stays generated). ForView/ForEntity/ForCopy take plain
+    // lambdas (optionally with an IServiceProvider); ForList takes an expression over the entity,
+    // composed into the single SQL projection.
+    partial void Configure(ShiftMapperBuilder<ProductBrand, ProductBrandListDTO, ProductBrandDTO> map)
+    {
+        map.ForList(d => d.Code, entity => entity.Code ?? "(No Code)");
+    }
 }
