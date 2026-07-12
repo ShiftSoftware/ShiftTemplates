@@ -384,13 +384,13 @@ public class AttentionTests
         // 1. Load the DTO as a form would — it carries the pre-clear concurrency stamp.
         var getRes = await client.GetAsync($"api/Invoice/{key}");
         Assert.Equal(HttpStatusCode.OK, getRes.StatusCode);
-        var dto = JsonNode.Parse(await getRes.Content.ReadAsStringAsync())!["entity"]!;
+        var dto = JsonNode.Parse(await getRes.Content.ReadAsStringAsync())!["Entity"]!;
 
         // 2. Clear attention — the row changes, so its stamp advances past the loaded one.
         var clearRes = await client.PostAsync($"api/Invoice/{key}/attention/clear", null);
         Assert.Equal(HttpStatusCode.OK, clearRes.StatusCode);
         var clearBody = JsonNode.Parse(await clearRes.Content.ReadAsStringAsync())!;
-        var freshStamp = clearBody["lastSaveDate"];
+        var freshStamp = clearBody["LastSaveDate"];
         Assert.NotNull(freshStamp);
 
         // 3. Saving with the stale stamp is the reported bug — a version conflict.
@@ -400,7 +400,7 @@ public class AttentionTests
         Assert.Equal(HttpStatusCode.Conflict, stalePut.StatusCode);
 
         // 4. Patch the stamp from the clear response → the same save passes.
-        dto["lastSaveDate"] = freshStamp.DeepClone();
+        dto["LastSaveDate"] = freshStamp.DeepClone();
         using var patchedPut = await client.PutAsync($"api/Invoice/{key}",
             new StringContent(dto.ToJsonString(), Encoding.UTF8, "application/json"));
         output.WriteLine($"PUT with patched stamp: {(int)patchedPut.StatusCode}");

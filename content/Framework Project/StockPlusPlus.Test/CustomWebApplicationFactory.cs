@@ -16,10 +16,14 @@ public class CustomWebApplicationFactory : ShiftCustomWebApplicationFactory<WebM
         new ShiftCustomWebApplicationBearerAuthSettings
         {
             Enabled = true,
-            TokenKeySettingKey = "Settings:TokenSettings:PublicKey",
+            // The API validates RSA-signed tokens (AddShiftIdentity), so the test token must be
+            // signed with the private key — the public key would silently produce 401s.
+            TokenKeySettingKey = "Settings:TokenSettings:PrivateKey",
             TokenIssuerSettingKey = "Settings:TokenSettings:Issuer",
             TypeAuthActions = new List<Type>()
             {
+                // Framework tree: DataGridExport permits list GETs without a $top restriction.
+                typeof(ShiftSoftware.ShiftEntity.Core.GeneralActionTree),
 #if (includeSampleApp)
                 typeof(StockPlusPlusActionTree),
                 typeof(ShiftIdentityActions)
