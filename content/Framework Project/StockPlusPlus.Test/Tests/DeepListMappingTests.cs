@@ -6,11 +6,11 @@ using StockPlusPlus.Shared.DTOs.Invoice;
 namespace StockPlusPlus.Test.Tests;
 
 /// <summary>
-/// DEEP LIST mapping via the config-driven opt-in. No [ShiftEntityMapper] partial and no attribute is
-/// declared for (InvoiceLine, InvoiceLineListDTO): the <c>ForListChildren</c> CALL in InvoiceRepository is
-/// itself the opt-in that makes the source generator emit that pair — including a list projection that
-/// carries the line's Product as a ShiftEntitySelectDTO (FK id + navigation name), SQL-translatable.
-/// Here we apply the identical call and run MapToList in-memory: list → lines → product.
+/// DEEP LIST mapping — EXPLICIT and per level. The (InvoiceLine, InvoiceLineListDTO) and
+/// (Product, InvoiceLineProductListDTO) pairs are generated purely from the ForListChildren / nested
+/// ForListChild CALLS in InvoiceRepository (config-driven opt-in — no partial, no attribute). Nothing
+/// goes deep automatically in the list direction: a child object is composed only when a ForListChild
+/// call says so, and that call's nested callback can customize the child's own properties.
 /// </summary>
 public class DeepListMappingTests
 {
@@ -24,56 +24,73 @@ public class DeepListMappingTests
         return (IShiftEntityMapper<Invoice, InvoiceListDTO, InvoiceDTO>)Activator.CreateInstance(mapperType!)!;
     }
 
-    [Fact]
-    public void ConfigCall_GeneratesListPair_NoPartialNoAttribute()
+    private static Invoice[] SampleInvoices() => new[]
     {
-        // The generator registered the pair purely because of the ForListChildren call site — proof that
-        // the config call is the opt-in (previously this returned null and ForListChildren threw).
+        new Invoice
+        {
+            ManualReference = "INV-1",
+            InvoiceNo = 1,
+            InvoiceLines = new HashSet<InvoiceLine>
+            {
+                new InvoiceLine
+                {
+                    ID = 100,
+                    Description = "Widget",
+                    Price = 9.5m,
+                    ProductID = 5,
+                    Product = new Product { ID = 5, Name = "Super Widget", Price = 120 },
+                },
+            },
+        },
+    };
+
+    [Fact]
+    public void ConfigCalls_GenerateBothPairs_NoPartialNoAttribute()
+    {
+        // Both the line pair AND the grandchild product pair are registered purely because of the
+        // ForListChildren / nested ForListChild calls in InvoiceRepository — no [ShiftEntityMapper].
         System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor(typeof(Invoice).Module.ModuleHandle);
 
-        var projection = ShiftEntityMapperRegistry.FindPairListProjection(typeof(InvoiceLine), typeof(InvoiceLineListDTO));
-
-        Assert.NotNull(projection);
+        Assert.NotNull(ShiftEntityMapperRegistry.FindPairListProjection(typeof(InvoiceLine), typeof(InvoiceLineListDTO)));
+        Assert.NotNull(ShiftEntityMapperRegistry.FindPairListProjection(typeof(Product), typeof(InvoiceLineProductListDTO)));
     }
 
     [Fact]
-    public void MapToList_ForListChildren_ProjectsLines_AndProductSelectDTO()
+    public void MapToList_ExplicitChild_ComposesCustomProduct_AndAppliesCustomNameMapping()
     {
+        var mapper = ResolveInvoiceMapper();
+        ((IShiftMapperConfigurable<Invoice, InvoiceListDTO, InvoiceDTO>)mapper)
+            .AddConfiguration(map => map.ForListChildren(d => d.InvoiceLines, e => e.InvoiceLines, line =>
+                line.ForListChild(l => l.Product, il => il.Product, product =>
+                    product.ForList(p => p.Name, prod => prod.Name + " + Custom Mapping"))));
+
+        var row = mapper.MapToList(SampleInvoices().AsQueryable()).Single();
+
+        var listLine = Assert.Single(row.InvoiceLines);
+        Assert.Equal("100", listLine.ID);
+        Assert.Equal("Widget", listLine.Description);
+        Assert.Equal(9.5m, listLine.Price);
+
+        // The explicitly-composed custom product DTO, with the per-property customization applied.
+        Assert.NotNull(listLine.Product);
+        Assert.Equal("5", listLine.Product.ID);
+        Assert.Equal("Super Widget + Custom Mapping", listLine.Product.Name);   // ForList customization
+        Assert.Equal(120, listLine.Product.Price);                             // convention, untouched
+    }
+
+    [Fact]
+    public void MapToList_WithoutExplicitChild_LeavesProductNull()
+    {
+        // No nested ForListChild → the product object is NOT composed. Nothing goes deep automatically
+        // in the list direction; the line's own scalar columns still project.
         var mapper = ResolveInvoiceMapper();
         ((IShiftMapperConfigurable<Invoice, InvoiceListDTO, InvoiceDTO>)mapper)
             .AddConfiguration(map => map.ForListChildren(d => d.InvoiceLines, e => e.InvoiceLines));
 
-        var invoices = new[]
-        {
-            new Invoice
-            {
-                ManualReference = "INV-1",
-                InvoiceNo = 1,
-                InvoiceLines = new HashSet<InvoiceLine>
-                {
-                    new InvoiceLine
-                    {
-                        ID = 100,
-                        Description = "Widget",
-                        Price = 9.5m,
-                        ProductID = 5,
-                        Product = new Product { ID = 5, Name = "Super Widget" },
-                    },
-                },
-            },
-        }.AsQueryable();
+        var row = mapper.MapToList(SampleInvoices().AsQueryable()).Single();
 
-        var row = mapper.MapToList(invoices).Single();
-
-        // level 2 — the lines are projected into the list row (scalars).
-        var line = Assert.Single(row.InvoiceLines);
-        Assert.Equal("100", line.ID);
-        Assert.Equal("Widget", line.Description);
-        Assert.Equal(9.5m, line.Price);
-
-        // level 3 — each line's product is a ShiftEntitySelectDTO: id from the FK, name from the navigation.
-        Assert.NotNull(line.Product);
-        Assert.Equal("5", line.Product.Value);
-        Assert.Equal("Super Widget", line.Product.Text);
+        var listLine = Assert.Single(row.InvoiceLines);
+        Assert.Equal("Widget", listLine.Description);
+        Assert.Null(listLine.Product);
     }
 }

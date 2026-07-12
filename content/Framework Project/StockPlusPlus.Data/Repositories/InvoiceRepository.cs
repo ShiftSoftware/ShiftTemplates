@@ -1,9 +1,7 @@
-using System.Linq.Expressions;
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.EntityFrameworkCore;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
-using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.Invoice;
@@ -18,10 +16,9 @@ public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceLi
     //   - MapToEntity writes the children back with ONE explicit line, options.ForEntityChildren(...),
     //     which maps each DTO line to a NEW InvoiceLine via the pair (replace-with-new — the repository
     //     owns the old lines via the delete-and-recreate in UpsertAsync below).
-    // DEEP LIST mapping (list → lines → product), told explicitly and directionally. MapToView composes
-    // children automatically; MapToList is a single SQL-translatable projection, so it does NOT — we hand
-    // it a correlated sub-select. EF translates l.Product.Name to a JOIN, so no Include is needed for the
-    // list read. Exposed as a field so the DB-independent DeepMappingTests exercises the exact expression.
+    //   - MapToList is EXPLICIT and per level (nothing goes deep automatically in the list direction):
+    //     ForListChildren composes the lines, and its nested callback composes each line's product (a
+    //     custom DTO) and customizes one of the product's own properties. EF translates it to JOINs.
 
     private static readonly Action<ShiftRepositoryOptions<Invoice, InvoiceListDTO, InvoiceDTO>> IncludeOptions =
         option =>
@@ -32,8 +29,11 @@ public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceLi
                 // Entity direction: replace-with-new via the pair (unchanged).
                 map.ForEntityChildren(x => x.InvoiceLines, d => d.InvoiceLines);
 
-                // List direction: project the lines (and each line's product) into the list row.
-                map.ForListChildren(d => d.InvoiceLines, d => d.InvoiceLines);
+                // List direction: compose the lines, and — explicitly, one level deeper — each line's
+                // product, with a custom mapping for the product's Name.
+                map.ForListChildren(d => d.InvoiceLines, e => e.InvoiceLines, line =>
+                    line.ForListChild(l => l.Product, il => il.Product, product =>
+                        product.ForList(p => p.Name, prod => prod.Name + " + Custom Mapping")));
             });
         };
 

@@ -36,17 +36,27 @@ public class InvoiceListDTO : ShiftEntityListDTO, IHasAttentionSummary
     public List<InvoiceLineListDTO> InvoiceLines { get; set; } = new List<InvoiceLineListDTO>();
 }
 
-// The nested line shape carried inside the invoice LIST row. Its Product is a ShiftEntitySelectDTO
-// (id + name) — one level deeper again. Everything here is filled by the SQL-translatable ForList
-// projection in InvoiceRepository, not by a pair mapper (pairs are discovered from view DTOs only).
+// The nested line shape carried inside the invoice LIST row. Its Product is a CUSTOM complex DTO
+// (NOT a ShiftEntitySelectDTO). The generated list projection composes it recursively — list → lines →
+// product — purely from the ForListChildren call in InvoiceRepository (no partial, no attribute).
 public class InvoiceLineListDTO
 {
     public string? ID { get; set; }
     public string Description { get; set; } = default!;
     public decimal Price { get; set; }
 
+    public InvoiceLineProductListDTO Product { get; set; } = default!;
+}
+
+// A CUSTOM product DTO (not ShiftEntitySelectDTO) on the invoice LIST line: id + name + one more of the
+// product's own columns. Composed from the InvoiceLine.Product navigation by the generated list projection,
+// SQL-translatable: e.Product == null ? null : new InvoiceLineProductListDTO { ID = ..., Name = ..., ... }.
+public class InvoiceLineProductListDTO
+{
     [_ProductHashId]
-    public ShiftEntitySelectDTO Product { get; set; } = default!;
+    public string? ID { get; set; }
+    public string Name { get; set; } = default!;
+    public int? Price { get; set; }
 }
 
 public class InvoiceLineDTO : ShiftEntityViewAndUpsertDTO
