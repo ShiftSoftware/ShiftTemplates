@@ -14,10 +14,11 @@ namespace StockPlusPlus.Test.Tests;
 
 /// <summary>
 /// Integration tests validating the repository mapping layer end-to-end through CRUD operations,
-/// exercising the mapping strategies at once: Product (overrides the mapping methods),
-/// Invoice (hand-written manual mapper plugged via UseMapper), and ProductCategory (SOURCE-GENERATED
-/// mapper via UseGeneratedMapper — its tests cover the SelectDTO relationship + ShiftFileDTO file conventions
-/// through generated code).
+/// exercising the mapping strategies at once: Product (overrides the mapping methods), ProductCategory
+/// (SOURCE-GENERATED mapper via UseGeneratedMapper — SelectDTO relationship + ShiftFileDTO file
+/// conventions), and Invoice (SOURCE-GENERATED mapper with DEEP child mapping — MapToView auto-composes
+/// InvoiceLines and MapToEntity writes them back via the explicit UseGeneratedMapper(map =>
+/// map.ForEntityChildren(...)) config).
 /// </summary>
 [Collection("API Collection")]
 public class ManualMappingTests
@@ -433,6 +434,9 @@ public class ManualMappingTests
         {
             ManualReference = "INV-UPD-002",
             InvoiceDate = new DateTimeOffset(2025, 9, 1, 0, 0, 0, TimeSpan.Zero),
+            // InvoiceNo round-trips from the view (the generated mapper maps it by convention); a real
+            // form posts back the full view DTO, so the server-assigned number is preserved on update.
+            InvoiceNo = found.InvoiceNo,
             InvoiceLines = new List<InvoiceLineDTO>
             {
                 new InvoiceLineDTO { Description = "Replaced Line A", Price = 99m, Product = new ShiftEntitySelectDTO { Value = product.ID.ToString() } },

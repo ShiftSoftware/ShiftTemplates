@@ -4,20 +4,23 @@ using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
-using StockPlusPlus.Data.Mappers;
 using StockPlusPlus.Shared.DTOs.Invoice;
 
 namespace StockPlusPlus.Data.Repositories;
 
 public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceListDTO, InvoiceDTO>
 {
-    // Invoice demonstrates a hand-written MANUAL mapper class (no mapping library), plugged via
-    // options.UseMapper(...). The repository also includes the InvoiceLines child collection.
+    // Invoice demonstrates SOURCE-GENERATED mapping with DEEP (child collection) mapping:
+    //   - MapToView auto-composes the InvoiceLines child collection (InvoiceLine → InvoiceLineDTO)
+    //     through the source-generated pair mapper — zero code.
+    //   - MapToEntity writes the children back with ONE explicit line, options.ForEntityChildren(...),
+    //     which maps each DTO line to a NEW InvoiceLine via the pair (replace-with-new — the repository
+    //     owns the old lines via the delete-and-recreate in UpsertAsync below).
     private static readonly Action<ShiftRepositoryOptions<Invoice, InvoiceListDTO, InvoiceDTO>> IncludeOptions =
         option =>
         {
             option.IncludeRelatedEntitiesWithFindAsync(x => x.Include(entity => entity.InvoiceLines));
-            option.UseMapper(new InvoiceMapper());
+            option.UseGeneratedMapper(map => map.ForEntityChildren(x => x.InvoiceLines, d => d.InvoiceLines));
         };
 
     public InvoiceRepository(DB db) : base(db, IncludeOptions)

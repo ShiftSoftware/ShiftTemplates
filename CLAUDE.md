@@ -93,16 +93,14 @@ We are actively decoupling `ShiftRepository` from AutoMapper by introducing `ISh
 
 **IMPORTANT:** When making any mapping-related changes across ShiftEntity, ShiftTemplates, or ShiftIdentity, always update the planning doc to reflect what was done. This document is the single source of truth for the team — check it before starting work to see current status, and update it after completing work. Do not rely on memory or conversation context alone.
 
-Key files in this repo:
-- `content/Framework Project/StockPlusPlus.Data/Mappers/` — mapper implementations per strategy:
-  - Manual: `ProductMapper.cs`, `ProductCategoryMapper.cs`, `InvoiceMapper.cs`
-  - Mapperly: `ProductMapperlyMapper.cs`, `ProductCategoryMapperlyMapper.cs`, `InvoiceMapperlyMapper.cs`
-  - Mapster: `ProductMapsterMapper.cs`, `ProductCategoryMapsterMapper.cs`, `InvoiceMapsterMapper.cs`
-- `content/Framework Project/StockPlusPlus.Data/Repositories/` — two-constructor pattern: DI picks `IShiftEntityMapper` when registered, falls back to AutoMapper
-- `content/Framework Project/StockPlusPlus.API/Program.cs` — reads `MappingStrategy` from appsettings, conditionally registers mappers (`AutoMapper`, `Manual`, `Mapperly`, or `Mapster`)
-- `content/Framework Project/StockPlusPlus.Shared/Enums/MappingStrategy.cs` — enum for the toggle
-- `content/Framework Project/StockPlusPlus.Test/Tests/ManualMappingTests.cs` — 8 integration tests validating `IShiftEntityMapper` path (pass with both Manual and Mapperly)
-- `content/Framework Project/StockPlusPlus.Test/Tests/MappingPOC/` — POC test files comparing Manual, Mapperly, and Mapster approaches (not production code)
+Sample mapping strategies (one per entity — the repository picks via `ShiftRepositoryOptions`; nothing configured falls back to AutoMapper). See the planning doc for the full inventory and rationale:
+- **Product** — overrides `MapToView`/`MapToEntity`/`MapToList` in `Repositories/ProductRepository.cs`.
+- **Invoice** — SOURCE-GENERATED with DEEP child mapping: `Repositories/InvoiceRepository.cs` calls `UseGeneratedMapper(map => map.ForEntityChildren(x => x.InvoiceLines, d => d.InvoiceLines))`; `MapToView` auto-composes `InvoiceLines` via the generated pair mapper.
+- **ProductCategory** — SOURCE-GENERATED (auto): `UseGeneratedMapper()`; covers the FK↔`ShiftEntitySelectDTO` relationship + `List<ShiftFileDTO>`↔JSON file conventions.
+- **ProductBrand** — `[ShiftEntityMapper]` partial class (`Mappers/ProductBrandMapper.cs`) filled by the generator, with a `Configure` hook customizing one property; plugged via `UseMapper(new ProductBrandMapper())`.
+- **Country** — zero-code SOURCE-GENERATED: `Repositories/CountryRepository.cs` (`UseGeneratedMapper()`) and the `api/country-generated` endpoint (`UseGeneratedMapper = true`). `api/countrymapped` uses the hand-written `Mappers/CountryMapper.cs` (manual `IShiftEntityMapper`).
+- Source generator lives in the sibling `ShiftEntity.SourceGenerator` project (ships as an analyzer inside the `ShiftSoftware.ShiftEntity` package).
+- Tests: `Tests/ManualMappingTests.cs` (Product/ProductCategory/Invoice end-to-end), `Tests/SourceGeneratedMappingTests.cs`, `Tests/DeepMappingTests.cs`, `Tests/MapperCustomizationTests`, `Tests/AutoDiscovered*`; `Tests/MappingPOC/` holds POC comparison files (not production code).
 
 Attribute-driven endpoints can also take a mapper (iteration §20 in the planning doc). Alongside `[ShiftEntityEndpoint<…>]` / `[ShiftEntityEndpoint<…, TRepository>]`, there are `[ShiftEntityEndpointWithMapper<…, TMapper>]` / `[ShiftEntitySecureEndpointWithMapper<…, TActionTree, TMapper>]` where `TMapper : class, IShiftEntityMapper` (a non-generic marker; the exact `(entity,list,view)` triple is validated at discovery). A mapper keeps the built-in repository but replaces AutoMapper. Sample: `StockPlusPlus.Data/Entities/Country.cs` exposes `api/country` (AutoMapper) and `api/countrymapped` (`Mappers/CountryMapper.cs` + the distinct `Shared/DTOs/CountryMappedDTO.cs` — a distinct DTO is REQUIRED because the mapper is keyed by DTO type). UI to test it: `StockPlusPlus.Web/Pages/Country/CountryMappedList.razor` + `CountryMappedForm.razor` (EntitySet/Endpoint `CountryMapped`), linked from `Shared/NavMenu.razor` as "Countries (Mapped)". Tests: `Tests/AttributeEndpointMapperDiscoveryTests.cs` (DB-independent) + `Tests/AttributeEndpointTests.cs`.
 
