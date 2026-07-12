@@ -1,7 +1,9 @@
+using System.Linq.Expressions;
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.EntityFrameworkCore;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
+using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.Invoice;
@@ -16,11 +18,23 @@ public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceLi
     //   - MapToEntity writes the children back with ONE explicit line, options.ForEntityChildren(...),
     //     which maps each DTO line to a NEW InvoiceLine via the pair (replace-with-new — the repository
     //     owns the old lines via the delete-and-recreate in UpsertAsync below).
+    // DEEP LIST mapping (list → lines → product), told explicitly and directionally. MapToView composes
+    // children automatically; MapToList is a single SQL-translatable projection, so it does NOT — we hand
+    // it a correlated sub-select. EF translates l.Product.Name to a JOIN, so no Include is needed for the
+    // list read. Exposed as a field so the DB-independent DeepMappingTests exercises the exact expression.
+
     private static readonly Action<ShiftRepositoryOptions<Invoice, InvoiceListDTO, InvoiceDTO>> IncludeOptions =
         option =>
         {
             option.IncludeRelatedEntitiesWithFindAsync(x => x.Include(entity => entity.InvoiceLines));
-            option.UseGeneratedMapper(map => map.ForEntityChildren(x => x.InvoiceLines, d => d.InvoiceLines));
+            option.UseGeneratedMapper(map =>
+            {
+                // Entity direction: replace-with-new via the pair (unchanged).
+                map.ForEntityChildren(x => x.InvoiceLines, d => d.InvoiceLines);
+
+                // List direction: project the lines (and each line's product) into the list row.
+                map.ForListChildren(d => d.InvoiceLines, d => d.InvoiceLines);
+            });
         };
 
     public InvoiceRepository(DB db) : base(db, IncludeOptions)

@@ -29,6 +29,24 @@ public class InvoiceListDTO : ShiftEntityListDTO, IHasAttentionSummary
     public bool HasActiveAttention { get; set; }
     public AttentionSeverity? HighestSeverity { get; set; }
     public int ActiveSignalCount { get; set; }
+
+    // DEEP LIST mapping: unlike MapToView, the list projection does NOT compose children automatically.
+    // It is populated explicitly and directionally by InvoiceRepository's ForList (list → lines → product).
+    // See InvoiceRepository.ListLinesProjection.
+    public List<InvoiceLineListDTO> InvoiceLines { get; set; } = new List<InvoiceLineListDTO>();
+}
+
+// The nested line shape carried inside the invoice LIST row. Its Product is a ShiftEntitySelectDTO
+// (id + name) — one level deeper again. Everything here is filled by the SQL-translatable ForList
+// projection in InvoiceRepository, not by a pair mapper (pairs are discovered from view DTOs only).
+public class InvoiceLineListDTO
+{
+    public string? ID { get; set; }
+    public string Description { get; set; } = default!;
+    public decimal Price { get; set; }
+
+    [_ProductHashId]
+    public ShiftEntitySelectDTO Product { get; set; } = default!;
 }
 
 public class InvoiceLineDTO : ShiftEntityViewAndUpsertDTO
