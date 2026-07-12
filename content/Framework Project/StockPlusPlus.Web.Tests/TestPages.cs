@@ -9,7 +9,7 @@ namespace StockPlusPlus.Web.Tests;
 public class PageRenderTests : ShiftBlazorTestContext
 {
     [Fact]
-    public void ShouldRenderPagesCorrectly()
+    public async Task ShouldRenderPagesCorrectly()
     {
         List<Type> pages = [];
 
@@ -26,12 +26,11 @@ public class PageRenderTests : ShiftBlazorTestContext
         pages.AddRange(mainPages);
         //pages.AddRange(identityPages);
 
-        Assert.All(pages, componentType =>
+        await Assert.AllAsync(pages, async componentType =>
         {
-            using var ctx = new ShiftBlazorTestContext();
+            await using var ctx = new ShiftBlazorTestContext();
             ctx.RenderTree.Add<IncludeMudProviders>();
             ctx.Render<DynamicComponent>(p => p.Add(c => c.Type, componentType));
-            ctx.DisposeAsync();
         });
     }
 }
