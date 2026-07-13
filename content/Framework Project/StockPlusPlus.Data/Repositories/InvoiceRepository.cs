@@ -10,9 +10,10 @@ namespace StockPlusPlus.Data.Repositories;
 
 public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceListDTO, InvoiceDTO>
 {
-    // Invoice demonstrates SOURCE-GENERATED mapping with DEEP (child collection) mapping:
-    //   - MapToView auto-composes the InvoiceLines child collection (InvoiceLine → InvoiceLineDTO)
-    //     through the source-generated pair mapper — zero code.
+    // Invoice demonstrates SOURCE-GENERATED mapping with DEEP (child collection) mapping. All three
+    // directions are EXPLICIT and per level (the programmer decides how deep and in which direction):
+    //   - MapToView composes the InvoiceLines child collection with ForViewChildren(...) (InvoiceLine →
+    //     InvoiceLineDTO); its nested callback could customize a deep property (see DeepMappingTests).
     //   - MapToEntity writes the children back with ONE explicit line, options.ForEntityChildren(...),
     //     which maps each DTO line to a NEW InvoiceLine via the pair (replace-with-new — the repository
     //     owns the old lines via the delete-and-recreate in UpsertAsync below).
@@ -26,8 +27,12 @@ public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceLi
             option.IncludeRelatedEntitiesWithFindAsync(x => x.Include(entity => entity.InvoiceLines));
             option.UseGeneratedMapper(map =>
             {
-                // Entity direction: replace-with-new via the pair (unchanged).
+                // Entity direction: replace-with-new via the pair.
                 map.ForEntityChildren(x => x.InvoiceLines, d => d.InvoiceLines);
+
+                // View direction — now EXPLICIT too (nothing goes deep automatically). Compose the lines
+                // into the invoice view.
+                map.ForViewChildren(d => d.InvoiceLines, e => e.InvoiceLines);
 
                 // List direction: compose the lines, and — explicitly, one level deeper — each line's
                 // product, with a custom mapping for the product's Name.
