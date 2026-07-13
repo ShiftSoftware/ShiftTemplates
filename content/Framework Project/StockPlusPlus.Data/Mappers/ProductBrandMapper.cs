@@ -27,9 +27,9 @@ public partial class ProductBrandMapper : IShiftEntityMapper<ProductBrand, Produ
     // Whole-method takeover WITH a base call — the partial-class analog of the repository's
     // base.MapToEntity(...): MapToEntityGenerated runs all generated conventions (and any
     // ForEntity customizations), then this method post-processes the result.
-    public ProductBrand MapToEntity(ProductBrandDTO dto, ProductBrand existing, IServiceProvider? serviceProvider = null)
+    public ProductBrand MapToEntity(ProductBrandDTO dto, ProductBrand existing, MappingContext context = default)
     {
-        existing = MapToEntityGenerated(dto, existing, serviceProvider);
+        existing = MapToEntityGenerated(dto, existing, context);
 
         existing.Code = existing.Code?.Trim();
 

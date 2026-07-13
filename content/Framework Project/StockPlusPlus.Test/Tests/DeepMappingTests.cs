@@ -124,7 +124,7 @@ public class DeepMappingTests
             line => line.ForEntity(il => il.Description, l => l.Description + " (persisted)"));
 
         builder.TryGetEntityValue(nameof(Invoice.InvoiceLines), out var value);
-        var func = (Func<InvoiceDTO, IServiceProvider?, ICollection<InvoiceLine>?>)value!;
+        var func = (Func<InvoiceDTO, MappingContext, ICollection<InvoiceLine>?>)value!;
 
         var dto = new InvoiceDTO
         {
@@ -134,7 +134,7 @@ public class DeepMappingTests
             },
         };
 
-        var line = Assert.Single(func(dto, null)!.ToList());
+        var line = Assert.Single(func(dto, default)!.ToList());
         Assert.Equal("A (persisted)", line.Description);   // deep entity customization applied
         Assert.Equal(3, line.ProductID);                   // convention untouched
     }
@@ -178,7 +178,7 @@ public class DeepMappingTests
         builder.ForEntityChildren(x => x.InvoiceLines, d => d.InvoiceLines);
 
         Assert.True(builder.TryGetEntityValue(nameof(Invoice.InvoiceLines), out var value));
-        var func = (Func<InvoiceDTO, IServiceProvider?, ICollection<InvoiceLine>?>)value!;
+        var func = (Func<InvoiceDTO, MappingContext, ICollection<InvoiceLine>?>)value!;
 
         var dto = new InvoiceDTO
         {
@@ -189,7 +189,7 @@ public class DeepMappingTests
             },
         };
 
-        var entities = func(dto, null)!.ToList();
+        var entities = func(dto, default)!.ToList();
 
         Assert.Equal(2, entities.Count);
         Assert.Equal("A", entities[0].Description);

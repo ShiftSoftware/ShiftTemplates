@@ -12,7 +12,7 @@ namespace StockPlusPlus.Data.Mappers;
 // prefers it over the AutoMapper default (see ShiftRepository.InitCommon).
 public class CountryMapper : IShiftEntityMapper<Country, CountryMappedDTO, CountryMappedDTO>
 {
-    public CountryMappedDTO MapToView(Country entity, IServiceProvider? serviceProvider = null)
+    public CountryMappedDTO MapToView(Country entity, MappingContext context = default)
     {
         return new CountryMappedDTO
         {
@@ -20,13 +20,13 @@ public class CountryMapper : IShiftEntityMapper<Country, CountryMappedDTO, Count
         }.MapBaseFields(entity);
     }
 
-    public Country MapToEntity(CountryMappedDTO dto, Country existing, IServiceProvider? serviceProvider = null)
+    public Country MapToEntity(CountryMappedDTO dto, Country existing, MappingContext context = default)
     {
         existing.Name = dto.Name;
         return existing;
     }
 
-    public IQueryable<CountryMappedDTO> MapToList(IQueryable<Country> query, IServiceProvider? serviceProvider = null)
+    public IQueryable<CountryMappedDTO> MapToList(IQueryable<Country> query, MappingContext context = default)
     {
         return query.Select(e => new CountryMappedDTO
         {
@@ -36,7 +36,7 @@ public class CountryMapper : IShiftEntityMapper<Country, CountryMappedDTO, Count
         });
     }
 
-    public void CopyEntity(Country source, Country target, IServiceProvider? serviceProvider = null)
+    public void CopyEntity(Country source, Country target, MappingContext context = default)
     {
         source.ShallowCopyTo(target);
     }

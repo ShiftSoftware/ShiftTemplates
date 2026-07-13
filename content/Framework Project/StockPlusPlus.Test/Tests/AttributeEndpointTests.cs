@@ -52,9 +52,10 @@ public class AttributeEndpointTests
 
         var repo = scope.ServiceProvider.GetRequiredService<ShiftRepository<DB, Country, CountryGeneratedDTO, CountryGeneratedDTO>>();
 
-        var dto = repo.MapToView(new Country { Name = "Testland" });
+        // The entity configures the built-in repository via ForList, so the list projection carries the tweak.
+        var row = repo.MapToList(new[] { new Country { Name = "Testland" } }.AsQueryable()).Single();
 
-        Assert.Equal("Testland (via IConfiguresShiftRepository)", dto.Name);
+        Assert.Equal("Testland (via IConfiguresShiftRepository)", row.Name);
     }
 
     // The interface is keyed by DTO triple: Country does NOT implement it for the CountryDTO triple, so that

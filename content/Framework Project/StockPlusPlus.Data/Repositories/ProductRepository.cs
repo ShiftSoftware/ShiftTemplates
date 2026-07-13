@@ -29,7 +29,7 @@ public class ProductRepository : ShiftRepository<DB, Entities.Product, ProductLi
     {
     }
 
-    public override ProductDTO MapToView(Product entity, IServiceProvider? serviceProvider = null)
+    public override ProductDTO MapToView(Product entity, MappingContext context = default)
     {
         return new ProductDTO
         {
@@ -45,7 +45,7 @@ public class ProductRepository : ShiftRepository<DB, Entities.Product, ProductLi
         }.MapBaseFields(entity);
     }
 
-    public override Product MapToEntity(ProductDTO dto, Product existing, IServiceProvider? serviceProvider = null)
+    public override Product MapToEntity(ProductDTO dto, Product existing, MappingContext context = default)
     {
         existing.Name = dto.Name;
         existing.TrackingMethod = dto.TrackingMethod;
@@ -60,7 +60,7 @@ public class ProductRepository : ShiftRepository<DB, Entities.Product, ProductLi
         return existing;
     }
 
-    public override IQueryable<ProductListDTO> MapToList(IQueryable<Product> queryable, IServiceProvider? serviceProvider = null)
+    public override IQueryable<ProductListDTO> MapToList(IQueryable<Product> queryable, MappingContext context = default)
     {
         return queryable.SelectWithTags(p => new ProductListDTO
         {
