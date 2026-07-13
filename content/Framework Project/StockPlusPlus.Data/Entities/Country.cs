@@ -1,5 +1,6 @@
 ﻿using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.Core.Flags;
+using ShiftSoftware.ShiftEntity.EFCore;
 using ShiftSoftware.ShiftEntity.Model;
 using StockPlusPlus.Data.Mappers;
 using StockPlusPlus.Shared.ActionTrees;
@@ -25,8 +26,21 @@ namespace StockPlusPlus.Data.Entities;
 [ShiftEntitySecureEndpoint<CountryDTO, CountryDTO, StockPlusPlusActionTree>("api/country", nameof(StockPlusPlusActionTree.Country))]
 [ShiftEntitySecureEndpointWithMapper<CountryMappedDTO, CountryMappedDTO, StockPlusPlusActionTree, CountryMapper>("api/countrymapped", nameof(StockPlusPlusActionTree.Country))]
 [ShiftEntitySecureEndpoint<CountryGeneratedDTO, CountryGeneratedDTO, StockPlusPlusActionTree>("api/country-generated", nameof(StockPlusPlusActionTree.Country), UseGeneratedMapper = true)]
-public class Country : ShiftEntity<Country>, IEntityHasIdempotencyKey<Country>
+public class Country : ShiftEntity<Country>, IEntityHasIdempotencyKey<Country>,
+    // Small config for the built-in (attribute-endpoint) repository WITHOUT a repository class. Keyed by the
+    // DTO triple, so this applies only to the "api/country-generated" endpoint — the AutoMapper endpoint
+    // ("api/country") and the custom-mapper endpoint ("api/countrymapped") are untouched (Country doesn't
+    // implement the interface for their triples).
+    IConfiguresShiftRepository<Country, CountryGeneratedDTO, CountryGeneratedDTO>
 {
     public string Name { get; set; } = default!;
     public Guid? IdempotencyKey { get; set; }
+
+    public void ConfigureRepository(ShiftRepositoryConfigurationContext<Country, CountryGeneratedDTO, CountryGeneratedDTO> context)
+    {
+        // A small custom mapping on the built-in repository, no repository class needed. context.Services is
+        // the request scope — resolve scoped services here if the config needs them (current user, tenant, …),
+        // e.g. context.Services.GetService<ICurrentUserProvider>().
+        context.Options.UseGeneratedMapper(map => map.ForList(d => d.Name, e => e.Name + " (via IConfiguresShiftRepository)"));
+    }
 }

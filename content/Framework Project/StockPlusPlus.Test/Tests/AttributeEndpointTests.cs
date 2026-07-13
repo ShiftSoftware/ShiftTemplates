@@ -42,6 +42,35 @@ public class AttributeEndpointTests
         Assert.Same(db, repo.db);
     }
 
+    // Country implements IConfiguresShiftRepository<Country, CountryGeneratedDTO, CountryGeneratedDTO>, so the
+    // BUILT-IN repository for that triple is configured by the entity (a small mapper tweak) with no repository
+    // class. The config is keyed by the triple, so only this endpoint is affected.
+    [Fact]
+    public void AttributeEndpoint_EntityConfiguresBuiltInRepository_ViaInterface()
+    {
+        using var scope = factory.Services.CreateScope();
+
+        var repo = scope.ServiceProvider.GetRequiredService<ShiftRepository<DB, Country, CountryGeneratedDTO, CountryGeneratedDTO>>();
+
+        var dto = repo.MapToView(new Country { Name = "Testland" });
+
+        Assert.Equal("Testland (via IConfiguresShiftRepository)", dto.Name);
+    }
+
+    // The interface is keyed by DTO triple: Country does NOT implement it for the CountryDTO triple, so that
+    // endpoint's built-in repository is untouched (still the plain AutoMapper mapping).
+    [Fact]
+    public void AttributeEndpoint_EntityInterface_DoesNotLeakToOtherTriples()
+    {
+        using var scope = factory.Services.CreateScope();
+
+        var repo = scope.ServiceProvider.GetRequiredService<ShiftRepository<DB, Country, CountryDTO, CountryDTO>>();
+
+        var dto = repo.MapToView(new Country { Name = "Testland" });
+
+        Assert.Equal("Testland", dto.Name);   // no suffix — the config didn't apply to this triple
+    }
+
     // The default Country -> CountryDTO map is synthesized from the attribute (no repository class and
     // no custom profile exist for Country), so the repository's ViewAsync/AutoMapper path works.
     [Fact]
