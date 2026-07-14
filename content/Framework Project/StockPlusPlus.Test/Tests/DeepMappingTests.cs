@@ -37,8 +37,8 @@ public class DeepMappingTests
     [Fact]
     public void MapToView_ExplicitChildCollection_ComposesViaForViewChildren()
     {
-        // The view direction is now EXPLICIT too — the child collection composes only because ForViewChildren
-        // says so (this is exactly what the production InvoiceRepository wires).
+        // View AUTO-composes the child collection; ForViewChildren is the explicit OVERRIDE path and
+        // composes the same InvoiceLine → InvoiceLineDTO pair. Both yield the composed collection.
         var invoice = new Invoice
         {
             ManualReference = "INV-1",
@@ -63,18 +63,22 @@ public class DeepMappingTests
     }
 
     [Fact]
-    public void MapToView_WithoutForViewChildren_LeavesChildCollectionEmpty()
+    public void MapToView_AutoComposesChildCollection()
     {
-        // No ForViewChildren → nothing goes deep automatically; the collection keeps its DTO default.
+        // Zero-code: the generated MapToView auto-composes the InvoiceLines child collection through the
+        // auto (InvoiceLine, InvoiceLineDTO) pair — no ForViewChildren needed.
         var invoice = new Invoice
         {
             ManualReference = "INV-1b",
-            InvoiceLines = new HashSet<InvoiceLine> { new InvoiceLine { Description = "Widget", ProductID = 5 } },
+            InvoiceLines = new HashSet<InvoiceLine> { new InvoiceLine { Description = "Widget", Price = 3m, ProductID = 5 } },
         };
 
         var dto = ResolveInvoiceMapper().MapToView(invoice);
 
-        Assert.Empty(dto.InvoiceLines);
+        var line = Assert.Single(dto.InvoiceLines);
+        Assert.Equal("Widget", line.Description);
+        Assert.Equal(3m, line.Price);
+        Assert.Equal("5", line.Product.Value);   // FK → SelectDTO convention, composed automatically
     }
 
     [Fact]

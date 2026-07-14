@@ -10,22 +10,23 @@ namespace StockPlusPlus.Data.Repositories;
 
 public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceListDTO, InvoiceDTO>
 {
-    // Invoice demonstrates SOURCE-GENERATED mapping with DEEP (child collection) mapping. All three
-    // directions are EXPLICIT and per level (the programmer decides how deep and in which direction):
-    //   - MapToView composes the InvoiceLines child collection with ForViewChildren(...) (InvoiceLine →
-    //     InvoiceLineDTO); its nested callback could customize a deep property (see DeepMappingTests).
-    //   - MapToEntity writes the children back with ONE explicit line, options.ForEntityChildren(...),
-    //     which maps each DTO line to a NEW InvoiceLine via the pair (replace-with-new — the repository
-    //     owns the old lines via the delete-and-recreate in UpsertAsync below).
-    //   - MapToList is EXPLICIT and per level (nothing goes deep automatically in the list direction):
-    //     ForListChildren composes the lines, and its nested callback composes each line's product (a
-    //     custom DTO) and customizes one of the product's own properties. EF translates it to JOINs.
+    // Invoice demonstrates SOURCE-GENERATED mapping with DEEP (child collection) mapping:
+    //   - MapToView AUTO-composes the InvoiceLines child collection (InvoiceLine → InvoiceLineDTO) via the
+    //     auto pair mapper — zero-code, side-effect-free DTO building.
+    //   - MapToEntity AUTO-writes the children back (replace-with-new via the pair's MapBack into fresh
+    //     instances — the repository owns the old lines via the delete-and-recreate in UpsertAsync below).
+    //   - MapToList is EXPLICIT and per level (deep children change the SQL query shape, so nothing goes
+    //     deep silently): ForListChildren composes the lines, and its nested ForChild composes each line's
+    //     custom Product DTO. This also opts the (InvoiceLine, InvoiceLineListDTO) and
+    //     (Product, InvoiceLineProductListDTO) pair projections into source generation. EF translates it to JOINs.
 
     private static readonly Action<ShiftRepositoryOptions<Invoice, InvoiceListDTO, InvoiceDTO>> IncludeOptions =
         option =>
         {
             option.IncludeRelatedEntitiesWithFindAsync(x => x.Include(entity => entity.InvoiceLines));
-            option.UseGeneratedMapper();
+            option.UseGeneratedMapper(map => map
+                .ForListChildren(d => d.InvoiceLines, e => e.InvoiceLines, line =>
+                    line.ForChild(l => l.Product, il => il.Product)));
         };
 
     public InvoiceRepository(DB db) : base(db, IncludeOptions)

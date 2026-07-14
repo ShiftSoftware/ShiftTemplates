@@ -453,8 +453,12 @@ public class MapperRepoConfigurationTests
 
     private class BrandRepoWithConfig : ShiftRepository<DB, ProductBrand, ProductBrandListDTO, ProductBrandDTO>
     {
+        // Overrides the SAME member the mapper's Configure customizes — Code, via ForList (see
+        // ProductBrandMapper.Configure: Code => Code ?? "(No Code)"). The repo's UseGeneratedMapper(configure)
+        // runs AFTER Configure, so it wins. ForList composes at runtime (ComposeList), so the override is
+        // honored for this fixture repo without the Data-only generator having to bake anything for it.
         public BrandRepoWithConfig(DB db) : base(db, x => x.UseGeneratedMapper(map =>
-            map.ForView(d => d.Description, (entity, _) => "repo override")))
+            map.ForList(d => d.Code, entity => "repo override")))
         {
         }
     }
@@ -466,10 +470,10 @@ public class MapperRepoConfigurationTests
         var db = scope.ServiceProvider.GetRequiredService<DB>();
 
         var repo = new BrandRepoWithConfig(db);
-        var dto = repo.MapToView(new ProductBrand { Name = "X", Description = null });
+        var list = repo.MapToList(new[] { new ProductBrand { Name = "X", Code = null } }.AsQueryable()).ToList();
 
-        // The repo's UseGeneratedMapper(configure) customization is applied on top of the mapper's
-        // own Configure hook (later wins) — Description comes from the repo config, not the convention.
-        Assert.Equal("repo override", dto.Description);
+        // The mapper's Configure sets Code => "(No Code)"; the repo's UseGeneratedMapper(configure) is
+        // applied on top (later wins) — Code comes from the repo config, not the Configure hook.
+        Assert.Equal("repo override", list[0].Code);
     }
 }

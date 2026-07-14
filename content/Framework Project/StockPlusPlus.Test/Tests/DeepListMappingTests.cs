@@ -8,9 +8,9 @@ namespace StockPlusPlus.Test.Tests;
 /// <summary>
 /// DEEP LIST mapping — EXPLICIT and per level. The (InvoiceLine, InvoiceLineListDTO) and
 /// (Product, InvoiceLineProductListDTO) pairs are generated purely from the ForListChildren / nested
-/// ForListChild CALLS in InvoiceRepository (config-driven opt-in — no partial, no attribute). Nothing
-/// goes deep automatically in the list direction: a child object is composed only when a ForListChild
-/// call says so, and that call's nested callback can customize the child's own properties.
+/// ForChild CALLS (config-driven opt-in — no partial, no attribute). Nothing goes deep automatically in
+/// the list direction: a child object is composed only when a nested ForChild call says so, and that
+/// call's callback (a direction-scoped ShiftListChildMapper) can customize the child's own properties via For.
 /// </summary>
 public class DeepListMappingTests
 {
@@ -48,7 +48,7 @@ public class DeepListMappingTests
     public void ConfigCalls_GenerateBothPairs_NoPartialNoAttribute()
     {
         // Both the line pair AND the grandchild product pair are registered purely because of the
-        // ForListChildren / nested ForListChild calls in InvoiceRepository — no [ShiftEntityMapper].
+        // ForListChildren / nested ForChild calls in the config below — no [ShiftEntityMapper].
         System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor(typeof(Invoice).Module.ModuleHandle);
 
         Assert.NotNull(ShiftEntityMapperRegistry.FindPairListProjection(typeof(InvoiceLine), typeof(InvoiceLineListDTO)));
@@ -61,8 +61,8 @@ public class DeepListMappingTests
         var mapper = ResolveInvoiceMapper();
         ((IShiftMapperConfigurable<Invoice, InvoiceListDTO, InvoiceDTO>)mapper)
             .AddConfiguration(map => map.ForListChildren(d => d.InvoiceLines, e => e.InvoiceLines, line =>
-                line.ForListChild(l => l.Product, il => il.Product, product =>
-                    product.ForList(p => p.Name, prod => prod.Name + " + Custom Mapping"))));
+                line.ForChild(l => l.Product, il => il.Product, product =>
+                    product.For(p => p.Name, prod => prod.Name + " + Custom Mapping"))));
 
         var row = mapper.MapToList(SampleInvoices().AsQueryable()).Single();
 
@@ -74,14 +74,14 @@ public class DeepListMappingTests
         // The explicitly-composed custom product DTO, with the per-property customization applied.
         Assert.NotNull(listLine.Product);
         Assert.Equal("5", listLine.Product.ID);
-        Assert.Equal("Super Widget + Custom Mapping", listLine.Product.Name);   // ForList customization
+        Assert.Equal("Super Widget + Custom Mapping", listLine.Product.Name);   // For customization
         Assert.Equal(120, listLine.Product.Price);                             // convention, untouched
     }
 
     [Fact]
     public void MapToList_WithoutExplicitChild_LeavesProductNull()
     {
-        // No nested ForListChild → the product object is NOT composed. Nothing goes deep automatically
+        // No nested ForChild → the product object is NOT composed. Nothing goes deep automatically
         // in the list direction; the line's own scalar columns still project.
         var mapper = ResolveInvoiceMapper();
         ((IShiftMapperConfigurable<Invoice, InvoiceListDTO, InvoiceDTO>)mapper)
