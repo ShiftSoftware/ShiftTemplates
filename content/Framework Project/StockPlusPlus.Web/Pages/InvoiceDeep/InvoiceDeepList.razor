@@ -1,0 +1,39 @@
+@attribute [Authorize]
+@attribute [Route($"/{nameof(InvoiceDeepList)}")]
+
+@using StockPlusPlus.Shared.DTOs.Invoice
+
+@* Lists the "api/invoice-deep" endpoint — the built-in repository served through the SOURCE-GENERATED
+   mapper (UseGeneratedMapper = true). The list projection AUTOMATICALLY composes three levels in SQL:
+   Invoice → InvoiceLines → Product → ProductBrand (no ForListChild calls). *@
+<ShiftList EntitySet="invoice-deep"
+           Title="Invoices (Deep)"
+           T="InvoiceDeepListDTO"
+           Dense
+           DisableActionColumn
+           ComponentType="typeof(InvoiceDeepForm)"
+           ShowIDColumn="true"
+           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice">
+
+    <PropertyColumn Property="x => x.ManualReference" Title="Reference" />
+    <PropertyColumn Property="x => x.InvoiceNo" Title="No" />
+
+    <TemplateColumn Title="Lines → Product → Brand" Sortable="false">
+        <CellTemplate Context="cell">
+            @foreach (var line in cell.Item.InvoiceLines)
+            {
+                <MudText Typo="Typo.body2">
+                    @line.Description <b>@line.Price</b>
+                    @if (line.Product is not null)
+                    {
+                        <span>→ @line.Product.Name</span>
+                        @if (line.Product.ProductBrand is not null)
+                        {
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@line.Product.ProductBrand.Name</MudChip>
+                        }
+                    }
+                </MudText>
+            }
+        </CellTemplate>
+    </TemplateColumn>
+</ShiftList>

@@ -1,0 +1,42 @@
+@attribute [Route($"/{nameof(InvoiceDeepForm)}/{{Key?}}")]
+
+@using StockPlusPlus.Shared.DTOs.Invoice
+
+@inherits ShiftForm<InvoiceDeepForm, InvoiceDeepDTO>
+
+@* Read-only view for "api/invoice-deep". Opening a row loads the invoice whose MapToView AUTOMATICALLY
+   composed three levels: InvoiceLines → Product → ProductBrand (via the generated pair mappers). *@
+<ShiftEntityForm @bind-Mode="Mode"
+                 @bind-Value="TheItem"
+                 @ref="FormContainer"
+                 Endpoint="invoice-deep"
+                 Title="Invoice (Deep)"
+                 TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice"
+                 @bind-Key="@Key">
+
+    <MudTextFieldExtended Label="Reference" @bind-Value="TheItem.ManualReference" ReadOnly="true" />
+    <MudField Label="Invoice No" Variant="Variant.Text">@TheItem.InvoiceNo</MudField>
+
+    <MudText Typo="Typo.h6" Class="mt-4 mb-2">Lines → Product → Brand (auto-composed)</MudText>
+
+    <MudSimpleTable Dense="true" Bordered="true" Striped="true">
+        <thead>
+            <tr><th>Description</th><th>Price</th><th>Product</th><th>Product Price</th><th>Brand</th></tr>
+        </thead>
+        <tbody>
+            @if (TheItem?.InvoiceLines is not null)
+            {
+                @foreach (var line in TheItem.InvoiceLines)
+                {
+                    <tr>
+                        <td>@line.Description</td>
+                        <td>@line.Price</td>
+                        <td>@line.Product?.Name</td>
+                        <td>@line.Product?.Price</td>
+                        <td>@line.Product?.ProductBrand?.Name</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </MudSimpleTable>
+</ShiftEntityForm>

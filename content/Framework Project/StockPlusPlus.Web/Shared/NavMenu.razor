@@ -2,6 +2,7 @@
 @using ShiftSoftware.ShiftIdentity.Core
 @using StockPlusPlus.Web.Pages.Country
 @using StockPlusPlus.Web.Pages.Invoice
+@using StockPlusPlus.Web.Pages.InvoiceDeep
 @using StockPlusPlus.Web.Pages.NeedsAttention
 @using StockPlusPlus.Web.Pages.Product
 @using StockPlusPlus.Web.Pages.ProductBrand
@@ -42,6 +43,11 @@
                           Match="NavLinkMatch.All"
                           Icon="@Icons.Material.Outlined.Newspaper"
                           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice">Invoices <AttentionNavBadge EntitySet="Invoice" /></AuthorizedMudNavLink>
+
+    <AuthorizedMudNavLink Href="@($"/{nameof(InvoiceDeepList)}")"
+                          Match="NavLinkMatch.All"
+                          Icon="@Icons.Material.Outlined.AccountTree"
+                          TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice">Invoices (Deep)</AuthorizedMudNavLink>
 
     <AuthorizedMudNavLink Href="@($"/{nameof(CountryList)}")"
                           Match="NavLinkMatch.All"
