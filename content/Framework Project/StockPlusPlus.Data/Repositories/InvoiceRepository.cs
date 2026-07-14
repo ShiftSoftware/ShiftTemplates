@@ -25,21 +25,7 @@ public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceLi
         option =>
         {
             option.IncludeRelatedEntitiesWithFindAsync(x => x.Include(entity => entity.InvoiceLines));
-            option.UseGeneratedMapper(map =>
-            {
-                // Entity direction: replace-with-new via the pair.
-                map.ForEntityChildren(x => x.InvoiceLines, d => d.InvoiceLines);
-
-                // View direction — now EXPLICIT too (nothing goes deep automatically). Compose the lines
-                // into the invoice view.
-                map.ForViewChildren(d => d.InvoiceLines, e => e.InvoiceLines);
-
-                // List direction: compose the lines, and — explicitly, one level deeper — each line's
-                // product, with a custom mapping for the product's Name.
-                map.ForListChildren(d => d.InvoiceLines, e => e.InvoiceLines, line =>
-                    line.ForListChild(l => l.Product, il => il.Product, product =>
-                        product.ForList(p => p.Name, prod => prod.Name + " + Custom Mapping")));
-            });
+            option.UseGeneratedMapper();
         };
 
     public InvoiceRepository(DB db) : base(db, IncludeOptions)

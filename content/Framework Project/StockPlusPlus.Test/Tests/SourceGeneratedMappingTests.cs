@@ -417,17 +417,10 @@ public class MapperCustomizationTests
         return (mapper, (IShiftMapperConfigurable<Country, CountryGeneratedDTO, CountryGeneratedDTO>)mapper);
     }
 
-    [Fact]
-    public void AddConfiguration_ForEntity_ReplacesConvention()
-    {
-        var (mapper, configurable) = CreateCountryMapper();
-        configurable.AddConfiguration(map => map.ForEntity(x => x.Name, (dto, _) => dto.Name.ToUpperInvariant()));
-
-        var existing = new Country();
-        mapper.MapToEntity(new CountryGeneratedDTO { Name = "abc" }, existing);
-
-        Assert.Equal("ABC", existing.Name);
-    }
+    // NOTE: runtime AddConfiguration of ForEntity/ForCopy on an already-generated mapper is no longer honored
+    // for baked members — the generator now decides custom-vs-convention at BUILD time from the static config
+    // it can see (a mapper's Configure / a repo's UseGeneratedMapper). See BuildTimeMappingTests for the baked
+    // ForEntity/ForCopy equivalents. ForList still composes at runtime (ComposeList), covered below.
 
     [Fact]
     public void AddConfiguration_ForList_ComposesIntoProjection_KeepingOtherBindings()
@@ -442,17 +435,6 @@ public class MapperCustomizationTests
         Assert.Equal("0", list[0].ID);              // convention binding intact
     }
 
-    [Fact]
-    public void AddConfiguration_ForCopy_ReplacesConvention()
-    {
-        var (mapper, configurable) = CreateCountryMapper();
-        configurable.AddConfiguration(map => map.ForCopy(x => x.Name, (source, _) => source.Name + " [C]"));
-
-        var target = new Country();
-        mapper.CopyEntity(new Country { Name = "N" }, target);
-
-        Assert.Equal("N [C]", target.Name);
-    }
 }
 
 /// <summary>

@@ -91,53 +91,11 @@ public class DeepMappingTests
         Assert.Null(dto.InvoiceLines);
     }
 
-    [Fact]
-    public void MapToView_ForViewChildren_CustomizesChildProperty()
-    {
-        // Customize a property of the deep view object — the same ForView you use on the parent, on the child.
-        var invoice = new Invoice
-        {
-            ManualReference = "INV-3",
-            InvoiceLines = new HashSet<InvoiceLine> { new InvoiceLine { Description = "Widget", Price = 9.5m, ProductID = 5 } },
-        };
-
-        var mapper = ResolveInvoiceMapper();
-        ((IShiftMapperConfigurable<Invoice, InvoiceListDTO, InvoiceDTO>)mapper)
-            .AddConfiguration(map => map.ForViewChildren(d => d.InvoiceLines, e => e.InvoiceLines,
-                line => line.ForView(l => l.Description, il => il.Description + " (view)")));
-
-        var dto = mapper.MapToView(invoice);
-
-        var line = Assert.Single(dto.InvoiceLines!);
-        Assert.Equal("Widget (view)", line.Description);   // deep view customization applied
-        Assert.Equal("5", line.Product!.Value);            // other conventions untouched
-    }
-
-    [Fact]
-    public void MapToEntity_ForEntityChildren_CustomizesChildProperty()
-    {
-        System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor(typeof(Invoice).Module.ModuleHandle);
-
-        // Same nested-config shape on the WRITE direction: customize a child entity property.
-        var builder = new ShiftMapperBuilder<Invoice, InvoiceListDTO, InvoiceDTO>();
-        builder.ForEntityChildren(x => x.InvoiceLines, d => d.InvoiceLines,
-            line => line.ForEntity(il => il.Description, l => l.Description + " (persisted)"));
-
-        builder.TryGetEntityValue(nameof(Invoice.InvoiceLines), out var value);
-        var func = (Func<InvoiceDTO, MappingContext, ICollection<InvoiceLine>?>)value!;
-
-        var dto = new InvoiceDTO
-        {
-            InvoiceLines = new List<InvoiceLineDTO>
-            {
-                new InvoiceLineDTO { Description = "A", Price = 1m, Product = new ShiftEntitySelectDTO { Value = "3" } },
-            },
-        };
-
-        var line = Assert.Single(func(dto, default)!.ToList());
-        Assert.Equal("A (persisted)", line.Description);   // deep entity customization applied
-        Assert.Equal(3, line.ProductID);                   // convention untouched
-    }
+    // NOTE: per-property customization of a DEEP child via RUNTIME nested config (line => line.ForView/ForEntity)
+    // is no longer honored for baked members — the generator decides custom-vs-convention at BUILD time from the
+    // static config it can see. Deep-child customization is now expressed statically (in the repo/mapper Configure)
+    // and baked; BuildTimeMappingTests covers the baked custom/ignore/auto-compose behavior. Composition itself
+    // (parent-level ForViewChildren / replace-with-new ForEntityChildren) is still covered by the tests above/below.
 
     [Fact]
     public void Pair_Map_AppliesConventions()

@@ -110,6 +110,15 @@ Key files in ShiftEntity (sibling repo):
 - `ShiftEntity.EFCore/AutoMapperShiftEntityMapper.cs` — wraps AutoMapper as an IShiftEntityMapper implementation
 - `ShiftEntity.EFCore/ShiftRepository.cs` — unified on single `entityMapper` path, ReloadAfterSave handled inline
 
+### Build-time baked mapping (2026-07-14)
+
+The source-generated mappers now decide custom-vs-convention-vs-ignore at BUILD time — no per-property runtime branch. The generator statically SEARCHES the fluent config (a mapper's `Configure`, a repo's `UseGeneratedMapper(map=>…)`, nested `configureChild`) keyed by the `ShiftMapperBuilder<E,L,V>` type args, and per member emits either a reference to the runtime delegate (`InvokeView/InvokeEntity/InvokeCopy` — value stays runtime, only the decision is baked), the convention directly, or nothing (Ignore). New capabilities across all four methods:
+- **Ignore** — fluent `map.Ignore(…)`/`IgnoreView/Entity/List/Copy(…)` or `[ShiftEntityMapperIgnore]` on any side; the member is OMITTED from generated code (not a runtime skip), complex subtrees pruned.
+- **Automatic deep mapping** — child objects/collections compose automatically up to a **max depth** (default 10; per-repo via `[ShiftEntityMapperMaxDepth(n)]` or `map.MaxDepth(n)`). Explicit `ForXxxChild(ren)` still composes beyond the cap (and, when present, makes auto-deep step aside for that member). Done for **View** (compose child DTO), **Entity** (replace-with-new), and **List** (inline correlated SQL member-init, grandchildren included).
+- Runtime-only `AddConfiguration` on an already-generated mapper is no longer baked (generator runs on production assemblies only, not the test assembly) — express customization statically. **Conditional registration is a build error** (`SHENGEN005`): a config call inside an `if/switch/loop/?:/&&/||/??` fails the build — register unconditionally and put the condition inside the value delegate. (There is deliberately NO runtime opt-out attribute.)
+
+New framework files: `ShiftEntity.Core/ShiftEntityMapperConfigAttributes.cs` (MaxDepth/Ignore attrs), `ShiftEntity.Core/ShiftMapperBuilder.cs` (Ignore/MaxDepth/Invoke*). The baked features are currently verified manually on Invoice + by generated-output inspection (a dedicated DB-free demo triple was tried then removed — the existing Invoice mapper can't host these tests since it's an auto mapper with explicitly-configured children). NOT YET done: auto-deep for Copy(clone), SHENGEN006/007 diagnostics.
+
 When working on mapping-related changes, always check the planning doc for current iteration status before starting.
 
 ## Tagging
