@@ -58,6 +58,57 @@ public class AttributeEndpointTests
         Assert.Equal("Testland (via IConfiguresShiftRepository)", row.Name);
     }
 
+    // Country also implements IUpsertsShiftRepository for the CountryGeneratedDTO triple, so the BUILT-IN
+    // repository's upsert is driven by the entity — still no repository class. context.Base() runs the framework
+    // default (which maps the DTO onto the entity); the hook's own code runs around it.
+    [Fact]
+    public async Task AttributeEndpoint_EntityHooksBuiltInRepositoryUpsert_ViaInterface()
+    {
+        using var scope = factory.Services.CreateScope();
+        var repo = scope.ServiceProvider
+            .GetRequiredService<ShiftRepository<DB, Country, CountryGeneratedDTO, CountryGeneratedDTO>>();
+
+        var saved = await repo.UpsertAsync(new Country(), new CountryGeneratedDTO { Name = "  Testland  " },
+            ActionTypes.Insert, userId: null, idempotencyKey: null,
+            disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
+
+        // Base() ran the default mapping ("  Testland  " landed on the entity), then the hook trimmed it.
+        Assert.Equal("Testland", saved.Name);
+        Assert.Equal("Saved", repo.ResponseMessage!.Title);
+    }
+
+    // The delete twin: Base() applies the framework's soft delete, the hook decorates the response.
+    [Fact]
+    public async Task AttributeEndpoint_EntityHooksBuiltInRepositoryDelete_ViaInterface()
+    {
+        using var scope = factory.Services.CreateScope();
+        var repo = scope.ServiceProvider
+            .GetRequiredService<ShiftRepository<DB, Country, CountryGeneratedDTO, CountryGeneratedDTO>>();
+
+        var deleted = await repo.DeleteAsync(new Country { Name = "Testland" }, userId: null,
+            disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
+
+        Assert.True(deleted.IsDeleted);
+        Assert.Equal("Deleted", repo.ResponseMessage!.Title);
+    }
+
+    // The write hooks are keyed by DTO triple just like the config one: Country implements them only for
+    // CountryGeneratedDTO, so the CountryDTO endpoint's upsert stays the plain framework default.
+    [Fact]
+    public async Task AttributeEndpoint_EntityWriteHooks_DoNotLeakToOtherTriples()
+    {
+        using var scope = factory.Services.CreateScope();
+        var repo = scope.ServiceProvider
+            .GetRequiredService<ShiftRepository<DB, Country, CountryDTO, CountryDTO>>();
+
+        var saved = await repo.UpsertAsync(new Country(), new CountryDTO { Name = "  Testland  " },
+            ActionTypes.Insert, userId: null, idempotencyKey: null,
+            disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
+
+        Assert.Equal("  Testland  ", saved.Name);   // untrimmed — the hook didn't run for this triple
+        Assert.Null(repo.ResponseMessage);
+    }
+
     // The interface is keyed by DTO triple: Country does NOT implement it for the CountryDTO triple, so that
     // endpoint's built-in repository is untouched (still the plain AutoMapper mapping).
     [Fact]
