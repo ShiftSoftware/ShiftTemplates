@@ -13,8 +13,8 @@ namespace StockPlusPlus.Data.Repositories;
 /// <para>
 /// It owns its own DTO triple on purpose. Passing an options builder to the base constructor (as below) means
 /// this repository configures ITSELF and takes over completely, so an entity's IConfiguresShiftRepository for
-/// the same triple would silently never run — the generator warns about that pairing (SHENGEN006). Country
-/// configures the CountryGeneratedDTO triple from the entity, so this demo stays clear of it.
+/// the same triple would silently never run — the generator fails the build on that pairing (SHENGEN006).
+/// Country configures the CountryGeneratedDTO triple from the entity, so this demo stays clear of it.
 /// </para>
 /// </summary>
 public class CountryRepository : ShiftRepository<DB, Entities.Country, CountryRepoDTO, CountryRepoDTO>

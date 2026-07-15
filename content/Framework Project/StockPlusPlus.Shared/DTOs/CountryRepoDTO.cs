@@ -9,8 +9,8 @@ namespace StockPlusPlus.Shared.DTOs;
 //
 // It specifically must NOT share CountryGeneratedDTO's triple: Country configures THAT triple from the entity
 // (IConfiguresShiftRepository), and a repository passing an options builder configures itself and takes over, so
-// the entity's configuration would silently never run. The generator flags that pairing as SHENGEN006 — keeping
-// this demo on its own triple is what keeps both demos honest.
+// the entity's configuration would silently never run. That pairing is a build ERROR (SHENGEN006) — keeping this
+// demo on its own triple is what keeps both demos honest.
 [ShiftEntityKeyAndName(nameof(ID), nameof(Name))]
 public class CountryRepoDTO : ShiftEntityMixedDTO
 {

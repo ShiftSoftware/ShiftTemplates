@@ -11,7 +11,7 @@ namespace StockPlusPlus.Shared.DTOs;
 // This is also the triple Country drives from the ENTITY: IConfiguresShiftRepository (a mapper tweak) plus
 // IUpsertsShiftRepository / IDeletesShiftRepository (the write hooks). The CountryRepository demo deliberately
 // lives on its own CountryRepoDTO triple instead — a repository passing an options builder configures itself and
-// would silently suppress the entity's configuration here (SHENGEN006).
+// would silently suppress the entity's configuration here, which is a build error (SHENGEN006).
 [ShiftEntityKeyAndName(nameof(ID), nameof(Name))]
 public class CountryGeneratedDTO : ShiftEntityMixedDTO
 {
