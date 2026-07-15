@@ -123,8 +123,9 @@ public class SourceGeneratedMapperTests
 /// <summary>
 /// DB-independent unit tests for the ZERO-CODE (auto-discovery) form of source generation: no mapper
 /// class is declared anywhere for Country's (Country, CountryGeneratedDTO, CountryGeneratedDTO) triple —
-/// the generator discovers it (from CountryRepository and the api/country-generated endpoint attribute),
-/// emits an auto-named mapper, and registers it in ShiftEntityMapperRegistry via a module initializer.
+/// the generator discovers it from the api/country-generated endpoint attribute, emits an auto-named mapper,
+/// and registers it in ShiftEntityMapperRegistry via a module initializer. (CountryRepository demonstrates the
+/// same zero-code form discovered from a REPOSITORY instead, on its own CountryRepoDTO triple.)
 /// </summary>
 public class AutoDiscoveredGeneratedMapperTests
 {
@@ -214,7 +215,7 @@ public class SourceGeneratedMappingTests
         var db = scope.ServiceProvider.GetRequiredService<DB>();
         var countryRepo = scope.ServiceProvider.GetRequiredService<CountryRepository>();
 
-        var dto = new CountryGeneratedDTO { Name = "SourceGen Country" };
+        var dto = new CountryRepoDTO { Name = "SourceGen Country" };
 
         var entity = new Country();
         countryRepo.Add(entity);
@@ -241,13 +242,13 @@ public class SourceGeneratedMappingTests
 
         var entity = new Country();
         countryRepo.Add(entity);
-        await countryRepo.UpsertAsync(entity, new CountryGeneratedDTO { Name = "Before Gen Update" }, ActionTypes.Insert, userId: null, idempotencyKey: null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
+        await countryRepo.UpsertAsync(entity, new CountryRepoDTO { Name = "Before Gen Update" }, ActionTypes.Insert, userId: null, idempotencyKey: null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
         await countryRepo.SaveChangesAsync();
 
         db.ChangeTracker.Clear();
 
         var found = (await countryRepo.FindAsync(entity.ID, asOf: null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true))!;
-        await countryRepo.UpsertAsync(found, new CountryGeneratedDTO { Name = "After Gen Update" }, ActionTypes.Update, userId: null, idempotencyKey: null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
+        await countryRepo.UpsertAsync(found, new CountryRepoDTO { Name = "After Gen Update" }, ActionTypes.Update, userId: null, idempotencyKey: null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
         await countryRepo.SaveChangesAsync();
 
         db.ChangeTracker.Clear();
