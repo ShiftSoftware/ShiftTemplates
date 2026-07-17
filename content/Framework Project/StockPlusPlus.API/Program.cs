@@ -227,6 +227,10 @@ mvcBuilder.AddShiftEntityWeb(x =>
     x.AddAzureStorage(azureStorageAccounts.ToArray());
 #if (internalShiftIdentityHosting)
     x.AddShiftIdentityAutoMapper();
+    // Lets app.MapShiftEntityEndpoints<DB>() (below) discover ShiftIdentity's own attribute-driven CRUD
+    // endpoints — the entities carrying [ShiftEntitySecureEndpoint<…>] (Brand, Service, Department).
+    // Their DI half is wired inside AddShiftIdentityDashboard.
+    x.AddShiftIdentityDataAssembly();
 #endif
 });
 
