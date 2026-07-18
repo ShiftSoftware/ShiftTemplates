@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using ShiftSoftware.ShiftEntity.CosmosDbReplication.Services;
 using ShiftSoftware.ShiftEntity.Model.Replication;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
-using ShiftSoftware.ShiftIdentity.Core.Entities;
+using ShiftSoftware.ShiftIdentity.Data.Entities;
 using StockPlusPlus.Data.DbContext;
 
 namespace StockPlusPlus.Functions.Functions;

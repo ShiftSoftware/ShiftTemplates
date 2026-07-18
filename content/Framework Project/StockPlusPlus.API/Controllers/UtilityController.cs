@@ -180,52 +180,52 @@ public class UtilityController : ControllerBase
 
     public static async Task ReplicateAll(CosmosDBReplication replication, CosmosClient client, string databaseId)
     {
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Core.Entities.Team>(client, databaseId)
+        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Team>(client, databaseId)
                     .Replicate<TeamModel>(IdentityDatabaseAndContainerNames.TeamContainerName)
                     .RunAsync(true);
 
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Core.Entities.Country>(client, databaseId, x => x.Include(x => x.Regions))
+        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Country>(client, databaseId, x => x.Include(x => x.Regions))
             .Replicate<CountryModel>(IdentityDatabaseAndContainerNames.CountryContainerName)
             .RunAsync(true);
 
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Core.Entities.Region>(client, databaseId)
+        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Region>(client, databaseId)
             .Replicate<RegionModel>(IdentityDatabaseAndContainerNames.CountryContainerName)
             .RunAsync(true);
 
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Core.Entities.City>(client, databaseId)
+        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.City>(client, databaseId)
             .Replicate<CityModel>(IdentityDatabaseAndContainerNames.CountryContainerName)
             .RunAsync(true);
 
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Core.Entities.Company>(client, databaseId)
+        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Company>(client, databaseId)
             .Replicate<CompanyModel>(IdentityDatabaseAndContainerNames.CompanyContainerName)
             .RunAsync(true);
 
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Core.Entities.CompanyBranch>(client, databaseId,
+        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.CompanyBranch>(client, databaseId,
             q => q.Include(x => x.City).ThenInclude(x => x.Region).Include(x => x.Company))
             .Replicate<CompanyBranchModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName)
             .RunAsync(true);
 
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Core.Entities.CompanyBranchDepartment>(client, databaseId, x => x.Include(i => i.Department))
+        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.CompanyBranchDepartment>(client, databaseId, x => x.Include(i => i.Department))
             .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName)
             .RunAsync(true);
 
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Core.Entities.CompanyBranchService>(client, databaseId, x => x.Include(i => i.Service))
+        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.CompanyBranchService>(client, databaseId, x => x.Include(i => i.Service))
             .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName)
             .RunAsync(true);
 
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Core.Entities.CompanyBranchBrand>(client, databaseId, x => x.Include(i => i.Brand))
+        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.CompanyBranchBrand>(client, databaseId, x => x.Include(i => i.Brand))
             .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName)
             .RunAsync(true);
 
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Core.Entities.Department>(client, databaseId)
+        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Department>(client, databaseId)
             .Replicate<DepartmentModel>(IdentityDatabaseAndContainerNames.DepartmentContainerName)
             .RunAsync(true);
 
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Core.Entities.Service>(client, databaseId)
+        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Service>(client, databaseId)
             .Replicate<ServiceModel>(IdentityDatabaseAndContainerNames.ServiceContainerName)
             .RunAsync(true);
 
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Core.Entities.Brand>(client, databaseId)
+        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Brand>(client, databaseId)
             .Replicate<BrandModel>(IdentityDatabaseAndContainerNames.BrandContainerName)
             .RunAsync(true);
     }

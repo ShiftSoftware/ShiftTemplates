@@ -23,7 +23,7 @@ using StockPlusPlus.API.Services;
 using AutoMapper;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
-using ShiftSoftware.ShiftIdentity.Core.Entities;
+using ShiftSoftware.ShiftIdentity.Data.Entities;
 using ShiftSoftware.ShiftIdentity.Core.Models;
 using ShiftSoftware.ShiftEntity.Model.Enums;
 using StockPlusPlus.Shared.Localization;
@@ -193,7 +193,7 @@ if (IsCosmosEnabled)
         x.SetUpReplication<DB, Team>(client, databaseId)
             .Replicate<TeamModel>("Teams", x => x.id);
 
-        x.SetUpReplication<DB, ShiftSoftware.ShiftIdentity.Core.Entities.User>(client, databaseId)
+        x.SetUpReplication<DB, ShiftSoftware.ShiftIdentity.Data.Entities.User>(client, databaseId)
             .Replicate<UserModel>("Users", x => x.id);
     });
 
