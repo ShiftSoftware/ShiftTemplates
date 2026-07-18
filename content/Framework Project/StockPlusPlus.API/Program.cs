@@ -462,6 +462,13 @@ app.MapAttentionHub();
 // no assemblies passed it discovers them from the registered data assemblies.
 app.MapShiftEntityEndpoints<DB>();
 
+#if (internalShiftIdentityHosting)
+// ShiftIdentity's dashboard-side custom (non-CRUD) endpoints — e.g. CompanyCalendar's GetCalendarEvents, which used
+// to live on IdentityCompanyCalendarController. Attribute-driven CRUD is mapped by MapShiftEntityEndpoints above.
+// This is the app-side companion to mvcBuilder.AddShiftIdentityDashboard(...).
+app.MapShiftIdentityDashboard();
+#endif
+
 #if (includeSampleApp)
 app.MapShiftTaggingEndpoints<DB>();
 #endif
