@@ -10,6 +10,7 @@ using ShiftSoftware.ShiftIdentity.Core.DTOs.CompanyCalendar;
 using ShiftSoftware.ShiftIdentity.Core.DTOs.Country;
 using ShiftSoftware.ShiftIdentity.Core.DTOs.Region;
 using ShiftSoftware.ShiftIdentity.Core.DTOs.Team;
+using ShiftSoftware.ShiftIdentity.Core.DTOs.User;
 using ShiftSoftware.ShiftIdentity.Data.Entities;
 using ShiftSoftware.ShiftIdentity.Data.Repositories;
 using System.Linq;
@@ -51,6 +52,8 @@ public class IdentityAttributeEndpointDiscoveryTests
     [InlineData("api/IdentityCompany")]
     [InlineData("api/IdentityCompanyBranch")]
     [InlineData("api/IdentityCompanyCalendar")]
+    // Phase 4
+    [InlineData("api/IdentityUser")]
     public void AllIdentityEndpoints_AreDiscovered_Secure_AndActionGated(string route)
     {
         var spec = DiscoverRoute(route);
@@ -88,6 +91,8 @@ public class IdentityAttributeEndpointDiscoveryTests
     // attribute mapper (the repository opts into the generated mapper in its own builder).
     [InlineData("api/IdentityCompany", typeof(Company), typeof(CompanyListDTO), typeof(CompanyDTO), typeof(CompanyRepository), nameof(ShiftIdentityActions.Companies))]
     [InlineData("api/IdentityCompanyBranch", typeof(CompanyBranch), typeof(CompanyBranchListDTO), typeof(CompanyBranchDTO), typeof(CompanyBranchRepository), nameof(ShiftIdentityActions.CompanyBranches))]
+    // Phase 4: User's endpoint routes through the surviving heavy repository (IUserRepository + public methods).
+    [InlineData("api/IdentityUser", typeof(User), typeof(UserListDTO), typeof(UserDTO), typeof(UserRepository), nameof(ShiftIdentityActions.Users))]
     public void CustomRepoEndpoint_UsesThinRepository_NoAttributeMapper(string route, System.Type entity, System.Type listDto, System.Type viewDto, System.Type repository, string actionName)
     {
         var spec = DiscoverRoute(route);
