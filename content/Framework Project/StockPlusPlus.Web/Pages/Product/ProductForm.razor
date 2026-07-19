@@ -10,7 +10,6 @@
 @using Pages.ProductCategory
 @using Pages.Country
 
-@inherits ShiftForm<ProductForm, ProductDTO>
 @inject ODataQuery odataQuery
 
 @* Viewing presence demo: ReportViewingPresence makes the form tell the server, through the
@@ -18,8 +17,7 @@
    that presence (context.HasActiveViewers()) and skips raising "ReleasedWithoutPrice" while
    someone has the record open. Best-effort: when the hub is unreachable, the server treats
    the record as not viewed and raises signals as normal. *@
-<ShiftEntityForm @bind-Mode="Mode"
-                 @bind-Value="TheItem"
+<ShiftEntityForm @bind-Value="_theItem"
                  @ref="FormContainer"
                  Endpoint="Product"
                  Title="Product"
@@ -32,46 +30,46 @@
 
     <MudTextFieldExtended OnlyValidateIfDirty="true"
                           Label="Name"
-                          @bind-Value="TheItem.Name"
-                          For="@(() => TheItem.Name)" />
+                          @bind-Value="context.Item.Name"
+                          For="@(() => context.Item.Name)" />
 
-    <MudNumericFieldExtended @bind-Value="TheItem.Price" For="() => TheItem.Price" />
+    <MudNumericFieldExtended @bind-Value="context.Item.Price" For="() => context.Item.Price" />
 
     <ShiftDateTimePicker Label="Release Date"
-                         @bind-DateTimeOffset="TheItem.ReleaseDate"
-                         For="() => TheItem.ReleaseDate" />
+                         @bind-DateTimeOffset="context.Item.ReleaseDate"
+                         For="() => context.Item.ReleaseDate" />
 
     <ShiftAutocomplete Label="Product Brand"
-                       @bind-Value="TheItem.ProductBrand"
+                       @bind-Value="context.Item.ProductBrand"
                        TEntitySet="ProductBrandListDTO"
                        EntitySet="ProductBrand"
                        QuickAddComponentType="typeof(ProductBrandForm)"
                        QuickAddParameterName="@nameof(ProductBrandForm.BrandName)"
-                       For="() => TheItem.ProductBrand" />
+                       For="() => context.Item.ProductBrand" />
 
     <ShiftAutocomplete Label="ProductCategory"
-                       @bind-Value="TheItem.ProductCategory"
+                       @bind-Value="context.Item.ProductCategory"
                        TEntitySet="ProductCategoryListDTO"
                        EntitySet="ProductCategory"
                        QuickAddComponentType="typeof(ProductCategoryForm)"
                        QuickAddParameterName="@nameof(ProductCategoryForm.ProductCategoryName)"
-                       For="() => TheItem.ProductCategory" />
+                       For="() => context.Item.ProductCategory" />
 
 
     <ShiftAutocomplete Label="Country"
-                       @bind-Value="TheItem.CountryOfOrigin"
+                       @bind-Value="context.Item.CountryOfOrigin"
                        TEntitySet="CountryDTO"
                        EntitySet="Country"
                        QuickAddComponentType="typeof(CountryForm)"
                        QuickAddParameterName="@nameof(CountryForm.Name)"
-                       For="()=> TheItem.CountryOfOrigin" />
+                       For="()=> context.Item.CountryOfOrigin" />
 
 
-    <MudSelectExtended @bind-Value="TheItem.TrackingMethod" For="() => TheItem.TrackingMethod"></MudSelectExtended>
+    <MudSelectExtended @bind-Value="context.Item.TrackingMethod" For="() => context.Item.TrackingMethod"></MudSelectExtended>
 
     @* Add (+) and view (double-click) use the framework's ShiftTagForm by default — no config needed. *@
     <ShiftTagPicker Label="Tags"
-                    @bind-Value="TheItem.Tags" />
+                    @bind-Value="context.Item.Tags" />
 
     @* Scoped-clear demo. Product's own "ReleasedWithoutPrice" signal is in the default scope and
        auto-clears on open (ClearAttentionOnOpen above). The compliance signal raised by
@@ -101,16 +99,23 @@
     [SupplyParameterFromQuery]
     public bool ForceSaveAsNew { get; set; }
 
+    [Parameter]
+    public object? Key { get; set; }
+
+    private ProductDTO _theItem = new();
+
+    private ShiftEntityForm<ProductDTO>? FormContainer = null;
+
     protected override void OnInitialized()
     {
         if (!string.IsNullOrWhiteSpace(ProductCategoryID))
         {
-            TheItem.ProductCategory = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO { Value = ProductCategoryID };
+            _theItem.ProductCategory = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO { Value = ProductCategoryID };
         }
 
         if (!string.IsNullOrWhiteSpace(ProductBrandID))
         {
-            TheItem.ProductBrand = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO { Value = ProductBrandID };
+            _theItem.ProductBrand = new ShiftSoftware.ShiftEntity.Model.Dtos.ShiftEntitySelectDTO { Value = ProductBrandID };
         }
     }
 

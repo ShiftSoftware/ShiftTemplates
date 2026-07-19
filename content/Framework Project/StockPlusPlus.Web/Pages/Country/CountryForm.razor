@@ -2,11 +2,7 @@
 
 @using StockPlusPlus.Shared.DTOs
 
-@inherits ShiftForm<CountryForm, CountryDTO>
-
-<ShiftEntityForm @bind-Mode="Mode"
-                 @bind-Value="TheItem"
-                 @ref="FormContainer"
+<ShiftEntityForm @bind-Value="_theItem"
                  Endpoint="Country"
                  Title="Country"
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Country"
@@ -14,8 +10,8 @@
 
     <MudTextFieldExtended OnlyValidateIfDirty="true"
                           Label="Name"
-                          @bind-Value="TheItem.Name"
-                          For="@(() => TheItem.Name)" />
+                          @bind-Value="context.Item.Name"
+                          For="@(() => context.Item.Name)" />
 </ShiftEntityForm>
 
 
@@ -23,11 +19,15 @@
     [Parameter]
     public string? Name { get; set; }
 
+    [Parameter]
+    public object? Key { get; set; }
+    private CountryDTO _theItem = new();
+
     protected override void OnInitialized()
     {
         if (!string.IsNullOrWhiteSpace(Name))
         {
-            TheItem.Name = Name;
+            _theItem.Name = Name;
         }
     }
 }

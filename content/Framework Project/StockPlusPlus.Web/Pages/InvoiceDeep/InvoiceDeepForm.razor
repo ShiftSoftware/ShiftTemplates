@@ -2,20 +2,16 @@
 
 @using StockPlusPlus.Shared.DTOs.Invoice
 
-@inherits ShiftForm<InvoiceDeepForm, InvoiceDeepDTO>
-
 @* Read-only view for "api/invoice-deep". Opening a row loads the invoice whose MapToView AUTOMATICALLY
    composed three levels: InvoiceLines → Product → ProductBrand (via the generated pair mappers). *@
-<ShiftEntityForm @bind-Mode="Mode"
-                 @bind-Value="TheItem"
-                 @ref="FormContainer"
+<ShiftEntityForm T="InvoiceDeepDTO"
                  Endpoint="invoice-deep"
                  Title="Invoice (Deep)"
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice"
                  @bind-Key="@Key">
 
-    <MudTextFieldExtended Label="Reference" @bind-Value="TheItem.ManualReference" ReadOnly="true" />
-    <MudField Label="Invoice No" Variant="Variant.Text">@TheItem.InvoiceNo</MudField>
+    <MudTextFieldExtended Label="Reference" @bind-Value="context.Item.ManualReference" ReadOnly="true" />
+    <MudField Label="Invoice No" Variant="Variant.Text">@context.Item.InvoiceNo</MudField>
 
     <MudText Typo="Typo.h6" Class="mt-4 mb-2">Lines → Product → Brand (auto-composed)</MudText>
 
@@ -24,9 +20,9 @@
             <tr><th>Description</th><th>Price</th><th>Product</th><th>Product Price</th><th>Brand</th></tr>
         </thead>
         <tbody>
-            @if (TheItem?.InvoiceLines is not null)
+            @if (context.Item?.InvoiceLines is not null)
             {
-                @foreach (var line in TheItem.InvoiceLines)
+                @foreach (var line in context.Item.InvoiceLines)
                 {
                     <tr>
                         <td>@line.Description</td>
@@ -40,3 +36,8 @@
         </tbody>
     </MudSimpleTable>
 </ShiftEntityForm>
+
+@code {
+    [Parameter]
+    public object? Key { get; set; }
+}
