@@ -3,51 +3,47 @@
 @using StockPlusPlus.Shared.DTOs.ProductCategory
 @using StockPlusPlus.Shared.Enums
 
-@inherits ShiftForm<ProductCategoryForm, ProductCategoryDTO>
-
-<ShiftEntityForm @bind-Mode="Mode"
-                 @bind-Value="TheItem"
-                 @ref="FormContainer"
+<ShiftEntityForm @bind-Value="_theItem"
                  ShowPrint
                  Endpoint="ProductCategory"
                  Title="Product Category"
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory"
                  @bind-Key="@Key">
 
-    <LocalizedTextField @bind-Value="TheItem.Name"
-                        For="() => TheItem.Name"
+    <LocalizedTextField @bind-Value="context.Item.Name"
+                        For="() => context.Item.Name"
                         Label="Name" />
 
     <MudTextFieldExtended OnlyValidateIfDirty="true"
                           Label="Description"
-                          @bind-Value="TheItem.Description"
-                          For="@(() => TheItem.Description)" />
+                          @bind-Value="context.Item.Description"
+                          For="@(() => context.Item.Description)" />
 
     <MudTextFieldExtended OnlyValidateIfDirty="true"
                           Label="Code"
-                          @bind-Value="TheItem.Code"
-                          For="@(() => TheItem.Code)" />
+                          @bind-Value="context.Item.Code"
+                          For="@(() => context.Item.Code)" />
 
     <FileUploader ShowThumbnail="true"
                   Label="Attachments"
                   TypeAuthAction="ShiftSoftware.ShiftEntity.Core.AzureStorageActionTree.UploadFiles"
-                  For="() => TheItem.Photos"
+                  For="() => context.Item.Photos"
                   AcceptImages="true"
-                  @bind-Values="TheItem.Photos" />
+                  @bind-Values="context.Item.Photos" />
 
     <MudSelectExtended OnlyValidateIfDirty="true"
                        T="TrackingMethod"
                        Label="Tracking Method"
                        AnchorOrigin="Origin.BottomLeft"
-                       @bind-Value="TheItem.TrackingMethod"
-                       For="@(() => TheItem.TrackingMethod)"/>
+                       @bind-Value="context.Item.TrackingMethod"
+                       For="@(() => context.Item.TrackingMethod)"/>
 
-    @if (Mode == FormModes.View)
+    @if (context.Mode == FormModes.View && !context.Embedded)
     {
         <br />
         <br />
 
-        <ProductList ProductCategoryID="@TheItem.ID" />
+        <ProductList ProductCategoryID="@context.Item.ID" />
     }
 </ShiftEntityForm>
 
@@ -56,11 +52,16 @@
     [Parameter]
     public string? ProductCategoryName { get; set; }
 
+    [Parameter]
+    public object? Key { get; set; }
+
+    private ProductCategoryDTO _theItem = new();
+
     protected override void OnInitialized()
     {
         if (!string.IsNullOrWhiteSpace(ProductCategoryName))
         {
-            TheItem.Name = ProductCategoryName;
+            _theItem.Name = ProductCategoryName;
         }
     }
 }

@@ -30,7 +30,7 @@
                        EntitySet="IdentityTeam"
                        For="() => context.Item.Team" />
 
-    @if (context.Mode == FormModes.View)
+    @if (context.Mode == FormModes.View && !context.Embedded)
     {
         <br />
         <br />
