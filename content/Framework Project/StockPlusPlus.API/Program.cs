@@ -463,9 +463,13 @@ app.MapAttentionHub();
 app.MapShiftEntityEndpoints<DB>();
 
 #if (internalShiftIdentityHosting)
-// ShiftIdentity's dashboard-side custom (non-CRUD) endpoints — e.g. CompanyCalendar's GetCalendarEvents, which used
-// to live on IdentityCompanyCalendarController. Attribute-driven CRUD is mapped by MapShiftEntityEndpoints above.
-// This is the app-side companion to mvcBuilder.AddShiftIdentityDashboard(...).
+// ShiftIdentity endpoints are hosted ONLY when this app IS the identity server (internal hosting). Under EXTERNAL
+// hosting the app is a microservice that CALLS a separate identity, so it must NOT host login/token/dashboard — it
+// only validates tokens (AddShiftIdentity above, which stays unconditional).
+//
+// One entry point for the whole identity server: MapShiftIdentityDashboard() maps auth
+// (login/refresh/MFA/auth-code/external-token, from ShiftIdentity.AspNetCore) AND the dashboard's custom endpoints
+// (CompanyCalendar's GetCalendarEvents, User, …). Auth is part of the identity server, not a separate concern.
 app.MapShiftIdentityDashboard();
 #endif
 
