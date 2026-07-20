@@ -2,12 +2,8 @@
 
 @using StockPlusPlus.Shared.DTOs
 
-@inherits ShiftForm<CountryGeneratedForm, CountryGeneratedDTO>
-
 @* Create/edit form for the "api/country-generated" endpoint (mapped by the SOURCE-GENERATED mapper). *@
-<ShiftEntityForm @bind-Mode="Mode"
-                 @bind-Value="TheItem"
-                 @ref="FormContainer"
+<ShiftEntityForm T="CountryGeneratedDTO"
                  Endpoint="country-generated"
                  Title="Country (Generated)"
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Country"
@@ -15,6 +11,11 @@
 
     <MudTextFieldExtended OnlyValidateIfDirty="true"
                           Label="Name"
-                          @bind-Value="TheItem.Name"
-                          For="@(() => TheItem.Name)" />
+                          @bind-Value="context.Item.Name"
+                          For="@(() => context.Item.Name)" />
 </ShiftEntityForm>
+
+@code {
+    [Parameter]
+    public object? Key { get; set; }
+}

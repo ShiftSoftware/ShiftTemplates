@@ -1,20 +1,11 @@
 @attribute [Route($"/{nameof(InvoiceForm)}/{{Key?}}")]
 
-@using ShiftSoftware.ShiftEntity.Model.Dtos
 @using StockPlusPlus.Shared.DTOs.Invoice
 @using StockPlusPlus.Shared.DTOs.Product
-@using StockPlusPlus.Shared.DTOs
 
-@using Pages.ProductBrand
-@using Pages.ProductCategory
-@using Pages.Country
-
-@inherits ShiftForm<InvoiceForm, InvoiceDTO>
 @inject ODataQuery odataQuery
 
-<ShiftEntityForm @bind-Mode="Mode"
-                 @bind-Value="TheItem"
-                 @ref="FormContainer"
+<ShiftEntityForm T="InvoiceDTO"
                  Endpoint="Invoice"
                  Title="Invoice"
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice"
@@ -23,25 +14,25 @@
 
     <MudTextFieldExtended OnlyValidateIfDirty="true"
                           Label="Manual Reference"
-                          @bind-Value="TheItem.ManualReference"
-                          For="@(() => TheItem.ManualReference)" />
+                          @bind-Value="context.Item.ManualReference"
+                          For="@(() => context.Item.ManualReference)" />
 
     <ShiftDateTimePicker Clearable
                          Label="Invoice Date"
-                         @bind-DateTimeOffset="TheItem.InvoiceDate"
-                         For="() => TheItem.InvoiceDate" />
+                         @bind-DateTimeOffset="context.Item.InvoiceDate"
+                         For="() => context.Item.InvoiceDate" />
 
     <ShiftDateTimePicker Clearable
                          Label="Due Date"
-                         @bind-DateTimeOffset="TheItem.DueDate"
-                         For="() => TheItem.DueDate" />
+                         @bind-DateTimeOffset="context.Item.DueDate"
+                         For="() => context.Item.DueDate" />
 
     <ShiftDateTimePicker Clearable
                          Label="Release Date"
-                         @bind-DateTimeOffset="TheItem.ReleaseDate"
-                         For="() => TheItem.ReleaseDate" />
+                         @bind-DateTimeOffset="context.Item.ReleaseDate"
+                         For="() => context.Item.ReleaseDate" />
 
-    <MultiItemField DisableDragAndDrop="false" ControlVariant="Variant.Filled" Min="3" Title="Lines" @bind-Value="TheItem.InvoiceLines" T="InvoiceLineDTO">
+    <MultiItemField DisableDragAndDrop="false" ControlVariant="Variant.Filled" Min="3" Title="Lines" @bind-Value="context.Item.InvoiceLines" T="InvoiceLineDTO">
         
         <FieldHeader Context="Field">
             <MudGrid Spacing="3" Style="align-items: baseline;">
@@ -111,3 +102,8 @@
   
     </MultiItemField>
 </ShiftEntityForm>
+
+@code {
+    [Parameter]
+    public object? Key { get; set; }
+}
