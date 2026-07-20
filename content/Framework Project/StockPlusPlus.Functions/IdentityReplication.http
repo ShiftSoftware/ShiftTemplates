@@ -1,0 +1,116 @@
+### Identity Cosmos replication — manual test & trigger
+### Host: StockPlusPlus.Functions  (local port comes from Properties/launchSettings.json → --port 7143)
+### Run the Functions host first:  func start   (or F5 / dotnet run)
+
+@host = http://localhost:7143
+
+# Deployed only — locally both endpoints are open (no key needed).
+# The HTTP endpoint is AuthorizationLevel.Function; the /admin endpoint needs the host master key.
+# Uncomment and fill in for a deployed host, then append the key as shown per request.
+# @functionKey = <replicate-all function key>
+# @masterKey   = <host master/_master key>
+
+
+###############################################################################
+# 1) ON-DEMAND FULL RE-SYNC  (updateAll: true — re-syncs EVERY identity row)
+#    ✅ Works in Development. This is the main way to test replication locally.
+#    Requires CosmosDb:Enabled=true + a reachable Cosmos (emulator on :8081).
+#    Returns { "replicated": true }  — or { "replicated": false, "reason": … }
+#    when Cosmos is disabled/unconfigured.
+###############################################################################
+
+### Replicate ALL identity entities now (Services, Departments, Brands, Regions,
+### Countries, Cities, CompanyBranches, Companies, Teams, Users + the M:N joins)
+POST {{host}}/api/replicate-all
+# Deployed: add ?code={{functionKey}}  — or the header:  x-functions-key: {{functionKey}}
+
+
+###############################################################################
+# 2) TRIGGER AN INDIVIDUAL HOURLY TIMER  (via the Functions admin endpoint)
+#    ⚠ The timers are DISABLED in local dev via AzureWebJobs.<name>.Disabled in
+#      local.settings.json, so the host does NOT load them locally and the admin
+#      calls below return 404. To exercise ONE locally: set its
+#      AzureWebJobs.<name>.Disabled to "false" in local.settings.json, restart the
+#      host, then send its request. On a deployed (non-dev) host they run on the
+#      hourly schedule and can be triggered on demand here with the master key.
+#      Each timer does a dirty-only incremental sync (updateAll: false).
+#    Deployed: add the header  x-functions-key: {{masterKey}}
+###############################################################################
+
+### Services
+POST {{host}}/admin/functions/ReplicateServicesTimer
+Content-Type: application/json
+
+{ "input": "" }
+
+### CompanyBranch ↔ Service joins  (branch sub-items)
+POST {{host}}/admin/functions/ReplicateCompanyBranchServicesTimer
+Content-Type: application/json
+
+{ "input": "" }
+
+### CompanyBranch ↔ Department joins  (branch sub-items)
+POST {{host}}/admin/functions/ReplicateCompanyBranchDepartmentsTimer
+Content-Type: application/json
+
+{ "input": "" }
+
+### Departments
+POST {{host}}/admin/functions/ReplicateDepartmentsTimer
+Content-Type: application/json
+
+{ "input": "" }
+
+### Brands
+POST {{host}}/admin/functions/ReplicateBrandsTimer
+Content-Type: application/json
+
+{ "input": "" }
+
+### CompanyBranch ↔ Brand joins  (branch sub-items)
+POST {{host}}/admin/functions/ReplicateCompanyBranchBrandsTimer
+Content-Type: application/json
+
+{ "input": "" }
+
+### Regions
+POST {{host}}/admin/functions/ReplicateRegionsTimer
+Content-Type: application/json
+
+{ "input": "" }
+
+### Countries
+POST {{host}}/admin/functions/ReplicateCountriesTimer
+Content-Type: application/json
+
+{ "input": "" }
+
+### Cities
+POST {{host}}/admin/functions/ReplicateCitiesTimer
+Content-Type: application/json
+
+{ "input": "" }
+
+### CompanyBranches
+POST {{host}}/admin/functions/ReplicateCompanyBranchesTimer
+Content-Type: application/json
+
+{ "input": "" }
+
+### Companies
+POST {{host}}/admin/functions/ReplicateCompaniesTimer
+Content-Type: application/json
+
+{ "input": "" }
+
+### Teams
+POST {{host}}/admin/functions/ReplicateTeamsTimer
+Content-Type: application/json
+
+{ "input": "" }
+
+### Users
+POST {{host}}/admin/functions/ReplicateUsersTimer
+Content-Type: application/json
+
+{ "input": "" }

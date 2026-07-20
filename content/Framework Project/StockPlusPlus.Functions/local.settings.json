@@ -5,7 +5,22 @@
   },
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+
+    "_comment_ReplicationTimers": "The hourly identity Cosmos-replication timers are disabled locally via the host-honored AzureWebJobs.<FunctionName>.Disabled settings below, so they do NOT fire in local dev. A deployed host never reads local.settings.json, so replication runs there. To test one locally, set its value to false; POST api/replicate-all always works regardless.",
+    "AzureWebJobs.ReplicateServicesTimer.Disabled": "true",
+    "AzureWebJobs.ReplicateCompanyBranchServicesTimer.Disabled": "true",
+    "AzureWebJobs.ReplicateCompanyBranchDepartmentsTimer.Disabled": "true",
+    "AzureWebJobs.ReplicateDepartmentsTimer.Disabled": "true",
+    "AzureWebJobs.ReplicateBrandsTimer.Disabled": "true",
+    "AzureWebJobs.ReplicateCompanyBranchBrandsTimer.Disabled": "true",
+    "AzureWebJobs.ReplicateRegionsTimer.Disabled": "true",
+    "AzureWebJobs.ReplicateCountriesTimer.Disabled": "true",
+    "AzureWebJobs.ReplicateCitiesTimer.Disabled": "true",
+    "AzureWebJobs.ReplicateCompanyBranchesTimer.Disabled": "true",
+    "AzureWebJobs.ReplicateCompaniesTimer.Disabled": "true",
+    "AzureWebJobs.ReplicateTeamsTimer.Disabled": "true",
+    "AzureWebJobs.ReplicateUsersTimer.Disabled": "true"
   },
   "OpenApi": {
     "ApiKey": "1234567890"
