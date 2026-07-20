@@ -28,6 +28,7 @@ using ShiftSoftware.ShiftIdentity.Core.Models;
 using ShiftSoftware.ShiftEntity.Model.Enums;
 using StockPlusPlus.Shared.Localization;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore;
+using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Replication;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Web.Explorer;
 using ShiftSoftware.ShiftEntity.Model.Replication;
@@ -135,66 +136,13 @@ if (IsCosmosEnabled)
 
     builder.Services.AddShiftEntityCosmosDbReplicationTrigger<DB>(x =>
     {
-        string databaseId = "Identity";
+        string databaseId = IdentityDatabaseAndContainerNames.DatabaseName;
         var client = x.Services.GetRequiredService<CosmosClient>();
 
-        x.SetUpReplication<DB, Service>(client, databaseId, null)
-            .Replicate<ServiceModel>(IdentityDatabaseAndContainerNames.ServiceContainerName, x => x.id)
-            .UpdateReference<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName,
-                (q, e) => q.Where(x => x.ItemType == CompanyBranchContainerItemTypes.Service && x.id == e.Entity.ID.ToString()));
-
-        x.SetUpReplication<DB, CompanyBranchService>(client, databaseId, null)
-            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
-
-        x.SetUpReplication<DB, CompanyBranchDepartment>(client, databaseId, null)
-            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
-
-        x.SetUpReplication<DB, Department>(client, databaseId, null)
-            .Replicate<DepartmentModel>(IdentityDatabaseAndContainerNames.DepartmentContainerName, x => x.id)
-            .UpdateReference<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName,
-                (q, e) => q.Where(x => x.ItemType == CompanyBranchContainerItemTypes.Department && x.id == e.Entity.ID.ToString()));
-
-        x.SetUpReplication<DB, Brand>(client, databaseId, null)
-            .Replicate<BrandModel>("Brands", x => x.id)
-            .UpdateReference<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName,
-                (q, e) => q.Where(x => x.id == e.Entity.ID.ToString() && x.ItemType == CompanyBranchContainerItemTypes.Brand));
-
-        x.SetUpReplication<DB, CompanyBranchBrand>(client, databaseId)
-            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.BranchID, x => x.ItemType);
-
-        x.SetUpReplication<DB, Region>(client, databaseId)
-            .Replicate<RegionModel>(IdentityDatabaseAndContainerNames.CountryContainerName, x => x.CountryID, x => x.RegionID, x => x.ItemType)
-            .UpdatePropertyReference<CityRegionModel, CompanyBranchModel>("CompanyBranches", x => x.City.Region,
-            (q, e) => q.Where(x => x.City.Region.id == e.Entity.ID.ToString() && x.ItemType == "Branch"));
-
-        x.SetUpReplication<DB, Country>(client, databaseId)
-            .Replicate<CountryModel>(IdentityDatabaseAndContainerNames.CountryContainerName, x => x.CountryID, x => x.RegionID, x => x.ItemType)
-            .UpdatePropertyReference<CountryModel, CompanyBranchModel>("CompanyBranches", x => x.City.Region.Country,
-            (q, e) => q.Where(x => x.City.Region.Country.id == e.Entity.ID.ToString() && x.ItemType == "Branch"));
-
-        x.SetUpReplication<DB, City>(client, databaseId)
-            .Replicate<CityModel>(IdentityDatabaseAndContainerNames.CountryContainerName, x => x.CountryID, x => x.RegionID, x => x.ItemType,
-            e =>
-            {
-                var mapper = e.Services.GetRequiredService<IMapper>();
-                return mapper.Map<CityModel>(e.Entity);
-            })
-            .UpdatePropertyReference<CityCompanyBranchModel, CompanyBranchModel>("CompanyBranches", x => x.City,
-            (q, e) => q.Where(x => x.City.id == e.Entity.ID.ToString() && x.ItemType == "Branch"));
-
-        x.SetUpReplication<DB, CompanyBranch>(client, databaseId)
-            .Replicate<CompanyBranchModel>("CompanyBranches", x => x.BranchID, x => x.ItemType);
-
-        x.SetUpReplication<DB, Company>(client, databaseId)
-            .Replicate<CompanyModel>("Companies", x => x.id)
-            .UpdatePropertyReference<CompanyModel, CompanyBranchModel>("CompanyBranches", x => x.Company,
-            (q, e) => q.Where(x => x.Company.id == e.Entity.ID.ToString()));
-
-        x.SetUpReplication<DB, Team>(client, databaseId)
-            .Replicate<TeamModel>("Teams", x => x.id);
-
-        x.SetUpReplication<DB, ShiftSoftware.ShiftIdentity.Data.Entities.User>(client, databaseId)
-            .Replicate<UserModel>("Users", x => x.id);
+        // Reusable, AutoMapper-free replication setup. Each SetUpXReplication (+ this aggregate) lives in
+        // ShiftIdentity.Dashboard.AspNetCore/Replication and supplies manual ToXModel() mapping delegates
+        // (ShiftIdentity.Data/Replication). Call individual SetUpXReplication<DB>(...) methods to customize.
+        x.SetUpAllIdentityReplications<DB>(client, databaseId);
     });
 
     builder.Services.AddShiftEntityCosmosDbReplication<DB>();
