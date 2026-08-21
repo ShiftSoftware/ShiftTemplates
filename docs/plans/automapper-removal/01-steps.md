@@ -67,10 +67,13 @@ worth having, but as part of **Step B1 (CI gate)** rather than as an urgent fix.
 
 # Stage A — Make failure visible
 
+> **Stage A landed 2026-08-21.** Evidence, per-step notes and what is still open in A10 are in
+> [`STATUS.md`](STATUS.md). Steps below are kept as written, for the reasoning behind each one.
+
 > **Rule for this stage:** conventions before diagnostics. Turning the list/entity diagnostics on before
 > Step A4 produces a warning wall on cases the framework should simply handle, and the real findings drown.
 
-## Step A1 — Behavioral generator test harness
+## Step A1 — Behavioral generator test harness ✅ DONE (2026-08-21)
 
 **Solves:** A-1 verification, and every step after this one.
 
@@ -99,7 +102,7 @@ resulting object", and `SHENGEN004` has a firing test plus three silent tests.
 
 ---
 
-## Step A2 — Give diagnostics a real source location
+## Step A2 — Give diagnostics a real source location ✅ DONE (2026-08-21)
 
 **Solves:** A-1 (usability half).
 
@@ -126,7 +129,7 @@ repository declaration.
 
 ---
 
-## Step A3 — Gate reserved member names by declaring type, not by name
+## Step A3 — Gate reserved member names by declaring type, not by name ✅ DONE (2026-08-21)
 
 **Solves:** A-3. **This is live data loss today.**
 
@@ -160,7 +163,7 @@ directions, pinned by a behavioral test.
 
 ---
 
-## Step A4 — Add inverse scalar conventions to `EntityConvention`
+## Step A4 — Add inverse scalar conventions to `EntityConvention` ✅ DONE (2026-08-21)
 
 **Solves:** A-2. **This is live silent data loss today.**
 
@@ -197,7 +200,7 @@ malformed value throws an exception that names the member.
 
 ---
 
-## Step A5 — List-direction unmapped diagnostic (`SHENGEN007`)
+## Step A5 — List-direction unmapped diagnostic (`SHENGEN007`) ✅ DONE (2026-08-21)
 
 **Solves:** A-1, and gives A-7 (no flattening) a usable migration path.
 
@@ -229,7 +232,7 @@ honest way to size Stage E.
 
 ---
 
-## Step A6 — Entity-direction asymmetry diagnostic (`SHENGEN008`)
+## Step A6 — Entity-direction asymmetry diagnostic (`SHENGEN008`) ✅ DONE (2026-08-21)
 
 **Solves:** A-1 (write half).
 
@@ -259,7 +262,7 @@ correctly and silently fails to save — at build time instead of in production.
 
 ---
 
-## Step A7 — Make fluent config discovery fail closed
+## Step A7 — Make fluent config discovery fail closed ✅ DONE (2026-08-21)
 
 **Solves:** A-5.
 
@@ -297,7 +300,7 @@ naming the member and the reason.
 
 ---
 
-## Step A8 — Deep-write safety: diagnostic + `existing`-aware `ForEntity` + `AfterEntity`
+## Step A8 — Deep-write safety: diagnostic + `existing`-aware `ForEntity` + `AfterEntity` ✅ DONE (2026-08-21)
 
 **Solves:** A-4, and unblocks the 16 `AfterMap` ports in Stage E.
 
@@ -339,7 +342,7 @@ are **stable** across an update.
 
 ---
 
-## Step A9 — Exclude soft-deleted children from auto-deep composition
+## Step A9 — Exclude soft-deleted children from auto-deep composition ✅ DONE (2026-08-21)
 
 **Solves:** A-6.
 
@@ -372,7 +375,7 @@ the generated SQL contains the predicate (assert via `ToQueryString()`).
 
 ---
 
-## Step A10 — Low-severity generator cleanups
+## Step A10 — Low-severity generator cleanups 🟡 PARTIAL (2026-08-21) — 4 of 8 bullets
 
 **Solves:** A-8, A-9, A-10, C-5.
 
