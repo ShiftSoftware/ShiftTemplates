@@ -93,6 +93,16 @@ We are actively decoupling `ShiftRepository` from AutoMapper by introducing `ISh
 
 **IMPORTANT:** When making any mapping-related changes across ShiftEntity, ShiftTemplates, or ShiftIdentity, always update the planning doc to reflect what was done. This document is the single source of truth for the team — check it before starting work to see current status, and update it after completing work. Do not rely on memory or conversation context alone.
 
+### AutoMapper removal — plan lives in this repo
+
+The **removal** of AutoMapper (making an explicit mapper required, rather than falling back to AutoMapper) is tracked in its own plan, and that plan lives **here, in this repo**: [`docs/plans/automapper-removal/`](docs/plans/automapper-removal/). Start at [`STATUS.md`](docs/plans/automapper-removal/STATUS.md) for what has landed and what is next.
+
+**Depend on the in-repo plan first.** A mirror is kept in `.shift/repos/shift-entity/automapper-removal/` for cross-repo visibility, but this copy is the one to read and work from.
+
+**When any AutoMapper-removal work lands — in this repo or in ShiftEntity, ShiftIdentity or ADP — update [`docs/plans/automapper-removal/STATUS.md`](docs/plans/automapper-removal/STATUS.md) here, and mirror the same edit into the `.shift` copy.** Keep both in step; never update only one.
+
+Two passages (Q7 and gap C-3) are deliberately fuller in the `.shift` mirror than in this public copy, because they describe a security narrowing that has not shipped. Keep reproduction detail out of this repo until it does.
+
 Sample mapping strategies (one per entity — the repository picks via `ShiftRepositoryOptions`; nothing configured falls back to AutoMapper). See the planning doc for the full inventory and rationale:
 - **Product** — overrides `MapToView`/`MapToEntity`/`MapToList` in `Repositories/ProductRepository.cs`.
 - **Invoice** — SOURCE-GENERATED with DEEP child mapping: `Repositories/InvoiceRepository.cs` calls `UseGeneratedMapper(map => map.ForEntityChildren(x => x.InvoiceLines, d => d.InvoiceLines))`; `MapToView` auto-composes `InvoiceLines` via the generated pair mapper.
