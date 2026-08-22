@@ -1,6 +1,10 @@
 # AutoMapper Removal — Status
 
-**Last updated:** 2026-08-21 — Stage 0 and Stage A complete, plus a widened conversion set. Stage B is next.
+**Last updated:** 2026-08-22 — rescoped to framework only (ADP/Menu out of scope); Step A11 added from a
+field report. Stage 0 and Stage A complete. Stage B is next.
+
+**Scope:** `ShiftEntity` + `ShiftIdentity` + `ShiftTemplates` + CI. Consumer services (`ADP.*`,
+`ADP.SyncAgent`, `Menu`) are out of scope — see [`README.md`](README.md#scope--framework-only).
 
 > **This is the primary working copy of this plan.** It lives in `ShiftTemplates/docs/plans/automapper-removal/`
 > and is the one to read and update. A mirror is kept in the private `.shift` repo
@@ -36,21 +40,26 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 | A8 Deep-write diagnostic + `ForEntity(existing)` + `AfterEntity` | ✅ | SHENGEN010 + both hooks. Built on Q4's recommendation (default-on) — **confirm Q4**. |
 | A9 Soft-deleted children excluded from auto-deep | ➖ | **Dropped from the generator — wrong layer.** Soft delete is owned by the repository + OData. The GAP is real (see below) and moves to Stage B. |
 | A10 Low-severity generator cleanups | 🟡 | 6 of 8 bullets done — arrays and the collection-container fix landed with the conversion work. Remaining: defensive copies, constructor-only DTO error. |
+| A12 Framework audit members are mapper payload (Q7) | ✅ | **2026-08-22.** `CreateDate`/`LastSaveDate`/`IsDeleted`/`CreatedByUserID`/`LastSavedByUserID` removed from `EntityExcludedMembers`; `ID`, `Tags`, `ReloadAfterSave`, `AuditFieldsAreSet`, `IdempotencyKey` stay. Repository restores the stored `IsDeleted` on update. 9 new tests; 2 source-text pins inverted. `ViewHandledMembers`, `CopyExcludedMembers` and the list filter deliberately untouched — see the log. |
+| A11 Case-insensitive member matching + opt-out | ⬜ | **New 2026-08-22, from a field report.** Parity regression — AutoMapper matched across case, the generator does not; already broke 3 live members in `CompanyBranchListDTO`. Optioned like `MaxDepth`, default insensitive, exact-first, conflict → skip + **SHENGEN011**. |
 
 ## Stage B — Close framework-owned holes
 
 | Step | Status | Notes |
 |------|--------|-------|
-| B1 CI gate | ⬜ | **Do first in this stage** — nothing is verified until it exists. |
-| B2 `dotnet new shiftentity` emits a mapper | ⬜ | **Broken right now**, independent of the removal. |
-| B3 `ShiftTagMapper` | ⬜ | No repository change needed — ctor already exists. |
-| B4 De-eagerize replication ctors | ⬜ | ~3 lines. Ship standalone. |
-| B5 `AsNoTracking` into `OdataList` | ⬜ | |
-| B6 Tags-in-list splice into `OdataList` | ⬜ | Also fixes the Core→EFCore layering inversion. |
-| B7 `MapToList` base-member contract | ⬜ | |
-| B8 `ToForeignKey` throws 400 | ⬜ | Scope depends on Q3. |
-| B9 `CopyEntity` throws | ⬜ | Land `ProductRepository.CopyEntity` first. |
-| B10 Deep children bypass the soft-delete filter | ⬜ | **New, from the A9 review.** See the log entry below. |
+| B1 CI gate | ➖ | Three steps before the pack steps: `dotnet test ShiftEntity.Tests`, build `StockPlusPlus.Data` (the SHENGEN gate — every sample mapper lives there), build `StockPlusPlus.Test`. Release config, so it reuses the same `bin/Release` the pack steps need. **The plan's "restore constraint" was refuted** — every `ShiftSoftware.*` reference already resolves as `"type": "project"`, so no csproj change, no local feed, no `!Exists` guards (which would be wrong anyway: those csprojs are template content). Also dropped: `ShiftIdentity.Data.Tests` does not exist, and `--filter Category!=RequiresSql` matches nothing (zero `[Trait]` attributes). **REVERTED 2026-08-23 at the owner's request — do not touch the CI pipeline.** `azure-pipeline.yml` is byte-identical to HEAD. The findings above are kept because they are what a future attempt needs; the step is not to be re-applied without asking. |
+| B2 `dotnet new shiftentity` emits a mapper | 🟡 | Template edits done: `ProductBrandMapper.cs` added to the item template's `include` + `rename`; its sample-only customizations guarded behind `includeItemTemplateContent` (applied literally, the plan's fix produces three CS1061s because `Code` only exists behind that symbol); the project template's `Mappers/` modifier widened so a mapper cannot ship into a sample-app-free project; `Mappers/.keep` added; `ProductBrandForm.razor` restructured so `Key`/`BrandItem` are declared unconditionally. **Not yet verified end to end** — needs a Builder run (`dotnet new install` is a machine-global side effect). |
+| B3 `ShiftTagMapper` | ✅ | `ShiftEntity.EFCore/Tagging/ShiftTagMapper.cs`, registered `TryAddScoped` in `AddShiftTagging`. No repository change — DI resolution precedes AutoMapper in `InitCommon`, so it is live now; 10 tagging integration tests pass through it. Two of the plan's three "traps" were wrong: `TagProjection.ToDto` **does** map `ID`, and `MapToEntity` writes `IsDeleted` **and** the audit fields per the Q7 decision. Added `TagProjection.ToDtoSingle` so the tag shape keeps one definition. |
+| B4 De-eagerize replication ctors | ✅ | Lazy `FallbackMapper`; both ctors hold the provider. **Neither ~3 lines nor risk-free:** the resolve is HOISTED above the per-row loop in `Replicate`, because the use site sits inside the swallowing `catch` — deferring it there would turn "host forgot AddAutoMapper" into a sweep that reports success while marking every row permanently dirty. The other two sites have no enclosing catch and resolve in place. |
+| B5 `AsNoTracking` into `OdataList` | ✅ | One call in `OdataList`. **Plan overstated the problem** — every mapper in the org returns a pure projection and EF does not track those, so nothing tracked before and nothing observably changed; this is a guard against a mapper that materializes first. `AutoMapperShiftEntityMapper` keeps its own call (direct `MapToList` callers bypass the repository). Deliberately NOT on `GetIQueryable` — bulk delete mutates and saves those entities. |
+| B6a Layering: tagging projection → Core | ✅ | `TagProjection` + `TaggableProjectionExtensions` moved to `ShiftEntity.Core/Tagging/` (zero EF dependencies), generator constant retargeted, `[Obsolete]` forwarder left in EFCore because mappers baked into published packages call the old name (gap B-10). Pinned by a generator test asserting the emitted call targets Core. |
+| B6b Runtime tags-in-list splice | ➖ | **Deferred.** `OdataList` receives an already-built `IQueryable<ListDTO>`, not the projection lambda — so this is not a splice but an `ExpressionVisitor` rewrite of a tree the repository did not author, on the hot list path, against a gap rated LOW with **zero live exposure** and zero framework-side tagging tests. Cheaper substitute: fold "and Tags" into B7's contract. |
+| B7 `MapToList` base-member contract | ✅ | **Reduced, per the owner's call.** Contract documented on `IShiftEntityMapper.MapToList`: `IsDeleted` and `ID` must be bound, why (the soft-delete filter and `$orderby`/`$filter` run on the *projected DTO*), and what happens if not — empirically, EF Core 10 **throws**, it does not default, so it is a 500 rather than leaked rows. Generator warning dropped (structurally near-vacuous — the generator binds both deliberately) and the reflection test dropped (both hand-written mappers in the workspace already bind both). |
+| B8 `ToForeignKey` throws 400 | ✅ | Both helpers now `TryParse` with the invariant culture and throw `ShiftEntityException(400)` naming the member via `[CallerArgumentExpression]`; the nullable overload still returns null on blank (clearing an optional reference is legitimate) but throws on a non-numeric value. 15 new tests in `ShiftEntity.Tests/Mapping/ForeignKeyGuardTests.cs`. No generator change needed — the list projection inlines the select-DTO member-init and never calls the helper, so no throwing code enters an expression tree. **ABI note (gap B-10):** adding the optional parameter changes both signatures, so an assembly compiled against the old one emits a 1-arg call and would hit `MissingMethodException` under version skew. Everything in scope is rebuilt together; this is exactly the hazard **D4** exists to stamp. Q3 does not gate it — the blank-`{"Value":""}` case is handled either way. |
+| B11 Soft delete is not writable through an upsert | ✅ | **2026-08-23, at the owner's request.** `ShiftRepository`'s upsert restores the stored `IsDeleted` after mapping, on **update** only — deleting is gated on `Access.Delete`, an upsert needs only `Access.Write`, and there is no undelete API. A **repository** policy, not a mapping rule: mappers keep mapping the member; the repository decides which writes it keeps. Insert exempt (`AuditStamper` forces it false). 4 tests in `SoftDeleteOnUpdateTests`. Read paths untouched — deleted rows still return by ID, deleted tags still show on the entities carrying them. |
+| B9 `CopyEntity` throws | ✅ | `ProductRepository.CopyEntity` landed first, then the throw. **Breaks nothing today** — AutoMapper is registered in every host in scope, so the `else` branch was already dead code; this is a pre-req that makes D1/E safe. Gap-register correction: the taggable auto-include sets `ReloadAfterSave` on every taggable **FindAsync**, not on every insert. |
+| ~~B10 Deep children bypass the soft-delete filter~~ | ➖ | **DROPPED 2026-08-23 by the owner — this is not a bug, it is the intended behaviour.** Filtering soft-deleted rows is the repository and OData layer's job; mapping does not do it, and AutoMapper never did either. Attaching a tag and later retiring that tag from the vocabulary does **not** remove it from the entities already carrying it — soft-deleting a tag stops it being attached to anything NEW (`TaggingPipeline` resolves live tags only) and nothing more. Same for deep-composed children. A filter added to `TagProjection`/`TaggableProjectionExtensions` was reverted; `TaggingTests.Product_DeletedTag_IsStillReturnedOnBothTheViewAndTheList` now pins the intended behaviour so it does not come back. |
+
 
 ## Stage C — Parity harness *(window closes when AutoMapper is deleted)*
 
@@ -70,27 +79,26 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 | D4 Codegen ABI stamp + check | ⬜ | |
 | D5 Registry conflict detection | ⬜ | |
 
-## Stage E — Service migration
+## Stage E — Migrate framework-owned code
 
-| Service | Triples | Status | Notes |
-|---------|---------|--------|-------|
-| ADP.Surveys | — | ⬜ | Cleanest — no `AfterMap`. Start here. |
-| ADP.WarrantyClaims | — | ⬜ | Differ already found 3 regressions here. |
-| ADP.ClaimableItems | — | ⬜ | + 5 replication sites. |
-| ADP.Menus | — | ⬜ | Worst — 5 `AfterMap` blocks. |
-| Menu | 11 | ⬜ | Only if still alive — see Q5. |
+| Target | Size | Status | Notes |
+|--------|------|--------|-------|
+| E1 Migration recipe | — | ⬜ | Write it to be **published** — it is the downstream migration guide. Ships in F5's docs pass. |
+| StockPlusPlus sample | 3 profiles / 83 lines, 0 `AfterMap` | ⬜ | First. Rehearses the recipe where fixing the framework is still cheap. |
+| ShiftIdentity.Data | 11 profiles / 352 lines, 0 `AfterMap` | ⬜ | After **D4** — it ships as a package, so its mappers freeze into the DLL. |
 | E2 Template's 12 replication sites | — | ⬜ | **Early** — stops the bleed into new services. |
-| E3 ADP replication ports + required delegate | — | ⬜ | |
+| E3 Required replication delegate | — | ⬜ | Deliberate compile break for un-migrated consumers. Blocked on **Q9**. |
+| ~~ADP.Surveys / WarrantyClaims / ClaimableItems / Menus / Menu~~ | 37 triples, 16 `AfterMap` | ➖ | **Out of scope.** Consumer services — they migrate on their own schedule via E1 + the compat package. |
 
 ## Stage F — Delete
 
 | Step | Status | Notes |
 |------|--------|-------|
-| F1 Compat package + obsoletions | ⬜ | |
+| F1 Compat package + obsoletions | ⬜ | **Load-bearing under this scope** — the landing pad for ~37 un-migrated consumer triples. Depends on framework-owned Stage E only, *not* on any consumer. Needs its own smoke project. |
 | F2 ShiftIdentity's 11 ad-hoc `Map<T>` sites | ⬜ | |
 | F3 Project template detached | ⬜ | |
-| F4 ADP.SyncAgent | ⬜ | Separate workstream. See Q6. |
-| F5 Package references + docs | ⬜ | Replication and SyncAgent first (NU1903), Core last. |
+| F4 ADP.SyncAgent | ➖ | **Out of scope** — no ShiftEntity coupling, nothing blocked by it. Recorded so the release notes say "gone from the framework", not "gone". |
+| F5 Package references + docs | ⬜ | Replication first (NU1903 reaches consumers transitively), Core last. Publish E1 as the migration guide in the same pass. |
 
 ---
 
@@ -102,14 +110,138 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 | Q2 | Nullable FK — clear or preserve? | ❓ | *(rec: clear + per-member opt-out)* |
 | Q3 | Empty select DTO — `null` or `{Value:""}`? | ❓ | *(rec: make it global)* |
 | Q4 | Entity auto-deep — default-on or opt-in? | 🟡 | A8 shipped on the recommendation (default-on + SHENGEN010). Confirm, or A8 needs revisiting. |
-| Q5 | Is `Menu` retired? | ❓ | |
-| Q6 | SyncAgent — delete or migrate? | ❓ | *(rec: lean delete)* |
-| Q7 | Audit-field narrowing — note or advisory? | ❓ | |
+| ~~Q5~~ | ~~Is `Menu` retired?~~ | ➖ | Dropped 2026-08-22 — consumer scope, moot here. |
+| ~~Q6~~ | ~~SyncAgent — delete or migrate?~~ | ➖ | Dropped 2026-08-22 — not a framework decision. See F4. |
+| Q7 | Audit-field narrowing — note or advisory? | ✅ | **Neither — there is no narrowing.** Generated `MapToEntity` writes the audit + soft-delete members, as AutoMapper did; guards belong in the repository or an explicit `IgnoreEntity`. **Shipped 2026-08-22 for 5 of 6 — `ID` carved out** (its convention throws on the null every insert carries, and deep write would force an identity insert). Repository soft-delete guard shipped with it. Gap C-3 closed. |
 | Q8 | Richer list payloads — accept? | ❓ | *(rec: accept, then measure)* |
+| **Q9** | Ship the required-delegate compile break? | ✅ | **Yes — at E3, not before.** The `= null` defaults and the 4 fallback sites stay until then. Pre-announce to the 6 downstream call sites. |
+| **Q10** | Shipped default: `AutoMapperFirst` forever, or a flip? | ❓ | *(rec: `AutoMapperFirst` until F5, then compat-seam)* **New, from the rescope.** |
+
+**Diagnostic ids:** shipped with Stage A — `SHENGEN007` unmapped list · `008` view members never written back
+· `009` configuration cannot be baked · `010` deep write replaces tracked children. **`011` is reserved for
+A11** (ambiguous case-insensitive match). Next free after that is `012`.
 
 ---
 
 ## Log
+
+**2026-08-23** — **Soft delete is now blocked on the write path, and allowed on the read path.** Two changes
+that look opposed and are not.
+
+*Repository (new, Step B11).* `ShiftRepository`'s upsert captures the stored `IsDeleted` before mapping and
+restores it after, on **update** only. Deleting is a separate operation behind `Access.Delete`; an upsert needs
+only `Access.Write`, so honouring the flag from a PUT body made the delete permission bypassable, and in the
+other direction it was an undelete the framework has no API for. Insert is exempt — `AuditStamper` forces the
+flag false there. Deliberately a repository policy, **not** a mapping rule: mappers keep mapping `IsDeleted`
+like any other member, and the repository decides which of those writes it keeps. 4 tests in
+`SoftDeleteOnUpdateTests`, including one asserting `DeleteAsync` still works.
+
+*Reads (reverted).* A filter that dropped soft-deleted rows from mapped output was added and then **removed at
+the owner's request**. Retiring a tag does not rewrite history: a tag already attached to an entity stays on it
+and keeps being returned. Soft-deleting a tag only stops it being attached to anything NEW. Same for
+deep-composed children. `TaggingTests.Product_DeletedTag_IsStillReturnedOnBothTheViewAndTheList` pins it.
+**Step B10 is dropped, not deferred** — filtering deleted rows belongs to the repository and OData layer, and
+AutoMapper never did it either, so this is also the parity behaviour.
+
+**2026-08-23** — **Convention sweep: 4 customizations deleted, 2 comments corrected, 1 template arm collapsed.**
+Now that the conventions cover more, workarounds written against the old gaps are dead weight — and worse, they
+carry comments asserting limitations that no longer exist.
+
+Removed, each proven by regenerating the mapper and diffing the emitted projection:
+
+- `ShiftIdentity.Data/Repositories/UserRepository.cs` — `ForList` for `CompanyBranchID` and `CompanyID`.
+- `ShiftIdentity.Data/Repositories/CompanyRepository.cs` — `ForList` for `ParentCompanyID`.
+- `StockPlusPlus.Data/Repositories/ProductBrandRepository.cs` — a manual `Include(e => e.Tags)` the framework
+  already adds for every `IShiftEntityTaggable` entity. With it gone both arms of the `#if (taggable)` split
+  were identical, so the split collapsed too, and the item template's `taggable` description no longer promises
+  an Include it does not emit.
+
+The generated output for all three `ForList` removals is **character-for-character** what the deleted lambdas
+produced (`X = e.X.HasValue ? e.X.Value.ToString() : null`), so there is no wire change. The build-time
+backstop is `SHENGEN007`: had the convention not covered them, it would name them as unprojected.
+
+**The rule that decides these is character-exact name equality, never the type shape.** `UserListDTO.CompanyID`
+↔ `User.CompanyID` matches ordinally, so the convention handles it. `CompanyBranchListDTO.CompanyId` ↔
+`CompanyBranch.CompanyID` differs by CASE, so its `ForList` is load-bearing and stays — along with `Team.cs`'s
+`CompanyId`. Same type shape, opposite verdict. That stays true until Step A11 lands.
+
+Two comments corrected because they asserted limitations the generator no longer has — exactly the rot this
+sweep exists to remove: `InvoiceDTO.cs` claimed the list projection does not compose children automatically (it
+does; `api/invoice-deep` builds three levels from a bare `UseGeneratedMapper()`) and referenced a
+`ListLinesProjection` that does not exist; `StockPlusPlus.API/Program.cs`'s strategy index — the first thing a
+newcomer reads — described Invoice as using a hand-written `InvoiceMapper` that does not exist.
+
+Deliberately NOT removed, and worth knowing why: `CompanyRepository`'s `ForView(d => d.ParentCompany, …)` looks
+like the same kind of leftover, but `((long?)null).ToString()` returns `""` while the convention's
+`ToSelectDTO` returns `null` — a client-visible wire change on every root company, not a cleanup. Everything
+else surveyed is genuine domain logic: M:N projections, flattening (declined by design), password-stripping,
+hash-id encoding, and `IgnoreEntity` calls that are security policy rather than workarounds.
+
+**2026-08-22** — **Q7 shipped: the generator now writes the audit and soft-delete columns.** Five members left
+`EntityExcludedMembers` — `CreateDate`, `LastSaveDate`, `IsDeleted`, `CreatedByUserID`, `LastSavedByUserID` — so
+the mapper maps them exactly as AutoMapper's unguarded `ReverseMap` always did. Per the decision: the mapper
+maps, and deciding who may change a value is the repository's job or an explicit `IgnoreEntity`.
+
+Three things worth keeping:
+
+1. **`ID` was carved out, and it is not a matter of taste.** `EntityConvention` resolves DTO `string?` to entity
+   `long` through `ToLong()`, which throws on the null every insert carries, and nothing in the framework catches
+   `ShiftEntityMappingException` — so it would 500 every POST. Deep write is worse: pair `MapBack` maps into
+   `new ChildEntity()`, so an existing child's key lands on a fresh row and SQL Server rejects the identity
+   insert. That is strictly *less* robust than AutoMapper, which yields `0` here. Writing `ID` needs its own
+   null-tolerant convention and an answer for deep children first. The most likely future mistake is someone
+   "finishing the job" — `FrameworkAuditMemberWriteTests.TheKey_IsStillNotWrittenFromTheDto` fails the moment
+   they do, before anything reaches a database.
+2. **The repository now holds the soft-delete line**, which is where the decision said guards belong: on update
+   the stored `IsDeleted` wins over the request body. Soft delete is gated on `Access.Delete` while an upsert
+   needs only `Access.Write`, and there is no undelete API anywhere in the framework. This closed the same hole
+   on the **AutoMapper** path, where it has been open in production all along — the generated mapper had been
+   the *safe* one. Insert is exempt: `AuditStamper` forces `IsDeleted = false` there.
+3. **`ViewHandledMembers` was deliberately NOT changed for symmetry.** Dropping `ID` from it while `ID` stays
+   entity-excluded would fire SHENGEN008 on every generated mapper in every consuming repo, and `MapBaseFields`
+   runs *after* the convention pass, so an existing `ForView` on an audit member would be silently clobbered.
+   `CopyExcludedMembers` and the list-side filter are separate concerns and were left alone too. Coverage of the
+   new writes comes from tests that run the mappers, not from a diagnostic that only fires on absence.
+
+Also still pipeline-owned: `Tags` (owned by `TaggingPipeline` on both legs — writing it composes rows the
+pipeline discards a line later, and `"tags": null` NREs on `Tags.Clear()`), plus `ReloadAfterSave`,
+`AuditFieldsAreSet` and `IdempotencyKey`, none of which any DTO in the three repos declares.
+
+Tests: 9 added (`FrameworkAuditMemberWriteTests` ×6, `SoftDeleteGuardTests` ×3); 2 source-text pins inverted
+(`FrameworkMemberGatingTests`, `GeneratedDeepWriteTests`). ShiftEntity.Tests 462/462, StockPlusPlus.Test 175/175.
+
+Logged, not fixed: `IsProtected` (`IShiftEntityProtectable`) has never been in the exclusion set, so it is
+already convention-writable wherever a DTO exposes it. Separate gap.
+
+**2026-08-22** — **Rescoped to the framework only.** ADP (`Surveys`, `WarrantyClaims`, `ClaimableItems`,
+`Menus`, `SyncAgent`) and `Menu` removed as work; they remain in the gap register as *(downstream)* evidence.
+Three consequences worth remembering:
+
+1. Framework-owned mapping is 14 profiles / 435 lines with **zero `AfterMap` blocks** — all 16 of the hard
+   collection-reconciliation blocks were downstream. Stage E went from five services to two (the sample, then
+   ShiftIdentity).
+2. Steps A5–A8 (already shipped) serve **no in-scope code**. They stay because only the framework can build
+   them and no consumer can migrate without them.
+3. Two new decisions fall out of the narrowing — **Q9** (ship the required-delegate compile break at 6
+   consumer call sites we do not own?) and **Q10** (what is the shipped default, and does the AutoMapper
+   fallback get deleted or *moved* into the compat package?). F1 stopped being an end-of-plan courtesy and
+   became the deliverable the whole scope rests on.
+
+**Also 2026-08-22** — **Step A11 added** (gap A-13): member matching is case-sensitive ordinal where
+AutoMapper's was not. Proof it is a regression, not a limitation: the `CompanyBranch` profile deleted at
+migration mapped `CompanyBranchListDTO.CompanyId`/`CityId`/`RegionId` from entity `CompanyID`/`CityID`/`RegionID`
+with **no `ForMember`** — AutoMapper matched across case *and* converted `long?→string`. All three silently
+stopped projecting on the flip; the repository now carries three hand-written `ForList` lines. Split out of
+gap A-7, which had bundled it with "no flattening" under one disposition ("A5, message only") and so hid a
+cheap fix behind a deliberate decline. Flattening stays declined. Two corrections found while confirming it:
+there are **five** name-keyed dictionaries, not two, and the FK convention's hardcoded `"ID"` suffix is the
+same defect. Implementation trap recorded in the step: ~20 emission sites interpolate the *lookup* name, so
+relaxing the comparer without switching them to the matched symbol's name emits code that does not compile.
+
+A sibling gap found in the same review — collection-kind mismatch silently dropped on write
+(`IReadOnlyCollection<T>` DTO ↔ `List<T>` entity, live in `CompanyBranch.PublishTargets` and `Team.Tags`) —
+turned out to be **already fixed** by Stage A's container-conversion work, and the per-member `ForEntity`
+workarounds have been deleted. No step was added for it.
 
 **2026-08-19** — Plan created from a full cross-repo audit (14 repos, 68 raw findings, 59 surviving
 adversarial verification). No code changed. Key correction to the earlier assumption that replication needs a

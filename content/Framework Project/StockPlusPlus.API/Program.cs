@@ -95,7 +95,7 @@ builder.Services.AddAttentionHub();
 
 // Mapping strategy is chosen per-repository — no global DI registration of mappers:
 //   - Product         -> overrides MapToView/MapToEntity/MapToList in ProductRepository
-//   - Invoice         -> hand-written manual InvoiceMapper plugged via options.UseMapper(...)
+//   - Invoice         -> SOURCE-GENERATED with DEEP children, via options.UseGeneratedMapper(map => ...)
 //   - ProductCategory -> SOURCE-GENERATED (auto-discovered) mapper via options.UseGeneratedMapper()
 //                        (covers the SelectDTO relationship + ShiftFileDTO file conventions)
 //   - ProductBrand    -> [ShiftEntityMapper] partial class (generator fills it) via options.UseMapper(...)

@@ -21,8 +21,8 @@ public class ProductRepository : ShiftRepository<DB, Entities.Product, ProductLi
             y => y.Include(z => z.CountryOfOrigin)
         );
 
-    // Product demonstrates the OVERRIDE mapping strategy: the repository overrides the mapping
-    // methods directly (no plugged mapper). The AutoMapper default still backs CopyEntity.
+    // Product demonstrates the OVERRIDE mapping strategy: the repository overrides all four mapping
+    // methods directly (no plugged mapper). CopyEntity uses the MappingHelpers.ShallowCopyTo default body.
     //The ProductCategory is intentionally not included to show that the ShiftAutoComplete can handle this asynchronously by making a get request to the oData endpoint.
     public ProductRepository(DB db) :
         base(db, IncludeOptions)
@@ -81,6 +81,15 @@ public class ProductRepository : ShiftRepository<DB, Entities.Product, ProductLi
             HighestSeverity = p.HighestSeverity,
             ActiveSignalCount = p.ActiveSignalCount,
         });
+    }
+
+    // The fourth mapping method. ShiftRepository.CopyEntity no longer falls back to ShallowCopyTo when no
+    // mapper is configured — it throws like MapToView/MapToEntity/MapToList — so a repository that maps by
+    // override has to supply this one too. ShallowCopyTo IS the default body (scalars + navigation
+    // references; ID, ReloadAfterSave and AuditFieldsAreSet preserved on the target).
+    public override void CopyEntity(Product source, Product target, MappingContext context = default)
+    {
+        source.ShallowCopyTo(target);
     }
 
     public override async ValueTask<IQueryable<Product>> GetIQueryable(DateTimeOffset? asOf, List<string>? includes, bool disableDefaultDataLevelAccess, bool disableGlobalFilters)

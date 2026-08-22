@@ -15,6 +15,7 @@ namespace StockPlusPlus.Data.Mappers;
 [ShiftEntityMapper]
 public partial class ProductBrandMapper : IShiftEntityMapper<ProductBrand, ProductBrandListDTO, ProductBrandDTO>
 {
+#if (includeItemTemplateContent)
     // Per-property customization hook: registering a member automatically suppresses the generated
     // convention for it (everything else stays generated). ForView/ForEntity/ForCopy take plain
     // lambdas (optionally with an IServiceProvider); ForList takes an expression over the entity,
@@ -35,4 +36,21 @@ public partial class ProductBrandMapper : IShiftEntityMapper<ProductBrand, Produ
 
         return existing;
     }
+#else
+    // Every member is mapped by convention — the generator fills MapToView / MapToEntity / MapToList /
+    // CopyEntity into this partial class. Customize per property with the generated Configure hook:
+    //
+    //partial void Configure(ShiftMapperBuilder<ProductBrand, ProductBrandListDTO, ProductBrandDTO> map)
+    //{
+    //    map.ForList(d => d.SomeColumn, entity => entity.SomeColumn ?? "(none)");
+    //}
+    //
+    // Or take a whole method over and still get the conventions, by calling the *Generated body:
+    //
+    //public ProductBrand MapToEntity(ProductBrandDTO dto, ProductBrand existing, MappingContext context = default)
+    //{
+    //    existing = MapToEntityGenerated(dto, existing, context);
+    //    return existing;
+    //}
+#endif
 }

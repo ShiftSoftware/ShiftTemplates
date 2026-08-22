@@ -30,9 +30,11 @@ public class InvoiceListDTO : ShiftEntityListDTO, IHasAttentionSummary
     public AttentionSeverity? HighestSeverity { get; set; }
     public int ActiveSignalCount { get; set; }
 
-    // DEEP LIST mapping: unlike MapToView, the list projection does NOT compose children automatically.
-    // It is populated explicitly and directionally by InvoiceRepository's ForList (list → lines → product).
-    // See InvoiceRepository.ListLinesProjection.
+    // DEEP LIST mapping. Automatic composition now covers the list direction too — `api/invoice-deep` builds
+    // three levels from a bare UseGeneratedMapper(). Invoice configures its children EXPLICITLY anyway
+    // (InvoiceRepository's IncludeOptions → ForListChildren → ForChild) to demonstrate the directional form and
+    // to control exactly which grandchild is projected; an explicit ForXxxChild(ren) takes precedence over the
+    // automatic composition for that member.
     public List<InvoiceLineListDTO> InvoiceLines { get; set; } = new List<InvoiceLineListDTO>();
 }
 

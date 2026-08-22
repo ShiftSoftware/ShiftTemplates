@@ -40,16 +40,20 @@
     @*#endif*@
 </ShiftEntityForm>
 
-@*#if (includeItemTemplateContent)*@
 @code {
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public string? BrandName { get; set; }
-
+    // Key and the bound item are declared UNCONDITIONALLY: the form binds @bind-Key and @bind-Value above,
+    // outside the item-template guard, so a scaffolded entity needs them or the generated page will not
+    // compile. Only the sample's own extras stay guarded. (The @*#if*@ markers are template comments, not C#
+    // preprocessor directives — this file compiles with every arm present, so a member may be declared once.)
     [Parameter]
     public object? Key { get; set; }
 
     private ProductBrandDTO BrandItem = new ProductBrandDTO();
+
+    @*#if (includeItemTemplateContent)*@
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? BrandName { get; set; }
 
     protected override void OnInitialized()
     {
@@ -63,5 +67,5 @@
             });
         }
     }
+    @*#endif*@
 }
-@*#endif*@

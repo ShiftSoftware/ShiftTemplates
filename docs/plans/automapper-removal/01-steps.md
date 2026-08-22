@@ -1,7 +1,12 @@
 # AutoMapper Removal — Step Plan
 
-**Created:** 2026-08-19
+**Created:** 2026-08-19 · **Rescoped:** 2026-08-22 — framework only
 Evidence for every step: [`00-gap-register.md`](00-gap-register.md). Live tracking: [`STATUS.md`](STATUS.md).
+
+> **Scope.** Every step below changes `ShiftEntity`, `ShiftIdentity`, `ShiftTemplates` or CI. Consumer
+> services (`ADP.*`, `ADP.SyncAgent`, `Menu`) are **not** migrated by this plan — they keep building through
+> the compat package (F1) and run Step E1 on their own schedule. See
+> [`README.md`](README.md#scope--framework-only).
 
 Each step is **individually shippable** — it compiles, tests pass, and it can be pushed on its own.
 Nothing here requires a big-bang change. Steps state their dependencies explicitly; anything without a
@@ -396,6 +401,104 @@ the generated SQL contains the predicate (assert via `ToQueryString()`).
 **Breaks.** Nothing.
 
 **Done when.** Each bullet has a test or a regenerated-output diff.
+
+## Step A11 — Case-insensitive member matching by default, with a per-triple opt-out
+
+**Solves:** A-13. **Found after Stage A landed. This is a parity regression — it has already silently broken
+three live members.**
+
+**Problem.** Every member lookup in the generator is a `ToDictionary(p => p.Name, p => p)` with the
+**default** (ordinal, case-sensitive) comparer. So `CompanyID` ↔ `CompanyId` does not match, the convention
+returns null, and — as everywhere else in this stage — **no line is emitted at all**.
+
+**This is not a limitation the framework gets to declare; it is a behavior AutoMapper had and the generator
+lost.** The proof is the profile deleted when `CompanyBranch` migrated: `CompanyBranchListDTO.CompanyId` /
+`CityId` / `RegionId` (`string?`) mapped from entity `CompanyID` / `CityID` / `RegionID` (`long?`) with **no
+`ForMember` at all** — AutoMapper matched across the case difference *and* converted `long? → string`. After
+the flip all three silently stopped projecting, and `CompanyBranchRepository` now carries three hand-written
+`ForList` lines and a paragraph of comment.
+
+**And the failure escalates in the list direction.** An unprojected scalar leaves an OData `$filter` with
+nothing to bind to, so EF inlines the whole collection-bearing projection into the `WHERE` clause and cannot
+translate it — the grid works in testing and 500s the first time someone filters it.
+
+**What this step does.** Make matching an **option**, defaulting to case-insensitive.
+
+**The option.** Mirror `MaxDepth` exactly — it is the established precedent for a per-triple, build-time-baked
+generator setting, so this introduces no new concept:
+
+| | `MaxDepth` (existing) | member matching (new) |
+|---|---|---|
+| attribute | `[ShiftEntityMapperMaxDepth(n)]` | `[ShiftEntityMapperCaseSensitive]` |
+| fluent | `map.MaxDepth(n)` | `map.CaseSensitive()` |
+| default | `ShiftEntityMapperDefaults.MaxDepth = 10` | `ShiftEntityMapperDefaults.CaseSensitiveMatching = false` |
+
+**Default is case-insensitive** — that is AutoMapper's behavior, so it is the setting under which a migration
+does not silently lose members. Case-sensitive is the deliberate opt-in for a team that wants names to line
+up exactly.
+
+**Resolution order.**
+
+- **Case-sensitive (opt-in):** exact ordinal match only. No fallback. A near-miss is unmapped and reported by SHENGEN004/007/008 like any other unmapped member.
+- **Case-insensitive (default):** try the **exact ordinal** match first — always, and never let a case-insensitive candidate beat it. Only if there is no exact match, retry with `OrdinalIgnoreCase`.
+- **Conflict** — no exact match and **two or more** case-insensitive candidates: **skip the member and warn (`SHENGEN011`)**. Do not guess, and do not fail the build.
+
+Exact-first is what keeps the fallback safe: an entity carrying both `Id` and `ID` still binds each to its
+own exactly-named DTO member, so only a member with no exact counterpart can ever reach the ambiguous branch.
+
+**Why skip-and-warn rather than a build error.** It follows the framework's own `SHENGEN` split — *errors*
+(001/002/005/006/009) mark something that cannot be expressed at build time or would run silently wrong;
+*warnings* (003/004/007/008/010) mark something merely **skipped**. An ambiguous match is skipped, and the
+fix (rename one member, or write `ForView`/`ForEntity`/`ForList`) is the programmer's decision. Failing the
+build would also let one rare naming collision block a whole assembly. A project that wants it fatal already
+has `<WarningsAsErrors>SHENGEN011</WarningsAsErrors>`.
+
+**Then the mechanical work:**
+
+1. Route all **five** name-keyed lookups through the new comparer — the view, entity (`dtoProps`) and list dictionaries plus the two pair-mapper ones. The gap register previously recorded only two of them.
+2. **Build the dictionaries defensively.** The current `ToDictionary` throws `ArgumentException` on a duplicate key; under `OrdinalIgnoreCase` that becomes reachable, and an exception inside a source generator surfaces as a build failure with **no usable message**. Group by name instead, keep the exact-cased member, and carry the collision list forward so `SHENGEN011` can name every candidate.
+3. Apply the same fix to the FK convention, which is this defect in another costume: two sites look up `dtoProp.Name + "ID"` and one tests `EndsWith("ID", StringComparison.Ordinal)`, so an entity spelling it `CompanyId` gets no FK convention either.
+
+**The implementation trap — this is the part that will not compile.** Roughly twenty emission sites
+interpolate the **lookup** name (`$"{accessor}.{dtoProp.Name}"`, `$"{accessor}.{entityProp.Name}"`), which is
+correct **only while the two names are identical**. Every one must switch to the matched
+`IPropertySymbol.Name` for the *source* side, keeping the *target* name for the assignment — otherwise the
+generator happily emits `entity.CompanyId`, which does not exist. Grep for `accessor}.{` and fix them as one
+sweep; a behavioral test over a deliberately case-mismatched pair is the only thing that proves it.
+
+**A successful case-insensitive match is silent — deliberately.** Parity is the goal: AutoMapper resolved
+these without comment, so warning on each would add ~17 members (three in scope, ~14 downstream) to the
+SHENGEN007 wall for a case with no decision in it. `SHENGEN011` fires only on real ambiguity, where there
+*is* a decision and the generator has correctly refused to make it.
+
+**Diagnostic id.** `SHENGEN011` — next free after the ids that shipped with Stage A: 007 (unmapped list),
+008 (view members never written back), 009 (configuration cannot be baked), 010 (deep write replaces tracked
+children).
+
+**Files.** `ShiftEntityMapperGenerator.cs` — the five dictionaries, the three FK-suffix sites, every
+`{accessor}.{…Name}` emission site, and the descriptor block;
+`ShiftEntity.Core/ShiftEntityMapperConfigAttributes.cs` (attribute + `ShiftEntityMapperDefaults`);
+`ShiftEntity.Core/ShiftMapperBuilder.cs` (the fluent marker).
+
+**Depends on.** A1 (the harness). Pairs with **A7** — the option is a build-time-baked setting, so A7's
+fail-closed check (`SHENGEN009`) is what stops `CaseSensitive(nonLiteral)` becoming another inert no-op.
+
+**Breaks.** Nothing that was working. It starts mapping members that previously vanished. Regenerate and diff
+`CompanyBranchList`: the three `ForList` scope-id lines should become redundant.
+
+**Note the boundary with A-7.** Case-insensitive matching is **not** flattening. Flattening stays declined
+(see the Stage A scope note) — it re-imports the invisible two-level reach this effort exists to remove.
+
+**Done when.** All four behaviors are pinned by behavioral tests:
+
+1. **Default:** entity `CompanyID` (`long?`) ↔ DTO `CompanyId` (`string?`) maps in all three directions with no fluent configuration.
+2. **Exact-first:** an entity carrying both `Id` and `ID` binds each to its exactly-named DTO member — no warning, no swap.
+3. **Conflict:** entity `Code` + `code` against DTO `CODE` skips the member and reports `SHENGEN011` naming both candidates — and the build **succeeds**, and the generator does not crash.
+4. **Opt-out:** `[ShiftEntityMapperCaseSensitive]` on that same triple leaves `CompanyId` unmapped and reported by SHENGEN007/008 as an ordinary unmapped member.
+
+Plus: the three `ForList` scope-id lines in `CompanyBranchRepository` are provably redundant under the default.
+
+---
 
 > **Explicitly out of scope for Stage A** — decided, not deferred:
 > - **Flattening.** It re-imports exactly the invisible two-level reach this whole effort exists to remove, and in the view direction it triggers lazy loads. A5's synthesized fix line is the answer instead.
@@ -953,31 +1056,44 @@ referenced assembly (warn, don't error).
 
 ---
 
-# Stage E — Migrate, one service at a time
+# Stage E — Migrate framework-owned code
 
-Repeat this recipe per service. Each pass is a reviewable, reversible unit of work.
+Two migrations, not six. Everything else in this workspace that uses AutoMapper is a consumer service and is
+[out of scope](README.md#scope--framework-only): it keeps working through the compat package (F1) and runs
+this same recipe on its own schedule.
 
-## Step E1 — Per-service migration recipe
+## Step E1 — The migration recipe
 
-1. Flip the service to `GeneratedFirst`.
+1. Flip the project to `GeneratedFirst`.
 2. Build. Clear every `SHENGEN` warning — each one is a real decision, resolved with `ForList` / `ForView` / `ForEntity` / `Ignore` / `AfterEntity` / a method override.
-3. Run the C1 differ for that service's triples. Resolve every divergence **explicitly** — either fix the mapper or add a reviewed `KnownDivergence` entry.
-4. Run the service's own test suite.
+3. Run the C1 differ for that project's triples. Resolve every divergence **explicitly** — either fix the mapper or add a reviewed `KnownDivergence` entry.
+4. Run the test suite.
 5. Flip to `GeneratedOnly`.
-6. Delete that service's AutoMapper profiles.
+6. Delete that project's AutoMapper profiles.
 
-**Recommended order — easiest first, so the recipe is proven before it meets the hard case:**
+**Write this step to be published.** Under a framework-only scope it is not just our checklist — it is the
+only migration instruction a consumer team will ever get, and they will run it without the person who wrote
+it in the room. Ship it as a docs page in Step F5, naming the C1 differ and the C2 goldens as the tools, and
+spelling out two things the recipe alone will not teach:
 
-| Order | Service | Why here |
-|-------|---------|----------|
-| 1 | **ADP.Surveys** | Cleanest — 151 profile lines, no `AfterMap`. |
-| 2 | **ADP.WarrantyClaims** | Small; also where the differ already found three regressions, so it validates the harness. |
-| 3 | **ADP.ClaimableItems** | Moderate, plus 5 replication sites (Step E3). |
-| 4 | **ADP.Menus** | **Worst** — 5 `AfterMap` blocks with soft-delete/revive collection reconciliation. Do it once A8's `AfterEntity` hook is proven. |
-| 5 | **Menu** | Only if it is still alive — see [`02-open-decisions.md`](02-open-decisions.md) Q5. |
+- **The `AfterEntity` recipe for collection reconciliation** — the shape behind all 16 downstream `AfterMap` blocks, and the one most likely to be got wrong.
+- **The two transcription traps in gap D-4** — AutoMapper's null-navigation propagation and its `default(long) → "0"` substitution. Transcribe with `?.` and `?? default` throughout; a naive port NREs inside a swallowed task and looks like nothing happened.
 
-**Do not drive this from a `CreateMap` codemod.** `LabourRateMappingListDTO` and `MenuVersionDTO` have no
-`CreateMap` at all yet still need mappers. **Enumerate triples from repositories, not from profiles.**
+**Order:**
+
+| Order | Target | Why here |
+|-------|--------|----------|
+| 1 | **StockPlusPlus sample** — `StockPlusPlus.Data`, 3 profiles / 83 lines, 0 `AfterMap` | Smallest, and already half-migrated: five repositories use `UseMapper`/`UseGeneratedMapper` today. It is also the recipe's rehearsal — whatever is awkward here is awkward for every consumer, and here it is still cheap to fix *in the framework* instead of documenting around. |
+| 2 | **ShiftIdentity.Data** — 11 profiles / 352 lines, 23 `CreateMap`, 58 `ForMember`, 0 `AfterMap` | The real one. It ships as a package, so its generated mappers are frozen into the shipped DLL (gap B-10) — do it **after** D4 stamps the codegen ABI, or you bake an unversioned mapper into a package consumers cannot rebuild. |
+
+**Do not drive this from a `CreateMap` codemod.** Enumerate triples from **repositories**, not from profiles:
+`LabourRateMappingListDTO` and `MenuVersionDTO` (downstream) have no `CreateMap` at all yet still need
+mappers, and nothing stops that shape occurring in scope.
+
+**Depends on.** Stage C, D1.
+
+**Done when.** No `Profile` class remains in `ShiftIdentity.Data` or `StockPlusPlus.Data`, and both suites are
+green under `GeneratedOnly`.
 
 ---
 
@@ -1002,23 +1118,51 @@ template needs no new mapping code at all.
 
 ---
 
-## Step E3 — Port the remaining ADP replication sites, then make the delegate required
+## Step E3 — Make the replication mapping delegate required
 
-**Solves:** D-2, D-4, D-6.
+**Solves:** D-2 (framework half), D-6.
+
+**Problem.** Every replication overload takes its mapping delegate with a `= null` default and falls back to
+`IMapper`. Once the fallback is gone, that default is a hole that fails at **runtime**, inside a swallowed
+per-row `catch` — a permanently-dirty row under a clean-looking watermark, which is the worst failure shape
+in this entire plan.
+
+**Both pipelines, verified 2026-08-22 — 9 overloads and 4 fallback sites, not the "8" previously recorded:**
+
+| path | file | delegate-optional overloads | AutoMapper fallback sites |
+|------|------|------|------|
+| **trigger** | `ShiftEntityCosmosDbOptions.cs` | 5 — `:79`, `:97`, `:116`, `:289`, `:334` | 3 — `:184`, `:310`, `:359` |
+| **catch-up / function service** | `Services/CosmosDBReplication.cs` | 4 — `:86`, `:170` (internal), `:275`, `:335` | 1 — `:133`, the lazy `FallbackMapper` B4 added, feeding 3 use sites |
+
+The trigger path carries the majority and is the one most easily forgotten, because B4 only touched the
+catch-up path. **B4 made the resolve lazy; it deliberately did not remove the fallback.** That is this step.
 
 **What this step does.**
-1. Port `ADP.ClaimableItems` (5 sites) and `ADP.WarrantyClaims` (1 site) as plain static `ToXModel()` / `ApplyTo()` methods — the proven in-tree pattern (`IdentityReplicationMappingExtensions.cs`, `MenuCosmosMappers.cs`).
-2. **Transcribe with `?.` and `?? default` throughout.** `ClaimableItemProfile.cs` dereferences `src.Campaign!` ten times and `SetUpReplication` passes no include — so **those fields already replicate as defaults today**. A naive port NREs inside a swallowed task and looks like nothing happened. Adding the missing `Include` is a **separate commit**: it changes live document content.
-3. Gate each port with a C2 golden diff **before** deleting the profile.
-4. Then drop the `= null` default on the mapping parameter of all 8 overloads — every remaining offender becomes a **compile error** instead of a silent runtime hole.
-5. Guard `Utility.BuildStamp` to throw when the document id is null/empty (the existing catch marks the row dirty and retries). Make non-null partition keys an opt-in `requireNonNullPartitionKey:` — nullable key columns are legitimate and test-pinned.
+1. Drop the `= null` default on the mapping parameter of all **9** overloads across **both** files, so a delegate-free call site becomes a **compile error** instead of a silent runtime hole.
+2. Delete the four fallback branches and the `using AutoMapper;` in both files, so the project stops referencing `IMapper` at all — this is what lets F5 drop `ShiftEntity.CosmosDbReplication`'s AutoMapper `PackageReference` **first**, ahead of Core.
+3. Guard `Utility.BuildStamp` to throw when the document id is null/empty (the existing catch marks the row dirty and retries). Make non-null partition keys an opt-in `requireNonNullPartitionKey:` — nullable key columns are legitimate and test-pinned.
 
-**What it solves.** Replication stops being able to fall back at all, and the compiler — not a code review —
-guarantees it.
+**This is a deliberate compile break for un-migrated consumers.** Six call sites downstream
+(`ADP.ClaimableItems` ×5, `ADP.WarrantyClaims` ×1), none of them ours to fix. That is the *point* of the
+break: it is visible, it happens at build time, and it is the one signal a swallowed `catch` cannot eat. A
+consumer that is not ready stays on the previous framework version until it is — a pinned version is a
+normal, reversible state; a half-replicated Cosmos partition is not.
 
-**Depends on.** B4, C2, E2.
+**Answer [`02-open-decisions.md`](02-open-decisions.md) Q9 before shipping this**, and tell the consumer
+teams ahead of the release rather than with it.
 
-**Done when.** No `Replicate` overload accepts a null mapping delegate, and the whole solution compiles.
+**Files.** `ShiftEntity.CosmosDbReplication/`.
+
+**Depends on.** B4 ✅, C2, **E2 — hard prerequisite**, **Q9 — hard prerequisite**.
+
+**Why E2 is a hard prerequisite, not an ordering preference:** `StockPlusPlus.API/Controllers/UtilityController.cs`
+has 12 delegate-free `.Replicate<>` calls. Make the delegate required before E2 lands and **the project
+template itself stops compiling** — the framework would ship a `dotnet new shift` that cannot build. E2 is
+cheap (delete the hand-rolled block, call `IdentityCatchUpReplicationExtensions.ReplicateAllAsync`, which
+already covers all 13 entities), so the pair is best landed together.
+
+**Done when.** No `Replicate` overload accepts a null mapping delegate, and the framework plus the template
+compile.
 
 ---
 
@@ -1044,7 +1188,14 @@ Ship `AddShiftIdentityAutoMapper()` as `[Obsolete(error: true)]` for one release
 replacement. **Never as a silent no-op** — that is the one option that lets a host compile while its
 replication mapping quietly vanishes.
 
-**Depends on.** Stage E complete for all services.
+**Add a compat smoke project to the framework test suite:** register an old-style `Profile` plus
+`AddShiftEntityAutoMapperCompat()`, resolve a mapper through the seam, assert it maps. Without it, the one
+deliverable every out-of-scope consumer depends on is the only thing CI never exercises.
+
+**Depends on.** Stage E complete for **framework-owned code** — not for any consumer. Under this scope,
+waiting for "all services" would mean never shipping. This package is what makes framework-only removal
+possible at all: it is the difference between *"consumers migrate when they can"* and *"consumers are
+stranded on an old framework version"*.
 
 ---
 
@@ -1088,29 +1239,31 @@ also serves a list via `ProjectTo` outside the repository; route it through the 
 
 ---
 
-## Step F4 — ADP.SyncAgent
+## Step F4 — ADP.SyncAgent *(out of scope — recorded, not scheduled)*
 
-**Solves:** D-5, D-7.
+**Solves:** D-5, D-7 (downstream half).
 
-**What this step does.** SyncAgent has no ShiftEntity coupling, so this is a **separate workstream** — but
-"AutoMapper is gone" stays false until it lands, and it carries the NU1903 advisory into consumer builds.
+SyncAgent has **no ShiftEntity coupling**. It carries its own `AutoMapper 14.0.0` and takes `IMapper` as a
+required ctor param. Nothing in this plan touches it, and nothing in this plan is blocked by it.
 
-Immediate: make `IMapper` optional and throw at the fallback line. Then delete the two dead
-`<Compile Remove>`d files (`SyncService2.cs`, `CosmosCSVSyncService.cs`), delete `UseAutoMapper` (**zero** call
-sites across all 14 repos), and make the mapping delegate required.
+It stays written down for one reason: **"AutoMapper is gone" is a false sentence while it exists.** Say
+"gone from the framework" instead, in the release notes and everywhere else.
 
-See [`02-open-decisions.md`](02-open-decisions.md) Q6 — deleting may be the honest answer.
+When its owners pick it up, the shape is already known: `UseAutoMapper` is public package API with **zero**
+call sites across all 14 repos, and two of its four services (`SyncService2.cs`, `CosmosCSVSyncService.cs`)
+are already `<Compile Remove>`d — dead text, not surface. Deleting is very likely cheaper than migrating.
 
-**Depends on.** Nothing in this plan.
+**Depends on.** Nothing. **Owned by.** Not this plan.
 
 ---
 
 ## Step F5 — Delete the package references, and the docs pass
 
 **What this step does.** Remove `PackageReference Include="AutoMapper"` from
-`ShiftEntity.CosmosDbReplication.csproj:36` **first**, then `ADP.SyncAgent`, then
-`ShiftEntity.Core.csproj:33` **last** — replication and SyncAgent carry the security advisory into consumer
-builds, so they should stop doing that as early as possible.
+`ShiftEntity.CosmosDbReplication.csproj:36` **first**, then `ShiftEntity.Core.csproj:33` **last** — the
+framework propagates AutoMapper 14.0.0's NU1903 advisory transitively into every consumer build, including
+the consumers this plan does not migrate and who cannot drop it themselves, so it should stop doing that as
+early as possible.
 
 Rewrite the 9 docs pages that reference AutoMapper, including the dedicated
 `data-project/auto-mapper-profiles.md` — until that page changes, template users keep writing profiles.
@@ -1120,5 +1273,9 @@ Rewrite the 9 docs pages that reference AutoMapper, including the dedicated
 
 **Depends on.** Everything.
 
-**Done when.** `grep -rn "AutoMapper" --include=*.csproj` over the workspace returns nothing outside the
-compat package.
+**Publish Step E1 as the downstream migration guide** in the same pass, together with the compat package's
+install instructions and the Q9 release note. This is the deliverable the out-of-scope services are waiting on.
+
+**Done when.** `grep -rn "AutoMapper" --include=*.csproj` over `ShiftEntity`, `ShiftIdentity` and
+`ShiftTemplates` returns nothing outside the compat package. Consumer repos will still match — by design,
+and that is exactly what the compat package is for.

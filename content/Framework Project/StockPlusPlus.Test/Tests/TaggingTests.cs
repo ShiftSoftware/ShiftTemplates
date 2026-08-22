@@ -511,4 +511,92 @@ public class TaggingTests
         Assert.Contains(verify.Tags, t => t.ID == t3.ID);
         Assert.DoesNotContain(verify.Tags, t => t.ID == t1.ID);
     }
+
+    [Fact]
+    public async Task Product_DeletedTag_IsStillReturnedOnBothTheViewAndTheList()
+    {
+        // DELIBERATE BEHAVIOUR, pinned so nobody "fixes" it. Retiring a tag from the vocabulary does NOT
+        // rewrite history: a tag already attached to a product stays on that product and keeps being returned,
+        // on the form and in the grid. What soft-deleting a tag does is stop it being attached to anything NEW
+        // — TaggingPipeline resolves live tags only.
+        //
+        // Filtering deleted rows is the repository and OData layer's job, not mapping's. AutoMapper never did
+        // it either, so this is also the parity behaviour. A previous attempt to filter here was reverted; this
+        // test is what stops it coming back.
+        using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<DB>();
+        var brandRepo = scope.ServiceProvider.GetRequiredService<ProductBrandRepository>();
+        var categoryRepo = scope.ServiceProvider.GetRequiredService<ProductCategoryRepository>();
+        var productRepo = scope.ServiceProvider.GetRequiredService<ProductRepository>();
+        var tagRepo = scope.ServiceProvider.GetRequiredService<ShiftTagRepository<DB>>();
+
+        var brand = new ProductBrand { Name = $"DB-{Guid.NewGuid():N}".Substring(0, 17) };
+        brandRepo.Add(brand);
+        await brandRepo.SaveChangesAsync();
+
+        var category = new ProductCategory { Name = $"DC-{Guid.NewGuid():N}".Substring(0, 17) };
+        categoryRepo.Add(category);
+        await categoryRepo.SaveChangesAsync();
+
+        // Two tags: one survives, one gets deleted after it is attached.
+        var keptSeed = new Tag();
+        tagRepo.Add(keptSeed);
+        var kept = await tagRepo.UpsertAsync(keptSeed,
+            new TagDTO { Name = $"KEEP-{Guid.NewGuid():N}".Substring(0, 18), Color = "#00FF00" },
+            ActionTypes.Insert, null, null, true, true);
+
+        var doomedSeed = new Tag();
+        tagRepo.Add(doomedSeed);
+        var doomed = await tagRepo.UpsertAsync(doomedSeed,
+            new TagDTO { Name = $"GONE-{Guid.NewGuid():N}".Substring(0, 18), Color = "#FF0000" },
+            ActionTypes.Insert, null, null, true, true);
+        await tagRepo.SaveChangesAsync();
+
+        var productName = $"DeletedTag-{Guid.NewGuid():N}".Substring(0, 22);
+        var product = new Product();
+        productRepo.Add(product);
+        var inserted = await productRepo.UpsertAsync(product, new ProductDTO
+        {
+            Name = productName,
+            TrackingMethod = TrackingMethod.Batch_LOT,
+            ProductBrand = new ShiftEntitySelectDTO { Value = brand.ID.ToString(), Text = brand.Name },
+            ProductCategory = new ShiftEntitySelectDTO { Value = category.ID.ToString(), Text = category.Name },
+            Tags = new List<TagDTO>
+            {
+                new() { ID = kept.ID.ToString(), Name = kept.Name },
+                new() { ID = doomed.ID.ToString(), Name = doomed.Name },
+            }
+        }, ActionTypes.Insert, null, null, true, true);
+        await productRepo.SaveChangesAsync();
+
+        // Retire one tag from the vocabulary. The M:N join row is untouched by design.
+        var doomedRow = await tagRepo.FindAsync(doomed.ID, null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
+        await tagRepo.DeleteAsync(doomedRow ?? doomed, null, true, true);
+        await tagRepo.SaveChangesAsync();
+
+        db.ChangeTracker.Clear();
+
+        // VIEW — TagProjection.ToDtoList, over the auto-included navigation. BOTH tags come back.
+        var reloaded = await productRepo.FindAsync(inserted.ID, null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
+        Assert.NotNull(reloaded);
+        var view = await productRepo.ViewAsync(reloaded!);
+
+        Assert.NotNull(view.Tags);
+        Assert.Equal(2, view.Tags!.Count);
+        Assert.Contains(view.Tags, t => t.Name == kept.Name);
+        Assert.Contains(view.Tags, t => t.Name == doomed.Name);
+
+        db.ChangeTracker.Clear();
+
+        // LIST — the SelectWithTags splice, translated to SQL. Same answer.
+        var queryable = await productRepo.GetIQueryable(
+            asOf: null, includes: null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
+        var row = (await productRepo.OdataList(queryable)).FirstOrDefault(p => p.Name == productName);
+
+        Assert.NotNull(row);
+        Assert.NotNull(row!.Tags);
+        Assert.Equal(2, row.Tags.Count);
+        Assert.Contains(row.Tags, t => t.Name == kept.Name);
+        Assert.Contains(row.Tags, t => t.Name == doomed.Name);
+    }
 }
