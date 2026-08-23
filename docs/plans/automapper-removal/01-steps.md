@@ -802,10 +802,16 @@ the **desired** state.
 
 # Stage C — Build the parity harness
 
-> **This stage has a closing window.** The differ compares generated output against AutoMapper output. Once
-> AutoMapper is deleted there is no oracle, permanently. Build this before Stage E flips anything.
+> **This stage has a closing window, and it closes at F1 — not F5.** The differ compares generated output
+> against AutoMapper output. `AddShiftIdentityAutoMapper()` becomes `[Obsolete(error: true)]` at F1, and that
+> is the only thing putting ShiftIdentity's profiles into the test container; F3 then removes the template's
+> own `AddAutoMapper`. After either, `GetRequiredService<IMapper>()` throws and both C1 and C2 would be
+> re-deriving their expectation from the implementation under test.
+>
+> **C3 is in this stage by topic, not by deadline.** It compares generated SQL against nothing and needs no
+> oracle, so it can slip past F1 without loss.
 
-## Step C1 — Triple differ (DB-free)
+## Step C1 — Triple differ
 
 **Solves:** the risk that Stage E silently changes payloads.
 
@@ -813,7 +819,8 @@ the **desired** state.
 the AutoMapper mapper and the generated mapper, and compare.
 
 **Four details that decide whether it works:**
-- **Build the baseline through the public entry point** — `AddControllers().AddShiftEntityWeb(o => o.AddDataAssembly(…).AddAutoMapper(…))`, then `RegisterShiftRepositories(…)`, then `GetRequiredService<IMapper>()`. Do **not** hand-roll `new MapperConfiguration(...)`: `DataAssemblies`, `AutoMapperAssemblies`, `EndpointDefaultMaps` and `GetConfiguredPairs` are all `internal` with `InternalsVisibleTo` limited to EFCore and Web, so a hand-rolled baseline silently omits the endpoint-default-map step and is **not** the production configuration.
+- **Not DB-free.** For several triples the mapping configuration lives in the repository's base-ctor builder or the entity's `ConfigureRepository` hook, so the arm has to be a constructed repository. The harness joins `[Collection("API Collection")]` at zero marginal cost — five suites already boot that fixture.
+- **Resolve the baseline from the RUNNING HOST**, not a hand-built container: `scope.ServiceProvider.GetRequiredService<IMapper>()`, exactly as `ReplicationMappingParityTests` already did. That is *more* faithful, and the reason is narrower than previously recorded here: the options fields have public writers and both `DefaultAutoMapperProfile` constructors are public — what is `internal` is `AddShiftEntity`, the only code that composes the three profiles in order (repository scan → user profiles → endpoint default maps, deduped against both). A hand-rolled baseline would reimplement that ordering and drift. It would also miss ShiftIdentity's half entirely, which is registered inside `AddShiftIdentityDashboard` and is invisible from `Program.cs`.
 - Wrap it in `AutoMapperShiftEntityMapper<E,L,V>` so both arms share one interface.
 - **Enumerate triples from `ShiftEntityEndpointDiscovery` + repository generic arguments**, so new entities are covered automatically and nobody maintains a list.
 - Use a **reflective object filler** — deterministic non-default value per scalar, in MAXIMAL and MINIMAL passes — not hand-authored fixtures. Fixtures reintroduce exactly the "whatever the author remembered" failure mode the harness exists to eliminate.
@@ -831,7 +838,26 @@ doesn't.
 
 **Depends on.** Stage A (so the differ measures the fixed generator, not the broken one).
 
-**Done when.** Every triple in StockPlusPlus and ShiftIdentity either matches or has a reviewed divergence entry.
+**Done when.** Every triple in StockPlusPlus and ShiftIdentity either matches or has a reviewed divergence
+entry — **and** every triple resolves a generated arm that is not an `AutoMapperShiftEntityMapper<,,>`.
+Without that second half the differ compares AutoMapper against AutoMapper on any triple with no explicit
+mapper and passes having measured nothing, which is unrecoverable once the oracle is gone.
+
+**✅ First half landed 2026-08-24** — `StockPlusPlus.Test/Tests/Parity/`: `MappingTriple`, `TripleEnumerator`
+(both sources, the generator's base-chain rule), `ParityArms` (baseline + generated-arm resolution + `ArmKind`
+classification), `MemberPathDiff` (+ its own 12 guard tests), and `TripleInventoryTests`, which prints the arm
+every triple actually resolves on every run.
+
+**The inventory, as measured:** 22 triples — **20 Configured**, **1 RegistryOnly**
+(`Country / CountryDTO / CountryDTO`), **1 RepositoryOverride** (`ProductRepository`), **0 AutoMapperFallback**,
+**0 None**. The single `RegistryOnly` row is gap **B-1** stated precisely: the generated mapper exists and
+`ShiftRepository` never consults the registry. Step D1 is what turns that row into `Configured`, and this
+inventory is how that progress becomes visible. Zero rows are vacuous and zero triples would throw when the
+fallback is removed.
+
+**Still to build (C1's second half):** the reflective object filler with its own tests, the rules layer, the
+mutation self-test, and the reviewed `KnownDivergence` table. The deliverable there is the *reviewed table*,
+not a green build — budget it as review time, not engineering time.
 
 ---
 
@@ -844,15 +870,23 @@ doesn't.
 null-navigation and three apply-onto cases, which deliberately encode AutoMapper's null-propagation and
 `"0"`-for-null-nav quirks.
 
-For the six un-migrated ADP pairs, capture goldens **before** writing the manual mapper, including an
-apply-onto-**populated**-destination case so "which members got overwritten" is captured rather than assumed.
+**What it solves.** The plan's original rationale — "makes each replication port in Stage E a diffable
+change" — is dead: that port landed in ShiftIdentity a month before this plan, and both live paths already
+pass explicit delegates for all 13 entities. Three things survive, and they are why it was still worth doing:
 
-**What it solves.** Makes each replication port in Stage E a diffable change instead of a leap of faith —
-and these are documents in a partitioned store, where a wrong write stamps a clean watermark and never retries.
+1. The 22 facts asserted that two implementations **agreed**, never what either **produced**. Nothing asserted that `BranchID` survives an apply-onto — and it is the Cosmos partition key.
+2. `(src.CompanyBranch?.ID ?? 0).ToString()` is a deliberate quirk whose only justification after F5 would be a comment, and comments do not fail builds. A future reader sees a coalesce-to-zero on an ID and "fixes" it, changing live document content in a partitioned store.
+3. The file breaks at F1 regardless, so the choice was convert or delete.
 
-**Depends on.** B4.
+**Depends on.** Nothing. **Blocks.** F1 — hard.
 
-**Done when.** All 22 facts pass with no AutoMapper in the test container.
+**✅ Landed 2026-08-24.** 24 facts (was 22) against goldens captured from the live AutoMapper arm, compared by
+member path rather than by string equality on one-line JSON — property order across the model hierarchy is a
+serializer detail, and a suite that fails for that reason gets deleted rather than debugged. Two facts added
+for the tombstone case (`IsDeleted = true`), which had zero coverage across all 22 originals despite being the
+whole reason replication propagates the flag. Fixtures extracted to `Parity/ReplicationFixtures` so both arms
+are fed identical input; `Parity/GoldenCapture` is the one-shot regeneration tool, `[Skip]`ped, and correct to
+delete after F1. The file needs no host now: 22 integration tests became 24 unit tests running in 191 ms.
 
 ---
 
@@ -873,9 +907,20 @@ output.
 become untranslatable the first time a user types in a filter box, in production, on a page that worked
 during testing.
 
-**Depends on.** A9 (so the emitted predicate is included in the assertion).
+**Depends on.** Stage A only. **A9 and B10 were both dropped** — mapping deliberately does not filter
+soft-deleted rows; that is the repository and OData layer's job, and AutoMapper never did it either. There is
+no predicate inside a composed child to assert. The replacement assertion is its mirror image: **exactly one
+`IsDeleted` predicate, at the root**, which pins that composed children are unfiltered on purpose.
 
-**Done when.** Every deep list triple has a translation test, and the generated SQL is asserted, not assumed.
+**Done when.** Every deep list triple has a translation test; the SQL asserts the child join reaches every
+composed level, and asserts exactly one root soft-delete predicate.
+
+**✅ Landed 2026-08-24** — `StockPlusPlus.Test/Tests/DeepListTranslationTests.cs`, 4 facts: `api/invoice-deep`
+(three levels composed automatically), `api/invoice` (explicit `ForListChildren`), `api/IdentityCompany`
+(two-hop `Brands` aggregation — the riskiest shape in ShiftIdentity and previously uncovered), and the
+taggable Product list. Assertions name TABLES, never EF aliases, which renumber on any EF minor bump.
+Also corrected `DeepListMappingTests`' summary, which claimed nothing composes automatically in the list
+direction — untrue since Stage A, and it is the file a reader consults first.
 
 ---
 

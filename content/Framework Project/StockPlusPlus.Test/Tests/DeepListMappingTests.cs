@@ -6,11 +6,22 @@ using StockPlusPlus.Shared.DTOs.Invoice;
 namespace StockPlusPlus.Test.Tests;
 
 /// <summary>
-/// DEEP LIST mapping — EXPLICIT and per level. The (InvoiceLine, InvoiceLineListDTO) and
+/// DEEP LIST mapping, the EXPLICIT per-level form. The (InvoiceLine, InvoiceLineListDTO) and
 /// (Product, InvoiceLineProductListDTO) pairs are generated purely from the ForListChildren / nested
-/// ForChild CALLS (config-driven opt-in — no partial, no attribute). Nothing goes deep automatically in
-/// the list direction: a child object is composed only when a nested ForChild call says so, and that
-/// call's callback (a direction-scoped ShiftListChildMapper) can customize the child's own properties via For.
+/// ForChild CALLS (config-driven opt-in — no partial, no attribute), and that call's callback (a
+/// direction-scoped ShiftListChildMapper) can customize the child's own properties via For.
+/// <para>
+/// Scoped to the <c>InvoiceListDTO</c> triple on purpose. Automatic deep composition in the list direction
+/// landed with Stage A and is exercised by the <c>InvoiceDeepListDTO</c> triple, which builds three levels
+/// from a bare <c>UseGeneratedMapper()</c> — see <see cref="DeepListTranslationTests"/>. An explicit
+/// <c>ForListChild(ren)</c> takes precedence over the automatic composition for that member, which is what
+/// these tests pin.
+/// </para>
+/// <para>
+/// These tests run LINQ-to-objects, so they assert VALUES — which <c>ToQueryString()</c> cannot. The
+/// translation suite is the other half and does not replace this one: LINQ-to-objects happily executes
+/// constructs EF cannot translate, so a green run here says nothing about SQL.
+/// </para>
 /// </summary>
 public class DeepListMappingTests
 {

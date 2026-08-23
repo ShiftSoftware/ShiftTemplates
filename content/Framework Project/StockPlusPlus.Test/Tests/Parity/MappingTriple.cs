@@ -1,0 +1,44 @@
+using System;
+
+namespace StockPlusPlus.Test.Tests.Parity;
+
+/// <summary>An (entity, list DTO, view DTO) triple — the unit the whole mapping layer is keyed by.</summary>
+public sealed record MappingTriple(Type Entity, Type ListDto, Type ViewDto)
+{
+    public override string ToString() => $"{Entity.Name} / {ListDto.Name} / {ViewDto.Name}";
+}
+
+/// <summary>Where a triple was found, and through what it is reached at runtime.</summary>
+public sealed record TripleSite(MappingTriple Triple, Type? RepositoryType, string Origin)
+{
+    public override string ToString() => $"{Triple}  [{Origin}]";
+}
+
+/// <summary>
+/// How a triple's non-AutoMapper mapping is actually resolved. This is not bookkeeping — it is the difference
+/// between a parity run that measures something and one that compares AutoMapper against itself.
+/// </summary>
+public enum ArmKind
+{
+    /// <summary>The repository overrides the mapping methods directly (ProductRepository).</summary>
+    RepositoryOverride,
+
+    /// <summary>An explicit mapper is configured — UseMapper / UseGeneratedMapper — and it is not AutoMapper-backed.</summary>
+    Configured,
+
+    /// <summary>Resolved from DI (ShiftTagMapper is registered this way).</summary>
+    DiRegistered,
+
+    /// <summary>
+    /// A generated mapper EXISTS in the registry, but the repository still resolves the AutoMapper fallback —
+    /// nothing wires the registry into <c>ShiftRepository</c> yet (gap B-1, fixed by Step D1). A real finding,
+    /// reported rather than failed.
+    /// </summary>
+    RegistryOnly,
+
+    /// <summary>The repository resolved <c>AutoMapperShiftEntityMapper</c> and no generated mapper exists.</summary>
+    AutoMapperFallback,
+
+    /// <summary>No mapper of any kind. Under <c>GeneratedOnly</c> this endpoint throws per request.</summary>
+    None,
+}

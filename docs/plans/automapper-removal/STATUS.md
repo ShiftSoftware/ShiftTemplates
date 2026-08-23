@@ -61,13 +61,13 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 | ~~B10 Deep children bypass the soft-delete filter~~ | ➖ | **DROPPED 2026-08-23 by the owner — this is not a bug, it is the intended behaviour.** Filtering soft-deleted rows is the repository and OData layer's job; mapping does not do it, and AutoMapper never did either. Attaching a tag and later retiring that tag from the vocabulary does **not** remove it from the entities already carrying it — soft-deleting a tag stops it being attached to anything NEW (`TaggingPipeline` resolves live tags only) and nothing more. Same for deep-composed children. A filter added to `TagProjection`/`TaggableProjectionExtensions` was reverted; `TaggingTests.Product_DeletedTag_IsStillReturnedOnBothTheViewAndTheList` now pins the intended behaviour so it does not come back. |
 
 
-## Stage C — Parity harness *(window closes when AutoMapper is deleted)*
+## Stage C — Parity harness *(window closes at F1; C3 has no window)*
 
 | Step | Status | Notes |
 |------|--------|-------|
-| C1 Triple differ | ⬜ | Deliverable = the reviewed `KnownDivergence` table. |
-| C2 Replication goldens | ⬜ | Capture **before** porting each pair. |
-| C3 SQL translation tests for deep lists | ⬜ | Currently zero coverage. |
+| C1 Triple differ | 🟡 | **First half landed.** `Tests/Parity/`: enumeration (22 triples, both sources), arm resolution + `ArmKind`, `MemberPathDiff` with 12 guard tests, and an inventory that prints what each triple actually resolves. **Measured: 20 Configured, 1 RegistryOnly (`Country/CountryDTO/CountryDTO` — gap B-1 exactly), 1 RepositoryOverride, 0 AutoMapperFallback, 0 None.** Remaining: object filler, rules layer, mutation self-test, and the reviewed `KnownDivergence` table — which is review time, not engineering time. |
+| C2 Replication goldens | ✅ | 24 facts (was 22) against goldens captured from the live AutoMapper arm, compared by member path. +2 tombstone facts (`IsDeleted = true`) — zero coverage before. Fixtures shared with the capture tool so both arms get identical input. Now host-free: 191 ms. **The plan's stated rationale was dead** (the port landed a month before the plan); it was worth doing because the facts asserted agreement, never values — nothing pinned `BranchID`, the Cosmos partition key, surviving an apply-onto. |
+| C3 SQL translation tests for deep lists | ✅ | `DeepListTranslationTests`, 4 facts: auto-deep three levels, explicit `ForListChildren`, the `Brands` two-hop aggregation, and the taggable Product list. Asserts exactly ONE root `IsDeleted` predicate — the mirror of A9/B10 being dropped, pinning that composed children are deliberately unfiltered. Names tables, never EF aliases. |
 
 ## Stage D — Wiring & enforcement
 
