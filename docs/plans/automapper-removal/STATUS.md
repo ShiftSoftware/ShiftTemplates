@@ -41,7 +41,7 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 | A9 Soft-deleted children excluded from auto-deep | ➖ | **Dropped from the generator — wrong layer.** Soft delete is owned by the repository + OData. The GAP is real (see below) and moves to Stage B. |
 | A10 Low-severity generator cleanups | 🟡 | 6 of 8 bullets done — arrays and the collection-container fix landed with the conversion work. Remaining: defensive copies, constructor-only DTO error. |
 | A12 Framework audit members are mapper payload (Q7) | ✅ | **2026-08-22.** `CreateDate`/`LastSaveDate`/`IsDeleted`/`CreatedByUserID`/`LastSavedByUserID` removed from `EntityExcludedMembers`; `ID`, `Tags`, `ReloadAfterSave`, `AuditFieldsAreSet`, `IdempotencyKey` stay. Repository restores the stored `IsDeleted` on update. 9 new tests; 2 source-text pins inverted. `ViewHandledMembers`, `CopyExcludedMembers` and the list filter deliberately untouched — see the log. |
-| A11 Case-insensitive member matching + opt-out | ⬜ | **New 2026-08-22, from a field report.** Parity regression — AutoMapper matched across case, the generator does not; already broke 3 live members in `CompanyBranchListDTO`. Optioned like `MaxDepth`, default insensitive, exact-first, conflict → skip + **SHENGEN011**. |
+| A11 Case-insensitive member matching + opt-out | ✅ | **New 2026-08-22, from a field report.** Parity regression — AutoMapper matched across case, the generator does not; already broke 3 live members in `CompanyBranchListDTO`. Optioned like `MaxDepth`, default insensitive, exact-first, conflict → skip + **SHENGEN011**. |
 
 ## Stage B — Close framework-owned holes
 
@@ -454,3 +454,65 @@ The two are separate decisions and this conflated them.
 
 Verified: ShiftEntity **438 tests pass**; StockPlusPlus 173/175, the two failures being the Cosmos tests, which
 need the emulator on `localhost:8081` and are unrelated to mapping.
+
+**2026-08-22 (later)** — **A11 done. Matching is case-insensitive by default, with an opt-out.**
+
+The parity regression is closed: entity `CompanyID` (`long?`) now feeds DTO `CompanyId` (`string?`) with no
+configuration, in all three directions. **469 tests pass** (6 new); ShiftEntity, ShiftIdentity.Data and
+StockPlusPlus.Data all build with 0 errors and no new SHENGEN011 anywhere in either tree.
+
+**The option** is `map.CaseSensitive()`, and only that:
+
+| | spelling |
+|---|---|
+| attribute | *(none)* — see the note below |
+| fluent | `map.CaseSensitive()` |
+| default | `ShiftEntityMapperDefaults.CaseSensitiveMatching = false` |
+
+
+**Fluent only.** An attribute (`[ShiftEntityMapperCaseSensitive]`, readable from the repository, the `[ShiftEntityMapper]` partial, the entity or the assembly) was built alongside it and then removed at the owner's request. One spelling beats four: easier to find, easier to reason about, and it keeps the setting with the rest of the per-mapper configuration. The default stays insensitive, so the opt-out is the only thing anyone has to write.
+
+The setting propagates to CHILD mappers: a pair reached from a case-sensitive triple is generated case-sensitive too, rather than quietly relaxing the rule one level down. Pinned by `CaseSensitiveOptOut_ReachesChildMappers`.
+
+**Resolution order**, as specified: exact ordinal first — always, and never beaten by a looser candidate — then
+`OrdinalIgnoreCase`; two or more candidates with no exact match means the member is SKIPPED and `SHENGEN011`
+names every candidate, as a warning, and the build succeeds. Exact-first is what makes the fallback safe: a
+type carrying both `Id` and `ID` still binds each to its own exactly-named member, so only a member with no
+exact counterpart can reach the ambiguous branch at all. A successful case-insensitive match is silent —
+AutoMapper resolved these without comment, and warning on each would bury the real findings.
+
+**Implementation notes worth keeping:**
+
+- The five name-keyed lookups became one `MemberLookup`, built by GROUPING rather than `ToDictionary`. The old
+  call throws on a duplicate key, which becomes reachable the moment names are compared without case, and an
+  exception inside a source generator surfaces as a build failure with no usable message.
+- The setting rides on `MapperDirectives` alongside `MaxDepth`. Note `MapperDirectives.Empty` is a single
+  shared instance — a fresh one is created for a triple with no configuration, because writing the flag onto
+  the shared one would leak the setting to every other triple.
+- The FK convention is the same defect in another costume: its `EndsWith("ID")` test and its `Name + "ID"`
+  lookups are now case-insensitive too, so an entity spelling it `CompanyId` gets the FK convention as well.
+- **The trap the step predicted is real and cost two rounds.** Roughly twenty emission sites interpolated the
+  REQUESTED name, which is correct only while the two spellings are identical. Missing two of them (the list
+  scalar tail, and the general-conversion fallback) emitted `e.CompanyId` for an entity that spells it
+  `CompanyID` — code that does not compile. Every source-side emission now reads the matched
+  `IPropertySymbol.Name`; the target side keeps the DTO's. Only a behavioural test over a deliberately
+  case-mismatched pair catches this, which is why all four required behaviours are pinned that way.
+
+**ShiftIdentity — the three `ForList` scope-id lines are gone.** `CompanyBranchRepository` carried
+`ForList(d => d.CompanyId, …)`, `CityId` and `RegionId` with a paragraph explaining that "BOTH the case AND the
+type differ". Both halves are handled now — case by A11, `long? -> string` by the earlier conversion work — and
+the generated projection is byte-for-byte what the hand-written lines produced
+(`CompanyId = e.CompanyID.HasValue ? e.CompanyID.Value.ToString() : null`). The comment's *rationale* was kept:
+those columns are LIST filter targets, and without a scalar to bind to EF inlines the collection-bearing
+projection into the WHERE and cannot translate it. Anyone tempted to `IgnoreList` them should read it first.
+
+**Recovery note.** Mid-step, an over-wide text replacement deleted ~370 lines of the generator (the conversion
+engine, `TryGetElement`, `IsPairable`, `BuildViewBody`). It was recovered from the `Stage B complete` commit and
+the A11 work re-applied on top; the full suite confirms nothing was lost. The lesson is narrow but real: slicing
+a file between two anchors deletes whatever else happens to live between them.
+
+**Mirror note (2026-08-22).** The `.shift` copy had drifted well behind this one and was re-synced from it.
+The two passages that used to be deliberately fuller in the private mirror — Q7 and gap C-3 — no longer are:
+Q7 is answered ("the mapper writes all properties; guard in the repository or with an explicit Ignore") and the
+`IsDeleted` case is resolved by a repository policy, so there is no unshipped narrowing left to keep private.
+The copies are now identical apart from the banner naming which one is primary. **This copy is primary.**

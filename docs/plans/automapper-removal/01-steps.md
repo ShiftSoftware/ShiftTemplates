@@ -402,7 +402,7 @@ the generated SQL contains the predicate (assert via `ToQueryString()`).
 
 **Done when.** Each bullet has a test or a regenerated-output diff.
 
-## Step A11 — Case-insensitive member matching by default, with a per-triple opt-out
+## Step A11 — Case-insensitive member matching by default, with a per-triple opt-out ✅ DONE (2026-08-22)
 
 **Solves:** A-13. **Found after Stage A landed. This is a parity regression — it has already silently broken
 three live members.**
@@ -429,9 +429,11 @@ generator setting, so this introduces no new concept:
 
 | | `MaxDepth` (existing) | member matching (new) |
 |---|---|---|
-| attribute | `[ShiftEntityMapperMaxDepth(n)]` | `[ShiftEntityMapperCaseSensitive]` |
+| attribute | `[ShiftEntityMapperMaxDepth(n)]` | *(none — deliberately fluent-only)* |
 | fluent | `map.MaxDepth(n)` | `map.CaseSensitive()` |
 | default | `ShiftEntityMapperDefaults.MaxDepth = 10` | `ShiftEntityMapperDefaults.CaseSensitiveMatching = false` |
+
+**Fluent only — decided 2026-08-22.** The attribute half of this table was built and then removed at the owner's request: `map.CaseSensitive()` is the single spelling. One way to say it is easier to find and to reason about than four (repository / mapper class / entity / assembly), and it keeps the setting where the rest of the per-mapper configuration already lives.
 
 **Default is case-insensitive** — that is AutoMapper's behavior, so it is the setting under which a migration
 does not silently lose members. Case-sensitive is the deliberate opt-in for a team that wants names to line
@@ -494,7 +496,7 @@ fail-closed check (`SHENGEN009`) is what stops `CaseSensitive(nonLiteral)` becom
 1. **Default:** entity `CompanyID` (`long?`) ↔ DTO `CompanyId` (`string?`) maps in all three directions with no fluent configuration.
 2. **Exact-first:** an entity carrying both `Id` and `ID` binds each to its exactly-named DTO member — no warning, no swap.
 3. **Conflict:** entity `Code` + `code` against DTO `CODE` skips the member and reports `SHENGEN011` naming both candidates — and the build **succeeds**, and the generator does not crash.
-4. **Opt-out:** `[ShiftEntityMapperCaseSensitive]` on that same triple leaves `CompanyId` unmapped and reported by SHENGEN007/008 as an ordinary unmapped member.
+4. **Opt-out:** `map.CaseSensitive()` on that same triple leaves `CompanyId` unmapped and reported by SHENGEN004/007 as an ordinary unmapped member, and the setting reaches child mappers.
 
 Plus: the three `ForList` scope-id lines in `CompanyBranchRepository` are provably redundant under the default.
 
