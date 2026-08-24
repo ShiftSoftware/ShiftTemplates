@@ -83,11 +83,11 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 
 | Target | Size | Status | Notes |
 |--------|------|--------|-------|
-| E1 Migration recipe | — | ⬜ | Write it to be **published** — it is the downstream migration guide. Ships in F5's docs pass. |
-| StockPlusPlus sample | 3 profiles / 83 lines, 0 `AfterMap` | ⬜ | First. Rehearses the recipe where fixing the framework is still cheap. |
-| ShiftIdentity.Data | 11 profiles / 352 lines, 0 `AfterMap` | ⬜ | After **D4** — it ships as a package, so its mappers freeze into the DLL. |
-| E2 Template's 12 replication sites | — | ⬜ | **Early** — stops the bleed into new services. |
-| E3 Required replication delegate | — | ⬜ | Deliberate compile break for un-migrated consumers. Blocked on **Q9**. |
+| E1 Migration recipe | — | ✅ | [`migration-guide.md`](migration-guide.md) — written to be read standalone by a consumer team, since they will run it without us. Covers the six steps, the three deliberate behaviour changes to expect from the differ, the two genuinely hard shapes (collection reconciliation, replication), and what will never be done for them (flattening). Ships in F5's docs pass. |
+| StockPlusPlus sample | 3 profiles / 83 lines | 🟡 | **Effectively already migrated** — the Stage C inventory found every sample triple on a generated mapper or a repository override. The remaining profile maps are NOT triples: `CompanyBranchModel→CompanyBranchListDTO` and `Product→ProductCategoryListDTO` feed **Cosmos `ProjectTo`** in two controllers, and `Product→ProductModel` is replication. Those are **F3** and **E3** respectively, not this row. |
+| ShiftIdentity.Data | 11 profiles / 352 lines | 🟡 | **Also effectively migrated.** Reading the profiles: 10 of the 11 are *purely* replication maps (`Entity→*Model`), already superseded by hand-written `ToXModel()` delegates and pinned by C2's goldens. Only `User.cs` still carries triple maps (`User→UserDTO`/`UserListDTO`) plus `UserDataDTO`, which is **F2**. The replication maps must stay until **E3** — they are the fallback that keeps un-migrated `Replicate` call sites working. |
+| E2 Template's 12 replication sites | — | ✅ | All 12 now pass their `ToXModel()` delegate explicitly. **The plan's fix did not work as written:** `ReplicateAllAsync` lives in `ShiftIdentity.AzureFunctions`, which the API does not reference and should not — so instead of calling it, the calls keep their shape and gain delegates. Better as template content anyway: this is the file every new service is scaffolded from, so it now *demonstrates* passing a delegate rather than hiding the question behind a helper. |
+| E3 Required replication delegate | — | ✅ | **Q9 answered: take the break.** All 9 overloads across both pipelines now require the delegate; all 4 AutoMapper fallbacks and the lazy `FallbackMapper` are gone. **AutoMapper left `ShiftEntity.CosmosDbReplication` entirely** — usings and `PackageReference` — which is F5's first action, arriving early as a consequence. `Utility.BuildStamp` now throws on an empty document id rather than writing a stamp that can never address the document again. |
 | ~~ADP.Surveys / WarrantyClaims / ClaimableItems / Menus / Menu~~ | 37 triples, 16 `AfterMap` | ➖ | **Out of scope.** Consumer services — they migrate on their own schedule via E1 + the compat package. |
 
 ## Stage F — Delete
@@ -114,7 +114,7 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 | ~~Q6~~ | ~~SyncAgent — delete or migrate?~~ | ➖ | Dropped 2026-08-22 — not a framework decision. See F4. |
 | Q7 | Audit-field narrowing — note or advisory? | ✅ | **Neither — there is no narrowing.** Generated `MapToEntity` writes the audit + soft-delete members, as AutoMapper did; guards belong in the repository or an explicit `IgnoreEntity`. **Shipped 2026-08-22 for 5 of 6 — `ID` carved out** (its convention throws on the null every insert carries, and deep write would force an identity insert). Repository soft-delete guard shipped with it. Gap C-3 closed. |
 | Q8 | Richer list payloads — accept? | ❓ | *(rec: accept, then measure)* |
-| **Q9** | Ship the required-delegate compile break? | ✅ | **Yes — at E3, not before.** The `= null` defaults and the 4 fallback sites stay until then. Pre-announce to the 6 downstream call sites. |
+| **Q9** | Ship the required-delegate compile break? | ✅ | **Yes — shipped 2026-08-24 in E3.** ADP and other consumers refactor later on their own schedule, pinned to the previous framework version until they do. |
 | **Q10** | Shipped default: `AutoMapperFirst` forever, or a flip? | ❓ | *(rec: `AutoMapperFirst` until F5, then compat-seam)* **New, from the rescope.** |
 
 **Diagnostic ids:** shipped with Stage A — `SHENGEN007` unmapped list · `008` view members never written back
@@ -124,6 +124,39 @@ A11** (ambiguous case-insensitive match). Next free after that is `012`.
 ---
 
 ## Log
+
+**2026-08-24** — **Stage E: E1 and E2 done, E3 shipped. AutoMapper is out of the replication package entirely.**
+
+**The stage was much smaller than budgeted, for a good reason.** It was scoped as two service migrations;
+reading the profiles showed both had already been migrated during Stage A — which the Stage C inventory had in
+fact already told us (20 of 22 triples `Configured`). Of ShiftIdentity's 11 profiles, **10 are purely
+replication maps**; only `User.cs` still carries triple maps. What looked like Stage E work was E3, F2 and F3
+work wearing a Stage E label.
+
+**E2 did not work the way the plan described.** The plan said the template needed no new code, just a call to
+`ReplicateAllAsync` — but that helper lives in `ShiftIdentity.AzureFunctions`, which the API does not
+reference and should not. Rather than drag an Azure Functions package into a web API, the 12 call sites keep
+their shape and each gained its `ToXModel()` delegate. Better as template content anyway: this is the file
+every new microservice is scaffolded from, so it now demonstrates passing a delegate instead of hiding the
+question behind a helper.
+
+**E3, on Q9 = take the break.** All 9 overloads require the delegate; the 4 fallbacks and the lazy
+`FallbackMapper` are deleted. A delegate-free call site is now a compile error instead of a silent fall-through
+to AutoMapper — which matters because every failure on that path is swallowed per row, surfacing as
+permanently-dirty documents under a clean watermark rather than as an exception.
+
+Consequence worth noting: with the fallbacks gone, **AutoMapper had no remaining use in
+`ShiftEntity.CosmosDbReplication`**, so the usings and the `PackageReference` came out. That is Step F5's first
+action arriving early as a by-product — and it takes AutoMapper 14's NU1903 advisory out of every consumer
+build that references replication.
+
+Also in E3: `Utility.BuildStamp` throws when a mapping produces a document with no `id`. It previously wrote a
+stamp that could never address the document again, so change detection for that row broke permanently while
+the upsert still succeeded and marked the row clean.
+
+**Downstream impact, accepted deliberately:** 6 call sites in `ADP.ClaimableItems` and `ADP.WarrantyClaims` no
+longer compile. Those teams pin the previous framework version until they port — a normal, reversible state,
+where the alternative was a runtime throw inside a swallowed catch.
 
 **2026-08-24** — **D4 reworked: version skew is now detected rather than declared.** The first cut stamped a
 hand-maintained `abiVersion` into every generated mapper and compared it at startup. That was the wrong
