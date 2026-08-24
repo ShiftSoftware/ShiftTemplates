@@ -1,6 +1,6 @@
 # AutoMapper Removal — Status
 
-**Last updated:** 2026-08-22 — rescoped to framework only (ADP/Menu out of scope); Step A11 added from a
+**Last updated:** 2026-08-24 — Stages A–D complete; Stage C partial (C1 second half outstanding).
 field report. Stage 0 and Stage A complete. Stage B is next.
 
 **Scope:** `ShiftEntity` + `ShiftIdentity` + `ShiftTemplates` + CI. Consumer services (`ADP.*`,
@@ -41,7 +41,7 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 | A9 Soft-deleted children excluded from auto-deep | ➖ | **Dropped from the generator — wrong layer.** Soft delete is owned by the repository + OData. The GAP is real (see below) and moves to Stage B. |
 | A10 Low-severity generator cleanups | 🟡 | 6 of 8 bullets done — arrays and the collection-container fix landed with the conversion work. Remaining: defensive copies, constructor-only DTO error. |
 | A12 Framework audit members are mapper payload (Q7) | ✅ | **2026-08-22.** `CreateDate`/`LastSaveDate`/`IsDeleted`/`CreatedByUserID`/`LastSavedByUserID` removed from `EntityExcludedMembers`; `ID`, `Tags`, `ReloadAfterSave`, `AuditFieldsAreSet`, `IdempotencyKey` stay. Repository restores the stored `IsDeleted` on update. 9 new tests; 2 source-text pins inverted. `ViewHandledMembers`, `CopyExcludedMembers` and the list filter deliberately untouched — see the log. |
-| A11 Case-insensitive member matching + opt-out | ✅ | **New 2026-08-22, from a field report.** Parity regression — AutoMapper matched across case, the generator does not; already broke 3 live members in `CompanyBranchListDTO`. Optioned like `MaxDepth`, default insensitive, exact-first, conflict → skip + **SHENGEN011**. |
+| A11 Case-insensitive member matching + opt-out | ✅ | **New 2026-08-22, from a field report.** Parity regression — AutoMapper matched across case, the generator does not; already broke 3 live members in `CompanyBranchListDTO`. Optioned like `MaxDepth`, default insensitive, exact-first, conflict → skip + **SHENGEN011**. **Shipped 2026-08-24**; every case-mismatch `ForList` bridge it made redundant is removed (CompanyBranch scope ids x3, Team.CompanyId). |
 
 ## Stage B — Close framework-owned holes
 
@@ -73,11 +73,11 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 
 | Step | Status | Notes |
 |------|--------|-------|
-| D1 `MappingMode` + registry resolution | ⬜ | Default stays `AutoMapperFirst`. |
-| D2 Attribute-endpoint default flip | ⬜ | Needs the three-way `spec.Repository` split. |
-| D3 Startup validation | ⬜ | Where "required" is actually enforced. |
-| D4 Codegen ABI stamp + check | ⬜ | |
-| D5 Registry conflict detection | ⬜ | |
+| D1 `MappingMode` + registry resolution | ✅ | `ShiftEntityMappingMode` (AutoMapperFirst / GeneratedFirst / GeneratedOnly) on `ShiftEntityOptions`; `ShiftRepository.InitCommon` now consults the registry between DI and AutoMapper, gated on the mode. `GeneratedMapperFactory` caches the ACTIVATOR, never the instance — generated mappers hold per-instance builder state, so a singleton would leak one repository's customization into every consumer of the triple. **Default unchanged, so shipping it changes nothing.** 6 acceptance tests incl. the no-options-configured host and the each-repo-gets-its-own-instance guard. |
+| D2 Attribute-endpoint default flip | ✅ | D1 already covers the runtime path — attribute endpoints with no mapper and no custom repository use the built-in `ShiftRepository`, so the registry step serves them. What D2 added is stopping the pointless AutoMapper default-map synthesis for triples the registry covers, which is the last framework path reaching for AutoMapper by default. The filter lives in the DEFERRED AutoMapper factory, not `RegisterShiftRepositories`, because the mode is only final after every `Configure` callback has run. |
+| D3 Startup validation | ✅ | `ShiftEntityMapperValidation.Validate` — one aggregate exception listing every uncovered triple, every registry conflict and every ABI-skewed mapper. Coverage accepts a DI descriptor, a registry hit, or a repository that OVERRIDES a mapping method (`DeclaringType`-based — a naive "has a MapToView?" check passes every repository and validates nothing). Runs module initializers first, each wrapped, since reflection alone does not trigger them and the registry would look empty. Uncovered triples are fatal only under `GeneratedOnly`. |
+| D4 Version-skew detection | ✅ | **Detected, not declared — nothing to version and nothing to remember.** `ShiftEntityMapperRegistry.VerifyBindings()` JIT-prepares each registered mapper's methods, which resolves their call targets; a member the mapper was compiled against and that no longer exists throws there, at startup, naming itself. Verified against a purpose-built two-assembly skew probe: `PrepareMethod` raises `MissingMethodException` without invoking anything. **Replaced an earlier hand-maintained ABI number**, which had both failure modes of a manual version — it fires on additive changes that break nothing, and stays silent whenever somebody forgets to bump it. Only `MissingMethod`/`MissingField`/`TypeLoad` are treated as skew; anything else is left alone rather than becoming a spurious startup error. |
+| D5 Registry conflict detection | ✅ | `Register` is now idempotent for the same type and deterministic for a different one — it prefers the mapper declared alongside its ENTITY, since that is the one whose generator run could see the entity's configuration. Conflicts are RECORDED, never thrown: `Register` runs in a `[ModuleInitializer]`, where an exception becomes an unreadable `TypeInitializationException`. D3 turns them into one readable startup error. |
 
 ## Stage E — Migrate framework-owned code
 
@@ -124,6 +124,77 @@ A11** (ambiguous case-insensitive match). Next free after that is `012`.
 ---
 
 ## Log
+
+**2026-08-24** — **D4 reworked: version skew is now detected rather than declared.** The first cut stamped a
+hand-maintained `abiVersion` into every generated mapper and compared it at startup. That was the wrong
+instrument, for the reason any manual version number is: it fires on additive framework changes that break
+nothing, and it stays silent exactly when it matters — the release where somebody changed a helper signature
+and did not think to bump it. Step B8, which added a parameter to `MappingHelpers.ToForeignKey`, is precisely
+that release.
+
+Replaced with `VerifyBindings()`: JIT-prepare each registered mapper's methods, which resolves their call
+targets, and report anything that no longer binds. Confirmed on a purpose-built probe — two versions of a
+"framework" assembly, a consumer compiled against v1 carrying a one-argument call in its IL, a host loading
+v2 — where `RuntimeHelpers.PrepareMethod` raises `MissingMethodException` at startup without invoking
+anything, and the message names the missing method verbatim:
+
+    Method not found: 'Int64 Fw.H.ToForeignKey(System.String)'
+
+Nothing is emitted, nothing is versioned, and the check fires exactly when a call target is genuinely gone.
+The error names the missing member and the package to rebuild, which the ABI number never could.
+
+**2026-08-24** — **A11 shipped, and the customizations it made redundant are gone.** Case-insensitive member
+matching landed with exact-first resolution, a `map.CaseSensitive()` opt-out and `SHENGEN011` for ambiguity.
+
+That retires the last class of workaround from the convention sweep. Four `ForList` bridges existed ONLY
+because matching was ordinal: `CompanyBranchListDTO.CompanyId`/`CityId`/`RegionId` ↔
+`CompanyBranch.CompanyID`/`CityID`/`RegionID`, and `TeamListDTO.CompanyId` ↔ `Team.CompanyID`. All four are
+removed. Regenerating and diffing shows the convention emits **character-for-character** what the deleted
+lambdas produced — `CompanyId = e.CompanyID.HasValue ? e.CompanyID.Value.ToString() : null` — now matching
+across the case difference, so there is no wire change. `SHENGEN007` is the backstop: had the convention not
+covered them it would name them as unprojected columns, and it does not.
+
+Worth stating because it nearly went the other way: these members are **LIST FILTER targets** (data-level
+access, and the Team form's branch picker sending `$filter=CompanyId eq X`). If they stopped being projected,
+EF would have nothing to bind the `Where` to and would inline the whole collection-bearing projection into the
+predicate — untranslatable, and only at the moment a user filters. They still must be projected; the
+convention is simply what projects them now. Anyone tempted to `IgnoreList` them should read that twice.
+
+The earlier sweep recorded these as **KEEP** on the grounds that A11 was not implemented. That was true when
+written and is not now — which is the hazard with "keep, because X is missing" notes generally: they are
+correct until the day X lands, and nothing makes them re-read themselves.
+
+**2026-08-24** — **Stage D complete.** The registry is now wired into repository resolution, and the mapping
+layer validates at startup instead of at first request.
+
+The change that matters is one line in `InitCommon`: the registry sits between DI and AutoMapper, gated on
+`ShiftEntityOptions.MappingMode`. Before it, the registry was read by `UseGeneratedMapper()` and endpoint
+discovery and by **nothing else** — so a generated mapper could exist, be correct, be registered, and the
+repository would still use AutoMapper. The Stage C inventory had already found that live on
+`Country / CountryDTO / CountryDTO`.
+
+**Default stays `AutoMapperFirst`, so shipping Stage D changes nothing.** That is the whole safety property,
+and it is pinned by a test asserting the registry is NOT consulted under the default — including for a host
+that never configured `ShiftEntityOptions` at all, which must not start resolving generated mappers just
+because the framework was upgraded underneath it.
+
+Three things worth remembering:
+
+1. **The activator is cached; the instance never is.** Generated mappers carry per-instance builder state that
+   `AddConfiguration` mutates, so a shared singleton would leak one repository's customization into every
+   other consumer of the same triple — presenting as intermittent mis-mapping, which is close to untraceable.
+2. **D2's filter had to be deferred.** The mapping mode is only final after every
+   `Configure<ShiftEntityOptions>` callback has run, and callers routinely configure options *after* calling
+   `RegisterShiftRepositories`. So the "skip the AutoMapper default map for triples the registry covers" check
+   lives inside the deferred AutoMapper factory, which runs when `IMapper` is first resolved.
+3. **Conflicts are recorded, not thrown.** `ShiftEntityMapperRegistry.Register` runs inside a
+   `[ModuleInitializer]`; throwing there surfaces as a `TypeInitializationException` with the real cause
+   buried. D3 is what makes them readable.
+
+One design note left deliberately: the registry is process-global with no reset, which production never needs
+but tests must respect — each conflict test owns its own triple types, or they read each other's conflicts.
+
+16 new tests. ShiftEntity.Tests 485/485, StockPlusPlus.Test 198/199 (1 skipped: the golden-capture tool).
 
 **2026-08-23** — **Soft delete is now blocked on the write path, and allowed on the read path.** Two changes
 that look opposed and are not.
