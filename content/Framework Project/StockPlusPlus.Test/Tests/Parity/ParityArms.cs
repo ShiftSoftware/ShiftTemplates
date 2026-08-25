@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -23,15 +23,15 @@ public sealed record MapperArm(object Mapper, MappingTriple Triple, string Descr
 /// measured the same object twice and reported perfect parity on every un-migrated triple. Green, worthless,
 /// and undetectable the day AutoMapper was deleted. That fallback is gone, so the vacuous arm is now
 /// unreachable rather than merely detected; what stays useful is <see cref="ArmKind.None"/>, a triple that
-/// throws on first use.
+/// fails startup validation.
 /// </para>
 /// </summary>
 public static class ParityArms
 {
     /// <summary>
-    /// Resolves the non-AutoMapper mapping for a triple, and classifies it. The classification is the
-    /// deliverable of this method — a caller that ignores <see cref="ArmKind"/> can compare AutoMapper to
-    /// itself and never know.
+    /// Resolves the mapping a triple actually uses, and classifies it. The classification is the deliverable
+    /// of this method — while AutoMapper was still the fallback, a caller that ignored
+    /// <see cref="ArmKind"/> could compare AutoMapper to itself and never know.
     /// </summary>
     public static (MapperArm? Arm, ArmKind Kind) GeneratedArm(IServiceScope scope, TripleSite site)
     {

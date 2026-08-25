@@ -40,7 +40,7 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
         //    Constants.CompanyBranchIdClaim
         //);
 
-        // Use the auto-generated mapper (replaces the AutoMapper default for this repository).
+        // Use the source-generated mapper for this repository's triple.
         o.UseGeneratedMapper();
     })
     {

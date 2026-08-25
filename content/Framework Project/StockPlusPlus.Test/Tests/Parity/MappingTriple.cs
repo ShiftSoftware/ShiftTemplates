@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace StockPlusPlus.Test.Tests.Parity;
 
@@ -15,15 +15,17 @@ public sealed record TripleSite(MappingTriple Triple, Type? RepositoryType, stri
 }
 
 /// <summary>
-/// How a triple's non-AutoMapper mapping is actually resolved. This is not bookkeeping — it is the difference
-/// between a parity run that measures something and one that compares AutoMapper against itself.
+/// How a triple's mapping is actually resolved. This is not bookkeeping: while AutoMapper was still the
+/// fallback it was the difference between a parity run that measured something and one that compared
+/// AutoMapper against itself. That fallback is gone, so the classification now records which of the
+/// surviving paths a row was measured through.
 /// </summary>
 public enum ArmKind
 {
     /// <summary>The repository overrides the mapping methods directly (ProductRepository).</summary>
     RepositoryOverride,
 
-    /// <summary>An explicit mapper is configured — UseMapper / UseGeneratedMapper — and it is not AutoMapper-backed.</summary>
+    /// <summary>An explicit mapper is configured — UseMapper / UseGeneratedMapper.</summary>
     Configured,
 
     /// <summary>Resolved from DI (ShiftTagMapper is registered this way).</summary>

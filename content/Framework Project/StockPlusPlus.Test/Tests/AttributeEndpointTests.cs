@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
 using StockPlusPlus.Data.DbContext;
@@ -176,7 +176,7 @@ public class AttributeEndpointTests
     }
 
     // The built-in repository for the mapper endpoint resolves the registered CountryMapper and uses it as
-    // its inner mapper — i.e. the custom mapper is PREFERRED over the AutoMapper default (proving the
+    // its inner mapper — i.e. the custom mapper is PREFERRED over the source-generated mapper (proving the
     // trailing-generic mapper path, not just that the mapper is in DI).
     [Fact]
     public void AttributeEndpoint_WithMapper_BuiltInRepositoryPrefersCustomMapper()
@@ -207,7 +207,8 @@ public class AttributeEndpointTests
         Assert.IsNotType<CountryMapper>(inner);
     }
 
-    // The mapper endpoint's routes are generated and served (same assertion rationale as the AutoMapper one).
+    // The mapper endpoint's routes are generated and served (same assertion rationale as
+    // AttributeEndpoint_IsMapped above, which covers the plain endpoint).
     [Fact]
     public async Task AttributeEndpoint_WithMapper_IsMapped()
     {
@@ -219,7 +220,7 @@ public class AttributeEndpointTests
     }
 
     // innerMapper is a protected member of ShiftRepository; the mapper chosen at construction (custom vs
-    // AutoMapper default) is exactly what we want to assert, so read it via reflection.
+    // source-generated) is exactly what we want to assert, so read it via reflection.
     private static object? GetInnerMapper(object repository)
     {
         var prop = repository.GetType().GetProperty("innerMapper", BindingFlags.NonPublic | BindingFlags.Instance);

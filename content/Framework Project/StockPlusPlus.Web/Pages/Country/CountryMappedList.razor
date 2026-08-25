@@ -1,11 +1,11 @@
-@attribute [Authorize]
+﻿@attribute [Authorize]
 @attribute [Route($"/{nameof(CountryMappedList)}")]
 
 @using StockPlusPlus.Shared.DTOs
 
 @* Lists the "api/countrymapped" endpoint — the same Country table served through the hand-written
-   CountryMapper (IShiftEntityMapper) instead of AutoMapper. It's a separate endpoint + DTO from the
-   "Countries" list (api/country), so the two are fully isolated. *@
+   CountryMapper (IShiftEntityMapper) instead of the source-generated mapper. It's a separate endpoint +
+   DTO from the "Countries" list (api/country), so the two are fully isolated. *@
 <ShiftList EntitySet="CountryMapped"
            Title="Country (Mapped) List"
            T="CountryMappedDTO"
