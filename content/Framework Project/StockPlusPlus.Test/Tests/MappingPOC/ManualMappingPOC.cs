@@ -199,7 +199,7 @@ public interface IShiftEntityMapper<TEntity, TListDTO, TViewDTO>
     void CopyEntity(TEntity source, TEntity target);
 }
 
-// --- ShiftEntitySelectDTO helper (reflection-based convention, same logic as current AutoMapperExtensions) ---
+// --- ShiftEntitySelectDTO helper (reflection-based convention, same logic as the AutoMapperExtensions helper that existed when this POC was written; it now lives in ShiftEntity.Core/MappingHelpers.cs) ---
 
 public static class ShiftEntitySelectDTOHelper
 {

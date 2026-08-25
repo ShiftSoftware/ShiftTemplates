@@ -48,7 +48,8 @@ Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
 
 // Also wires attribute-driven endpoints: scans the given (data) assembly for entities decorated with
 // [ShiftEntityEndpoint<…>] / [ShiftEntitySecureEndpoint<…>] (e.g. Country) and registers their built-in
-// repository + default map + DTO-map entry. Map the routes below with app.MapShiftEntityEndpoints<DB>().
+// repository + DTO-map entry; the mapping itself comes from the source-generated mapper unless the attribute
+// names one. Map the routes below with app.MapShiftEntityEndpoints<DB>().
 builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
 
 builder.Services.AddAttentionEvaluator<IHasDueDate, FrameworkOverdueEvaluator>();

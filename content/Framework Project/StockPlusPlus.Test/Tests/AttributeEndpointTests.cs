@@ -13,8 +13,9 @@ namespace StockPlusPlus.Test.Tests;
 /// <summary>
 /// Integration tests for the attribute-driven endpoints. Country carries
 /// <c>[ShiftEntitySecureEndpoint&lt;CountryDTO, CountryDTO, StockPlusPlusActionTree&gt;("api/country", …)]</c>
-/// and has NO controller and NO repository — the DI side (built-in repository, default map, DTO-map
-/// entry) is wired by <c>RegisterShiftRepositories(...)</c> and the routes are mapped by
+/// and has NO controller and NO repository — the DI side (built-in repository, DTO-map entry, and a mapper
+/// registration only when the attribute names one) is wired by <c>RegisterShiftRepositories(...)</c>, the
+/// mapping otherwise coming from the source-generated mapper, and the routes are mapped by
 /// <c>app.MapShiftEntityEndpoints&lt;DB&gt;()</c>.
 /// </summary>
 [Collection("API Collection")]
