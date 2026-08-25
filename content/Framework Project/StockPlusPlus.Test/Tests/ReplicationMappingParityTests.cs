@@ -15,16 +15,17 @@ namespace StockPlusPlus.Test.Tests;
 /// asserts the produced document against a GOLDEN — the exact JSON the host's AutoMapper profile produced from
 /// the same fixture, captured while AutoMapper was still in the container.
 /// <para>
-/// It used to assert the two implementations AGREED, resolving <c>IMapper</c> from the running host. That dies
-/// at Step F1, when <c>AddShiftIdentityAutoMapper()</c> becomes <c>[Obsolete(error: true)]</c> and the oracle
-/// disappears permanently. Worse, agreement was never the interesting property: nothing asserted that
+/// It used to assert the two implementations AGREED, resolving <c>IMapper</c> from the running host. That
+/// died when <c>AddShiftIdentityAutoMapper()</c> was deleted — it was never obsoleted first — and the oracle
+/// disappeared with it. Worse, agreement was never the interesting property: nothing asserted that
 /// <c>BranchID</c> survives an apply-onto, only that both arms treated it identically — and it is the Cosmos
 /// partition key. A golden pins the absolute document.
 /// </para>
 /// <para>
-/// Regenerate with <see cref="Parity.GoldenCapture"/> — but only while AutoMapper is still registered. After
-/// F1 there is nothing left to capture, and a "regenerated" golden would just be the implementation under test
-/// restating itself.
+/// The goldens are FROZEN, and there is no capture harness any more: the oracle that produced them no longer
+/// exists in any assembly, so nothing can regenerate them. A "regenerated" golden would just be the
+/// implementation under test restating itself. Edit a constant below only when the document is MEANT to
+/// change, and say why.
 /// </para>
 /// <para>
 /// No host, no database: these are pure unit tests now. That also frees them from the API holding the build

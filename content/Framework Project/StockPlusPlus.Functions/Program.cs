@@ -71,7 +71,6 @@ var host = new HostBuilder()
         services.AddMvc().AddShiftEntityWeb(x =>
         {
             x.AddDataAssembly(typeof(StockPlusPlus.Data.Marker).Assembly);
-            x.AddAutoMapper(typeof(StockPlusPlus.Data.Marker).Assembly);
             x.HashId.RegisterHashId(false);
 
             var azureStorageAccounts = new List<ShiftSoftware.ShiftEntity.Core.Services.AzureStorageOption>();
@@ -79,9 +78,6 @@ var host = new HostBuilder()
             hostBuilder.Configuration.Bind("AzureStorageAccounts", azureStorageAccounts);
 
             x.AddAzureStorage(azureStorageAccounts.ToArray());
-#if (internalShiftIdentityHosting)
-            x.AddAutoMapper(typeof(ShiftSoftware.ShiftIdentity.Data.Marker).Assembly);
-#endif
         });
 
 #if (includeSampleApp)

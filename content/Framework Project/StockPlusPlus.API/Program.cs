@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using StockPlusPlus.Data.DbContext;
 using ShiftSoftware.ShiftEntity.Web.Services;
 using ShiftSoftware.TypeAuth.AspNetCore.Extensions;
@@ -20,7 +20,6 @@ using StockPlusPlus.Shared.DTOs.Service;
 
 #if (internalShiftIdentityHosting)
 using StockPlusPlus.API.Services;
-using AutoMapper;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
 using ShiftSoftware.ShiftIdentity.Data.Entities;
@@ -101,7 +100,8 @@ builder.Services.AddAttentionHub();
 //   - ProductBrand    -> [ShiftEntityMapper] partial class (generator fills it) via options.UseMapper(...)
 //   - Country         -> zero-code source generation: CountryRepository (UseGeneratedMapper) and the
 //                        api/country-generated endpoint (UseGeneratedMapper = true)
-//   - everything else -> default AutoMapper (AutoMapperProfiles)
+// Every triple is covered by one of these. There is no global fallback to fall back TO any more: a triple
+// with no mapper throws at startup rather than mapping by convention at request time.
 
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
 builder.Services.AddHttpClient();
@@ -163,7 +163,6 @@ mvcBuilder.AddShiftEntityWeb(x =>
 {
     x.AddDataAssembly(typeof(StockPlusPlus.Data.Marker).Assembly);
     x.WrapValidationErrorResponseWithShiftEntityResponse(true);
-    x.AddAutoMapper(typeof(StockPlusPlus.Data.Marker).Assembly);
 
     x.HashId.RegisterHashId(builder.Configuration.GetValue<bool>("Settings:HashIdSettings:AcceptUnencodedIds"));
     x.HashId.RegisterIdentityHashId("one-two", 5);
@@ -174,7 +173,6 @@ mvcBuilder.AddShiftEntityWeb(x =>
 
     x.AddAzureStorage(azureStorageAccounts.ToArray());
 #if (internalShiftIdentityHosting)
-    x.AddShiftIdentityAutoMapper();
     // Lets app.MapShiftEntityEndpoints<DB>() (below) discover ShiftIdentity's own attribute-driven CRUD
     // endpoints — the entities carrying [ShiftEntitySecureEndpoint<…>] (Brand, Service, Department).
     // Their DI half is wired inside AddShiftIdentityDashboard.

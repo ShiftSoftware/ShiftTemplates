@@ -30,15 +30,14 @@ public enum ArmKind
     DiRegistered,
 
     /// <summary>
-    /// A generated mapper EXISTS in the registry, but the repository still resolves the AutoMapper fallback —
-    /// nothing wires the registry into <c>ShiftRepository</c> yet (gap B-1, fixed by Step D1). A real finding,
-    /// reported rather than failed.
+    /// A generated mapper EXISTS in the registry but the repository did not resolve it — which before Step D1
+    /// meant the triple silently ran on AutoMapper instead (gap B-1). A real finding, reported not failed.
     /// </summary>
     RegistryOnly,
 
-    /// <summary>The repository resolved <c>AutoMapperShiftEntityMapper</c> and no generated mapper exists.</summary>
-    AutoMapperFallback,
-
-    /// <summary>No mapper of any kind. Under <c>GeneratedOnly</c> this endpoint throws per request.</summary>
+    /// <summary>
+    /// No mapper of any kind. Not a per-request surprise: with no fallback left,
+    /// <c>ShiftEntityMapperValidation</c> lists every uncovered triple and fails STARTUP.
+    /// </summary>
     None,
 }

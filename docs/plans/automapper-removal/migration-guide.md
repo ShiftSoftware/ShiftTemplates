@@ -9,33 +9,42 @@ You will run it without the person who wrote it in the room, so it says *why* at
 
 ## Before you start
 
-**You do not have to do this yet.** The framework still ships `MappingMode.AutoMapperFirst` as the default,
-which is exactly today's behaviour. Nothing breaks by upgrading. When AutoMapper is finally removed from the
-framework, an opt-in compatibility package keeps un-migrated services working — so the deadline for this
-procedure is your own schedule, not the framework's release.
+**AutoMapper has been removed from the framework** (2026-08-25). There is no compatibility package and no
+fallback: a triple with no mapper now fails at **startup**, listing everything that is missing.
+
+**So the order matters.** Stay pinned to your current framework version — the last one that still carries
+AutoMapper — and do this whole procedure there, where you can still compare against the old behaviour. Upgrade
+only at the end, as step 6. Migrating and upgrading at the same time means debugging both at once with no
+oracle for either.
 
 What you need first:
 
-- The framework version that has `ShiftEntityMappingMode` (Stage D).
+- Your current framework version pinned, and your build green on it.
 - Your test suite green.
 - Ten minutes to read this.
+
+> **If you are reading this because your build just broke on an upgrade:** roll the framework version back
+> first. Nothing here is easier to do from a broken tree.
 
 ---
 
 ## The recipe
 
-### 1. Flip the mode
+### 1. Ask each repository for its generated mapper
+
+Still on your pinned version, so AutoMapper is present and every step below is reversible.
 
 ```csharp
-builder.Services.AddControllers().AddShiftEntityWeb(o =>
+public ProductRepository(DB db) : base(db, o => o.UseGeneratedMapper())
 {
-    o.MappingMode = ShiftEntityMappingMode.GeneratedFirst;
-    ...
-});
+}
 ```
 
-`GeneratedFirst` means: prefer the source-generated mapper, fall back to AutoMapper for anything the generator
-did not cover. Nothing is lost yet — this is the setting you can leave on while you work through the rest.
+Do this one repository at a time. Everything you have not converted yet still runs on AutoMapper, so the tree
+stays green throughout and each conversion is reviewable on its own.
+
+For an entity with no repository class, the generated mapper is picked up automatically once you are on the
+new framework version — nothing to write.
 
 ### 2. Build, and clear every `SHENGEN` warning
 
@@ -72,18 +81,20 @@ The divergences you should expect, because they are behaviour changes the framew
 
 Not the framework's. Yours.
 
-### 5. Flip to `GeneratedOnly`
+### 5. Delete your AutoMapper profiles
 
-```csharp
-o.MappingMode = ShiftEntityMappingMode.GeneratedOnly;
-```
+Still on the pinned version. Deleting them here, before the upgrade, is the point: if removing a profile
+changes behaviour, the differ in step 3 missed something, and you can still find out what.
 
-Now there is no fallback. Startup validation fails the app if any triple has no mapper, listing all of them at
-once — so you find out at boot with a complete list, not per-request in production.
+Delete `AddAutoMapper(...)` and the `AutoMapper` package reference in the same pass.
 
-### 6. Delete your AutoMapper profiles
+### 6. Upgrade the framework
 
-Only after step 5 is green. If deleting a profile changes anything, the differ in step 3 missed something.
+Only now. Startup validation fails the app if any triple has no mapper, listing all of them at once — so you
+find out at boot with a complete list, rather than per-request in production.
+
+If it fails, the list tells you exactly which triples you missed; each one needs a `UseGeneratedMapper()`, a
+`UseMapper(...)`, or overridden mapping methods.
 
 ---
 
@@ -137,6 +148,14 @@ them. These are documents in a partitioned store: a wrong write stamps a clean w
 
 ## If something goes wrong
 
-Set `MappingMode` back to `AutoMapperFirst`. It is one line and it is reversible at any point up to step 6.
-That is why the mode exists rather than the registry simply being wired in: a silent swap of a hand-tuned
-profile for convention output is the one change that cannot be reviewed after the fact.
+**Before step 6:** revert the repository you just converted. That is why the conversion is per-repository and
+why the upgrade is last — every step up to the upgrade is a one-line revert, with AutoMapper still installed
+and still able to answer "what did this used to return?"
+
+**After step 6:** roll the framework version back. That restores the oracle, at which point you are back in
+the reversible part of the procedure.
+
+There is deliberately no mode switch and no compatibility shim to fall back on. An earlier draft of this plan
+shipped both; they were removed because a silent swap of a hand-tuned profile for convention output is the one
+change that cannot be reviewed after the fact — and a fallback that quietly catches the triples you forgot is
+exactly that swap, just later and with nobody watching.

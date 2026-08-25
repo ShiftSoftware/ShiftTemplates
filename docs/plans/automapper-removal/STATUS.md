@@ -1,7 +1,7 @@
 # AutoMapper Removal — Status
 
-**Last updated:** 2026-08-24 — Stages A–D complete; Stage C partial (C1 second half outstanding).
-field report. Stage 0 and Stage A complete. Stage B is next.
+**Last updated:** 2026-08-25 — **AutoMapper is removed from the framework.** Stages A, B, D, E and F
+complete; Stage C partial (C1 second half outstanding, and its window has now closed — see below).
 
 **Scope:** `ShiftEntity` + `ShiftIdentity` + `ShiftTemplates` + CI. Consumer services (`ADP.*`,
 `ADP.SyncAgent`, `Menu`) are out of scope — see [`README.md`](README.md#scope--framework-only).
@@ -10,7 +10,7 @@ field report. Stage 0 and Stage A complete. Stage B is next.
 > and is the one to read and update. A mirror is kept in the private `.shift` repo
 > (`.shift/repos/shift-entity/automapper-removal/`) for cross-repo visibility; both are updated together.
 > Two passages carry more detail in the `.shift` mirror than here — Q7 and gap C-3 — because this repo is
-> public and the change they describe has not shipped yet. Everything else is identical.
+> public. Everything else is identical.
 
 Update this file as steps land. Keep it factual: what shipped, what it changed, what surprised you.
 Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-register.md) · Decisions: [`02-open-decisions.md`](02-open-decisions.md)
@@ -75,7 +75,7 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 |------|--------|-------|
 | D1 `MappingMode` + registry resolution | ✅ | `ShiftEntityMappingMode` (AutoMapperFirst / GeneratedFirst / GeneratedOnly) on `ShiftEntityOptions`; `ShiftRepository.InitCommon` now consults the registry between DI and AutoMapper, gated on the mode. `GeneratedMapperFactory` caches the ACTIVATOR, never the instance — generated mappers hold per-instance builder state, so a singleton would leak one repository's customization into every consumer of the triple. **Default unchanged, so shipping it changes nothing.** 6 acceptance tests incl. the no-options-configured host and the each-repo-gets-its-own-instance guard. |
 | D2 Attribute-endpoint default flip | ✅ | D1 already covers the runtime path — attribute endpoints with no mapper and no custom repository use the built-in `ShiftRepository`, so the registry step serves them. What D2 added is stopping the pointless AutoMapper default-map synthesis for triples the registry covers, which is the last framework path reaching for AutoMapper by default. The filter lives in the DEFERRED AutoMapper factory, not `RegisterShiftRepositories`, because the mode is only final after every `Configure` callback has run. |
-| D3 Startup validation | ✅ | `ShiftEntityMapperValidation.Validate` — one aggregate exception listing every uncovered triple, every registry conflict and every ABI-skewed mapper. Coverage accepts a DI descriptor, a registry hit, or a repository that OVERRIDES a mapping method (`DeclaringType`-based — a naive "has a MapToView?" check passes every repository and validates nothing). Runs module initializers first, each wrapped, since reflection alone does not trigger them and the registry would look empty. Uncovered triples are fatal only under `GeneratedOnly`. |
+| D3 Startup validation | ✅ | `ShiftEntityMapperValidation.Validate` — one aggregate exception listing every uncovered triple, every registry conflict and every ABI-skewed mapper. Coverage accepts a DI descriptor, a registry hit, or a repository that OVERRIDES a mapping method (`DeclaringType`-based — a naive "has a MapToView?" check passes every repository and validates nothing). Runs module initializers first, each wrapped, since reflection alone does not trigger them and the registry would look empty. ~~Uncovered triples are fatal only under `GeneratedOnly`.~~ **Superseded by F1:** `MappingMode` was deleted with the AutoMapper path, so `Validate` has no mode gate left — it is called unconditionally and an uncovered triple fails startup in every host. |
 | D4 Version-skew detection | ✅ | **Detected, not declared — nothing to version and nothing to remember.** `ShiftEntityMapperRegistry.VerifyBindings()` JIT-prepares each registered mapper's methods, which resolves their call targets; a member the mapper was compiled against and that no longer exists throws there, at startup, naming itself. Verified against a purpose-built two-assembly skew probe: `PrepareMethod` raises `MissingMethodException` without invoking anything. **Replaced an earlier hand-maintained ABI number**, which had both failure modes of a manual version — it fires on additive changes that break nothing, and stays silent whenever somebody forgets to bump it. Only `MissingMethod`/`MissingField`/`TypeLoad` are treated as skew; anything else is left alone rather than becoming a spurious startup error. |
 | D5 Registry conflict detection | ✅ | `Register` is now idempotent for the same type and deterministic for a different one — it prefers the mapper declared alongside its ENTITY, since that is the one whose generator run could see the entity's configuration. Conflicts are RECORDED, never thrown: `Register` runs in a `[ModuleInitializer]`, where an exception becomes an unreadable `TypeInitializationException`. D3 turns them into one readable startup error. |
 
@@ -94,11 +94,11 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 
 | Step | Status | Notes |
 |------|--------|-------|
-| F1 Compat package + obsoletions | ⬜ | **Load-bearing under this scope** — the landing pad for ~37 un-migrated consumer triples. Depends on framework-owned Stage E only, *not* on any consumer. Needs its own smoke project. |
-| F2 ShiftIdentity's 11 ad-hoc `Map<T>` sites | ⬜ | |
-| F3 Project template detached | ⬜ | |
+| F1 Delete the AutoMapper code path | ✅ | **Q10 answered "delete outright" — no compat package ships.** `AutoMapperShiftEntityMapper`, `DefaultAutoMapperProfile`, `AutoMapperExtensions`, `ShiftTaggingAutoMapperProfile`, `AddAutoMapper`, `AddEndpointDefaultMap` and the whole `services.AddAutoMapper(...)` composition block are gone. `ShiftRepository` resolves DI → registry → nothing. **`MappingMode` went with it** — it chose between AutoMapper and the registry, so with one side deleted its three values collapsed to one; startup validation is now unconditional. |
+| F2 ShiftIdentity's ad-hoc `Map<T>` sites | ✅ | `Mappers/UserProjections.cs` (4 explicit projections) replaces every site; `IMapper` is out of `UserRepository`, `UserEndpoints`, `UserManagerEndpoints`. **All 11 profiles deleted as dead code** — 10 were replication maps already superseded at E3, `User.cs`'s triple maps by `UseGeneratedMapper`. Two findings: one call was a `UserInfoDTO`→`UserInfoDTO` identity map, and the write direction was writing `EmailVerified`/`PhoneVerified`/`IsDeleted`/audit/PK from the request body (see gap C-3). |
+| F3 Project template detached | ✅ | Registrations removed from `API/Program.cs` and `Functions/Program.cs`; 3 profiles deleted; `ProductCategories.cs` now calls `ViewAsync` (its `opt.Items["lang"]` turned out to be read by **nothing**). The two `ProjectTo` controllers split: the SQL one uses `repository.MapToList`, the Cosmos one a hand-written `CompanyBranchProjections.ToListDTO` **verified against AutoMapper before deletion** — the check caught a real `""`-vs-`null` divergence. |
 | F4 ADP.SyncAgent | ➖ | **Out of scope** — no ShiftEntity coupling, nothing blocked by it. Recorded so the release notes say "gone from the framework", not "gone". |
-| F5 Package references + docs | ⬜ | Replication first (NU1903 reaches consumers transitively), Core last. Publish E1 as the migration guide in the same pass. |
+| F5 Package references + docs | ✅ | `ShiftEntity.Core.csproj` was the last one (replication went early at E3). `grep -rn "AutoMapper" --include=*.csproj` across all three repos now returns **nothing** — with no compat package there is no carve-out. Parity harness retired (`GoldenCapture` deleted, `ParityArms.Baseline` and `ArmKind.AutoMapperFallback` removed). `ShiftFrameworkDocs` rewritten; `auto-mapper-profiles.md` → `mappers.md` + nav. **The docs pass MISSED two pages**, because it grepped for the literal string `AutoMapper` and neither page contains it: `project-setup/data-project/repositories.md` (said `IMapper`, and taught a repository constructor that no longer compiles) and `project-setup/data-project/dependencies.md` (said "Automapper Profiles"). Both fixed in the follow-up audit below. |
 
 ---
 
@@ -115,7 +115,7 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 | Q7 | Audit-field narrowing — note or advisory? | ✅ | **Neither — there is no narrowing.** Generated `MapToEntity` writes the audit + soft-delete members, as AutoMapper did; guards belong in the repository or an explicit `IgnoreEntity`. **Shipped 2026-08-22 for 5 of 6 — `ID` carved out** (its convention throws on the null every insert carries, and deep write would force an identity insert). Repository soft-delete guard shipped with it. Gap C-3 closed. |
 | Q8 | Richer list payloads — accept? | ❓ | *(rec: accept, then measure)* |
 | **Q9** | Ship the required-delegate compile break? | ✅ | **Yes — shipped 2026-08-24 in E3.** ADP and other consumers refactor later on their own schedule, pinned to the previous framework version until they do. |
-| **Q10** | Shipped default: `AutoMapperFirst` forever, or a flip? | ❓ | *(rec: `AutoMapperFirst` until F5, then compat-seam)* **New, from the rescope.** |
+| **Q10** | Shipped default: `AutoMapperFirst` forever, or a flip? | ✅ | **Answered 2026-08-25: delete it outright**, against the compat-package recommendation. `MappingMode` does not survive; un-migrated consumers (ADP, Menu) pin the previous framework version until they port. |
 
 **Diagnostic ids:** shipped with Stage A — `SHENGEN007` unmapped list · `008` view members never written back
 · `009` configuration cannot be baked · `010` deep write replaces tracked children. **`011` is reserved for
@@ -124,6 +124,80 @@ A11** (ambiguous case-insensitive match). Next free after that is `012`.
 ---
 
 ## Log
+
+**2026-08-25** — **Adversarial audit after Stage F: three things the stage's "done" rows did not cover.**
+
+**The framework's own public XML documentation still taught AutoMapper as the default.** About 16 `///` lines
+— across `ShiftEntityEndpointAttributes`, `ShiftEntityEndpointDiscovery`, `ShiftRepositoryOptions`,
+`ShiftTaggingServiceCollectionExtensions` and `Core/Extensions/IServiceCollectionExtensions` — described "the
+default AutoMapper map(ping)" as what an endpoint or repository gets when nothing is configured. They ship
+inside the NuGet packages and surface in IntelliSense, so they are consumer-facing documentation that F5's
+`*.csproj` grep could not see. The accurate wording is the source-generated mapper resolved via
+`ShiftEntityMapperRegistry`.
+
+**A second docs repo was missed entirely.** `ShiftFrameworkDocumentation` (the Blazor docs site) is a
+different repository from `ShiftFrameworkDocs` (mkdocs), and the Stage F docs pass covered only the latter. It
+also held **the only actual build break the removal left behind**: `Docs.API/Program.cs` still called the
+deleted `x.AddAutoMapper(...)`.
+
+**Two mkdocs pages were missed by a case-sensitive grep** — `repositories.md` (says `IMapper`) and
+`dependencies.md` (says "Automapper Profiles"); see F5 above. Grepping one spelling of the product name is not
+a sweep.
+
+**2026-08-25** — **Stage F: AutoMapper is gone from the framework.**
+
+**Q10 was answered against the plan's own recommendation** — delete outright, no compat package — and that
+reshaped the stage rather than just sizing it. F1 stopped being "ship a package" and became "delete a code
+path". F2 and F3 had to land *first*: with no fallback, nothing catches a site that still expects one, so the
+order the plan gave (F1 → F2 → F3) would have meant a broken tree in between.
+
+**Three things this stage deleted were dead before it started, which is worth recording separately from the
+work of deleting them.** All 11 ShiftIdentity profiles: ten were replication maps already superseded by
+`IdentityReplicationMappingExtensions` at E3, and `User.cs`'s triple maps by `UseGeneratedMapper`. Two of the
+three template profiles, for the same reason. And `UserEndpoints.cs:64`, which mapped `UserInfoDTO` to
+`UserInfoDTO` — an identity map through AutoMapper, copying every member onto fresh instances to no purpose.
+The Stage C inventory had already implied all of this (20 of 22 triples `Configured`); reading it as
+"Stage F is mostly deletion" up front would have been correct.
+
+**The one place the mapping was NOT already replaced was the Cosmos read path**, and it is the one that
+justified the whole parity apparatus. `CosmosCompanyBranchController` projects from a replicated document, not
+a SQL entity, so no repository and no generated mapper covers it — the profile was the only written
+description of that mapping. The hand-written replacement was compared member-by-member against AutoMapper
+*while AutoMapper still existed*, and diverged on two: AutoMapper's `long? -> string` convention yields `""`
+for a null FK, while the profile's one explicit FK map (`CityId`) yields `null`. **The same DTO ships both
+behaviours**, and no amount of reading the profile would have surfaced that — only running it did. Both are
+reproduced exactly rather than tidied up; fixing the inconsistency is a deliberate API change, not a
+side effect of dropping AutoMapper. `CosmosProjectionParityTests` froze the captured values as literals, so
+the test outlived its oracle.
+
+**`opt.Items["lang"]` needed no replacement.** The plan flagged it as a runtime-context feature `MappingContext`
+has no equivalent for, and asked for a decision. Nothing anywhere reads that item — the Function was
+demonstrating a feature no code consumed, while building a throwaway `MapperConfiguration` over the entire Data
+assembly on every request.
+
+**`MappingMode` did not survive, and should not have.** It existed to choose between AutoMapper and the
+registry so services could move one at a time. With AutoMapper deleted, `AutoMapperFirst` names a behaviour
+that no longer exists and `GeneratedFirst`/`GeneratedOnly` become the same thing. Leaving a knob with one
+position would have been worse than removing it. Startup validation, which used to hard-fail only under
+`GeneratedOnly` because the other modes had AutoMapper behind them, is now unconditional.
+
+**One deliberate behaviour change, beyond the mechanical port** — flagged here because it is the opposite of
+what Q7 decided for the *generated* mapper. The self-service profile PUT (`UpdateUserDataAsync`) used
+`Map(dto, user)`, which wrote every name that lined up: `IsDeleted`, the audit fields, the primary key, and
+`EmailVerified` / `PhoneVerified`. `ApplyProfileEdits` writes only the six fields a user may change about
+themselves. Q7 said the *mapper* maps everything and the repository guards; this is not the mapper, it is a
+single hand-written endpoint mapping, which is exactly the "unless ignored explicitly by the programmer" case.
+🔒 Detail in the `.shift` copy (gap C-3).
+
+**Verification.** ShiftEntity 480/480 · StockPlusPlus.Test 198/198 · ShiftIdentity solution, StockPlusPlus
+API / Functions / Test / Web.Tests all build clean. `grep` for AutoMapper across all three repos returns only
+comments. **Not done:** the template was not installed and `dotnet new shift` was not re-run across parameter
+combinations (skipped at the user's request), and C1's differ second half remains outstanding — its window has
+now closed with the oracle, so what it would have found on the un-migrated triples is no longer discoverable
+by that route. Nothing depended on it, since the inventory found 0 `AutoMapperFallback` triples.
+
+**Consumers.** ADP and Menu are hard-broken on upgrade and pin the previous framework version until they port.
+That is the cost the compat package existed to avoid, accepted deliberately with Q10.
 
 **2026-08-24** — **Stage E: E1 and E2 done, E3 shipped. AutoMapper is out of the replication package entirely.**
 

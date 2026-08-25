@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.Web;
@@ -20,21 +19,18 @@ public class ProductCategoryController : ShiftEntitySecureControllerAsync<Produc
     private readonly IConfiguration configuration;
     private readonly DB db;
     private readonly IDefaultDataLevelAccess defaultDataLevelAccess;
-    private readonly IMapper mapper;
 
     public ProductCategoryController(
         ProductCategoryRepository repository, 
         IConfiguration configuration, 
         DB db,
-        IDefaultDataLevelAccess defaultDataLevelAccess,
-        IMapper mapper
+        IDefaultDataLevelAccess defaultDataLevelAccess
     ) : base(StockPlusPlusActionTree.ProductCategory)
     {
         this.repository = repository;
         this.configuration = configuration;
         this.db = db;
         this.defaultDataLevelAccess = defaultDataLevelAccess;
-        this.mapper = mapper;
     }
 
     [HttpGet("custom-list")]
@@ -48,8 +44,10 @@ public class ProductCategoryController : ShiftEntitySecureControllerAsync<Produc
             )
             .ApplyGlobalRepositoryFiltersAsync(this.repository.ShiftRepositoryOptions.GlobalRepositoryFilters);
 
-        var result = await mapper
-            .ProjectTo<ProductCategoryListDTO>(query)
+        // The repository's own list projection — the source-generated one it uses for api/productcategory —
+        // rather than a second, separately-maintained description of the same shape.
+        var result = await this.repository
+            .MapToList(query)
             .ToOdataDTO(oDataQueryOptions, this.Request);
 
         return Ok(result);

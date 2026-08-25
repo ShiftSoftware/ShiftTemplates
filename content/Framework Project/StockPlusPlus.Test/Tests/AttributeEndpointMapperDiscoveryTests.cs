@@ -11,8 +11,8 @@ namespace StockPlusPlus.Test.Tests;
 /// Verifies the <c>…EndpointWithMapper&lt;…, TMapper&gt;</c> attribute at the discovery + DI-registration
 /// level. These tests need NO database (no WebApplicationFactory / EnsureCreated), so they exercise the
 /// mapper wiring even where the app's SQL-Server-2025 (native json) schema can't be created. The end-to-end
-/// runtime behaviour (the built-in repository preferring the mapper over AutoMapper) is covered by
-/// <see cref="AttributeEndpointTests"/>, which run against the live test database.
+/// runtime behaviour (the built-in repository preferring the attribute's mapper over the generated one) is
+/// covered by <see cref="AttributeEndpointTests"/>, which run against the live test database.
 /// </summary>
 public class AttributeEndpointMapperDiscoveryTests
 {
@@ -33,16 +33,16 @@ public class AttributeEndpointMapperDiscoveryTests
         Assert.Equal(typeof(CountryMappedDTO), mapped.ViewDto);
     }
 
-    // The plain (no trailing generic) "api/country" endpoint stays on the built-in repository + AutoMapper:
-    // neither a repository nor a mapper is attached.
+    // The plain (no trailing generic) "api/country" endpoint attaches neither a repository nor a mapper: it
+    // stays on the built-in repository, which resolves the source-generated mapper for the triple itself.
     [Fact]
     public void Discover_PlainEndpoint_HasNeitherRepositoryNorMapper()
     {
         var specs = ShiftEntityEndpointDiscovery.Discover(new[] { DataAssembly });
 
-        var auto = specs.Single(s => s.Route == "api/country");
-        Assert.Null(auto.Mapper);
-        Assert.Null(auto.Repository);
+        var plain = specs.Single(s => s.Route == "api/country");
+        Assert.Null(plain.Mapper);
+        Assert.Null(plain.Repository);
     }
 
     // RegisterShiftRepositories registers the attribute's mapper as IShiftEntityMapper<Entity, List, View>,
@@ -63,10 +63,11 @@ public class AttributeEndpointMapperDiscoveryTests
         Assert.IsType<CountryMapper>(mapper);
     }
 
-    // The distinct-DTO isolation: no mapper is registered for the AutoMapper endpoint's (Country, CountryDTO)
-    // triple, so the built-in repository there falls back to AutoMapper.
+    // The distinct-DTO isolation: CountryMapper is keyed by CountryMappedDTO, so nothing is registered in DI
+    // for the plain endpoint's (Country, CountryDTO) triple. There is no fallback — the built-in repository
+    // resolves that triple's source-generated mapper from ShiftEntityMapperRegistry instead.
     [Fact]
-    public void RegisterShiftRepositories_DoesNotRegisterMapper_ForAutoMapperEndpoint()
+    public void RegisterShiftRepositories_DoesNotRegisterMapper_ForPlainEndpoint()
     {
         var services = new ServiceCollection();
         services.AddOptions();
@@ -116,8 +117,8 @@ public class AttributeEndpointMapperDiscoveryTests
         Assert.StartsWith("Generated_", mapper!.GetType().Name);
     }
 
-    // Setting the flag on a triple the generator never saw must fail loudly at discovery,
-    // not silently fall back to AutoMapper.
+    // Setting the flag on a triple the generator never saw must fail loudly at discovery, not leave the
+    // endpoint to quietly resolve something else.
     [Fact]
     public void Discover_UseGeneratedMapperFlag_WithoutRegisteredMapper_Throws()
     {

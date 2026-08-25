@@ -245,16 +245,33 @@ tell the consumer teams *before* the release rather than with it.
 
 ## Q10 — What ships as the default: `AutoMapperFirst` forever, or a flip?
 
-**Status:** ❓ unanswered · **Blocks:** D1, F1, F5 · **Recommendation: `AutoMapperFirst` until F5, then it stops existing**
+**Status:** ✅ **answered 2026-08-25 — delete it outright, no compat package** · **Blocked:** F1, F5 (now unblocked)
 
 `MappingMode` (D1) exists so each service can move on its own schedule. With every consumer out of scope, the
-live question becomes: what does the **framework** ship as the default, and for how long?
+live question became: what does the **framework** ship as the default, and for how long?
 
 - **Keep `AutoMapperFirst` and never delete the fallback** — then the removal never actually happens; the plan produces better diagnostics and nothing else.
 - **Flip the default to `GeneratedFirst` while consumers are un-migrated** — exactly the silent profile-for-convention swap D1 exists to prevent. Measured on the first triple examined, the generated `WarrantyClaim` mapper produced three regressions with zero warnings.
 
-**Recommendation:** the default stays `AutoMapperFirst` through every release up to F5. At F5 the fallback
-*moves* into the compat package rather than being deleted outright, so the shipped chain becomes
-registry → compat seam (only if you installed it) → throw. A consumer opts in with one package and one line,
-and nobody's mapper silently changes underneath them. `MappingMode` survives afterwards as the per-service
-opt-in it was designed to be.
+**The recommendation was a compat package** — move the fallback into an opt-in
+`ShiftSoftware.ShiftEntity.EFCore.AutoMapper` so the shipped chain became registry → compat seam → throw, and
+un-migrated consumers could upgrade behind one package and one line.
+
+**Answered: delete it outright.** No compat package ships. `AutoMapperShiftEntityMapper`,
+`DefaultAutoMapperProfile`, `AutoMapperExtensions`, `AddAutoMapper`, `ShiftTaggingAutoMapperProfile` and
+`AddShiftIdentityAutoMapper` are gone, and so is the `AutoMapper` package reference. The resolution chain is
+now **explicit mapper → DI → registry → throw**.
+
+**Consequences accepted with this answer, none of them incidental:**
+
+- **`MappingMode` does not survive.** It existed to choose between AutoMapper and the registry. With one side
+  deleted, `AutoMapperFirst` names a behaviour that no longer exists and `GeneratedFirst` / `GeneratedOnly`
+  become the same thing. The enum and the `ShiftEntityOptions.MappingMode` property were removed rather than
+  left as a knob with one position.
+- **Startup validation is now unconditional.** It used to hard-fail only under `GeneratedOnly`, because the
+  other modes had AutoMapper behind them to catch an uncovered triple. There is nothing behind it now, so an
+  uncovered triple is always a startup error — which is the point: the alternative is a repository that throws
+  on the first request that happens to touch it.
+- **Un-migrated consumers (ADP, Menu) are hard-broken on upgrade** and pin the previous framework version until
+  they port. That is the cost the compat package existed to avoid, accepted deliberately: it buys an end state
+  with no second mapping path to keep working, document, or explain.

@@ -1213,76 +1213,107 @@ compile.
 
 ---
 
-# Stage F — Delete
+# Stage F — Delete ✅ DONE (2026-08-25)
 
-## Step F1 — Ship the compat package and the obsoletions
+**Q10 was answered "delete it outright" rather than the compat package the plan recommended**, which reshaped
+this stage: F1 became a deletion instead of a new package, and F2/F3 had to land *first*, because once the
+fallback is gone nothing catches a site that still expects it.
+
+## Step F1 — Delete the AutoMapper code path ✅ DONE (2026-08-25)
 
 **Solves:** B-4.
 
-**What this step does.** Move `DefaultAutoMapperProfile`, `AutoMapperExtensions`, `AutoMapperShiftEntityMapper`
-and `AddAutoMapper` into an opt-in `ShiftSoftware.ShiftEntity.EFCore.AutoMapper` package, **keeping the
-original namespaces** so consumer `using`s still compile. No `[TypeForwardedTo]` — that would keep Core's
-reference. Add a non-generic Core seam (`IShiftEntityFallbackMapperFactory`) consulted **after** the registry.
+**What shipped.** Deleted outright, per Q10: `DefaultAutoMapperProfile`, `Extensions/AutoMapperExtensions.cs`,
+`AutoMapperShiftEntityMapper`, `Tagging/ShiftTaggingAutoMapperProfile`, `ShiftEntityOptions.AddAutoMapper`,
+`AddEndpointDefaultMap` / `EndpointDefaultMaps`, and the whole `services.AddAutoMapper(...)` composition block
+in `ShiftEntity.Core/Extensions/IServiceCollectionExtensions.cs` (with its `HasGeneratedMapper` and
+`GetConfiguredPairs` helpers). `AddShiftIdentityAutoMapper()` was removed rather than shipped
+`[Obsolete(error: true)]` — with no compat package to point at, the obsoletion message would have had no
+replacement to name.
 
-**Critical:** the compat package must **not** register `IShiftEntityMapper<,,>` open-generically. MS.DI
-resolves a closed request against both descriptors and the last one wins, so
-`AddShiftEntityAutoMapperCompat()` called after `AddShiftEntity` would silently replace every closed endpoint
-mapper registered at `IServiceCollectionExtensions.cs:221`.
+`ShiftRepository.InitCommon` lost its third branch; resolution is now DI → registry → nothing.
 
-Keep `AddDataAssembly` — it has a second consumer (endpoint discovery).
+**`MappingMode` went with it.** It existed to pick between AutoMapper and the registry, so with one side gone
+`AutoMapperFirst` named a behaviour that no longer exists and the other two values collapsed into each other.
+`ShiftEntityMappingMode` and `ShiftEntityOptions.MappingMode` are deleted; `ShiftEntityMapperValidation.Validate`
+lost its `mode` parameter and now hard-fails on an uncovered triple unconditionally.
 
-Ship `AddShiftIdentityAutoMapper()` as `[Obsolete(error: true)]` for one release with a message naming the
-replacement. **Never as a silent no-op** — that is the one option that lets a host compile while its
-replication mapping quietly vanishes.
+**No compat smoke project was added** — that deliverable belonged to the compat package, which is not shipping.
 
-**Add a compat smoke project to the framework test suite:** register an old-style `Profile` plus
-`AddShiftEntityAutoMapperCompat()`, resolve a mapper through the seam, assert it maps. Without it, the one
-deliverable every out-of-scope consumer depends on is the only thing CI never exercises.
+`AddDataAssembly` was kept, as planned: endpoint discovery is its second consumer.
 
-**Depends on.** Stage E complete for **framework-owned code** — not for any consumer. Under this scope,
-waiting for "all services" would mean never shipping. This package is what makes framework-only removal
-possible at all: it is the difference between *"consumers migrate when they can"* and *"consumers are
-stranded on an old framework version"*.
+**Tests reworked rather than deleted**, since each was pinning a property that still holds in a different
+shape: `MappingModeResolutionTests` → `MapperResolutionTests` (the two `AutoMapperFirst` cases replaced by one
+asserting an uncovered triple resolves nothing and throws on use); `MappingModeTests` →
+`MapperRegistryTests` (registry round-trip, conflicts, `VerifyBindings` — only the default-mode fact dropped).
 
 ---
 
-## Step F2 — Port ShiftIdentity's 11 ad-hoc `Map<T>` sites
+## Step F2 — Port ShiftIdentity's ad-hoc `Map<T>` sites ✅ DONE (2026-08-25)
 
 **Solves:** the ShiftIdentity half of B-4.
 
-**Problem.** 11 ad-hoc `IMapper.Map<T>` sites in the User flows, plus `IMapper` as a public constructor
-parameter of the shipped `UserRepository`. `UserDataDTO` / `UserInfoDTO` are not any triple's DTOs, and
-`UserEndpoints.cs:153` maps an in-memory `IEnumerable`, which `MapToList(IQueryable)` cannot serve. Hard
-compile break in three files.
+**What shipped.** `ShiftIdentity.Data/Mappers/UserProjections.cs` — four explicit projections (`ToListDTO`,
+`ToInfoDTO`, `ToDataDTO`, `ApplyProfileEdits`) covering every ad-hoc site. `IMapper` is gone from
+`UserRepository`'s constructor, from `UserEndpoints` and from `UserManagerEndpoints`.
 
-**What this step does.** Two `[ShiftEntityMapper] partial class : IShiftObjectMapper<User, X>` pairs cover 10
-of 11 — `MapBack(dto, existing, ctx)` is an exact match for `Map(dto, user)` at `UserRepository.cs:196`.
-Route `UserEndpoints.cs:153` through the repository's generated list mapper. `UserEndpoints.cs:64` is a no-op
-identity map — delete it.
+The plan expected `[ShiftEntityMapper]` pair classes. Hand-written won: `UserInfoDTO` and `UserDataDTO` are not
+any repository triple's DTOs, `UserEndpoints.cs:153` maps an in-memory `IEnumerable` that
+`MapToList(IQueryable)` cannot serve, and the write direction needed a member-by-member decision the generator
+would have made by convention (see below).
 
-**Two behavior notes to release-note:**
-- `UserInfoDTO : UserListDTO`, but AutoMapper does **not** inherit `ForMember` without `IncludeBase`, so four members are convention-default today (all provably empty: navigations unloaded, `AccessTrees` ctor-initialized, no `TotpEnabled` on the entity). A pair mapper will populate them — a wire change on four endpoints.
-- `UserDataDTO.Signature` (`List<ShiftFileDTO>?`) ↔ `User.Signature` (`string?`) depends on a global `ITypeConverter` invisible in ShiftIdentity's own source. The generator bakes both directions (`:928-930`, `:1133-1134`) with byte-compatible helpers.
+**Two findings the port surfaced, both worth reading as results rather than notes:**
 
-**Depends on.** F1.
+- **`UserEndpoints.cs:64` was mapping `UserInfoDTO` to `UserInfoDTO`.** `AssignRandomPasswords` already returns
+  `UserInfoDTO` — it is the only thing that knows the generated plaintext password — so the call copied every
+  member onto fresh instances to no purpose. Deleted, as the plan predicted.
+
+- **The write direction was writing members no caller intended to expose.** `Map(dto, user)` on the
+  self-service profile PUT wrote every name that lined up: `IsDeleted`, the audit fields, the primary key, and
+  `EmailVerified` / `PhoneVerified`. `ApplyProfileEdits` writes only `Username`, `Email`, `Phone`, `FullName`,
+  `BirthDate` and `Signature`. **This is a deliberate behaviour change, not a faithful port** — see gap C-3.
+
+**All 11 AutoMapper profiles in `ShiftIdentity.Data/AutoMapperProfiles/` were deleted as dead code.** Ten were
+purely replication maps already superseded by `IdentityReplicationMappingExtensions` (every `To*Model()` exists
+and every `Replicate` call site passes one, since E3); `User.cs`'s triple maps were superseded by the
+repository's `UseGeneratedMapper`.
 
 ---
 
-## Step F3 — Detach the project template from AutoMapper
+## Step F3 — Detach the project template from AutoMapper ✅ DONE (2026-08-25)
 
 **Solves:** B-6.
 
-**What this step does.** `StockPlusPlus.API/Program.cs:166` calls `AddAutoMapper` **outside every `#if`**, so
-it ships in every generated project — including `includeSampleApp=false`, which strips the whole
-`AutoMapperProfiles/` folder that call exists to scan. Same in `StockPlusPlus.Functions/Program.cs:74`, `:83`.
-`StockPlusPlus.Functions/Functions/ProductCategories.cs:45` hand-constructs `MapperConfiguration` +
-`DefaultAutoMapperProfile` and uses `opt.Items`, a per-call runtime-context feature `MappingContext` has no
-equivalent for — decide whether to add one or restructure that Function. An OData controller in the template
-also serves a list via `ProjectTo` outside the repository; route it through the repository instead.
+**What shipped.** `AddAutoMapper` and `AddShiftIdentityAutoMapper` removed from
+`StockPlusPlus.API/Program.cs`; both `AddAutoMapper` calls removed from `StockPlusPlus.Functions/Program.cs`
+(leaving an empty `#if (internalShiftIdentityHosting)` block, also removed). The three template profiles in
+`StockPlusPlus.Data/AutoMapperProfiles/` are deleted, along with the folder's stale entries in
+`ShiftTemplates.csproj` and in `template.json`'s `includeSampleApp=false` exclusion list.
 
-**Depends on.** F1, and B2 (item template) already landed.
+**`ProductCategories.cs` needed no `MappingContext` equivalent.** The plan flagged `opt.Items["lang"] = "en"`
+as a runtime-context feature with no counterpart and asked for a decision. There was nothing to decide:
+**nothing anywhere reads that item.** The Function also built a throwaway `MapperConfiguration` over the entire
+Data assembly on every request. Both are replaced by `productCategoryRepository.ViewAsync(productCategory)`.
 
-**Done when.** `dotnet new shift` builds in all parameter combinations with no AutoMapper reference.
+**The two `ProjectTo` controllers took different routes**, because they are different problems:
+
+- `ProductCategoryController.CustomList` projects from a SQL entity, so it now calls
+  `this.repository.MapToList(query)` — the same source-generated projection `api/productcategory` uses, rather
+  than a second description of the same shape.
+- `CosmosCompanyBranchController` projects from a **replicated Cosmos document**, which no repository and no
+  generated mapper covers. It now uses a hand-written queryable projection,
+  `StockPlusPlus.Data/Projections/CompanyBranchProjections.ToListDTO`.
+
+**That projection was verified against AutoMapper before AutoMapper was deleted, and the check paid for
+itself.** A first attempt diverged on two members: AutoMapper's `long? -> string` convention yields `""` for a
+null FK, while the profile's one *explicit* FK map (`CityId`) yields `null`. The same DTO ships both
+behaviours. Parity was the job, so both are reproduced exactly and commented as the API-visible inconsistency
+they are. `CosmosProjectionParityTests` pins it; its expectations were captured from the running profile and
+frozen as literals, so the test outlived its oracle.
+
+**Done when.** ✅ `StockPlusPlus.API`, `.Functions`, `.Test` and `.Web.Tests` all build with no AutoMapper
+reference. (The template was not installed and `dotnet new shift` was not re-run across parameter
+combinations — the user asked for the template install to be skipped.)
 
 ---
 
@@ -1304,25 +1335,29 @@ are already `<Compile Remove>`d — dead text, not surface. Deleting is very lik
 
 ---
 
-## Step F5 — Delete the package references, and the docs pass
+## Step F5 — Delete the package references, and the docs pass ✅ DONE (2026-08-25)
 
-**What this step does.** Remove `PackageReference Include="AutoMapper"` from
-`ShiftEntity.CosmosDbReplication.csproj:36` **first**, then `ShiftEntity.Core.csproj:33` **last** — the
-framework propagates AutoMapper 14.0.0's NU1903 advisory transitively into every consumer build, including
-the consumers this plan does not migrate and who cannot drop it themselves, so it should stop doing that as
-early as possible.
+**What shipped.** `ShiftEntity.CosmosDbReplication.csproj` lost its reference early, as a by-product of E3.
+`ShiftEntity.Core.csproj:33` — the last one — went here. `grep -rn "AutoMapper" --include=*.csproj` over
+`ShiftEntity`, `ShiftIdentity` and `ShiftTemplates` now returns nothing at all; with no compat package there is
+no carve-out to explain.
 
-Rewrite the 9 docs pages that reference AutoMapper, including the dedicated
-`data-project/auto-mapper-profiles.md` — until that page changes, template users keep writing profiles.
+**The test-side parity harness was retired in the same pass**, because it was built around AutoMapper as the
+oracle: `Tests/Parity/GoldenCapture.cs` deleted (its own docstring said to delete it here),
+`ParityArms.Baseline` and `IsAutoMapperBacked` removed, and `ArmKind.AutoMapperFallback` deleted — that arm is
+now unreachable rather than merely detected, which is the outcome `TripleInventoryTests` existed to drive
+toward. The inventory itself survives, still failing on `ArmKind.None`.
 
-**Optional, and explicitly last:** `MapOnto(source, existing, ctx)` codegen for replication pairs
-(gap D-3). It is not on the critical path — the delegate form already covers every live case.
+**Docs pass done** across all 9 pages in `ShiftFrameworkDocs`. `data-project/auto-mapper-profiles.md` is
+replaced by `data-project/mappers.md` (source generation first, then fluent customisation, then a named
+`[ShiftEntityMapper]` class, then hand-written), the `mkdocs.yml` nav entry is renamed, the
+`AutoMapperProfiles` folder is renamed to `Mappers` in eight directory trees, and the registration calls are
+gone from the two API setup pages.
 
-**Depends on.** Everything.
+**Not done, and explicitly still optional:** `MapOnto(source, existing, ctx)` codegen for replication pairs
+(gap D-3). Not on the critical path — the delegate form covers every live case.
 
-**Publish Step E1 as the downstream migration guide** in the same pass, together with the compat package's
-install instructions and the Q9 release note. This is the deliverable the out-of-scope services are waiting on.
+**Publish Step E1 as the downstream migration guide.** `migration-guide.md` is updated with the Q10 outcome;
+publishing it to the docs site is a distribution step, not a code one, and is left to whoever cuts the release.
 
-**Done when.** `grep -rn "AutoMapper" --include=*.csproj` over `ShiftEntity`, `ShiftIdentity` and
-`ShiftTemplates` returns nothing outside the compat package. Consumer repos will still match — by design,
-and that is exactly what the compat package is for.
+---

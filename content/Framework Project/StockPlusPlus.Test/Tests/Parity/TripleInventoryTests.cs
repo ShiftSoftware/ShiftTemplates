@@ -9,16 +9,18 @@ namespace StockPlusPlus.Test.Tests.Parity;
 /// <summary>
 /// Step C1, first half: establish WHAT there is to compare, and prove the comparison would not be vacuous.
 /// <para>
-/// The parity differ's whole value rests on one fact that is easy to get wrong and impossible to notice once
-/// AutoMapper is deleted: <c>ShiftRepository</c> falls back to wrapping the registered <c>IMapper</c> when
-/// nothing else is configured, so a differ can compare AutoMapper against AutoMapper and report perfect parity
-/// having measured nothing at all. These tests print the arm every triple actually resolves, so "what did this
-/// run measure?" is answerable by reading output rather than by reading code.
+/// The parity differ's whole value rested on one fact that was easy to get wrong and impossible to notice
+/// once AutoMapper was deleted: <c>ShiftRepository</c> used to fall back to wrapping the registered
+/// <c>IMapper</c> when nothing else was configured, so a differ could compare AutoMapper against AutoMapper
+/// and report perfect parity having measured nothing at all. That fallback is gone. These tests print the arm
+/// every triple actually resolves, so "what did this run measure?" is answerable by reading output rather
+/// than by reading code.
 /// </para>
 /// <para>
 /// The inventory is independently useful even if the differ is never finished: it says which triples are
-/// migrated, which have a generated mapper that nothing resolves yet (gap B-1 / Step D1), and which have no
-/// mapper at all and would therefore throw the day the AutoMapper fallback is removed.
+/// migrated, which are reachable only through the registry (gap B-1, closed by Step D1), and which have no
+/// mapper at all — which, now that there is no fallback left, is a startup failure rather than a surprise
+/// later on.
 /// </para>
 /// </summary>
 [Collection("API Collection")]
@@ -53,18 +55,17 @@ public class TripleInventoryTests
     }
 
     /// <summary>
-    /// The inventory itself. Prints one row per triple and fails only on the case that cannot be lived with —
-    /// a triple with no mapper of any kind, which throws per request the moment the AutoMapper fallback goes.
+    /// The inventory itself. Prints one row per triple and fails on the case that cannot be lived with — a
+    /// triple with no mapper of any kind, which <c>ShiftEntityMapperValidation</c> now rejects at startup.
     /// </summary>
     [Fact]
-    public void Inventory_EveryTripleResolvesAMapper_AndTheArmIsNotAutoMapper()
+    public void Inventory_EveryTripleResolvesAMapper()
     {
         using var scope = factory.Services.CreateScope();
 
         var rows = new List<string>();
         var counts = new Dictionary<ArmKind, int>();
         var unmapped = new List<string>();
-        var vacuous = new List<string>();
 
         foreach (var site in TripleEnumerator.All())
         {
@@ -74,38 +75,20 @@ public class TripleInventoryTests
             rows.Add($"{site.Triple,-64} {kind,-20} {arm?.Description ?? "—"}");
 
             if (kind == ArmKind.None) unmapped.Add(site.Triple.ToString());
-            if (kind == ArmKind.AutoMapperFallback) vacuous.Add(site.Triple.ToString());
         }
 
         output.WriteLine($"{TripleEnumerator.All().Count} triples\n");
         output.WriteLine(string.Join("\n", rows));
         output.WriteLine("\n" + string.Join("   ", counts.OrderBy(c => c.Key.ToString()).Select(c => $"{c.Key}={c.Value}")));
 
-        // ArmKind.RegistryOnly is NOT a failure. It is the accurate statement of gap B-1: the generated mapper
-        // exists, and nothing resolves it yet because ShiftRepository never consults the registry. Step D1 is
-        // what changes those rows to Configured — this inventory is how that progress becomes visible.
-
-        Assert.True(vacuous.Count == 0,
-            "These triples resolve AutoMapper as their 'generated' arm, so comparing them would measure the " +
-            "same object twice and pass vacuously:\n  " + string.Join("\n  ", vacuous));
+        // ArmKind.RegistryOnly is NOT a failure. It was the accurate statement of gap B-1: the generated
+        // mapper existed and nothing resolved it, because ShiftRepository did not consult the registry. Step
+        // D1 closed that — a row here now means only that this harness could not reach the repository's own
+        // mapper and read the registry directly instead.
 
         Assert.True(unmapped.Count == 0,
-            "These triples have no mapper of any kind — they will throw per request once the AutoMapper " +
-            "fallback is removed:\n  " + string.Join("\n  ", unmapped));
-    }
-
-    /// <summary>
-    /// The baseline arm exists and is the host's own. If this cannot resolve, the oracle is already gone and
-    /// every parity assertion downstream is re-deriving its expectation from the code under test.
-    /// </summary>
-    [Fact]
-    public void Baseline_ResolvesTheHostsOwnAutoMapper()
-    {
-        using var scope = factory.Services.CreateScope();
-
-        var baseline = ParityArms.Baseline(scope);
-
-        Assert.NotNull(baseline);
+            "These triples have no mapper of any kind — ShiftEntityMapperValidation fails startup on " +
+            "them:\n  " + string.Join("\n  ", unmapped));
     }
 
     /// <summary>

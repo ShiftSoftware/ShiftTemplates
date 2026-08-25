@@ -1,4 +1,3 @@
-using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
@@ -110,7 +109,7 @@ public class AttributeEndpointTests
     }
 
     // The interface is keyed by DTO triple: Country does NOT implement it for the CountryDTO triple, so that
-    // endpoint's built-in repository is untouched (still the plain AutoMapper mapping).
+    // endpoint's built-in repository is untouched (still the plain generated mapping).
     [Fact]
     public void AttributeEndpoint_EntityInterface_DoesNotLeakToOtherTriples()
     {
@@ -123,15 +122,24 @@ public class AttributeEndpointTests
         Assert.Equal("Testland", dto.Name);   // no suffix — the config didn't apply to this triple
     }
 
-    // The default Country -> CountryDTO map is synthesized from the attribute (no repository class and
-    // no custom profile exist for Country), so the repository's ViewAsync/AutoMapper path works.
+    // An attribute-driven endpoint maps without anyone writing a mapper: Country has no repository class and
+    // no hand-written mapper for this triple, so the built-in repository resolves the SOURCE-GENERATED one out
+    // of ShiftEntityMapperRegistry.
+    //
+    // This used to assert the same thing about a default AutoMapper map synthesized from the attribute. That
+    // synthesis is gone along with AutoMapper, and the property worth keeping is the one a user would notice:
+    // the endpoint maps, and nobody had to write the mapping.
     [Fact]
-    public void AttributeEndpoint_SynthesizesDefaultMap()
+    public void AttributeEndpoint_MapsWithoutAHandWrittenMapper()
     {
         using var scope = factory.Services.CreateScope();
-        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
-        var dto = mapper.Map<CountryDTO>(new Country { Name = "Testland" });
+        var repo = scope.ServiceProvider
+            .GetRequiredService<ShiftRepository<DB, Country, CountryDTO, CountryDTO>>();
+
+        Assert.NotNull(repo.ShiftRepositoryOptions.Mapper);
+
+        var dto = repo.MapToView(new Country { Name = "Testland" });
 
         Assert.NotNull(dto);
         Assert.Equal("Testland", dto.Name);
@@ -181,18 +189,22 @@ public class AttributeEndpointTests
         Assert.IsType<CountryMapper>(GetInnerMapper(repo));
     }
 
-    // Isolation: the AutoMapper endpoint (api/country, CountryDTO) is unaffected by the mapper registered
-    // for the mapped endpoint — its built-in repository still falls back to the AutoMapper-backed mapper.
-    // This is only true because the mapper endpoint uses a DISTINCT DTO (the mapper is keyed on the DTO).
+    // Isolation: the plain endpoint (api/country, CountryDTO) is unaffected by the mapper registered for the
+    // mapped endpoint — it keeps its own mapping. This is only true because the mapper endpoint uses a
+    // DISTINCT DTO; the mapper is keyed on the DTO, so sharing one would silently hand both endpoints the same
+    // mapper. That is the whole reason CountryMappedDTO exists.
     [Fact]
-    public void AttributeEndpoint_AutoMapperEndpoint_StillUsesAutoMapper()
+    public void AttributeEndpoint_PlainEndpoint_DoesNotPickUpTheOtherEndpointsMapper()
     {
         using var scope = factory.Services.CreateScope();
 
         var repo = scope.ServiceProvider
             .GetRequiredService<ShiftRepository<DB, Country, CountryDTO, CountryDTO>>();
 
-        Assert.IsType<AutoMapperShiftEntityMapper<Country, CountryDTO, CountryDTO>>(GetInnerMapper(repo));
+        var inner = GetInnerMapper(repo);
+
+        Assert.NotNull(inner);
+        Assert.IsNotType<CountryMapper>(inner);
     }
 
     // The mapper endpoint's routes are generated and served (same assertion rationale as the AutoMapper one).

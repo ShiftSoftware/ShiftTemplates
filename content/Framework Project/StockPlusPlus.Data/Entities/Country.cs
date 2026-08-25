@@ -15,12 +15,15 @@ namespace StockPlusPlus.Data.Entities;
 //
 // Three endpoints over the same table demonstrate the mapping paths (a distinct DTO per endpoint keeps
 // them isolated — mappers are keyed by the (entity, list, view) triple):
-//   - "api/country"           -> ShiftEntitySecureEndpoint: built-in repository + default AutoMapper mapping.
-//   - "api/countrymapped"     -> ShiftEntitySecureEndpointWithMapper: built-in repository but AutoMapper is
-//                                replaced by the hand-written CountryMapper.
+//   - "api/country"           -> ShiftEntitySecureEndpoint: built-in repository + the SOURCE-GENERATED
+//                                mapper. Nothing is declared for the triple, so the repository resolves the
+//                                mapping itself: options, then DI, then ShiftEntityMapperRegistry.
+//   - "api/countrymapped"     -> ShiftEntitySecureEndpointWithMapper: built-in repository, but the generated
+//                                mapping is replaced by the hand-written CountryMapper.
 //   - "api/country-generated" -> UseGeneratedMapper = true: built-in repository + the SOURCE-GENERATED
-//                                mapper the generator auto-discovers and emits for the triple — no mapper
-//                                class is declared anywhere.
+//                                mapper the generator auto-discovers and emits for the triple, pinned at the
+//                                attribute so discovery fails loudly if the generator never emitted one — no
+//                                mapper class is declared anywhere.
 [TemporalShiftEntity]
 [ShiftEntityKeyAndName(nameof(ID), nameof(Name))]
 [ShiftEntitySecureEndpoint<CountryDTO, CountryDTO, StockPlusPlusActionTree>("api/country", nameof(StockPlusPlusActionTree.Country))]
@@ -28,7 +31,7 @@ namespace StockPlusPlus.Data.Entities;
 [ShiftEntitySecureEndpoint<CountryGeneratedDTO, CountryGeneratedDTO, StockPlusPlusActionTree>("api/country-generated", nameof(StockPlusPlusActionTree.Country), UseGeneratedMapper = true)]
 public class Country : ShiftEntity<Country>, IEntityHasIdempotencyKey<Country>,
     // The entity-driven trio, all WITHOUT a repository class and all keyed by the DTO triple — so they apply
-    // only to the "api/country-generated" endpoint. The AutoMapper endpoint ("api/country") and the
+    // only to the "api/country-generated" endpoint. The plain endpoint ("api/country") and the
     // custom-mapper endpoint ("api/countrymapped") are untouched, because Country doesn't implement these
     // interfaces for their triples.
     //   - IConfiguresShiftRepository -> shape the built-in repository (includes, mapping, filters, …)

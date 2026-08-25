@@ -46,7 +46,6 @@
 
   <ItemGroup>
     <None Remove="content\framework project\stockplusplus.api\controllers\.keep" />
-    <None Remove="content\Framework Project\StockPlusPlus.Data\AutoMapperProfiles\.keep" />
     <None Remove="content\Framework Project\StockPlusPlus.Data\Entities\.keep" />
     <None Remove="content\Framework Project\StockPlusPlus.Data\Migrations\.keep" />
     <None Remove="content\Framework Project\StockPlusPlus.Data\ReplicationModels\.keep" />

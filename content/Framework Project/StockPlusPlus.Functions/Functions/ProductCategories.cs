@@ -1,4 +1,3 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -40,19 +39,17 @@ namespace StockPlusPlus.Functions
                 productCategory = await this.productCategoryRepository.FindAsync(productCategoryId, asOf: null, disableDefaultDataLevelAccess: false, disableGlobalFilters: false);
             }
 
-            var configuration = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile(new ShiftSoftware.ShiftEntity.Core.DefaultAutoMapperProfile(typeof(StockPlusPlus.Data.Marker).Assembly));
-            });
-
-            var mapper = new Mapper(configuration);
-
-            var item = mapper.Map<ProductCategoryDTO>(productCategory, opt => opt.Items["lang"] = "en");
+            // The repository's own view mapping (source-generated for ProductCategory). This used to build a
+            // throwaway AutoMapper over the whole Data assembly on every request, and passed it a "lang" item
+            // that no map ever read.
+            var item = productCategory is null
+                ? null
+                : await this.productCategoryRepository.ViewAsync(productCategory);
 
             return new OkObjectResult(new
             {
                 AllProducts = allProductCategories,
-                FirstProductCategory = productCategory is null ? null : item,
+                FirstProductCategory = item,
                 Lang = CultureInfo.CurrentCulture.TwoLetterISOLanguageName,
             });
         }

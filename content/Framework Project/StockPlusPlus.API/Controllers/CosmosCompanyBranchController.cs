@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Azure.Cosmos;
 using ShiftSoftware.ShiftEntity.Core;
@@ -9,6 +8,7 @@ using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.ShiftIdentity.Core.DTOs.CompanyBranch;
 using ShiftSoftware.TypeAuth.AspNetCore;
 using ShiftSoftware.TypeAuth.Core;
+using StockPlusPlus.Data.Projections;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,13 +20,11 @@ public class CosmosCompanyBranchController : ControllerBase
 {
     private readonly CosmosClient client;
     private readonly IDefaultDataLevelAccess defaultDataLevelAccess;
-    private readonly IMapper mapper;
 
-    public CosmosCompanyBranchController(CosmosClient client, IDefaultDataLevelAccess defaultDataLevelAccess, IMapper mapper)
+    public CosmosCompanyBranchController(CosmosClient client, IDefaultDataLevelAccess defaultDataLevelAccess)
     {
         this.client = client;
         this.defaultDataLevelAccess = defaultDataLevelAccess;
-        this.mapper = mapper;
     }
 
     [HttpGet]
@@ -43,8 +41,10 @@ public class CosmosCompanyBranchController : ControllerBase
             .ApplyDefaultCompanyFilter(defaultDataLevelAccess)
             .ApplyDefaultBranchFilter(defaultDataLevelAccess);
 
-        var result = await mapper
-            .ProjectTo<CompanyBranchListDTO>(query)
+        // Cosmos documents are not SQL entities, so there is no repository (and no generated mapper) behind
+        // this shape — the projection is written out explicitly and pinned by CosmosProjectionParityTests.
+        var result = await query
+            .Select(CompanyBranchProjections.ToListDTO)
             .ToOdataDTO(oDataQueryOptions, Request, false);
 
         return Ok(result);
