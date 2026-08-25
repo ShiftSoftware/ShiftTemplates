@@ -1,7 +1,8 @@
 # AutoMapper Removal — Status
 
-**Last updated:** 2026-08-25 — **AutoMapper is removed from the framework.** Stages A, B, D, E and F
-complete; Stage C partial (C1 second half outstanding, and its window has now closed — see below).
+**Last updated:** 2026-08-25 — **AutoMapper is removed from the framework.** Stages D, E and F complete;
+Stages A and B substantially complete — **A10 and B2 are still open**, see their rows; Stage C partial (C1
+second half outstanding, and its window has now closed — see below).
 
 **Scope:** `ShiftEntity` + `ShiftIdentity` + `ShiftTemplates` + CI. Consumer services (`ADP.*`,
 `ADP.SyncAgent`, `Menu`) are out of scope — see [`README.md`](README.md#scope--framework-only).

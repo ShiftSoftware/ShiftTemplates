@@ -101,7 +101,7 @@ The removal of AutoMapper (completed 2026-08-25 — an explicit or generated map
 
 **When any AutoMapper-removal work lands — in this repo or in ShiftEntity, ShiftIdentity or ADP — update [`docs/plans/automapper-removal/STATUS.md`](docs/plans/automapper-removal/STATUS.md) here, and mirror the same edit into the `.shift` copy.** Keep both in step; never update only one.
 
-Two passages (Q7 and gap C-3) are deliberately fuller in the `.shift` mirror than in this public copy, because they describe a security narrowing that has not shipped. Keep reproduction detail out of this repo until it does.
+Two passages (Q7 and gap C-3) are deliberately fuller in the `.shift` mirror than in this public copy: they carry the reproduction detail behind gap C-3. **That narrowing shipped on 2026-08-25 with Stage F2**, so "keep it out until it does" no longer applies as written — consumers upgrade on their own schedule, so the reproduction stays private regardless. The deliberate exception is exactly two files, `00-gap-register.md` and `02-open-decisions.md`: never sync those between the two locations. `STATUS.md` and everything else in the folder are kept **byte-identical**.
 
 Sample mapping strategies (one per entity — the repository picks via `ShiftRepositoryOptions`). A repository that configures nothing resolves in this order, with no further fallback: a mapper set on the options (`UseMapper`/`UseGeneratedMapper`) → an `IShiftEntityMapper<E,L,V>` registered in DI → the source-generated mapper from `ShiftEntityMapperRegistry` → nothing, and then the mapping methods throw. A triple nothing covers is a **startup** error (`ShiftEntityMapperValidation`, called unconditionally), not a request-time surprise. See the planning doc for the full inventory and rationale:
 - **Product** — overrides `MapToView`/`MapToEntity`/`MapToList` in `Repositories/ProductRepository.cs`.
@@ -123,7 +123,7 @@ Attribute-driven endpoints can also take a mapper (iteration §20 in the plannin
 Key files in ShiftEntity (sibling repo):
 - `ShiftEntity.Core/IShiftEntityMapper.cs` — the interface (4 methods: MapToView, MapToEntity, MapToList, CopyEntity)
 - `ShiftEntity.Core/MappingHelpers.cs` — helpers to reduce manual mapping boilerplate (audit fields, FK ↔ ShiftEntitySelectDTO, ShallowCopyTo)
-- `ShiftEntity.EFCore/ShiftRepository.cs` — unified on single `entityMapper` path, ReloadAfterSave handled inline
+- `ShiftEntity.EFCore/ShiftRepository.cs` — unified on a single mapper field (`innerMapper`, resolved in `InitCommon`), ReloadAfterSave handled inline
 
 ### Build-time baked mapping (2026-07-14)
 
