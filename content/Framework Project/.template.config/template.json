@@ -61,8 +61,6 @@
         "**/StockPlusPlus.Data/Migrations/*.cs",
         "ShiftTemplates.Builder",
         "TestProject",
-        "StockPlusPlus.WebComponents/**/*",
-        "StockPlusPlus.Store/**/*",
         "StockPlusPlus.Web.Tests/**/*"
       ],
       "modifiers": [
