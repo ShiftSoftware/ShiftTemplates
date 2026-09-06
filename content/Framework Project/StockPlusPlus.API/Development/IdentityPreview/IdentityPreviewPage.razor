@@ -1,0 +1,27 @@
+@page "/"
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using MudBlazor
+@using ShiftSoftware.ShiftIdentity.Core.Authentication
+@using ShiftSoftware.ShiftIdentity.Blazor.Services
+@using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Pages.Auth
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@namespace StockPlusPlus.API.Development.IdentityPreview
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <title>StockPlusPlus authentication preview</title>
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link href="_content/ShiftSoftware.ShiftBlazor/main.css" rel="stylesheet" />
+</head>
+<body style="background:#f3f6f9;font-family:Arial,sans-serif">
+    <IdentityPreviewPanel @rendermode="@(new InteractiveServerRenderMode(prerender: false))" />
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script src="_content/ShiftSoftware.ShiftBlazor/main.js"></script>
+    <script src="_framework/blazor.web.js"></script>
+</body>
+</html>

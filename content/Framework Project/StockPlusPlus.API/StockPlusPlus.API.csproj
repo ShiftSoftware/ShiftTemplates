@@ -10,6 +10,25 @@
 		<UserSecretsId>9424fe73-f4dd-4d92-a137-deea3d0f1c46</UserSecretsId>
 	</PropertyGroup>
 
+	<!--#if shiftFrameworkDevelopmentMode-->
+	<PropertyGroup Condition="'$(IdentityAdmissionPreview)' == 'true'">
+		<DefineConstants>$(DefineConstants);IDENTITY_ADMISSION_PREVIEW</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup Condition="'$(IdentityAdmissionPreview)' == 'true'">
+		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Tests\ShiftIdentity.Tests.csproj" />
+	</ItemGroup>
+	<Target Name="ValidateIdentityPreviewBuild" BeforeTargets="PrepareForBuild" Condition="'$(IdentityAdmissionPreview)' == 'true'">
+		<Error Condition="'$(Configuration)' != 'Debug' Or '$(ImportShiftFrameworkProjects)' != 'true'" Text="IdentityAdmissionPreview requires a local framework Debug build. It must not be published." />
+	</Target>
+	<Target Name="RefuseIdentityPreviewPublication" BeforeTargets="Publish;Pack" Condition="'$(IdentityAdmissionPreview)' == 'true'">
+		<Error Text="The disposable identity preview cannot be published or packed." />
+	</Target>
+	<!--#endif -->
+	<ItemGroup Condition="'$(IdentityAdmissionPreview)' != 'true'">
+		<RazorComponent Remove="Development\IdentityPreview\**\*.razor" />
+		<Content Remove="Development\IdentityPreview\**\*.razor" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.10" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.10">

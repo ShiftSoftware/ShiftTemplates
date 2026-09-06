@@ -27,6 +27,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\StockPlusPlus.API\StockPlusPlus.API.csproj" />
 		<!--#if shiftFrameworkDevelopmentMode-->
+		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Tests\ShiftIdentity.Tests.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Tests\ShiftIdentity.Tests.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools.csproj" Condition="Exists('..\..\..\..\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<!--#endif -->
 	</ItemGroup>

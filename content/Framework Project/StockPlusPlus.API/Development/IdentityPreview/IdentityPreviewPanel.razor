@@ -1,0 +1,86 @@
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using MudBlazor
+@using ShiftSoftware.ShiftIdentity.Core.Authentication
+@using ShiftSoftware.ShiftIdentity.Blazor.Services
+@using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Pages.Auth
+@namespace StockPlusPlus.API.Development.IdentityPreview
+@inject IdentityPreviewState Preview
+@inject AuthenticationFlow Flow
+@inject PreviewIdentityStore Store
+@inject Microsoft.Extensions.Hosting.IHostApplicationLifetime Lifetime
+@implements IDisposable
+
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<main style="max-width:1100px;margin:32px auto;padding:0 20px">
+    <h1 style="font-size:28px;margin-bottom:12px">StockPlusPlus authentication preview</h1>
+    <MudAlert Severity="Severity.Info">Local synthetic accounts · disposable SQL · isolated session storage</MudAlert>
+    <p style="margin:16px 0">Enter one of these accounts in the shared login form. All use password <strong>@Preview.Password</strong>.</p>
+    <ul>
+        @foreach (var account in IdentityPreviewState.Accounts)
+        {
+            <li><strong>@account.Username</strong> — @account.Label</li>
+        }
+    </ul>
+    <p style="margin:16px 0">
+        Current synthetic MFA code: <strong data-testid="synthetic-code">@currentCode</strong>
+        <span> (@seconds seconds left)</span>
+        <MudButton OnClick="RefreshCode" Variant="Variant.Outlined" Size="Size.Small">Refresh code</MudButton>
+    </p>
+    <p>Try a wrong code first, then the current code. Each authenticator time step is accepted once; wait for the next code before a second successful MFA login.</p>
+    @if (issued is not null)
+    {
+        <MudAlert Severity="Severity.Success" data-testid="session-issued">
+            Session issued for @issued.Session.UserData.Username. Access expires in @issued.Session.TokenLifeTimeInSeconds seconds.
+            Credentials are held only in this preview circuit.
+        </MudAlert>
+        <MudButton OnClick="Restart" Variant="Variant.Filled" Color="Color.Primary">Try another login</MudButton>
+    }
+    else
+    {
+        <LoginForm @key="formVersion" AdmissionFlow="Flow" SessionCompleted="Completed" />
+        @if (Flow.Pending is { Step: not AuthenticationStep.ExistingMfa } restricted)
+        {
+            <MudAlert Severity="Severity.Warning" data-testid="preview-restricted">
+                Restricted: @restricted.Step. This step is not implemented; no session was stored.
+            </MudAlert>
+        }
+    }
+    <hr style="margin:24px 0" />
+    <p>Sessions stay in this preview only. Stop preview shuts down the local host and removes its temporary database.</p>
+    <MudButton OnClick="Stop" Color="Color.Error" Variant="Variant.Outlined">Stop preview</MudButton>
+</main>
+
+@code {
+    private SessionIssued? issued;
+    private int formVersion;
+    private string currentCode = "";
+    private int seconds;
+    private readonly CancellationTokenSource refreshCancellation = new();
+    private void RefreshCode() { currentCode = Preview.CurrentCode; seconds = Preview.SecondsRemaining; }
+    protected override void OnInitialized() { RefreshCode(); _ = RefreshLoopAsync(); }
+    private async Task RefreshLoopAsync()
+    {
+        try
+        {
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+            while (await timer.WaitForNextTickAsync(refreshCancellation.Token))
+                await InvokeAsync(() => { RefreshCode(); StateHasChanged(); });
+        }
+        catch (OperationCanceledException) { }
+    }
+    private void Completed(SessionIssued result) { issued = result; RefreshCode(); }
+    private async Task Restart()
+    {
+        Flow.Restart();
+        await Store.RemoveTokenAsync();
+        issued = null;
+        formVersion++;
+        RefreshCode();
+    }
+    private void Stop() => Lifetime.StopApplication();
+    public void Dispose() { refreshCancellation.Cancel(); refreshCancellation.Dispose(); Flow.Restart(); }
+}

@@ -1,0 +1,41 @@
+# Only the maintained ShiftTemplates framework pipeline includes these gates.
+parameters:
+- name: identityRoot
+  type: string
+  default: $(Build.SourcesDirectory)/../ShiftIdentity
+- name: templatesRoot
+  type: string
+  default: $(Build.SourcesDirectory)
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: sdk
+    version: '10.0.x'
+- pwsh: 'dotnet build "${{ parameters.templatesRoot }}/content/Framework Project/StockPlusPlus.API/StockPlusPlus.API.csproj" --configuration Debug -p:IdentityAdmissionPreview=true'
+  displayName: Build opt-in StockPlusPlus admission preview
+- pwsh: '& "${{ parameters.identityRoot }}/eng/Start-IdentitySql.ps1"'
+  displayName: Start owned identity SQL fixture
+- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Tests/ShiftIdentity.Tests.csproj" -Filter "Category=Policy|Category=Http" -Suite identity-policy-http -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
+  displayName: identity-policy-http
+  env:
+    SHIFT_IDENTITY_TEST_SQL: $(IdentitySqlConnection)
+- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Tests/ShiftIdentity.Tests.csproj" -Filter "Category=Sql" -Suite identity-sql -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
+  displayName: identity-sql
+  env:
+    SHIFT_IDENTITY_TEST_SQL: $(IdentitySqlConnection)
+- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Blazor.Tests/ShiftIdentity.Blazor.Tests.csproj" -Filter "Category=Ui" -Suite identity-ui -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
+  displayName: identity-ui
+- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.templatesRoot }}/content/Framework Project/StockPlusPlus.Test/StockPlusPlus.Test.csproj" -Filter "Category=IdentityConsumer" -Suite identity-consumer-contract -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
+  displayName: identity-consumer-contract
+  env:
+    SHIFT_IDENTITY_TEST_SQL: $(IdentitySqlConnection)
+- task: PublishTestResults@2
+  condition: always()
+  inputs:
+    testResultsFormat: VSTest
+    testResultsFiles: '$(Agent.TempDirectory)/identity-results/**/*.trx'
+    failTaskOnFailedTests: true
+    failTaskOnMissingResultsFile: true
+- pwsh: '& "${{ parameters.identityRoot }}/eng/Stop-IdentitySql.ps1" -Container "$(IdentitySqlContainer)"'
+  condition: always()
+  displayName: Remove owned identity SQL fixture
