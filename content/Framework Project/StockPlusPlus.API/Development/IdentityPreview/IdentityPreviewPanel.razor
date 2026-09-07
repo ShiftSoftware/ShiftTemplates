@@ -4,10 +4,14 @@
 @using ShiftSoftware.ShiftIdentity.Core.Authentication
 @using ShiftSoftware.ShiftIdentity.Blazor.Services
 @using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Pages.Auth
+@using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Pages.UserManager
+@using System.Net.Http.Json
+@using ShiftSoftware.ShiftIdentity.Core.DTOs
 @namespace StockPlusPlus.API.Development.IdentityPreview
 @inject IdentityPreviewState Preview
 @inject AuthenticationFlow Flow
 @inject PreviewIdentityStore Store
+@inject HttpClient Http
 @inject Microsoft.Extensions.Hosting.IHostApplicationLifetime Lifetime
 @implements IDisposable
 
@@ -18,7 +22,7 @@
 <main style="max-width:1100px;margin:32px auto;padding:0 20px">
     <h1 style="font-size:28px;margin-bottom:12px">StockPlusPlus authentication preview</h1>
     <MudAlert Severity="Severity.Info">Local synthetic accounts · disposable SQL · isolated session storage</MudAlert>
-    <p style="margin:16px 0">Enter one of these accounts in the shared login form. All use password <strong>@Preview.Password</strong>.</p>
+    <p style="margin:16px 0">Initial password for every account: <strong>@Preview.Password</strong>. Your chosen replacement remains in this disposable database until the preview stops.</p>
     <ul>
         @foreach (var account in IdentityPreviewState.Accounts)
         {
@@ -30,24 +34,39 @@
         <span> (@seconds seconds left)</span>
         <MudButton OnClick="RefreshCode" Variant="Variant.Outlined" Size="Size.Small">Refresh code</MudButton>
     </p>
-    <p>Try a wrong code first, then the current code. Each authenticator time step is accepted once; wait for the next code before a second successful MFA login.</p>
-    @if (issued is not null)
+    <p>Sign in with preview-basic or preview-mfa, then choose Change password. The required accounts start that step during login. Try an incorrect current password, a short new password, a wrong code, or Start again. Each MFA code can be accepted once per account; wait for the next code after sign-in.</p>
+    @if (changing)
+    {
+        <ChangePasswordForm AdmissionFlow="Flow" AdmissionCompleted="PasswordCompleted" />
+        <MudButton OnClick="CancelChange" Variant="Variant.Outlined">Cancel password change</MudButton>
+    }
+    else if (issued is not null)
     {
         <MudAlert Severity="Severity.Success" data-testid="session-issued">
             Session issued for @issued.Session.UserData.Username. Access expires in @issued.Session.TokenLifeTimeInSeconds seconds.
             Credentials are held only in this preview circuit.
         </MudAlert>
+        <MudButton OnClick="StartChange" Variant="Variant.Outlined" Color="Color.Primary">Change password</MudButton>
+        <MudButton OnClick="RenewCurrent" Variant="Variant.Outlined" Disabled="renewing">Renew current session</MudButton>
         <MudButton OnClick="Restart" Variant="Variant.Filled" Color="Color.Primary">Try another login</MudButton>
     }
     else
     {
         <LoginForm @key="formVersion" AdmissionFlow="Flow" SessionCompleted="Completed" />
-        @if (Flow.Pending is { Step: not AuthenticationStep.ExistingMfa } restricted)
+        @if (Flow.Pending is { Handle: null } restricted)
         {
             <MudAlert Severity="Severity.Warning" data-testid="preview-restricted">
-                Restricted: @restricted.Step. This step is not implemented; no session was stored.
+                Restricted: @restricted.Step. This remedy remains unavailable in the preview; no session was stored.
             </MudAlert>
         }
+    }
+    @if (previous is not null)
+    {
+        <MudButton OnClick="RenewPrevious" Variant="Variant.Outlined" Disabled="renewing">Try previous session renewal</MudButton>
+    }
+    @if (resultText is not null)
+    {
+        <MudAlert Severity="Severity.Info" data-testid="preview-result">@resultText</MudAlert>
     }
     <hr style="margin:24px 0" />
     <p>Sessions stay in this preview only. Stop preview shuts down the local host and removes its temporary database.</p>
@@ -56,6 +75,11 @@
 
 @code {
     private SessionIssued? issued;
+    private TokenDTO? previous;
+    private bool changing;
+    private bool renewing;
+    private int journeyVersion;
+    private string? resultText;
     private int formVersion;
     private string currentCode = "";
     private int seconds;
@@ -72,12 +96,73 @@
         }
         catch (OperationCanceledException) { }
     }
-    private void Completed(SessionIssued result) { issued = result; RefreshCode(); }
+    private void Completed(SessionIssued result)
+    {
+        journeyVersion++;
+        issued = result;
+        if (Flow.PasswordWasChanged) resultText = "Password changed. The initiating session uses the new security version.";
+        RefreshCode();
+    }
+    private async Task StartChange()
+    {
+        if (issued is null) return;
+        journeyVersion++;
+        previous = issued.Session;
+        var result = await Flow.BeginPasswordChangeAsync(issued.Session.Token);
+        changing = result is ChallengeRequired;
+        resultText = changing ? "Confirm your current password, then complete any MFA before choosing a new password."
+            : "The signed-in context is no longer current. Sign in again.";
+    }
+    private void PasswordCompleted(AuthOutcome result)
+    {
+        if (result is PasswordChanged { Continuation: SessionIssued session })
+        {
+            changing = false; Completed(session);
+        }
+        else if (Flow.Pending is null && result is AuthenticationRefused)
+        {
+            changing = false;
+            resultText = "The change could not be confirmed. Sign in again to check; a lost response can follow a completed change.";
+        }
+    }
+    private async Task CancelChange()
+    {
+        journeyVersion++;
+        var result = await Flow.CancelAsync(); changing = false;
+        resultText = result is OperationCancelled ? "Password-change operation cancelled."
+            : "Cancellation was not confirmed. If completion was already in progress, sign in again to check the password.";
+    }
+    private Task RenewPrevious() => Renew(previous, false);
+    private Task RenewCurrent() => Renew(issued?.Session, true);
+    private async Task Renew(TokenDTO? token, bool current)
+    {
+        if (token is null || renewing) return;
+        renewing = true;
+        var requestVersion = journeyVersion;
+        try
+        {
+            using var response = await Http.PostAsJsonAsync("api/identity/v2/refresh", new RenewSessionRequest(token.RefreshToken));
+            var result = await response.Content.ReadFromJsonAsync<AuthOutcome>();
+            if (requestVersion != journeyVersion) return;
+            resultText = $"{(current ? "Current" : "Previous")} session renewal: " + (result switch
+            {
+                SessionIssued => "accepted.", AuthenticationRefused refused => $"refused ({refused.Code}).",
+                ChallengeRequired challenge => $"restricted ({challenge.Challenge.Step}).", _ => "unavailable."
+            });
+            if (current && !changing && ReferenceEquals(issued?.Session, token) && result is SessionIssued session && response.IsSuccessStatusCode)
+            { issued = session; await Store.StoreTokenAsync(session.Session); }
+        }
+        catch (Exception e) when (e is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
+        { if (requestVersion == journeyVersion) resultText = "Renewal could not be confirmed."; }
+        finally { renewing = false; }
+    }
     private async Task Restart()
     {
-        Flow.Restart();
+        journeyVersion++;
+        await Flow.CancelAsync();
         await Store.RemoveTokenAsync();
         issued = null;
+        previous = null; changing = false; resultText = null;
         formVersion++;
         RefreshCode();
     }

@@ -123,7 +123,7 @@ internal static class IdentityPreviewHost
             {
                 Username = account.Username, FullName = account.Label, IsActive = true,
                 PasswordHash = hash.PasswordHash, Salt = hash.Salt,
-                RequireChangePassword = account.Username == "preview-restricted",
+                RequireChangePassword = account.Username is "preview-restricted" or "preview-required-mfa" or "preview-recovery",
                 CompanyID = template.CompanyID, CompanyBranchID = template.CompanyBranchID,
                 CountryID = template.CountryID, RegionID = template.RegionID
             };
@@ -132,8 +132,9 @@ internal static class IdentityPreviewHost
             db.Add(new UserSecurityState
             {
                 UserID = user.ID,
-                ProtectedTotpSecret = account.Username == "preview-mfa"
-                    ? fixture.Protection.CreateProtector("Identity.Totp.v2").Protect(fixture.FactorSecret) : null
+                ProtectedTotpSecret = account.Username is "preview-mfa" or "preview-required-mfa" or "preview-recovery"
+                    ? fixture.Protection.CreateProtector("Identity.Totp.v2").Protect(fixture.FactorSecret) : null,
+                LocalMfaRecoveryRequired = account.Username == "preview-recovery"
             });
         }
         await db.SaveChangesAsync();
@@ -173,7 +174,9 @@ public sealed class IdentityPreviewState(SqlIdentityFixture fixture)
     [
         new("preview-basic", "Login without MFA"),
         new("preview-mfa", "Existing authenticator"),
-        new("preview-restricted", "Password change required")
+        new("preview-restricted", "Password change required, without MFA"),
+        new("preview-required-mfa", "Password change required, then existing MFA"),
+        new("preview-recovery", "Password change followed by a recovery restriction")
     ];
 }
 public sealed record PreviewAccount(string Username, string Label);
