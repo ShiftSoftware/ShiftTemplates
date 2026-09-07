@@ -1,17 +1,16 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Options;
-using ShiftSoftware.ShiftIdentity.Data.Cosmos.Options;
-using ShiftSoftware.ShiftIdentity.Data.Cosmos.Services;
+using ShiftSoftware.ShiftIdentity.Data.IdentityReference.Cosmos;
 
 namespace StockPlusPlus.Test.Tests;
 
-public class IdentityReferenceCosmosDataServiceTests
+public class IdentityReferenceSourceTests
 {
     private const int CallsPerFunction = 5;
     private readonly ITestOutputHelper output;
 
-    public IdentityReferenceCosmosDataServiceTests(ITestOutputHelper output)
+    public IdentityReferenceSourceTests(ITestOutputHelper output)
     {
         this.output = output;
     }
@@ -90,15 +89,15 @@ public class IdentityReferenceCosmosDataServiceTests
             return $"count={result.Count}";
         });
 
-        await MeasureByIdAsync("GetCountryByIdAsync", rows, scope.Service.GetCountryByIdAsync, countries.Keys.FirstOrDefault());
-        await MeasureByIdAsync("GetRegionByIdAsync", rows, scope.Service.GetRegionByIdAsync, regions.Keys.FirstOrDefault());
-        await MeasureByIdAsync("GetCityByIdAsync", rows, scope.Service.GetCityByIdAsync, cities.Keys.FirstOrDefault());
-        await MeasureByIdAsync("GetCompanyByIdAsync", rows, scope.Service.GetCompanyByIdAsync, companies.Keys.FirstOrDefault());
-        await MeasureByIdAsync("GetCompanyBranchByIdAsync", rows, scope.Service.GetCompanyBranchByIdAsync, branches.Keys.FirstOrDefault());
-        await MeasureByIdAsync("GetServiceByIdAsync", rows, scope.Service.GetServiceByIdAsync, services.Keys.FirstOrDefault());
-        await MeasureByIdAsync("GetDepartmentByIdAsync", rows, scope.Service.GetDepartmentByIdAsync, departments.Keys.FirstOrDefault());
-        await MeasureByIdAsync("GetTeamByIdAsync", rows, scope.Service.GetTeamByIdAsync, teams.Keys.FirstOrDefault());
-        await MeasureByIdAsync("GetBrandByIdAsync", rows, scope.Service.GetBrandByIdAsync, brands.Keys.FirstOrDefault());
+        await MeasureByIdAsync("ResolveCountryAsync", rows, scope.Service.ResolveCountryAsync, countries.Keys.FirstOrDefault());
+        await MeasureByIdAsync("ResolveRegionAsync", rows, scope.Service.ResolveRegionAsync, regions.Keys.FirstOrDefault());
+        await MeasureByIdAsync("ResolveCityAsync", rows, scope.Service.ResolveCityAsync, cities.Keys.FirstOrDefault());
+        await MeasureByIdAsync("ResolveCompanyAsync", rows, scope.Service.ResolveCompanyAsync, companies.Keys.FirstOrDefault());
+        await MeasureByIdAsync("ResolveCompanyBranchAsync", rows, scope.Service.ResolveCompanyBranchAsync, branches.Keys.FirstOrDefault());
+        await MeasureByIdAsync("ResolveServiceAsync", rows, scope.Service.ResolveServiceAsync, services.Keys.FirstOrDefault());
+        await MeasureByIdAsync("ResolveDepartmentAsync", rows, scope.Service.ResolveDepartmentAsync, departments.Keys.FirstOrDefault());
+        await MeasureByIdAsync("ResolveTeamAsync", rows, scope.Service.ResolveTeamAsync, teams.Keys.FirstOrDefault());
+        await MeasureByIdAsync("ResolveBrandAsync", rows, scope.Service.ResolveBrandAsync, brands.Keys.FirstOrDefault());
 
         WriteTable(rows);
     }
@@ -170,8 +169,8 @@ public class IdentityReferenceCosmosDataServiceTests
         {
             var client = new CosmosClient(connectionString);
 
-            var options = Options.Create(new IdentityReferenceCosmosDataOptions());
-            var service = new IdentityReferenceCosmosDataService<CosmosClient>(client, options);
+            var options = Options.Create(new CosmosIdentityReferenceOptions());
+            var service = new CosmosIdentityReferenceSource<CosmosClient>(client, options);
 
             return new TestScope(client, service);
         }
@@ -210,14 +209,14 @@ public class IdentityReferenceCosmosDataServiceTests
     {
         public TestScope(
         CosmosClient Client,
-        IdentityReferenceCosmosDataService<CosmosClient> Service)
+        CosmosIdentityReferenceSource<CosmosClient> Service)
         {
             this.Client = Client;
             this.Service = Service;
         }
 
         public CosmosClient Client { get; }
-        public IdentityReferenceCosmosDataService<CosmosClient> Service { get; }
+        public CosmosIdentityReferenceSource<CosmosClient> Service { get; }
 
         public void Dispose() => Client.Dispose();
     }
