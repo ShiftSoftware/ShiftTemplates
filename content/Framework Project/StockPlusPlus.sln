@@ -123,6 +123,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnifiedAttestation", "..\..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnifiedAttestation.Functions", "..\..\..\UnifiedAttestation\UnifiedAttestation.Functions\UnifiedAttestation.Functions.csproj", "{8F23E4DA-4EBE-32D3-9B8E-DF68CEC2B273}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftIdentity.Tests", "..\..\..\ShiftIdentity\ShiftIdentity.Tests\ShiftIdentity.Tests.csproj", "{BF484050-C3F7-09CE-5083-845A53FE39BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftIdentity.Data.Tests", "..\..\..\ShiftIdentity\ShiftIdentity.Data.Tests\ShiftIdentity.Data.Tests.csproj", "{CA5B9378-926D-7E15-DDF7-CD621F9E4152}"
+EndProject
 <!--#endif -->
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -287,6 +291,14 @@ Global
 		{8F23E4DA-4EBE-32D3-9B8E-DF68CEC2B273}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F23E4DA-4EBE-32D3-9B8E-DF68CEC2B273}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F23E4DA-4EBE-32D3-9B8E-DF68CEC2B273}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF484050-C3F7-09CE-5083-845A53FE39BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF484050-C3F7-09CE-5083-845A53FE39BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF484050-C3F7-09CE-5083-845A53FE39BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF484050-C3F7-09CE-5083-845A53FE39BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA5B9378-926D-7E15-DDF7-CD621F9E4152}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA5B9378-926D-7E15-DDF7-CD621F9E4152}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA5B9378-926D-7E15-DDF7-CD621F9E4152}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA5B9378-926D-7E15-DDF7-CD621F9E4152}.Release|Any CPU.Build.0 = Release|Any CPU
 		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
@@ -333,6 +345,8 @@ Global
 		{56C29A79-3285-4154-B35B-C452EC980EB4} = {6B5137B3-F21C-483E-B131-54706EE91D55}
 		{1DD3F99C-1A0D-364A-44D2-847659E74ADB} = {56C29A79-3285-4154-B35B-C452EC980EB4}
 		{8F23E4DA-4EBE-32D3-9B8E-DF68CEC2B273} = {56C29A79-3285-4154-B35B-C452EC980EB4}
+		{BF484050-C3F7-09CE-5083-845A53FE39BC} = {628E8BC1-C04D-4681-90A3-5CD4DF6A4003}
+		{CA5B9378-926D-7E15-DDF7-CD621F9E4152} = {628E8BC1-C04D-4681-90A3-5CD4DF6A4003}
 		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
