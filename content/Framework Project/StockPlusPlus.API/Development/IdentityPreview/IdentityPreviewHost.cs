@@ -80,6 +80,14 @@ internal static class IdentityPreviewHost
                 return;
             }
             context.Response.Headers.CacheControl = "no-store";
+            var path = context.Request.Path;
+            if (path != "/" && !path.StartsWithSegments("/_blazor") && !path.StartsWithSegments("/_preview") &&
+                !path.StartsWithSegments("/api/identity/v2") && !path.StartsWithSegments("/_content") &&
+                !(path.StartsWithSegments("/_framework") && path.Value!.EndsWith(".js", StringComparison.Ordinal)))
+            {
+                context.Response.StatusCode = 404;
+                return;
+            }
             await next(context);
         });
         app.UseWhen(context => context.Request.Path.StartsWithSegments("/_content") ||
@@ -88,6 +96,9 @@ internal static class IdentityPreviewHost
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseAntiforgery();
+        // .NET 10 serves the Blazor bootstrap through the static-asset endpoint manifest.
+        // The preview path allowlist above still excludes appsettings and other application files.
+        app.MapStaticAssets();
         IdentityHttpHost.MapAdmissionEndpoints(app);
         app.MapGet("/_preview/logo.svg", () => Results.Text(
             """<svg xmlns="http://www.w3.org/2000/svg" width="360" height="42"><text x="0" y="32" font-size="30" font-family="sans-serif" fill="#24597a">StockPlusPlus · Preview</text></svg>""", "image/svg+xml"));
@@ -123,7 +134,9 @@ internal static class IdentityPreviewHost
             {
                 Username = account.Username, FullName = account.Label, IsActive = true,
                 PasswordHash = hash.PasswordHash, Salt = hash.Salt,
-                RequireChangePassword = account.Username is "preview-restricted" or "preview-required-mfa" or "preview-recovery",
+                RequireChangePassword = account.Username is "preview-restricted" or "preview-required-mfa",
+                AccessTree = account.Username == "preview-admin"
+                    ? "{\"ShiftIdentityActions\":{\"ManageMfaRecovery\":[\"m\"]}}" : null,
                 CompanyID = template.CompanyID, CompanyBranchID = template.CompanyBranchID,
                 CountryID = template.CountryID, RegionID = template.RegionID
             };
@@ -132,9 +145,8 @@ internal static class IdentityPreviewHost
             db.Add(new UserSecurityState
             {
                 UserID = user.ID,
-                ProtectedTotpSecret = account.Username is "preview-mfa" or "preview-required-mfa" or "preview-recovery"
-                    ? fixture.Protection.CreateProtector("Identity.Totp.v2").Protect(fixture.FactorSecret) : null,
-                LocalMfaRecoveryRequired = account.Username == "preview-recovery"
+                ProtectedTotpSecret = account.Username is "preview-mfa" or "preview-required-mfa" or "preview-recovery" or "preview-admin"
+                    ? fixture.Protection.CreateProtector("Identity.Totp.v2").Protect(fixture.FactorSecret) : null
             });
         }
         await db.SaveChangesAsync();
@@ -170,13 +182,22 @@ public sealed class IdentityPreviewState(SqlIdentityFixture fixture)
     public string Password => fixture.Password;
     public string CurrentCode => new Totp(fixture.FactorSecret).ComputeTotp();
     public int SecondsRemaining => 30 - (int)(DateTimeOffset.UtcNow.ToUnixTimeSeconds() % 30);
+    public bool Mandatory { get; private set; }
+    public Task<(long UserID, string? Code)> FactorAsync(string username) => fixture.GetSyntheticFactorAsync(username);
+    public async Task SetMandatoryAsync(bool mandatory)
+    {
+        await fixture.ChangeMfaPolicyAsync(mandatory);
+        Mandatory = mandatory;
+    }
     public static PreviewAccount[] Accounts { get; } =
     [
-        new("preview-basic", "Login without MFA"),
-        new("preview-mfa", "Existing authenticator"),
+        new("preview-basic", "First signed-in authenticator enrollment"),
+        new("preview-mfa", "Replace an existing authenticator"),
+        new("preview-mandatory", "Required enrollment when the policy below is enabled"),
         new("preview-restricted", "Password change required, without MFA"),
         new("preview-required-mfa", "Password change required, then existing MFA"),
-        new("preview-recovery", "Password change followed by a recovery restriction")
+        new("preview-recovery", "Lost authenticator — ask the synthetic admin for a recovery code"),
+        new("preview-admin", "Recovery operator with the dedicated permission")
     ];
 }
 public sealed record PreviewAccount(string Username, string Label);

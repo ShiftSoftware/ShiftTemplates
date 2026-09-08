@@ -116,6 +116,79 @@ public sealed class IdentityConsumerContractTests : IAsyncLifetime
         Assert.False((await verify.Users.SingleAsync(x => x.ID == fixture.UserID)).RequireChangePassword);
     }
 
+    [Theory]
+    [InlineData("enroll")]
+    [InlineData("replace")]
+    [InlineData("recover")]
+    [InlineData("mandatory")]
+    [InlineData("mandatory-password")]
+    public async Task Consumer_composes_all_MFA_lifecycle_flows_without_bypassing_required_proof(string journey)
+    {
+        var clock = new ControlledClock(DateTimeOffset.UtcNow); fixture.Clock = clock;
+        await fixture.ResetAsync(journey is "replace" or "recover");
+        using var host = new IdentityHttpHost(fixture);
+        var old = await LoginAs(fixture.Username);
+        var pkce = IdentityHttpHost.Pkce();
+        AuthenticationChallenge setup;
+        if (journey.StartsWith("mandatory", StringComparison.Ordinal))
+        {
+            await fixture.ChangeMfaPolicyAsync(true);
+            if (journey == "mandatory-password")
+            {
+                await using var db = fixture.CreateContext();
+                await db.Users.Where(x => x.ID == fixture.UserID).ExecuteUpdateAsync(x => x.SetProperty(u => u.RequireChangePassword, true));
+            }
+            setup = Assert.IsType<ChallengeRequired>(await host.LoginAsync(fixture, pkce.Challenge)).Challenge;
+            if (journey == "mandatory-password") setup = Assert.IsType<ChallengeRequired>(await host.ChangePasswordAsync(
+                setup.Handle!, "Consumer synthetic password 94!", pkce.Verifier)).Challenge;
+        }
+        else if (journey == "recover")
+        {
+            const string adminName = "consumer-recovery-admin";
+            await fixture.CreateSyntheticUserAsync(adminName, "{\"ShiftIdentityActions\":{\"ManageMfaRecovery\":[\"m\"]}}", mfa: true);
+            var admin = await LoginAs(adminName);
+            var grant = Assert.IsType<MfaRecoveryCodeIssued>(await host.IssueRecoveryAsync(admin.Session.Token, fixture.UserID, "Synthetic consumer verification"));
+            Assert.Equal(AuthenticationStep.MfaRecovery, Assert.IsType<ChallengeRequired>(await host.LoginAsync(fixture, pkce.Challenge)).Challenge.Step);
+            Assert.IsType<AuthenticationRefused>(await host.RecoverMfaAsync(fixture.Username, "wrong", grant.Code, pkce.Challenge));
+            setup = Assert.IsType<ChallengeRequired>(await host.RecoverMfaAsync(fixture.Username, fixture.Password, grant.Code, pkce.Challenge)).Challenge;
+            Assert.IsType<AuthenticationRefused>(await host.RecoverMfaAsync(fixture.Username, fixture.Password, grant.Code, pkce.Challenge));
+        }
+        else
+        {
+            var start = Assert.IsType<ChallengeRequired>(await host.StartMfaAsync(old.Session.Token, pkce.Challenge, journey == "replace")).Challenge;
+            if (journey == "replace")
+            {
+                clock.Advance(TimeSpan.FromSeconds(30));
+                setup = Assert.IsType<ChallengeRequired>(await host.ExistingFactorAsync(start.Handle!,
+                    (await fixture.GetSyntheticFactorAsync(fixture.Username)).Code!, pkce.Verifier)).Challenge;
+            }
+            else setup = Assert.IsType<ChallengeRequired>(await host.MfaPasswordAsync(start.Handle!, fixture.Password, pkce.Verifier)).Challenge;
+        }
+        Assert.Equal(AuthenticationStep.NewMfa, setup.Step);
+        Assert.NotNull(setup.NewAuthenticator);
+        var code = new Totp(Base32Encoding.ToBytes(setup.NewAuthenticator.Secret)).ComputeTotp(clock.GetUtcNow().UtcDateTime);
+        var changed = Assert.IsType<MfaChanged>(await host.ConfirmFactorAsync(setup.Handle!, code, pkce.Verifier));
+        if (journey == "recover") Assert.IsType<ReturnToLogin>(changed.Continuation);
+        else Assert.IsType<SessionIssued>(await host.RefreshAsync(Assert.IsType<SessionIssued>(changed.Continuation).Session.RefreshToken));
+        Assert.IsType<AuthenticationRefused>(await host.RefreshAsync(old.Session.RefreshToken));
+        Assert.IsType<AuthenticationRefused>(await host.ConfirmFactorAsync(setup.Handle!, code, pkce.Verifier));
+        await using var verify = fixture.CreateContext();
+        var state = await verify.Set<UserSecurityState>().SingleAsync(x => x.UserID == fixture.UserID);
+        Assert.Equal(journey == "recover" ? 3 : 2, state.SecurityVersion);
+        Assert.NotNull(state.ProtectedTotpSecret); Assert.False(state.LocalMfaRecoveryRequired);
+        Assert.False(await verify.Set<AuthenticationOperation>().AnyAsync(x => x.UserID == fixture.UserID && x.ProtectedPendingTotpSecret != null));
+
+        async Task<SessionIssued> LoginAs(string username)
+        {
+            var proof = IdentityHttpHost.Pkce();
+            using var response = await host.Client.PostAsJsonAsync("/api/identity/v2/login", new PasswordLoginRequest(username, fixture.Password, proof.Challenge));
+            var result = (await response.Content.ReadFromJsonAsync<AuthOutcome>())!;
+            if (result is ChallengeRequired challenge)
+                result = await host.CompleteAsync(challenge.Challenge.Handle!, (await fixture.GetSyntheticFactorAsync(username)).Code!, proof.Verifier);
+            return Assert.IsType<SessionIssued>(result);
+        }
+    }
+
     private sealed class ConsumerIdentityContext(DbContextOptions<DB> options) : DB(options)
     {
         protected override void OnModelCreating(ModelBuilder builder)

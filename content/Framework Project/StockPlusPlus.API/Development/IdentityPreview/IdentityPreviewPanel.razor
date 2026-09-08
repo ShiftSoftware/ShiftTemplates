@@ -30,14 +30,32 @@
         }
     </ul>
     <p style="margin:16px 0">
-        Current synthetic MFA code: <strong data-testid="synthetic-code">@currentCode</strong>
+        <label for="code-account">Show the active authenticator for: </label>
+        <select id="code-account" value="@codeAccount" @onchange="SelectCodeAccount">
+            @foreach (var account in IdentityPreviewState.Accounts)
+            { <option value="@account.Username">@account.Username</option> }
+        </select>
+        <strong data-testid="synthetic-code">@(currentCode ?? "No active authenticator")</strong>
         <span> (@seconds seconds left)</span>
         <MudButton OnClick="RefreshCode" Variant="Variant.Outlined" Size="Size.Small">Refresh code</MudButton>
     </p>
-    <p>Sign in with preview-basic or preview-mfa, then choose Change password. The required accounts start that step during login. Try an incorrect current password, a short new password, a wrong code, or Start again. Each MFA code can be accepted once per account; wait for the next code after sign-in.</p>
-    @if (changing)
+    @if (newCode is not null)
     {
-        <ChangePasswordForm AdmissionFlow="Flow" AdmissionCompleted="PasswordCompleted" />
+        <MudAlert Severity="Severity.Info">New authenticator preview code: <strong data-testid="new-factor-code">@newCode</strong>. You can also scan the QR code with your authenticator app.</MudAlert>
+    }
+    <p>Each code can be accepted once per account. After sign-in, wait for the next code before proving the existing authenticator for replacement. A cancelled replacement keeps the old authenticator active.</p>
+    <p>Mandatory MFA: <strong>@(Preview.Mandatory ? "enabled" : "optional")</strong>.
+        <MudButton OnClick="ToggleMandatory" Variant="Variant.Outlined" Disabled="Flow.Busy">@(Preview.Mandatory ? "Make MFA optional" : "Require MFA for local login")</MudButton>
+        Changing this synthetic policy ends this journey and invalidates existing preview sessions. Use preview-mandatory to try required enrollment.
+    </p>
+    <p>For lost-device recovery, sign in as preview-admin, record <strong>DEMO-CHECK-001</strong> as the synthetic independent verification reference, and copy the issued code. Choose Try another login, then Use an admin recovery code with preview-recovery, its current password, and the copied code. Confirm the new authenticator; recovery returns to login without a session.</p>
+    @if (configuringMfa)
+    {
+        <TotpEnrollmentForm AdmissionFlow="Flow" AdmissionCompleted="SecurityCompleted" />
+    }
+    else if (changing)
+    {
+        <ChangePasswordForm AdmissionFlow="Flow" AdmissionCompleted="SecurityCompleted" />
         <MudButton OnClick="CancelChange" Variant="Variant.Outlined">Cancel password change</MudButton>
     }
     else if (issued is not null)
@@ -47,13 +65,19 @@
             Credentials are held only in this preview circuit.
         </MudAlert>
         <MudButton OnClick="StartChange" Variant="Variant.Outlined" Color="Color.Primary">Change password</MudButton>
+        <MudButton OnClick="StartMfa" Variant="Variant.Outlined" Color="Color.Primary">@(hasFactor ? "Replace authenticator" : "Set up authenticator")</MudButton>
         <MudButton OnClick="RenewCurrent" Variant="Variant.Outlined" Disabled="renewing">Renew current session</MudButton>
         <MudButton OnClick="Restart" Variant="Variant.Filled" Color="Color.Primary">Try another login</MudButton>
+        @if (issued.Session.UserData.Username == "preview-admin")
+        {
+            <h2 style="margin-top:20px">Recovery for preview-recovery</h2>
+            <MfaRecoveryAdminForm AdmissionFlow="Flow" AccessToken="@issued.Session.Token" UserID="recoveryUserID" />
+        }
     }
     else
     {
         <LoginForm @key="formVersion" AdmissionFlow="Flow" SessionCompleted="Completed" />
-        @if (Flow.Pending is { Handle: null } restricted)
+        @if (Flow.Pending is { Handle: null, Step: not AuthenticationStep.MfaRecovery } restricted)
         {
             <MudAlert Severity="Severity.Warning" data-testid="preview-restricted">
                 Restricted: @restricted.Step. This remedy remains unavailable in the preview; no session was stored.
@@ -77,31 +101,54 @@
     private SessionIssued? issued;
     private TokenDTO? previous;
     private bool changing;
+    private bool configuringMfa;
+    private bool hasFactor;
+    private long recoveryUserID;
     private bool renewing;
     private int journeyVersion;
     private string? resultText;
     private int formVersion;
-    private string currentCode = "";
+    private string codeAccount = "preview-mfa";
+    private string? currentCode;
+    private string? newCode;
     private int seconds;
     private readonly CancellationTokenSource refreshCancellation = new();
-    private void RefreshCode() { currentCode = Preview.CurrentCode; seconds = Preview.SecondsRemaining; }
-    protected override void OnInitialized() { RefreshCode(); _ = RefreshLoopAsync(); }
+    private async Task RefreshCode()
+    {
+        currentCode = (await Preview.FactorAsync(codeAccount)).Code;
+        seconds = Preview.SecondsRemaining;
+        newCode = Flow.Pending?.NewAuthenticator is { } setup
+            ? new OtpNet.Totp(OtpNet.Base32Encoding.ToBytes(setup.Secret)).ComputeTotp() : null;
+    }
+    private async Task SelectCodeAccount(ChangeEventArgs args)
+    {
+        var selected = args.Value?.ToString();
+        if (IdentityPreviewState.Accounts.Any(x => x.Username == selected)) codeAccount = selected!;
+        await RefreshCode();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        recoveryUserID = (await Preview.FactorAsync("preview-recovery")).UserID;
+        await RefreshCode(); _ = RefreshLoopAsync();
+    }
     private async Task RefreshLoopAsync()
     {
         try
         {
             using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
             while (await timer.WaitForNextTickAsync(refreshCancellation.Token))
-                await InvokeAsync(() => { RefreshCode(); StateHasChanged(); });
+                await InvokeAsync(async () => { await RefreshCode(); StateHasChanged(); });
         }
         catch (OperationCanceledException) { }
     }
-    private void Completed(SessionIssued result)
+    private async Task Completed(SessionIssued result)
     {
         journeyVersion++;
         issued = result;
-        if (Flow.PasswordWasChanged) resultText = "Password changed. The initiating session uses the new security version.";
-        RefreshCode();
+        codeAccount = result.Session.UserData.Username;
+        hasFactor = (await Preview.FactorAsync(codeAccount)).Code is not null;
+        if (Flow.PasswordWasChanged || Flow.MfaWasChanged) resultText = "Security change completed. The initiating session uses the new security version.";
+        await RefreshCode();
     }
     private async Task StartChange()
     {
@@ -113,17 +160,40 @@
         resultText = changing ? "Confirm your current password, then complete any MFA before choosing a new password."
             : "The signed-in context is no longer current. Sign in again.";
     }
-    private void PasswordCompleted(AuthOutcome result)
+    private async Task StartMfa()
     {
-        if (result is PasswordChanged { Continuation: SessionIssued session })
+        if (issued is null) return;
+        journeyVersion++;
+        previous = issued.Session;
+        var result = await Flow.BeginMfaAsync(issued.Session.Token, hasFactor);
+        configuringMfa = result is ChallengeRequired;
+        resultText = configuringMfa ? null : "The setup could not start. Sign in again.";
+        await RefreshCode();
+    }
+    private async Task SecurityCompleted(AuthOutcome result)
+    {
+        var continuation = result switch { PasswordChanged p => p.Continuation, MfaChanged m => m.Continuation, _ => result };
+        if (continuation is SessionIssued session)
         {
-            changing = false; Completed(session);
+            changing = false; configuringMfa = false; await Completed(session);
+        }
+        else if (result is OperationCancelled)
+        {
+            changing = false; configuringMfa = false;
+            resultText = "Setup cancelled. The active credential is unchanged.";
         }
         else if (Flow.Pending is null && result is AuthenticationRefused)
         {
-            changing = false;
+            changing = false; configuringMfa = false;
             resultText = "The change could not be confirmed. Sign in again to check; a lost response can follow a completed change.";
         }
+        await RefreshCode();
+    }
+    private async Task ToggleMandatory()
+    {
+        await Restart();
+        await Preview.SetMandatoryAsync(!Preview.Mandatory);
+        resultText = "Preview policy changed. Sign in again to begin a new journey.";
     }
     private async Task CancelChange()
     {
@@ -149,7 +219,7 @@
                 SessionIssued => "accepted.", AuthenticationRefused refused => $"refused ({refused.Code}).",
                 ChallengeRequired challenge => $"restricted ({challenge.Challenge.Step}).", _ => "unavailable."
             });
-            if (current && !changing && ReferenceEquals(issued?.Session, token) && result is SessionIssued session && response.IsSuccessStatusCode)
+            if (current && !changing && !configuringMfa && ReferenceEquals(issued?.Session, token) && result is SessionIssued session && response.IsSuccessStatusCode)
             { issued = session; await Store.StoreTokenAsync(session.Session); }
         }
         catch (Exception e) when (e is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
@@ -162,9 +232,9 @@
         await Flow.CancelAsync();
         await Store.RemoveTokenAsync();
         issued = null;
-        previous = null; changing = false; resultText = null;
+        previous = null; changing = false; configuringMfa = false; resultText = null;
         formVersion++;
-        RefreshCode();
+        await RefreshCode();
     }
     private void Stop() => Lifetime.StopApplication();
     public void Dispose() { refreshCancellation.Cancel(); refreshCancellation.Dispose(); Flow.Restart(); }
