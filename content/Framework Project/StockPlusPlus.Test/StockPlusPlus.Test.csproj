@@ -38,4 +38,11 @@
 		</None>
 	</ItemGroup>
 
+	<!-- Data generates the application mappers. Test fixtures must not generate duplicate registrations. -->
+	<Target Name="ExcludeFixtureMapperGeneration" BeforeTargets="CoreCompile">
+		<ItemGroup>
+			<Analyzer Remove="@(Analyzer->WithMetadataValue('Filename', 'ShiftSoftware.ShiftEntity.SourceGenerator'))" />
+		</ItemGroup>
+	</Target>
+
 </Project>
