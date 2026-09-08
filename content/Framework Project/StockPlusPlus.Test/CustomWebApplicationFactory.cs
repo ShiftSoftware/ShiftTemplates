@@ -1,5 +1,6 @@
 ﻿using ShiftSoftware.ShiftFrameworkTestingTools;
 using ShiftSoftware.ShiftIdentity.Core;
+using Microsoft.Extensions.Configuration;
 using StockPlusPlus.API;
 using StockPlusPlus.Data.DbContext;
 
@@ -31,4 +32,8 @@ public class CustomWebApplicationFactory : ShiftCustomWebApplicationFactory<WebM
             }
         })
     { }
+
+    // Verification runs must explicitly select a test override, such as SHIFT_TEST_ConnectionStrings__SQLServer_Test.
+    protected override IConfigurationBuilder CreateTestConfigurationBuilder()
+        => base.CreateTestConfigurationBuilder().AddEnvironmentVariables("SHIFT_TEST_");
 }

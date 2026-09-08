@@ -116,6 +116,12 @@ builder.Services.AddAttentionHub();
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
 builder.Services.AddHttpClient();
 
+#if (includeSampleApp)
+// One explicit host opt-in installs the v2 engine and its seven standard marker dimensions. The Vehicle repository
+// replaces the standard single-key Companies dimension with a two-key owner-or-intermediary rule.
+builder.Services.AddShiftEntityDataLevelAccess();
+#endif
+
 //builder.Services.AddScoped<IFileExplorerAccessControl, FileManagerAccessControl>();
 
 var cosmosConnectionString = builder.Configuration.GetValue<string>("CosmosDb:ConnectionString")!;
