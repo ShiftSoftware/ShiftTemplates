@@ -40,7 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="content\**\*" Exclude="content\**\bin\**;content\**\obj\**" />
+    <Content Include="content\**\*" Exclude="content\**\bin\**;content\**\obj\**;content\**\.vs\**" />
     <Compile Remove="**\*" />
   </ItemGroup>
 
@@ -64,7 +64,7 @@
 
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'!='DEBUG'">
-	  <Exec Command="dotnet run --project ShiftTemplates.Builder --skip-project --skip-template-install --update-template-versions" />
+	  <Exec Command="dotnet run --project ShiftTemplates.Builder --configuration &quot;$(Configuration)&quot; -- --skip-project --skip-template-install --update-template-versions" />
 	</Target>
 	
 </Project>

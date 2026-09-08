@@ -258,7 +258,7 @@
       "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2026.7.4.1"
+        "value": "2026.09.08.2"
       },
       "datatype": "string",
       "generator": "constant"
@@ -268,7 +268,7 @@
       "description": "Replace AzureFunctionsAspNetCoreAuthorization Version",
       "replaces": "$(AzureFunctionsAspNetCoreAuthorizationVersion)",
       "parameters": {
-        "value": "0.0.35"
+        "value": "0.0.36"
       },
       "datatype": "string",
       "generator": "constant"
@@ -278,7 +278,7 @@
       "description": "Replace TypeAuth Version",
       "replaces": "$(TypeAuthVersion)",
       "parameters": {
-        "value": "1.6.26"
+        "value": "1.6.28"
       },
       "datatype": "string",
       "generator": "constant"
