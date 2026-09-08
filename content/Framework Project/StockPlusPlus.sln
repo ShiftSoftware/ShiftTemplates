@@ -16,6 +16,7 @@ EndProject
 
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftFramework", "ShiftFramework", "{6B5137B3-F21C-483E-B131-54706EE91D55}"
 	ProjectSection(SolutionItems) = preProject
+		..\..\.pipelines\identity-checks.steps.yml = ..\..\.pipelines\identity-checks.steps.yml
 		..\..\azure-pipeline.yml = ..\..\azure-pipeline.yml
 		..\..\CLAUDE.md = ..\..\CLAUDE.md
 		..\..\ImportAndReferenceAll.bat = ..\..\ImportAndReferenceAll.bat
