@@ -1,0 +1,74 @@
+@implements IAsyncDisposable
+
+<MudPaper Class="pa-4 mt-4" data-testid="development-inbox">
+    <MudText Typo="Typo.h6">Local test inbox</MudText>
+    <MudText>Only this disposable development app uses this inbox. No real email is sent. Links open the shared reset or verification screen in a new tab.</MudText>
+    <MudButton Href="Identity/SendResetPasswordLink" Target="_blank">Request password reset</MudButton>
+    <MudButton Href="Identity/SendEmailVerificationLink" Target="_blank">Request email verification</MudButton>
+    <MudButton OnClick="Refresh" Disabled="busy">Refresh inbox</MudButton>
+    <MudButton OnClick="ToggleFailure" Disabled="busy">@(inbox.FailDeliveries ? "Allow local delivery" : "Simulate delivery failure")</MudButton>
+    @if (inbox.FailDeliveries) { <MudAlert Severity="Severity.Warning">Local sender failures are enabled. To try again, allow local delivery and request a new link after the cooldown.</MudAlert> }
+    @if (error is not null) { <MudAlert Severity="Severity.Error">@error</MudAlert> }
+    @foreach (var mail in inbox.Messages.OrderByDescending(x => x.DeliveredAt))
+    {
+        <MudPaper Class="pa-3 mt-2" data-testid="inbox-message">
+            <MudText>@mail.Subject — @mail.Destination</MudText>
+            <MudText>Accepted locally @mail.DeliveredAt.ToString("u")</MudText>
+            @if (SafeLink(mail.Link) is { } link)
+            {
+                <MudButton Href="@link" Target="_blank" rel="noreferrer">Open link</MudButton>
+            }
+        </MudPaper>
+    }
+    @if (inbox.Messages.Length == 0) { <MudText>No local messages yet.</MudText> }
+    <MudText Class="mt-3">Try a saved username, then open its latest message. Opening a link changes nothing until you submit. A newer link replaces the old one. For a lost password and authenticator, reset the password first, then ask the administrator for a fresh authenticator recovery code and use the new password.</MudText>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired] public HttpClient Client { get; set; } = null!;
+    private Inbox inbox = new([], false);
+    private readonly CancellationTokenSource stop = new();
+    private Task? polling;
+    private bool busy;
+    private string? error;
+    protected override async Task OnInitializedAsync() { await Refresh(); polling = Poll(); }
+    private async Task Poll()
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
+        try { while (await timer.WaitForNextTickAsync(stop.Token)) await InvokeAsync(async () => { await Refresh(); StateHasChanged(); }); }
+        catch (OperationCanceledException) when (stop.IsCancellationRequested) { }
+    }
+    private async Task Refresh()
+    {
+        if (busy || stop.IsCancellationRequested) return;
+        busy = true;
+        try { inbox = await Client.GetFromJsonAsync<Inbox>("development/inbox", stop.Token) ?? new([], false); error = null; }
+        catch (Exception failure) when (failure is HttpRequestException or System.Text.Json.JsonException or OperationCanceledException)
+        { if (!stop.IsCancellationRequested) error = "The local inbox could not be loaded."; }
+        finally { busy = false; }
+    }
+    private async Task ToggleFailure() => await Change("development/inbox/failure/" + (!inbox.FailDeliveries).ToString().ToLowerInvariant());
+    private async Task Change(string route)
+    {
+        if (busy) return;
+        busy = true;
+        try { using var response = await Client.PostAsync(route, null, stop.Token); response.EnsureSuccessStatusCode(); error = null; }
+        catch (Exception failure) when (failure is HttpRequestException or OperationCanceledException)
+        { if (!stop.IsCancellationRequested) error = "The local delivery setting could not be changed."; }
+        finally { busy = false; }
+        await Refresh();
+    }
+    private string? SafeLink(string value)
+    {
+        if (Client.BaseAddress is null || !Uri.TryCreate(Client.BaseAddress, value, out var uri) ||
+            uri.GetLeftPart(UriPartial.Authority) != Client.BaseAddress.GetLeftPart(UriPartial.Authority) ||
+            uri.AbsolutePath is not ("/Identity/ResetPassword" or "/Identity/VerifyEmail")) return null;
+        return uri.ToString();
+    }
+    public async ValueTask DisposeAsync()
+    {
+        stop.Cancel(); if (polling is not null) await polling; stop.Dispose();
+    }
+    private sealed record Inbox(Message[] Messages, bool FailDeliveries);
+    private sealed record Message(string Id, string Destination, string Subject, string Link, DateTimeOffset DeliveredAt);
+}

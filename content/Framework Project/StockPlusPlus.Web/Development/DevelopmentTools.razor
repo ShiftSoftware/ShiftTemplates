@@ -14,9 +14,12 @@
         <DevelopmentAuthenticatorCodes LoadCodes="LoadCodes" />
         <MudButton OnClick="() => Policy(true)">Require MFA for local login</MudButton>
         <MudButton OnClick="() => Policy(false)">Make MFA optional</MudButton>
+        <MudButton OnClick="() => EmailPolicy(true)">Require verified email for local login</MudButton>
+        <MudButton OnClick="() => EmailPolicy(false)">Make email verification optional</MudButton>
         <MudButton OnClick="Renew">Renew current session</MudButton>
         <MudAlert Severity="Severity.Info">Changing policy invalidates current sessions and pending journeys. New-factor codes come from scanning the real setup QR or entering its manual key in an authenticator app.</MudAlert>
         <MudText>@message</MudText>
+        <DevelopmentInbox Client="client" />
         <MudButton Href="Identity/login" Color="Color.Primary">Login</MudButton>
         <MudButton Href="Identity/UserDataForm">Profile</MudButton>
         <MudButton OnClick="Stop" Color="Color.Warning">Stop development app</MudButton>
@@ -44,6 +47,14 @@
         message = required ? "MFA is required. Sign in again." : "MFA is optional. Sign in again.";
     }
     private async Task Renew() => message = await Services.GetRequiredService<AdmissionSessionStore>().RenewAsync() ? "Session renewed." : "No current session. Sign in again.";
+    private async Task EmailPolicy(bool required)
+    {
+        using var response = await client!.PostAsync("development/verified-email/" + required.ToString().ToLowerInvariant(), null);
+        response.EnsureSuccessStatusCode();
+        await AdmissionContext!.Store.RemoveTokenAsync();
+        await AdmissionContext.Flow.CancelAsync();
+        message = required ? "Verified email is required for local login. Accounts without email are exempt. Sign in again." : "Email verification is optional for local login. Sign in again.";
+    }
     private async Task Stop() { await client!.PostAsync("development/stop", null); message = "Development app stopped."; }
     public void Dispose() => client?.Dispose();
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.DataProtection;
 using ShiftIdentity.Tests.Infrastructure;
+using ShiftSoftware.ShiftIdentity.AspNetCore.Authentication;
 using ShiftSoftware.ShiftIdentity.Blazor.Services;
 using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.ShiftIdentity.Data.Authentication;
@@ -17,7 +18,7 @@ namespace StockPlusPlus.API.Development.IdentityApp;
 // Built only on explicit development opt-in. No configured application controllers or remote services are registered.
 public static class IdentityDevelopmentHost
 {
-    public static readonly string[] Accounts = ["dev-basic", "dev-mfa", "dev-mandatory", "dev-restricted", "dev-required-mfa", "dev-recovery", "dev-admin"];
+    public static readonly string[] Accounts = ["dev-basic", "dev-mfa", "dev-mandatory", "dev-restricted", "dev-required-mfa", "dev-recovery", "dev-admin", "dev-legacy", "dev-no-email"];
     public static async Task RunAsync()
     {
         await using var fixture = new SqlIdentityFixture
@@ -26,6 +27,7 @@ public static class IdentityDevelopmentHost
         };
         await fixture.InitializeAsync();
         await SeedAsync(fixture);
+        fixture.UseRuntimeDeliveryLimits();
         var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions
         {
             ApplicationName = typeof(IdentityDevelopmentHost).Assembly.GetName().Name,
@@ -38,6 +40,8 @@ public static class IdentityDevelopmentHost
         builder.Services.Configure<Microsoft.AspNetCore.DataProtection.KeyManagement.KeyManagementOptions>(o => o.XmlRepository = new MemoryKeys());
         IdentityHttpHost.AddAdmissionServices(builder.Services, fixture);
         IdentityHttpHost.AddResourceAuthentication(builder.Services);
+        builder.Services.AddSingleton(new LocalSecurityInbox(fixture.Clock));
+        builder.Services.AddSingleton<ISecurityEmailSink>(services => services.GetRequiredService<LocalSecurityInbox>());
         await using var app = builder.Build();
         var runID = Guid.NewGuid().ToString("N");
         var origin = "";
@@ -67,9 +71,7 @@ public static class IdentityDevelopmentHost
         app.UseAuthentication();
         app.UseAuthorization();
         MapEndpoints(app, fixture);
-        app.MapGet("/development/info", async (CancellationToken cancellation) =>
-            Results.Ok(await CodeSnapshotAsync(fixture, cancellation)));
-        app.MapPost("/development/mandatory/{required:bool}", async (bool required) => { await fixture.ChangeMfaPolicyAsync(required); return Results.Ok(); });
+        MapDevelopmentEndpoints(app, fixture);
         app.MapPost("/development/stop", () => { app.Lifetime.StopApplication(); return Results.Ok(); });
         // Unknown API routes must never fall through to an application controller or an HTML success response.
         app.Map("/api/{**path}", () => Results.NotFound());
@@ -79,6 +81,18 @@ public static class IdentityDevelopmentHost
         Console.WriteLine($"IDENTITY_DEVELOPMENT_URL={origin}/");
         Console.WriteLine("Normal StockPlusPlus WebAssembly shell; owned synthetic SQL only. Graceful shutdown removes the database.");
         await app.WaitForShutdownAsync();
+    }
+
+    public static void MapDevelopmentEndpoints(IEndpointRouteBuilder endpoints, SqlIdentityFixture fixture)
+    {
+        endpoints.MapGet("/development/info", async (CancellationToken cancellation) =>
+            Results.Ok(await CodeSnapshotAsync(fixture, cancellation)));
+        endpoints.MapPost("/development/mandatory/{required:bool}", async (bool required) => { await fixture.ChangeMfaPolicyAsync(required); return Results.Ok(); });
+        endpoints.MapPost("/development/verified-email/{required:bool}", async (bool required) => { await fixture.ChangeVerifiedEmailPolicyAsync(required); return Results.Ok(); });
+        endpoints.MapGet("/development/inbox", (LocalSecurityInbox inbox) =>
+            Results.Ok(new { messages = inbox.Messages, failDeliveries = inbox.FailDeliveries }));
+        endpoints.MapPost("/development/inbox/failure/{enabled:bool}", (bool enabled, LocalSecurityInbox inbox) =>
+        { inbox.FailDeliveries = enabled; return Results.Ok(); });
     }
 
     public static async Task<AuthenticatorCodeSnapshot> CodeSnapshotAsync(SqlIdentityFixture fixture, CancellationToken cancellation = default)
@@ -99,13 +113,20 @@ public static class IdentityDevelopmentHost
         foreach (var name in Accounts)
         {
             var id = await fixture.CreateSyntheticUserAsync(name, name == "dev-admin"
-                ? "{\"ShiftIdentityActions\":{\"ManageMfaRecovery\":[\"m\"],\"Users\":[\"r\"]}}" : null,
-                name is "dev-mfa" or "dev-required-mfa" or "dev-recovery" or "dev-admin");
-            if (name is "dev-restricted" or "dev-required-mfa")
+                ? "{\"ShiftIdentityActions\":{\"ManageMfaRecovery\":[\"m\"],\"Users\":[\"r\",\"w\"]}}" : null,
+                name is "dev-mfa" or "dev-required-mfa" or "dev-recovery" or "dev-admin",
+                email: name == "dev-no-email" ? null : name + "@example.invalid");
+            await using var db = fixture.CreateContext();
+            var user = await db.Users.SingleAsync(u => u.ID == id);
+            var security = await db.Set<UserSecurityState>().SingleAsync(s => s.UserID == id);
+            user.RequireChangePassword = name is "dev-restricted" or "dev-required-mfa";
+            if (name != "dev-no-email")
             {
-                await using var db = fixture.CreateContext();
-                await db.Users.Where(u => u.ID == id).ExecuteUpdateAsync(s => s.SetProperty(u => u.RequireChangePassword, true));
+                user.EmailVerified = name == "dev-admin";
+                if (name != "dev-legacy")
+                    RecoveryContact.RecordOwnership(user, security, RecoveryEmailProvenance.TrustedAdminAssignment);
             }
+            await db.SaveChangesAsync();
         }
     }
 
@@ -119,17 +140,21 @@ public static class IdentityDevelopmentHost
         {
             var actor = await Current(c);
             if (actor is null) return Results.Unauthorized();
-            if (!actor.CanManageRecovery) return Results.StatusCode(403);
+            if (!CanManageUsers(actor)) return Results.StatusCode(403);
             await using var db = fixture.CreateContext();
-            return Results.Ok(await db.Users.Where(u => Accounts.Contains(u.Username)).OrderBy(u => u.Username)
-                .Select(u => new AdmissionAccount(u.ID, u.Username, u.FullName, false, false, false)).ToArrayAsync());
+            var ids = await db.Users.Where(u => Accounts.Contains(u.Username) && u.IsActive && !u.IsDeleted).OrderBy(u => u.Username)
+                .Select(u => u.ID).ToArrayAsync();
+            var accounts = new List<AdmissionAccount>();
+            foreach (var id in ids)
+                if (await Read(id) is { } account) accounts.Add(account);
+            return Results.Ok(accounts);
         });
         async Task<IResult> Account(HttpContext c, long? target)
         {
             var actor = await Current(c);
             if (actor is null) return Results.Unauthorized();
             if (target is null || target == actor.UserID) return Results.Ok(actor);
-            if (!actor.CanManageRecovery) return Results.StatusCode(403);
+            if (!CanManageUsers(actor)) return Results.StatusCode(403);
             var found = await Read(target.Value);
             return found is null ? Results.NotFound() : Results.Ok(found);
         }
@@ -152,9 +177,13 @@ public static class IdentityDevelopmentHost
             if (user is null || state is null) return null;
             var trees = user.AccessTrees.Select(t => t.AccessTree.Tree).ToList();
             if (!string.IsNullOrWhiteSpace(user.AccessTree)) trees.Add(user.AccessTree);
+            var permissions = new TypeAuthContext(trees, typeof(ShiftIdentityActions));
+            var canWrite = permissions.CanWrite(ShiftIdentityActions.Users);
             return new(user.ID, user.Username, user.FullName, state.ProtectedTotpSecret is not null,
-                state.LocalMfaRecoveryRequired, new TypeAuthContext(trees, typeof(ShiftIdentityActions)).CanAccess(ShiftIdentityActions.ManageMfaRecovery));
+                state.LocalMfaRecoveryRequired, permissions.CanAccess(ShiftIdentityActions.ManageMfaRecovery),
+                user.Email, user.EmailVerified, RecoveryContact.IsEligible(user, state), canWrite, canWrite);
         }
+        static bool CanManageUsers(AdmissionAccount actor) => actor.CanManageRecovery || actor.CanManagePasswordReset || actor.CanManageEmailVerification;
     }
 
     private sealed class DevelopmentDb(DbContextOptions<DB> options) : DB(options)

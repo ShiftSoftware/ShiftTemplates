@@ -26,7 +26,8 @@ public static class IdentityDevelopmentRoutes
     {
         var route = path.Split('?', '#')[0].Trim('/');
         if (new[] { "", "Identity/login", "Identity/UserDataForm", "Identity/UserList", "Identity/ChangePasswordForm",
-            "Identity/TotpEnrollmentForm", "development/tools", "development/unavailable" }.Contains(route, StringComparer.OrdinalIgnoreCase)) return true;
+            "Identity/TotpEnrollmentForm", "Identity/SendResetPasswordLink", "Identity/ResetPassword", "Identity/SendEmailVerificationLink",
+            "Identity/VerifyEmail", "development/tools", "development/unavailable" }.Contains(route, StringComparer.OrdinalIgnoreCase)) return true;
         var parts = route.Split('/');
         return parts.Length == 3 && parts[0].Equals("Identity", StringComparison.OrdinalIgnoreCase) &&
             parts[1].Equals("UserForm", StringComparison.OrdinalIgnoreCase) && long.TryParse(parts[2], out var id) && id > 0;

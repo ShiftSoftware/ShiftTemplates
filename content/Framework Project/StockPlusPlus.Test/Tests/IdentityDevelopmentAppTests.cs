@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using ShiftIdentity.Tests.Infrastructure;
+using ShiftSoftware.ShiftIdentity.AspNetCore.Authentication;
 using ShiftSoftware.ShiftIdentity.Blazor.Services;
 using ShiftSoftware.ShiftIdentity.Core.Authentication;
 using ShiftSoftware.ShiftIdentity.Core.DTOs;
@@ -18,7 +20,7 @@ using Xunit;
 namespace StockPlusPlus.Test.Tests;
 
 [Trait("Category", "IdentityDevelopmentApp")]
-public sealed class IdentityDevelopmentAppTests : IAsyncLifetime
+public sealed partial class IdentityDevelopmentAppTests : IAsyncLifetime
 {
     private readonly SqlIdentityFixture fixture = new()
     {
@@ -26,16 +28,22 @@ public sealed class IdentityDevelopmentAppTests : IAsyncLifetime
     };
     private TestServer server = null!;
     private HttpClient client = null!;
+    private readonly AdjustableClock clock = new(DateTimeOffset.UtcNow);
+    private LocalSecurityInbox inbox = null!;
     public async ValueTask InitializeAsync()
     {
+        fixture.Clock = clock;
         await fixture.InitializeAsync(); await IdentityDevelopmentHost.SeedAsync(fixture);
+        inbox = new LocalSecurityInbox(clock);
         server = new TestServer(new WebHostBuilder().ConfigureServices(s =>
         {
             IdentityHttpHost.AddAdmissionServices(s, fixture); IdentityHttpHost.AddResourceAuthentication(s);
+            s.AddSingleton(inbox);
+            s.AddSingleton<ISecurityEmailSink>(inbox);
         }).Configure(app =>
         {
             app.UseRouting(); app.UseAuthentication(); app.UseAuthorization();
-            app.UseEndpoints(e => IdentityDevelopmentHost.MapEndpoints(e, fixture));
+            app.UseEndpoints(e => { IdentityDevelopmentHost.MapEndpoints(e, fixture); IdentityDevelopmentHost.MapDevelopmentEndpoints(e, fixture); });
         }));
         client = server.CreateClient();
     }
@@ -51,7 +59,7 @@ public sealed class IdentityDevelopmentAppTests : IAsyncLifetime
         Assert.Equal(instant, snapshot.GeneratedAt);
         Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1800000030), snapshot.ExpiresAt);
         Assert.Equal(1, clock.Reads);
-        Assert.Equal(7, snapshot.Accounts.Length);
+        Assert.Equal(IdentityDevelopmentHost.Accounts.Length, snapshot.Accounts.Length);
         foreach (var account in snapshot.Accounts.Where(a => a.Code is not null))
         {
             Assert.Matches("^[0-9]{6}$", account.Code!);
@@ -98,7 +106,7 @@ public sealed class IdentityDevelopmentAppTests : IAsyncLifetime
         client.DefaultRequestHeaders.Authorization = new("Bearer", targetSession.Token);
         Assert.Equal(HttpStatusCode.Forbidden, (await client.GetAsync("/api/identity/v2/account/" + fixture.UserID)).StatusCode);
         client.DefaultRequestHeaders.Authorization = new("Bearer", (await Login("dev-admin")).Token);
-        Assert.Equal(7, (await client.GetFromJsonAsync<AdmissionAccount[]>("/api/identity/v2/users"))!.Length);
+        Assert.Equal(IdentityDevelopmentHost.Accounts.Length, (await client.GetFromJsonAsync<AdmissionAccount[]>("/api/identity/v2/users"))!.Length);
         var result = await Post("mfa/recovery-code", new IssueMfaRecoveryRequest(targetID, "Synthetic independent verification"));
         Assert.IsType<MfaRecoveryCodeIssued>(result);
         var target = await client.GetFromJsonAsync<AdmissionAccount>("/api/identity/v2/account/" + targetID);
@@ -147,6 +155,12 @@ public sealed class IdentityDevelopmentAppTests : IAsyncLifetime
     private sealed class ConsumerDb(DbContextOptions<DB> options) : DB(options)
     {
         protected override void OnModelCreating(ModelBuilder builder) { base.OnModelCreating(builder); builder.ConfigureIdentitySecurity(); }
+    }
+    private sealed class AdjustableClock(DateTimeOffset instant) : TimeProvider
+    {
+        private DateTimeOffset now = instant;
+        public override DateTimeOffset GetUtcNow() => now;
+        public void Advance(TimeSpan elapsed) => now += elapsed;
     }
 }
 #endif
