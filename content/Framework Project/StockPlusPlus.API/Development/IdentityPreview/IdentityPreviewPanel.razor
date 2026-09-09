@@ -5,6 +5,7 @@
 @using ShiftSoftware.ShiftIdentity.Blazor.Services
 @using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Pages.Auth
 @using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Pages.UserManager
+@using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Shared
 @using System.Net.Http.Json
 @using ShiftSoftware.ShiftIdentity.Core.DTOs
 @namespace StockPlusPlus.API.Development.IdentityPreview
@@ -35,20 +36,15 @@
             @foreach (var account in IdentityPreviewState.Accounts)
             { <option value="@account.Username">@account.Username</option> }
         </select>
-        <strong data-testid="synthetic-code">@(currentCode ?? "No active authenticator")</strong>
-        <span> (@seconds seconds left)</span>
-        <MudButton OnClick="RefreshCode" Variant="Variant.Outlined" Size="Size.Small">Refresh code</MudButton>
     </p>
-    @if (newCode is not null)
-    {
-        <MudAlert Severity="Severity.Info">New authenticator preview code: <strong data-testid="new-factor-code">@newCode</strong>. You can also scan the QR code with your authenticator app.</MudAlert>
-    }
+    <DevelopmentAuthenticatorCodes @ref="codes" LoadCodes="LoadCodes" ContextKey="CodeContext" />
+    <p>New authenticator codes appear during setup. You can also scan the QR code with your authenticator app.</p>
     <p>Each code can be accepted once per account. After sign-in, wait for the next code before proving the existing authenticator for replacement. A cancelled replacement keeps the old authenticator active.</p>
     <p>Mandatory MFA: <strong>@(Preview.Mandatory ? "enabled" : "optional")</strong>.
         <MudButton OnClick="ToggleMandatory" Variant="Variant.Outlined" Disabled="Flow.Busy">@(Preview.Mandatory ? "Make MFA optional" : "Require MFA for local login")</MudButton>
         Changing this synthetic policy ends this journey and invalidates existing preview sessions. Use preview-mandatory to try required enrollment.
     </p>
-    <p>For lost-device recovery, sign in as preview-admin, record <strong>DEMO-CHECK-001</strong> as the synthetic independent verification reference, and copy the issued code. Choose Try another login, then Use an admin recovery code with preview-recovery, its current password, and the copied code. Confirm the new authenticator; recovery returns to login without a session.</p>
+    <p>For lost-device recovery, sign in as preview-admin. After confirming the person's identity through your team's procedure, record a support ticket or short note. <strong>DEMO-CHECK-001</strong> is only an example audit reference; Shift does not verify its truth. Copy the separately generated recovery code and share it privately. Choose Try another login, then Use an admin recovery code with preview-recovery, its current password, and that code. Confirm the new authenticator; recovery returns to login without a session.</p>
     @if (configuringMfa)
     {
         <TotpEnrollmentForm AdmissionFlow="Flow" AdmissionCompleted="SecurityCompleted" />
@@ -109,17 +105,11 @@
     private string? resultText;
     private int formVersion;
     private string codeAccount = "preview-mfa";
-    private string? currentCode;
-    private string? newCode;
-    private int seconds;
-    private readonly CancellationTokenSource refreshCancellation = new();
-    private async Task RefreshCode()
-    {
-        currentCode = (await Preview.FactorAsync(codeAccount)).Code;
-        seconds = Preview.SecondsRemaining;
-        newCode = Flow.Pending?.NewAuthenticator is { } setup
-            ? new OtpNet.Totp(OtpNet.Base32Encoding.ToBytes(setup.Secret)).ComputeTotp() : null;
-    }
+    private DevelopmentAuthenticatorCodes? codes;
+    private string CodeContext() => codeAccount + ":" + Flow.Pending?.NewAuthenticator?.Secret;
+    private Task<AuthenticatorCodeSnapshot> LoadCodes(CancellationToken cancellation) =>
+        Preview.CodeSnapshotAsync(codeAccount, Flow.Pending?.NewAuthenticator?.Secret, cancellation);
+    private Task RefreshCode() => codes?.RefreshAsync() ?? Task.CompletedTask;
     private async Task SelectCodeAccount(ChangeEventArgs args)
     {
         var selected = args.Value?.ToString();
@@ -129,17 +119,6 @@
     protected override async Task OnInitializedAsync()
     {
         recoveryUserID = (await Preview.FactorAsync("preview-recovery")).UserID;
-        await RefreshCode(); _ = RefreshLoopAsync();
-    }
-    private async Task RefreshLoopAsync()
-    {
-        try
-        {
-            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
-            while (await timer.WaitForNextTickAsync(refreshCancellation.Token))
-                await InvokeAsync(async () => { await RefreshCode(); StateHasChanged(); });
-        }
-        catch (OperationCanceledException) { }
     }
     private async Task Completed(SessionIssued result)
     {
@@ -237,5 +216,5 @@
         await RefreshCode();
     }
     private void Stop() => Lifetime.StopApplication();
-    public void Dispose() { refreshCancellation.Cancel(); refreshCancellation.Dispose(); Flow.Restart(); }
+    public void Dispose() => Flow.Restart();
 }

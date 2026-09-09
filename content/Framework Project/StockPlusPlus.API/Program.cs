@@ -38,12 +38,19 @@ using ShiftSoftware.TypeAuth.Core;
 using ShiftSoftware.ShiftIdentity.Core.Models;
 #endif
 
-#if IDENTITY_ADMISSION_PREVIEW
+#if IDENTITY_DEVELOPMENT_APP
+if (!args.Contains("--identity-development", StringComparer.Ordinal))
+    throw new InvalidOperationException("This development build requires --identity-development. Rebuild normally for configured application startup.");
+await StockPlusPlus.API.Development.IdentityApp.IdentityDevelopmentHost.RunAsync();
+return;
+#elif IDENTITY_ADMISSION_PREVIEW
 if (!args.Contains("--identity-preview", StringComparer.Ordinal))
     throw new InvalidOperationException("This local preview build requires --identity-preview. Rebuild normally to run the application.");
 await StockPlusPlus.API.Development.IdentityPreview.IdentityPreviewHost.RunAsync();
 return;
 #else
+if (args.Contains("--identity-development", StringComparer.Ordinal))
+    throw new InvalidOperationException("Build with eng/Start-IdentityDevelopmentApp.ps1 before using --identity-development.");
 if (args.Contains("--identity-preview", StringComparer.Ordinal))
     throw new InvalidOperationException("Build the local admission preview with eng/Start-IdentityPreview.ps1 before using --identity-preview.");
 

@@ -63,7 +63,9 @@
         "TestProject",
         "StockPlusPlus.Web.Tests/**/*",
         "StockPlusPlus.Test/Tests/IdentityConsumerContractTests.cs",
-        "StockPlusPlus.API/Development/IdentityPreview/**/*"
+        "StockPlusPlus.API/Development/IdentityPreview/**/*",
+        "StockPlusPlus.API/Development/IdentityApp/**/*",
+        "StockPlusPlus.Test/Tests/IdentityDevelopmentAppTests.cs"
       ],
       "modifiers": [
         {

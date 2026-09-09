@@ -1,6 +1,18 @@
 ﻿@page "/"
 @attribute [Authorize]
 
+@if (AdmissionContext is not null)
+{
+    <MudText Typo="Typo.h4">StockPlusPlus</MudText>
+    <MudAlert Severity="Severity.Info" Class="my-4">Isolated authentication development. Accounts and changes exist only in this disposable local database.</MudAlert>
+    <MudButton Href="Identity/UserDataForm" Color="Color.Primary" Variant="Variant.Filled">Open profile</MudButton>
+    <MudButton Href="development/tools" Target="_blank">Synthetic accounts and authenticator codes</MudButton>
+}
+
 <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Reverse>
     <DateBig/>
 </MudStack>
+
+@code {
+    [CascadingParameter] public ShiftSoftware.ShiftIdentity.Blazor.Services.AdmissionUiContext? AdmissionContext { get; set; }
+}

@@ -1,0 +1,12 @@
+@implements IAsyncDisposable
+@inject ShiftSoftware.ShiftIdentity.Blazor.Services.AdmissionSessionStore Session
+@code {
+    private readonly PeriodicTimer timer = new(TimeSpan.FromSeconds(30));
+    private Task? renewal;
+    protected override void OnInitialized() => renewal = RunAsync();
+    private async Task RunAsync()
+    {
+        while (await timer.WaitForNextTickAsync()) await InvokeAsync(Session.RenewAsync);
+    }
+    public async ValueTask DisposeAsync() { timer.Dispose(); if (renewal is not null) await renewal; }
+}

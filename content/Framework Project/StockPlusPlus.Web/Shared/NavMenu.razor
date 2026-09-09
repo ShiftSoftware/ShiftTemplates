@@ -9,7 +9,20 @@
 @using StockPlusPlus.Web.Pages.ProductCategory
 @using StockPlusPlus.Web.Pages.CosmosCompanyBranch
 @*#endif*@
+@inject ShiftSoftware.TypeAuth.Core.ITypeAuthService TypeAuthService
 <MudNavMenu>
+    @if (AdmissionContext is not null)
+    {
+        <MudNavLink Href="/" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+        <MudNavLink Href="Identity/UserDataForm" Icon="@Icons.Material.Filled.Person">Profile</MudNavLink>
+        @if (TypeAuthService.CanAccess(ShiftIdentityActions.ManageMfaRecovery))
+        {
+            <MudNavLink Href="Identity/UserList" Icon="@Icons.Material.Filled.People">Users</MudNavLink>
+        }
+        <MudNavLink Href="development/tools" Target="_blank" Icon="@Icons.Material.Filled.Science">Development tools</MudNavLink>
+    }
+    else
+    {
     @*#if (includeSampleApp)*@
     <MudNavLink Href="@($"/{nameof(NeedsAttentionPage)}")"
                 Match="NavLinkMatch.All"
@@ -74,8 +87,10 @@
                           Icon="@Icons.Material.Outlined.Business"
                           TypeAuthAction="ShiftSoftware.ShiftIdentity.Core.ShiftIdentityActions.CompanyBranches">Branches (Cosmos)</AuthorizedMudNavLink>
     @*#endif*@
+    }
 </MudNavMenu>
 
 @code {
+    [CascadingParameter] public ShiftSoftware.ShiftIdentity.Blazor.Services.AdmissionUiContext? AdmissionContext { get; set; }
     [Parameter] public bool isDrawerOpen { get; set; }
 }

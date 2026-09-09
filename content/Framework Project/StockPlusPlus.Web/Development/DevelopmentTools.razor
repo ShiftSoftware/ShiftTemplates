@@ -1,0 +1,49 @@
+@page "/development/tools"
+@layout ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Shared.EmptyLayout
+@using ShiftSoftware.ShiftIdentity.Blazor.Services
+@using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Shared
+@inject NavigationManager Navigation
+@inject IServiceProvider Services
+@implements IDisposable
+
+<MudPaper Class="pa-5">
+    <MudText Typo="Typo.h5">Synthetic account tools</MudText>
+    @if (AdmissionContext is not null && client is not null)
+    {
+        <MudText>Each 30-second code can be accepted once per account. After login, wait for the next code before replacing an authenticator.</MudText>
+        <DevelopmentAuthenticatorCodes LoadCodes="LoadCodes" />
+        <MudButton OnClick="() => Policy(true)">Require MFA for local login</MudButton>
+        <MudButton OnClick="() => Policy(false)">Make MFA optional</MudButton>
+        <MudButton OnClick="Renew">Renew current session</MudButton>
+        <MudAlert Severity="Severity.Info">Changing policy invalidates current sessions and pending journeys. New-factor codes come from scanning the real setup QR or entering its manual key in an authenticator app.</MudAlert>
+        <MudText>@message</MudText>
+        <MudButton Href="Identity/login" Color="Color.Primary">Login</MudButton>
+        <MudButton Href="Identity/UserDataForm">Profile</MudButton>
+        <MudButton OnClick="Stop" Color="Color.Warning">Stop development app</MudButton>
+    }
+    else { <MudText>This page requires the isolated development host.</MudText> }
+</MudPaper>
+@code {
+    [CascadingParameter] public AdmissionUiContext? AdmissionContext { get; set; }
+    private HttpClient? client;
+    private string? message;
+    protected override void OnInitialized()
+    {
+        if (AdmissionContext is null) return;
+        client = new HttpClient { BaseAddress = new Uri(Navigation.BaseUri) };
+    }
+    private async Task<AuthenticatorCodeSnapshot> LoadCodes(CancellationToken cancellation) =>
+        await client!.GetFromJsonAsync<AuthenticatorCodeSnapshot>("development/info", cancellation)
+            ?? throw new HttpRequestException("Code snapshot unavailable.");
+    private async Task Policy(bool required)
+    {
+        using var response = await client!.PostAsync("development/mandatory/" + required.ToString().ToLowerInvariant(), null);
+        response.EnsureSuccessStatusCode();
+        await AdmissionContext!.Store.RemoveTokenAsync();
+        await AdmissionContext.Flow.CancelAsync();
+        message = required ? "MFA is required. Sign in again." : "MFA is optional. Sign in again.";
+    }
+    private async Task Renew() => message = await Services.GetRequiredService<AdmissionSessionStore>().RenewAsync() ? "Session renewed." : "No current session. Sign in again.";
+    private async Task Stop() { await client!.PostAsync("development/stop", null); message = "Development app stopped."; }
+    public void Dispose() => client?.Dispose();
+}

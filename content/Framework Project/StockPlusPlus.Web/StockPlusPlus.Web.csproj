@@ -9,6 +9,17 @@
 		<BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
 	</PropertyGroup>
 
+	<!--#if shiftFrameworkDevelopmentMode-->
+	<PropertyGroup Condition="'$(IdentityDevelopmentApp)' == 'true'">
+		<DefineConstants>$(DefineConstants);IDENTITY_DEVELOPMENT_APP</DefineConstants>
+	</PropertyGroup>
+	<Target Name="ValidateIdentityDevelopmentWebBuild" BeforeTargets="PrepareForBuild" Condition="'$(IdentityDevelopmentApp)' == 'true'">
+		<Error Condition="'$(Configuration)' != 'Debug' Or '$(ImportShiftFrameworkProjects)' != 'true'" Text="IdentityDevelopmentApp requires a local framework Debug build." />
+	</Target>
+	<Target Name="RefuseIdentityDevelopmentWebPublication" BeforeTargets="Publish;Pack" Condition="'$(IdentityDevelopmentApp)' == 'true'">
+		<Error Text="The disposable identity development client cannot be published or packed." />
+	</Target>
+	<!--#endif -->
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.10" PrivateAssets="all" />

@@ -27,6 +27,19 @@ using ShiftSoftware.ShiftBlazor.Enums;
 
 [assembly: RootNamespace("StockPlusPlus.Web")]
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+#if IDENTITY_DEVELOPMENT_APP
+if (builder.Configuration.GetValue<bool>("IdentityDevelopment") != true ||
+    new Uri(builder.HostEnvironment.BaseAddress).Host != "127.0.0.1")
+    throw new InvalidOperationException("This client requires the isolated identity development host.");
+var developmentRunID = builder.Configuration["RunID"] ?? throw new InvalidOperationException("Missing owned host identity.");
+// The owned host serves only synthetic configuration. Resolve every service address from this origin.
+builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+{
+    ["BaseURL"] = builder.HostEnvironment.BaseAddress + "api/",
+    ["ShiftIdentityApi"] = builder.HostEnvironment.BaseAddress + "api/",
+    ["ShiftIdentityFrontEnd"] = builder.HostEnvironment.BaseAddress.TrimEnd('/')
+});
+#endif
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
@@ -70,6 +83,9 @@ builder.Services.AddShiftBlazor(config =>
 });
 
 builder.Services.AddShiftIdentity("StockPlusPlus-Dev", shiftIdentityApiURL, shiftIdentityFrontEndURL, false);
+#if IDENTITY_DEVELOPMENT_APP
+StockPlusPlus.Web.Development.IdentityDevelopmentClient.Configure(builder.Services, builder.HostEnvironment.BaseAddress, developmentRunID);
+#endif
 
 #if (internalShiftIdentityHosting)
 builder.Services.AddShiftIdentityDashboardBlazor(x =>
@@ -77,9 +93,12 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
     x.ShiftIdentityHostingType = ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.External;
     x.LogoPath = "/img/shift-full.png";
     x.Title = "StockPlusPlus";
+#if IDENTITY_DEVELOPMENT_APP
+    x.DynamicTypeAuthActionExpander = () => Task.CompletedTask;
+#else
     x.DynamicTypeAuthActionExpander = async () =>
     {
-#if (includeSampleApp)
+#if (includeSampleApp && !IDENTITY_DEVELOPMENT_APP)
         var httpService = builder.Services.BuildServiceProvider().GetRequiredService<HttpClient>();
 
         ODataDTO<ProductBrandListDTO>? brands = null!;
@@ -96,6 +115,7 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
         StockPlusPlusActionTree.DataLevelAccess.ProductCategory.Expand(categories!.Value.Select(x => new KeyValuePair<string, string>(x.ID!, x.Name!)).ToList());
 #endif
     };
+#endif
 
 #if (includeSampleApp)
     x.AddCompanyCustomField("SomeExternalLink", "Some External Link")
@@ -146,6 +166,10 @@ var culture = setMan.GetCulture();
 CultureInfo.DefaultThreadCurrentCulture = culture;
 CultureInfo.DefaultThreadCurrentUICulture = culture;
 
+#if IDENTITY_DEVELOPMENT_APP
+await host.Services.GetRequiredService<ShiftSoftware.ShiftIdentity.Blazor.Services.AdmissionSessionStore>().RenewAsync();
+#else
 await host.RefreshTokenAsync(50);
+#endif
 
 await host.RunAsync();

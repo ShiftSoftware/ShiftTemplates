@@ -14,6 +14,18 @@
 	<PropertyGroup Condition="'$(IdentityAdmissionPreview)' == 'true'">
 		<DefineConstants>$(DefineConstants);IDENTITY_ADMISSION_PREVIEW</DefineConstants>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(IdentityDevelopmentApp)' == 'true'">
+		<DefineConstants>$(DefineConstants);IDENTITY_DEVELOPMENT_APP</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup Condition="'$(IdentityDevelopmentApp)' == 'true'">
+		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Tests\ShiftIdentity.Tests.csproj" />
+	</ItemGroup>
+	<Target Name="ValidateIdentityDevelopmentBuild" BeforeTargets="PrepareForBuild" Condition="'$(IdentityDevelopmentApp)' == 'true'">
+		<Error Condition="'$(Configuration)' != 'Debug' Or '$(ImportShiftFrameworkProjects)' != 'true' Or '$(IdentityAdmissionPreview)' == 'true'" Text="IdentityDevelopmentApp requires an isolated local Debug build and cannot be combined with the preview." />
+	</Target>
+	<Target Name="RefuseIdentityDevelopmentPublication" BeforeTargets="Publish;Pack" Condition="'$(IdentityDevelopmentApp)' == 'true'">
+		<Error Text="The disposable identity development app cannot be published or packed." />
+	</Target>
 	<ItemGroup Condition="'$(IdentityAdmissionPreview)' == 'true'">
 		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Tests\ShiftIdentity.Tests.csproj" />
 	</ItemGroup>

@@ -184,6 +184,16 @@ public sealed class IdentityPreviewState(SqlIdentityFixture fixture)
     public int SecondsRemaining => 30 - (int)(DateTimeOffset.UtcNow.ToUnixTimeSeconds() % 30);
     public bool Mandatory { get; private set; }
     public Task<(long UserID, string? Code)> FactorAsync(string username) => fixture.GetSyntheticFactorAsync(username);
+    public async Task<AuthenticatorCodeSnapshot> CodeSnapshotAsync(string username, string? newSecret, CancellationToken cancellation)
+    {
+        var generated = fixture.Clock.GetUtcNow();
+        var expires = DateTimeOffset.FromUnixTimeSeconds((generated.ToUnixTimeSeconds() / 30 + 1) * 30);
+        var factor = await fixture.GetSyntheticFactorAsync(username, generated, cancellation);
+        var codes = new List<AuthenticatorCode> { new(username, factor.Code, factor.UserID) };
+        if (newSecret is not null)
+            codes.Add(new("New authenticator", new Totp(Base32Encoding.ToBytes(newSecret)).ComputeTotp(generated.UtcDateTime)));
+        return new(generated, expires, codes.ToArray());
+    }
     public async Task SetMandatoryAsync(bool mandatory)
     {
         await fixture.ChangeMfaPolicyAsync(mandatory);

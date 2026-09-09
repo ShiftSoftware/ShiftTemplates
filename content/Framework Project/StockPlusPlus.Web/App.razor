@@ -2,13 +2,20 @@
 @using ShiftSoftware.ShiftIdentity.Core
 
 <CascadingAuthenticationState>
+    <CascadingValue Value="AdmissionContext" IsFixed="true">
+    @if (AdmissionContext is not null)
+    {
+        <StockPlusPlus.Web.Development.DevelopmentSessionLifetime />
+    }
     <DefaultApp AppTitle="StockPlusPlus"
                 AppAssembly="@typeof(App).Assembly"
                 IdentityHostingType="shiftIdentityHostingTypes"
-                AdditionalAssemblies="additionalAssemblies">
+                AdditionalAssemblies="additionalAssemblies"
+                OnNavigateAsync="CheckDevelopmentRoute">
 
         <NavMenuTemplate>
             <NavMenu isDrawerOpen="@context.IsDrawerOpen" />
         </NavMenuTemplate>
     </DefaultApp>
+    </CascadingValue>
 </CascadingAuthenticationState>

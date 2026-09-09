@@ -12,6 +12,10 @@
 		<IsTestProject>true</IsTestProject>
 	</PropertyGroup>
 
+	<!-- Tests for the owned normal-app host run only with its explicit Debug build property. -->
+	<PropertyGroup Condition="'$(IdentityDevelopmentApp)' == 'true'">
+		<DefineConstants>$(DefineConstants);IDENTITY_DEVELOPMENT_APP</DefineConstants>
+	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
 		<PackageReference Include="ShiftSoftware.ShiftFrameworkTestingTools" Version="$(ShiftFrameworkVersion)" />
