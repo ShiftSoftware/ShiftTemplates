@@ -137,12 +137,11 @@ internal static class IdentityPreviewHost
             };
             db.Add(user);
             await db.SaveChangesAsync();
-            db.Add(new UserSecurityState
-            {
-                UserID = user.ID,
-                ProtectedTotpSecret = account.Username is "preview-mfa" or "preview-required-mfa" or "preview-recovery" or "preview-admin"
-                    ? fixture.Protection.CreateProtector("Identity.Totp.v2").Protect(fixture.FactorSecret) : null
-            });
+            var security = new UserSecurityState { UserID = user.ID };
+            fixture.SetSyntheticFactor(security,
+                account.Username is "preview-mfa" or "preview-required-mfa" or "preview-recovery" or "preview-admin"
+                    ? fixture.FactorSecret : null);
+            db.Add(security);
         }
         await db.SaveChangesAsync();
     }
