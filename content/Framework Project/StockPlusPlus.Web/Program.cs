@@ -167,7 +167,7 @@ CultureInfo.DefaultThreadCurrentCulture = culture;
 CultureInfo.DefaultThreadCurrentUICulture = culture;
 
 #if IDENTITY_DEVELOPMENT_APP
-await host.Services.GetRequiredService<ShiftSoftware.ShiftIdentity.Blazor.Services.AdmissionSessionStore>().RenewAsync();
+await host.Services.GetRequiredService<ShiftSoftware.ShiftIdentity.Blazor.IdentitySession>().RenewAsync();
 #else
 await host.RefreshTokenAsync(50);
 #endif

@@ -1,7 +1,5 @@
 #if IDENTITY_ADMISSION_PREVIEW
 using System.Net;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
@@ -9,10 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using OtpNet;
 using ShiftIdentity.Tests.Infrastructure;
 using ShiftSoftware.ShiftBlazor.Extensions;
-using ShiftSoftware.ShiftIdentity.Blazor;
+using ShiftSoftware.ShiftIdentity.Blazor.Extensions;
 using ShiftSoftware.ShiftIdentity.Blazor.Services;
 using ShiftSoftware.ShiftIdentity.Core;
-using ShiftSoftware.ShiftIdentity.Core.DTOs;
 using ShiftSoftware.ShiftIdentity.Core.Localization;
 using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
 using ShiftSoftware.ShiftIdentity.Data.Authentication;
@@ -54,10 +51,8 @@ internal static class IdentityPreviewHost
         IdentityHttpHost.AddAdmissionServices(builder.Services, fixture);
         var preview = new IdentityPreviewState(fixture);
         builder.Services.AddSingleton(preview);
-        builder.Services.AddScoped<PreviewIdentityStore>();
-        builder.Services.AddScoped<IIdentityStore>(sp => sp.GetRequiredService<PreviewIdentityStore>());
-        builder.Services.AddScoped<AuthenticationStateProvider, PreviewAuthState>();
         builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(preview.Origin) });
+        builder.Services.AddIdentityAdmissionSession(sp => sp.GetRequiredService<HttpClient>());
         builder.Services.AddScoped<AuthenticationFlow>();
         builder.Services.AddShiftBlazor(options => options.ShiftConfiguration = config => config.BaseAddress = "/");
         // Shared dialog/settings services expect synchronous storage. Keep that storage in this
@@ -211,25 +206,6 @@ public sealed class IdentityPreviewState(SqlIdentityFixture fixture)
     ];
 }
 public sealed record PreviewAccount(string Username, string Label);
-
-public sealed class PreviewIdentityStore : IIdentityStore
-{
-    private TokenDTO? token;
-    public Task<TokenDTO?> GetTokenAsync() => Task.FromResult(token);
-    public string? GetToken() => token?.Token;
-    public Task StoreTokenAsync(TokenDTO value) { token = value; return Task.CompletedTask; }
-    public Task RemoveTokenAsync() { token = null; return Task.CompletedTask; }
-}
-
-internal sealed class PreviewAuthState(PreviewIdentityStore store) : AuthenticationStateProvider
-{
-    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
-    {
-        var token = await store.GetTokenAsync();
-        return new(token is null ? new ClaimsPrincipal(new ClaimsIdentity()) :
-            new ClaimsPrincipal(new ClaimsIdentity(new Microsoft.IdentityModel.JsonWebTokens.JsonWebToken(token.Token).Claims, "PreviewSession")));
-    }
-}
 
 internal sealed class PreviewSettingsStore : Blazored.LocalStorage.ISyncLocalStorageService
 {

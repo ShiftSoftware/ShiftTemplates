@@ -1,6 +1,8 @@
 @page "/development/tools"
 @layout ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Shared.EmptyLayout
 @using ShiftSoftware.ShiftIdentity.Blazor.Services
+@using ShiftSoftware.ShiftIdentity.Blazor
+@using ShiftSoftware.ShiftIdentity.Blazor.Extensions
 @using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Shared
 @inject NavigationManager Navigation
 @inject IServiceProvider Services
@@ -46,7 +48,7 @@
         await AdmissionContext.Flow.CancelAsync();
         message = required ? "MFA is required. Sign in again." : "MFA is optional. Sign in again.";
     }
-    private async Task Renew() => message = await Services.GetRequiredService<AdmissionSessionStore>().RenewAsync() ? "Session renewed." : "No current session. Sign in again.";
+    private async Task Renew() => message = await Services.GetRequiredService<IdentitySession>().RenewAsync() ? "Session renewed." : "No current session. Sign in again.";
     private async Task EmailPolicy(bool required)
     {
         using var response = await client!.PostAsync("development/verified-email/" + required.ToString().ToLowerInvariant(), null);

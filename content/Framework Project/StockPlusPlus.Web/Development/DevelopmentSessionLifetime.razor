@@ -1,5 +1,6 @@
 @implements IAsyncDisposable
-@inject ShiftSoftware.ShiftIdentity.Blazor.Services.AdmissionSessionStore Session
+@using ShiftSoftware.ShiftIdentity.Blazor.Extensions
+@inject ShiftSoftware.ShiftIdentity.Blazor.IdentitySession Session
 @code {
     private readonly PeriodicTimer timer = new(TimeSpan.FromSeconds(30));
     private Task? renewal;

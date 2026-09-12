@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Components.Authorization;
 using ShiftSoftware.ShiftIdentity.Blazor;
+using ShiftSoftware.ShiftIdentity.Blazor.Extensions;
 using ShiftSoftware.ShiftIdentity.Blazor.Services;
 
 namespace StockPlusPlus.Web.Development;
@@ -10,12 +10,9 @@ internal static class IdentityDevelopmentClient
     {
         // A raw client keeps refresh and operation credentials out of the normal bearer handler.
         services.AddScoped(_ => new DevelopmentTransport { BaseAddress = new Uri(origin) });
-        services.AddScoped(sp => new AdmissionSessionStore(sp.GetRequiredService<DevelopmentTransport>(),
-            sp.GetRequiredService<Blazored.LocalStorage.ISyncLocalStorageService>(), "identity-development-" + runID));
-        services.AddScoped<IIdentityStore>(sp => sp.GetRequiredService<AdmissionSessionStore>());
-        services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<AdmissionSessionStore>());
-        services.AddScoped(sp => new AuthenticationFlow(sp.GetRequiredService<DevelopmentTransport>(), sp.GetRequiredService<IIdentityStore>()));
-        services.AddScoped(sp => new AdmissionUiContext(sp.GetRequiredService<AuthenticationFlow>(), sp.GetRequiredService<IIdentityStore>(), sp.GetRequiredService<DevelopmentTransport>()));
+        services.AddIdentityAdmissionSession(sp => sp.GetRequiredService<DevelopmentTransport>(), "identity-development-" + runID);
+        services.AddScoped(sp => new AuthenticationFlow(sp.GetRequiredService<DevelopmentTransport>(), sp.GetRequiredService<IdentitySession>()));
+        services.AddScoped(sp => new AdmissionUiContext(sp.GetRequiredService<AuthenticationFlow>(), sp.GetRequiredService<IdentitySession>(), sp.GetRequiredService<DevelopmentTransport>()));
     }
     private sealed class DevelopmentTransport : HttpClient;
 }
