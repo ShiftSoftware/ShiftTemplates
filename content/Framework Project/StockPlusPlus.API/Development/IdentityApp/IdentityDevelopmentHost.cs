@@ -142,7 +142,7 @@ public static class IdentityDevelopmentHost
             if (actor is null) return Results.Unauthorized();
             if (!CanManageUsers(actor)) return Results.StatusCode(403);
             await using var db = fixture.CreateContext();
-            var ids = await db.Users.Where(u => Accounts.Contains(u.Username) && u.IsActive && !u.IsDeleted).OrderBy(u => u.Username)
+            var ids = await db.Users.Where(u => Accounts.Contains(u.Username) && !u.IsDeleted).OrderBy(u => u.Username)
                 .Select(u => u.ID).ToArrayAsync();
             var accounts = new List<AdmissionAccount>();
             foreach (var id in ids)
@@ -166,13 +166,13 @@ public static class IdentityDevelopmentHost
             var policy = await db.Set<AuthenticationPolicyState>().AsNoTracking().SingleAsync();
             if (state is null || state.SecurityVersion.ToString() != c.User.FindFirstValue("shift_sv") ||
                 policy.Revision.ToString() != c.User.FindFirstValue("shift_policy")) return null;
-            return await Read(id);
+            return await Read(id, requireActive: true);
         }
-        async Task<AdmissionAccount?> Read(long id)
+        async Task<AdmissionAccount?> Read(long id, bool requireActive = false)
         {
             await using var db = fixture.CreateContext();
             var user = await db.Users.AsNoTracking().Include(u => u.AccessTrees).ThenInclude(t => t.AccessTree)
-                .SingleOrDefaultAsync(u => u.ID == id && u.IsActive && !u.IsDeleted);
+                .SingleOrDefaultAsync(u => u.ID == id && !u.IsDeleted && (!requireActive || u.IsActive));
             var state = await db.Set<UserSecurityState>().AsNoTracking().SingleOrDefaultAsync(s => s.UserID == id);
             if (user is null || state is null) return null;
             var trees = user.AccessTrees.Select(t => t.AccessTree.Tree).ToList();
@@ -181,7 +181,8 @@ public static class IdentityDevelopmentHost
             var canWrite = permissions.CanWrite(ShiftIdentityActions.Users);
             return new(user.ID, user.Username, user.FullName, state.ProtectedTotpSecret is not null,
                 state.LocalMfaRecoveryRequired, permissions.CanAccess(ShiftIdentityActions.ManageMfaRecovery),
-                user.Email, user.EmailVerified, RecoveryContact.IsEligible(user, state), canWrite, canWrite);
+                user.Email, user.EmailVerified, RecoveryContact.IsEligible(user, state), canWrite, canWrite,
+                IsActive: user.IsActive, CanManageAccount: canWrite);
         }
         static bool CanManageUsers(AdmissionAccount actor) => actor.CanManageRecovery || actor.CanManagePasswordReset || actor.CanManageEmailVerification;
     }
