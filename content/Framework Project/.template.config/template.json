@@ -286,6 +286,16 @@
       "datatype": "string",
       "generator": "constant"
     },
+    "shiftMapperVersion": {
+      "type": "generated",
+      "description": "Replace ShiftMapper Version",
+      "replaces": "$(ShiftMapperVersion)",
+      "parameters": {
+        "value": "0.1.0"
+      },
+      "datatype": "string",
+      "generator": "constant"
+    },
     "includeItemTemplateContent": {
       "type": "generated",
       "generator": "constant",

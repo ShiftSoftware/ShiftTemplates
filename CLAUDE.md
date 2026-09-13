@@ -57,7 +57,9 @@ The Builder: (1) reads `ShiftFrameworkGlobalSettings.props` and updates template
 
 Controlled by `ShiftFrameworkGlobalSettings.props` at the repo root. When `shiftFrameworkDevelopmentMode` is defined and sibling framework repos are cloned with the correct folder structure, projects use **local project references** instead of NuGet packages. This file is excluded from the template output.
 
-Required sibling repos for development mode: `ShiftEntity`, `ShiftBlazor`, `ShiftIdentity`, `TypeAuth`, `AzureFunctionsAspNetCoreAuthorization`, `ShiftFrameworkTestingTools`, `ShiftFrameworkLocalization`.
+Required sibling repos for development mode: `ShiftEntity`, `ShiftBlazor`, `ShiftIdentity`, `TypeAuth`, `AzureFunctionsAspNetCoreAuthorization`, `ShiftFrameworkTestingTools`, `ShiftFrameworkLocalization`, `ShiftMapper`.
+
+`ShiftMapper` (https://github.com/ShiftSoftware/ShiftMapper) is referenced by `StockPlusPlus.Data` only — the runtime library as a normal project reference and `ShiftMapper.Generator` as an analyzer (the source-generator half of the single `ShiftSoftware.ShiftMapper` package; the package also carries `ShiftMapper.CodeFixes`, which is IDE-only and is not wired in dev mode, matching ShiftMapper's own sample). It is wired in as a reference and a published package only; nothing in the framework or the sample consumes it yet. **The pipeline clones it anonymously like every other sibling, so the GitHub repository must be public before a `release*` tag is built** — the clone is unconditional because the sample build needs the checkout (the package is only ever published from this pipeline).
 
 ### Sample Project Structure (StockPlusPlus)
 
@@ -79,11 +81,11 @@ Template config lives in `content/Framework Project/.template.config/template.js
 
 ### Framework Version Management
 
-`ShiftFrameworkGlobalSettings.props` defines `ShiftFrameworkVersion`, `TypeAuthVersion`, and `AzureFunctionsAspNetCoreAuthorizationVersion`. The Builder's `UpdateTemplateVersions` reads these and writes them into `template.json` so newly created projects get correct package versions.
+`ShiftFrameworkGlobalSettings.props` defines `ShiftFrameworkVersion`, `TypeAuthVersion`, `AzureFunctionsAspNetCoreAuthorizationVersion` and `ShiftMapperVersion`. The Builder's `UpdateTemplateVersions` reads these and writes them into `template.json` so newly created projects get correct package versions. The last three are standalone: each sibling repo imports this props file — from the `ShiftTemplates` folder and from `s`, the pipeline's checkout directory, with the path relative to the importing file (`..\..\` from a csproj one level below the repo root, as in TypeAuth; `..\` from `ShiftMapper`'s repo-root `Directory.Build.props`) — and sets its `<Version>` from its own entry, so those packages move independently of the framework version. `ShiftMapper` keeps a fallback number in that props file for standalone clones; the published number is always the one here.
 
 ## CI/CD
 
-Azure DevOps pipeline (`azure-pipeline.yml`) triggers on `release*` tags. It clones all framework sibling repos, builds everything, runs tests, then packs and publishes NuGet packages. Tag naming controls what gets published: `release-all`, `release-framework`, `release-typeauth`, `release-aspNetCore-authorization`.
+Azure DevOps pipeline (`azure-pipeline.yml`) triggers on `release*` tags. It clones all framework sibling repos, builds everything, runs tests, then packs and publishes NuGet packages. Tag naming controls what gets published: `release-all`, `release-framework`, `release-typeauth`, `release-aspNetCore-authorization`, `release-shiftmapper`. `release-all` publishes every group; the specific tags publish only their own. The ShiftMapper group runs both of its test projects, packs `ShiftSoftware.ShiftMapper` (one package carrying the library and the generator) into its own staging folder, verifies both halves are inside the `.nupkg`, and pushes with `-SkipDuplicate` so a `release-all` after a `release-shiftmapper` of the same version does not fail.
 
 ## Active Work: Mapping Abstraction
 

@@ -27,12 +27,14 @@ public class UpdateTemplateVersions
         var shiftFrameworkVersion = xmlDoc.SelectSingleNode("//ns:Project/ns:PropertyGroup/ns:ShiftFrameworkVersion", nsmgr)!.InnerText;
         var typeAuthVersion = xmlDoc.SelectSingleNode("//ns:Project/ns:PropertyGroup/ns:TypeAuthVersion", nsmgr)!.InnerText;
         var azureFunctionsAspNetCoreAuthorizationVersion = xmlDoc.SelectSingleNode("//ns:Project/ns:PropertyGroup/ns:AzureFunctionsAspNetCoreAuthorizationVersion", nsmgr)!.InnerText;
+        var shiftMapperVersion = xmlDoc.SelectSingleNode("//ns:Project/ns:PropertyGroup/ns:ShiftMapperVersion", nsmgr)!.InnerText;
 
         
         Console.WriteLine();
         Console.WriteLine($"Framework:\t\t\t\t {shiftFrameworkVersion}");
         Console.WriteLine($"TypeAuth:\t\t\t\t {typeAuthVersion}");
         Console.WriteLine($"Az Fun AspNetCore Authorization:\t {azureFunctionsAspNetCoreAuthorizationVersion}");
+        Console.WriteLine($"ShiftMapper:\t\t\t\t {shiftMapperVersion}");
         Console.WriteLine();
         
 
@@ -46,6 +48,7 @@ public class UpdateTemplateVersions
         templateJsonContent!["symbols"]!["frameworkVersion"]!["parameters"]!["value"] = shiftFrameworkVersion;
         templateJsonContent!["symbols"]!["typeAuthVersion"]!["parameters"]!["value"] = typeAuthVersion;
         templateJsonContent!["symbols"]!["azureFunctionsAspNetCoreAuthorizationVersion"]!["parameters"]!["value"] = azureFunctionsAspNetCoreAuthorizationVersion;
+        templateJsonContent!["symbols"]!["shiftMapperVersion"]!["parameters"]!["value"] = shiftMapperVersion;
 
         //// Write back updated JSON content
         File.WriteAllText(templateJsonPath, templateJsonContent.ToString());

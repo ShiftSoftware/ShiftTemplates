@@ -21,3 +21,9 @@ dotnet sln remove ..\ShiftIdentity\ShiftIdentity.Data\ShiftIdentity.Data.csproj
 dotnet sln remove ..\ShiftIdentity\ShiftIdentity.Dashboard.AspNetCore\ShiftIdentity.Dashboard.AspNetCore.csproj
 dotnet sln remove ..\ShiftIdentity\ShiftIdentity.Dashboard.Blazor\ShiftIdentity.Dashboard.Blazor.csproj
 dotnet sln remove ..\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools.csproj
+
+dotnet sln remove ..\ShiftMapper\ShiftMapper\ShiftMapper.csproj
+dotnet sln remove ..\ShiftMapper\ShiftMapper.Generator\ShiftMapper.Generator.csproj
+dotnet sln remove ..\ShiftMapper\ShiftMapper.CodeFixes\ShiftMapper.CodeFixes.csproj
+dotnet sln remove ..\ShiftMapper\ShiftMapper.Tests\ShiftMapper.Tests.csproj
+dotnet sln remove ..\ShiftMapper\ShiftMapper.Generator.Tests\ShiftMapper.Generator.Tests.csproj

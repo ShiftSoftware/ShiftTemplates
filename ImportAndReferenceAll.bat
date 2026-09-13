@@ -20,3 +20,9 @@ dotnet sln add --solution-folder ShiftFramework\ShiftIdentity ..\..\..\ShiftIden
 dotnet sln add --solution-folder ShiftFramework\ShiftIdentity ..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.Blazor\ShiftIdentity.Dashboard.Blazor.csproj
 
 dotnet sln add --solution-folder ShiftFramework\TestingTools ..\..\..\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools.csproj
+
+dotnet sln add --solution-folder ShiftFramework\ShiftMapper ..\..\..\ShiftMapper\ShiftMapper\ShiftMapper.csproj
+dotnet sln add --solution-folder ShiftFramework\ShiftMapper ..\..\..\ShiftMapper\ShiftMapper.Generator\ShiftMapper.Generator.csproj
+dotnet sln add --solution-folder ShiftFramework\ShiftMapper ..\..\..\ShiftMapper\ShiftMapper.CodeFixes\ShiftMapper.CodeFixes.csproj
+dotnet sln add --solution-folder ShiftFramework\ShiftMapper ..\..\..\ShiftMapper\ShiftMapper.Tests\ShiftMapper.Tests.csproj
+dotnet sln add --solution-folder ShiftFramework\ShiftMapper ..\..\..\ShiftMapper\ShiftMapper.Generator.Tests\ShiftMapper.Generator.Tests.csproj

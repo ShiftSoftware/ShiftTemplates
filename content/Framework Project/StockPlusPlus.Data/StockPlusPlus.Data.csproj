@@ -19,6 +19,9 @@
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Print\ShiftEntity.Print.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.Print\ShiftEntity.Print.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Data\ShiftIdentity.Data.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Data\ShiftIdentity.Data.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<ProjectReference Include="..\..\..\..\ShiftIdentity\ShiftIdentity.Core\ShiftIdentity.Core.csproj" Condition="Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Core\ShiftIdentity.Core.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
+		<ProjectReference Include="..\..\..\..\ShiftMapper\ShiftMapper\ShiftMapper.csproj" Condition="Exists('..\..\..\..\ShiftMapper\ShiftMapper\ShiftMapper.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
+		<!-- Dev-mode analyzer reference; in package mode the generator ships inside the ShiftSoftware.ShiftMapper package. -->
+		<ProjectReference Include="..\..\..\..\ShiftMapper\ShiftMapper.Generator\ShiftMapper.Generator.csproj" Condition="Exists('..\..\..\..\ShiftMapper\ShiftMapper.Generator\ShiftMapper.Generator.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 		<!--#endif -->
 	</ItemGroup>
 
@@ -28,6 +31,7 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.EFCore" Version="$(ShiftFrameworkVersion)" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.Print" Version="$(ShiftFrameworkVersion)" />
+		<PackageReference Include="ShiftSoftware.ShiftMapper" Version="$(ShiftMapperVersion)" />
 		<!--#if(internalShiftIdentityHosting)-->
 		<PackageReference Include="ShiftSoftware.ShiftIdentity.Data" Version="$(ShiftFrameworkVersion)" />
 		<!--#endif -->

@@ -37,6 +37,13 @@ steps:
  - script: git clone https://github.com/ShiftSoftware/ShiftFrameworkLocalization ../ShiftFrameworkLocalization
    displayName: 'Clone ShiftFrameworkLocalization'
 
+ # Cloned anonymously like every other sibling, so the repository has to be public before a release* tag is built.
+ # The clone is unconditional because StockPlusPlus.Data references ShiftMapper as a project: without the checkout,
+ # the sample build (identity-checks) would need the ShiftSoftware.ShiftMapper package instead, and that package
+ # is only ever published from this pipeline.
+ - script: git clone https://github.com/ShiftSoftware/ShiftMapper.git ../ShiftMapper || { echo "##vso[task.logissue type=error]Could not clone https://github.com/ShiftSoftware/ShiftMapper anonymously. The repository must be readable without credentials (public), like every other sibling this pipeline clones, before any release* tag is built."; exit 1; }
+   displayName: 'Clone ShiftMapper'
+
  - template: .pipelines/identity-checks.steps.yml
    parameters:
     identityRoot: $(Build.SourcesDirectory)/../ShiftIdentity
@@ -150,6 +157,35 @@ steps:
    condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-aspNetCore-authorization')))
    displayName: 'pack Azure Functions AspNetCore Authorization'
 
+ # ShiftMapper is versioned on its own (ShiftMapperVersion in ShiftFrameworkGlobalSettings.props) and published
+ # by 'release-all' or its own 'release-shiftmapper' tag. One package carries both the runtime library and the
+ # source generator, so the pack is followed by a check that both halves made it into the .nupkg.
+ - script: dotnet test ../ShiftMapper/ShiftMapper.Tests --configuration Release
+   condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-shiftmapper')))
+   displayName: 'Test ShiftMapper'
+
+ - script: dotnet test ../ShiftMapper/ShiftMapper.Generator.Tests --configuration Release
+   condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-shiftmapper')))
+   displayName: 'Test ShiftMapper.Generator'
+
+ - script: dotnet pack ../ShiftMapper/ShiftMapper --configuration Release --output $(Build.ArtifactStagingDirectory)/ShiftMapper
+   condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-shiftmapper')))
+   displayName: 'pack ShiftMapper'
+
+ - script: |
+    set -euo pipefail
+    package=$(ls $(Build.ArtifactStagingDirectory)/ShiftMapper/*.nupkg)
+    echo "Inspecting $package"
+    contents=$(unzip -Z1 "$package")
+    echo "$contents"
+    for required in analyzers/dotnet/cs/ShiftMapper.Generator.dll analyzers/dotnet/cs/ShiftMapper.CodeFixes.dll lib/net10.0/ShiftMapper.dll lib/net10.0/ShiftMapper.xml README.md icon.png
+    do
+      grep -qx "$required" <<< "$contents" || { echo "##vso[task.logissue type=error]$package is missing $required"; exit 1; }
+    done
+    ls $(Build.ArtifactStagingDirectory)/ShiftMapper/*.snupkg > /dev/null || { echo "##vso[task.logissue type=error]No .snupkg symbol package was produced next to $package"; exit 1; }
+   condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-shiftmapper')))
+   displayName: 'Verify the ShiftMapper package carries the library and the generator'
+
  - task: NuGetToolInstaller@1
    inputs:
     versionSpec: '6.9.1'
@@ -167,6 +203,13 @@ steps:
    inputs:
     command: 'custom'
     arguments: 'push "$(Build.ArtifactStagingDirectory)/AzureFunctionsAspNetCoreAuthorization/**/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey $(ShiftSoftwareNugetApiKey) -SkipDuplicate'
+
+ - task: NuGetCommand@2
+   displayName: 'Push ShiftMapper Package'
+   condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-shiftmapper')))
+   inputs:
+    command: 'custom'
+    arguments: 'push "$(Build.ArtifactStagingDirectory)/ShiftMapper/**/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey $(ShiftSoftwareNugetApiKey) -SkipDuplicate'
 
  - task: NuGetCommand@2
    displayName: 'Push Framework Packages'
