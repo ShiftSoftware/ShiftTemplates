@@ -26,3 +26,4 @@ dotnet sln add --solution-folder ShiftFramework\ShiftMapper ..\..\..\ShiftMapper
 dotnet sln add --solution-folder ShiftFramework\ShiftMapper ..\..\..\ShiftMapper\ShiftMapper.CodeFixes\ShiftMapper.CodeFixes.csproj
 dotnet sln add --solution-folder ShiftFramework\ShiftMapper ..\..\..\ShiftMapper\ShiftMapper.Tests\ShiftMapper.Tests.csproj
 dotnet sln add --solution-folder ShiftFramework\ShiftMapper ..\..\..\ShiftMapper\ShiftMapper.Generator.Tests\ShiftMapper.Generator.Tests.csproj
+dotnet sln add --solution-folder ShiftFramework\ShiftMapper ..\..\..\ShiftMapper\Contoso.Platform\Contoso.Platform.csproj

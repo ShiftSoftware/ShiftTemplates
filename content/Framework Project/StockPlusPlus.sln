@@ -142,6 +142,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftMapper.Tests", "..\..\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftMapper.Generator.Tests", "..\..\..\ShiftMapper\ShiftMapper.Generator.Tests\ShiftMapper.Generator.Tests.csproj", "{EA322330-4586-41B4-9512-8112F5AB43C3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contoso.Platform", "..\..\..\ShiftMapper\Contoso.Platform\Contoso.Platform.csproj", "{A871A2DC-CDF1-4B04-BF7C-90A7F1FDB2BF}"
+EndProject
 <!--#endif -->
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -338,6 +340,10 @@ Global
 		{EA322330-4586-41B4-9512-8112F5AB43C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA322330-4586-41B4-9512-8112F5AB43C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA322330-4586-41B4-9512-8112F5AB43C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A871A2DC-CDF1-4B04-BF7C-90A7F1FDB2BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A871A2DC-CDF1-4B04-BF7C-90A7F1FDB2BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A871A2DC-CDF1-4B04-BF7C-90A7F1FDB2BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A871A2DC-CDF1-4B04-BF7C-90A7F1FDB2BF}.Release|Any CPU.Build.0 = Release|Any CPU
 		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
@@ -393,6 +399,7 @@ Global
 		{03576F8F-CF50-4060-943A-19532E5D5A3B} = {9E913C84-F40B-415B-876D-126C334E4CE7}
 		{F64C41CB-1E96-4999-A03D-2CC6DFC688F8} = {9E913C84-F40B-415B-876D-126C334E4CE7}
 		{EA322330-4586-41B4-9512-8112F5AB43C3} = {9E913C84-F40B-415B-876D-126C334E4CE7}
+		{A871A2DC-CDF1-4B04-BF7C-90A7F1FDB2BF} = {9E913C84-F40B-415B-876D-126C334E4CE7}
 		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

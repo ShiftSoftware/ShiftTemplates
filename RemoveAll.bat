@@ -27,3 +27,4 @@ dotnet sln remove ..\ShiftMapper\ShiftMapper.Generator\ShiftMapper.Generator.csp
 dotnet sln remove ..\ShiftMapper\ShiftMapper.CodeFixes\ShiftMapper.CodeFixes.csproj
 dotnet sln remove ..\ShiftMapper\ShiftMapper.Tests\ShiftMapper.Tests.csproj
 dotnet sln remove ..\ShiftMapper\ShiftMapper.Generator.Tests\ShiftMapper.Generator.Tests.csproj
+dotnet sln remove ..\ShiftMapper\Contoso.Platform\Contoso.Platform.csproj
