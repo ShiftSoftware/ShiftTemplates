@@ -9,7 +9,7 @@
 > Two passages carry more detail in the `.shift` mirror than here — Q7 and gap C-3 — because this repo is
 > public and the change they describe has not shipped yet. Everything else is identical.
 
-**Goal:** delete the AutoMapper dependency from Shift Framework. Make an explicit mapper (source-generated or hand-written) **required** instead of falling back to AutoMapper. Cover Cosmos replication too.
+**Goal:** delete the AutoMapper dependency from Shift Framework. Make an explicit mapper (source-generated or hand-written) **required** instead of falling back to AutoMapper. Cover Cosmos replication too — where, since 2026-09-15, the fallback for a call site without a delegate is a ShiftMapper map, resolved and checked before any row is written.
 
 This folder is the working plan. It supersedes the "AutoMapper Removal Path" bullet at the bottom of
 the mapping-abstraction plan (`.shift/repos/shift-entity/mapping-abstraction-plan.md`), which stays the source of truth for the
@@ -116,7 +116,7 @@ Work through them in order. Steps *within* a stage are mostly independent and sa
 
 - No `PackageReference Include="AutoMapper"` anywhere in `ShiftEntity`, `ShiftIdentity` or `ShiftTemplates` — the compat package is the only place it survives.
 - Every framework-owned `ShiftRepository<,,,>` triple and every endpoint attribute resolves an explicit mapper, verified at startup.
-- Every replication call site **in the framework and the template** passes an explicit mapping delegate — enforced by the compiler, not convention.
+- Every replication call site **in the framework and the template** resolves an explicit mapping delegate or a registered ShiftMapper map — checked before any row is written, never inside the per-row catch (STATUS log, 2026-09-15).
 - `dotnet new shift` and `dotnet new shiftentity` produce projects that build, with no AutoMapper reference.
 - CI runs the mapping tests on every framework release tag.
 - `ShiftSoftware.ShiftEntity.EFCore.AutoMapper` is published, and the framework test suite contains a compat smoke project proving an old-style `Profile` still resolves a mapper through the seam.

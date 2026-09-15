@@ -17,8 +17,9 @@ namespace StockPlusPlus.Functions.Functions;
 
 // Scheduled Cosmos catch-up replication for the hosted ShiftIdentity domain. There is ONE hourly timer per entity
 // (each an incremental, dirty-only re-sync) plus ONE on-demand HTTP endpoint that re-syncs EVERYTHING (a full
-// backfill). All mapping is manual — the ToXModel() delegates in ShiftIdentity.Data — via the reusable
-// IdentityCatchUpReplicationExtensions service; AutoMapper is not involved.
+// backfill). The reusable IdentityCatchUpReplicationExtensions pass no mapping delegates: every document is mapped
+// through the ShiftMapper mapper that x.AddShiftIdentity(issuer, key) in Program.cs registers — the same
+// IdentityReplicationProfile the API's save trigger uses, so a backfilled document matches a live one.
 //
 // The timers are DISABLED in local dev two ways: (1) the host-honored AzureWebJobs.<FunctionName>.Disabled settings
 // in local.settings.json stop them from firing at all locally (those settings are absent on a deployed host, so

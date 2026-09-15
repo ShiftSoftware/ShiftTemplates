@@ -10,10 +10,14 @@ using Xunit;
 namespace StockPlusPlus.Test.Tests;
 
 /// <summary>
-/// Correctness guard for the AutoMapper-free Cosmos replication mappings (ShiftIdentity.Data/Replication +
-/// Dashboard.AspNetCore/Replication). Each fact runs the hand-written <c>ToXModel()</c> / <c>ApplyTo…()</c> and
-/// asserts the produced document against a GOLDEN — the exact JSON the host's AutoMapper profile produced from
-/// the same fixture, captured while AutoMapper was still in the container.
+/// Correctness guard for the Cosmos replication mappings of the ShiftIdentity domain — the 19 pairs of
+/// <c>IdentityReplicationProfile</c> (ShiftIdentity.Data/Replication), which both the save trigger
+/// (Dashboard.AspNetCore/Replication) and the catch-up sweep (AzureFunctions/Replication) map through. Each fact maps
+/// a fixture through the ready-made <see cref="ShiftIdentityReplicationMapper"/> — <c>Map&lt;XModel&gt;(entity)</c>
+/// for the create doors, <c>Map(entity, existing)</c> for the apply-onto (<c>UpdateReference</c>) path — and asserts
+/// the produced document against a GOLDEN: the exact JSON the host's AutoMapper profile produced from the same
+/// fixture, captured while AutoMapper was still in the container, and matched byte-for-byte by the hand-written
+/// delegates that came between. The ShiftMapper profile is the third implementation these constants have pinned.
 /// <para>
 /// It used to assert the two implementations AGREED, resolving <c>IMapper</c> from the running host. That
 /// died when <c>AddShiftIdentityAutoMapper()</c> was deleted — it was never obsoleted first — and the oracle
@@ -28,13 +32,18 @@ namespace StockPlusPlus.Test.Tests;
 /// change, and say why.
 /// </para>
 /// <para>
-/// No host, no database: these are pure unit tests now. That also frees them from the API holding the build
-/// lock, which is why they no longer carry <c>[Collection("API Collection")]</c>.
+/// No host, no database: these are pure unit tests. The mapper is constructed directly — its profile takes no
+/// dependencies, which is what keeps <c>new ShiftIdentityReplicationMapper()</c> legal outside DI — so they are
+/// also free of the API holding the build lock, which is why they carry no <c>[Collection("API Collection")]</c>.
 /// </para>
 /// </summary>
 public class ReplicationMappingParityTests
 {
     private static readonly ReplicationFixtures F = new();
+
+    // One instance for the class: the mapper is stateless apart from its compiled-customization cache, and
+    // building it per fact would only re-run the profile's constructor 24 times.
+    private static readonly ShiftIdentityReplicationMapper M = new();
 
     // The SAME options the goldens were captured with. Do not "make this more realistic" — with no
     // IHashIdService in scope the hash-id converters short-circuit and IDs serialize raw. That was harmless
@@ -140,47 +149,49 @@ public class ReplicationMappingParityTests
     private const string CompanyBranch_DeletedGolden =
         "{\"Name\":\"Main\",\"Phone\":\"555\",\"Phones\":[],\"ShortPhone\":\"5\",\"Email\":\"b@x.com\",\"Emails\":[],\"Address\":\"Addr\",\"IntegrationId\":\"BR-1\",\"ShortCode\":\"MB\",\"TerminationDate\":null,\"Location\":{\"Coordinates\":[44.1,36.2],\"Type\":\"Point\"},\"Photos\":\"p\",\"MobilePhotos\":\"mp\",\"WorkingHours\":\"9-5\",\"WorkingDays\":\"Mon-Fri\",\"IsProtected\":true,\"City\":{\"Name\":\"Erbil\",\"IntegrationId\":\"CT-1\",\"IsProtected\":true,\"DisplayOrder\":1,\"Region\":{\"CountryID\":\"40\",\"RegionID\":\"50\",\"Name\":\"KRG\",\"IntegrationId\":\"R-1\",\"ShortCode\":\"KRG\",\"IsProtected\":true,\"Flag\":\"krg.png\",\"DisplayOrder\":2,\"Country\":{\"CountryID\":40,\"RegionID\":null,\"ItemType\":\"Country\",\"Name\":\"Iraq\",\"IntegrationId\":\"C-1\",\"ShortCode\":\"IQ\",\"CallingCode\":\"\\u002B964\",\"IsProtected\":true,\"Flag\":\"iq.png\",\"DisplayOrder\":3,\"id\":\"40\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false},\"id\":\"50\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false},\"id\":\"60\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false},\"Company\":{\"Name\":\"Shift\",\"LegalName\":\"Shift LLC\",\"IntegrationId\":\"CO-1\",\"ShortCode\":\"SFT\",\"CompanyType\":0,\"Logo\":\"logo.png\",\"HQPhone\":\"123\",\"HQEmail\":\"hq@x.com\",\"HQAddress\":\"St 1\",\"Website\":\"x.com\",\"IsProtected\":true,\"TerminationDate\":null,\"CustomFields\":{},\"ParentCompanyID\":5,\"CompanyID\":70,\"DisplayOrder\":4,\"id\":\"70\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false},\"BranchID\":\"80\",\"ItemType\":\"Branch\",\"CustomFields\":{},\"RegionID\":50,\"CityID\":60,\"CompanyID\":70,\"CountryID\":40,\"CompanyBranchID\":88,\"DisplayOrder\":6,\"DisplayName\":\"Main Branch\",\"Description\":\"desc\",\"WebsiteURL\":null,\"PublishTargets\":[],\"id\":\"80\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":true}";
 
-    [Fact] public void Brand() => AssertGolden(F.Brand().ToBrandModel(), BrandGolden);
-    [Fact] public void Service() => AssertGolden(F.Service().ToServiceModel(), ServiceGolden);
-    [Fact] public void Department() => AssertGolden(F.Department().ToDepartmentModel(), DepartmentGolden);
-    [Fact] public void Country() => AssertGolden(F.Country().ToCountryModel(), CountryGolden);
-    [Fact] public void Region() => AssertGolden(F.Region().ToRegionModel(), RegionGolden);
-    [Fact] public void Region_AsCityRegion() => AssertGolden(F.Region().ToCityRegionModel(), RegionCityRegionGolden);
-    [Fact] public void City() => AssertGolden(F.City().ToCityModel(), CityGolden);
-    [Fact] public void City_AsCompanyBranch() => AssertGolden(F.City().ToCityCompanyBranchModel(), CityCompanyBranchGolden);
-    [Fact] public void Company() => AssertGolden(F.Company().ToCompanyModel(), CompanyGolden);
-    [Fact] public void CompanyBranch() => AssertGolden(F.CompanyBranch().ToCompanyBranchModel(), CompanyBranchGolden);
-    [Fact] public void User() => AssertGolden(F.User().ToUserModel(), UserGolden);
-    [Fact] public void Team() => AssertGolden(F.Team().ToTeamModel(), TeamGolden);
-    [Fact] public void BranchService_AsSubItem() => AssertGolden(F.BranchService().ToCompanyBranchSubItemModel(), CompanyBranchService_SubItemGolden);
-    [Fact] public void BranchDepartment_AsSubItem() => AssertGolden(F.BranchDepartment().ToCompanyBranchSubItemModel(), CompanyBranchDepartment_SubItemGolden);
-    [Fact] public void BranchBrand_AsSubItem() => AssertGolden(F.BranchBrand().ToCompanyBranchSubItemModel(), CompanyBranchBrand_SubItemGolden);
+    [Fact] public void Brand() => AssertGolden(M.Map<BrandModel>(F.Brand()), BrandGolden);
+    [Fact] public void Service() => AssertGolden(M.Map<ServiceModel>(F.Service()), ServiceGolden);
+    [Fact] public void Department() => AssertGolden(M.Map<DepartmentModel>(F.Department()), DepartmentGolden);
+    [Fact] public void Country() => AssertGolden(M.Map<CountryModel>(F.Country()), CountryGolden);
+    [Fact] public void Region() => AssertGolden(M.Map<RegionModel>(F.Region()), RegionGolden);
+    [Fact] public void Region_AsCityRegion() => AssertGolden(M.Map<CityRegionModel>(F.Region()), RegionCityRegionGolden);
+    [Fact] public void City() => AssertGolden(M.Map<CityModel>(F.City()), CityGolden);
+    [Fact] public void City_AsCompanyBranch() => AssertGolden(M.Map<CityCompanyBranchModel>(F.City()), CityCompanyBranchGolden);
+    [Fact] public void Company() => AssertGolden(M.Map<CompanyModel>(F.Company()), CompanyGolden);
+    [Fact] public void CompanyBranch() => AssertGolden(M.Map<CompanyBranchModel>(F.CompanyBranch()), CompanyBranchGolden);
+    [Fact] public void User() => AssertGolden(M.Map<UserModel>(F.User()), UserGolden);
+    [Fact] public void Team() => AssertGolden(M.Map<TeamModel>(F.Team()), TeamGolden);
+    [Fact] public void BranchService_AsSubItem() => AssertGolden(M.Map<CompanyBranchSubItemModel>(F.BranchService()), CompanyBranchService_SubItemGolden);
+    [Fact] public void BranchDepartment_AsSubItem() => AssertGolden(M.Map<CompanyBranchSubItemModel>(F.BranchDepartment()), CompanyBranchDepartment_SubItemGolden);
+    [Fact] public void BranchBrand_AsSubItem() => AssertGolden(M.Map<CompanyBranchSubItemModel>(F.BranchBrand()), CompanyBranchBrand_SubItemGolden);
     // ── The ACTUAL runtime case ───────────────────────────────────────────────────────────────────────────
     // The join row is inserted carrying only its FK, so the Service/Department/Brand navigation is null. The
     // mapping must null-propagate to a null name, not throw: a non-null-safe map NREs here and silently kills
     // replication, because the failure lands inside a swallowed per-row catch and the watermark still stamps
-    // clean. These four goldens are the only build-enforced record of that behaviour once AutoMapper is gone —
-    // note BranchID pinned as "0", which is IdentityReplicationMappingExtensions' deliberate
-    // (src.CompanyBranch?.ID ?? 0).ToString(). A future reader who "fixes" that coalesce to null changes live
-    // document content in a partitioned store; this is what stops them.
+    // clean. These four goldens are the only build-enforced record of that behaviour — the profile reads every
+    // navigation through a ternary (an expression tree cannot carry `?.`). Note BranchID pinned as "0": the
+    // profile's deliberate `s.CompanyBranch == null ? 0 : s.CompanyBranch.ID`, AutoMapper's default(long). A
+    // future reader who "fixes" that to null changes live document content in a partitioned store; this is what
+    // stops them.
 
-    [Fact] public void BranchService_NullNav() => AssertGolden(F.BranchService(withNav: false).ToCompanyBranchSubItemModel(), CompanyBranchService_NullNavGolden);
-    [Fact] public void BranchDepartment_NullNav() => AssertGolden(F.BranchDepartment(withNav: false).ToCompanyBranchSubItemModel(), CompanyBranchDepartment_NullNavGolden);
-    [Fact] public void BranchBrand_NullNav() => AssertGolden(F.BranchBrand(withNav: false).ToCompanyBranchSubItemModel(), CompanyBranchBrand_NullNavGolden);
-    [Fact] public void Team_NullBranchNav() => AssertGolden(F.Team(withBranchNav: false).ToTeamModel(), Team_NullBranchNavGolden);
+    [Fact] public void BranchService_NullNav() => AssertGolden(M.Map<CompanyBranchSubItemModel>(F.BranchService(withNav: false)), CompanyBranchService_NullNavGolden);
+    [Fact] public void BranchDepartment_NullNav() => AssertGolden(M.Map<CompanyBranchSubItemModel>(F.BranchDepartment(withNav: false)), CompanyBranchDepartment_NullNavGolden);
+    [Fact] public void BranchBrand_NullNav() => AssertGolden(M.Map<CompanyBranchSubItemModel>(F.BranchBrand(withNav: false)), CompanyBranchBrand_NullNavGolden);
+    [Fact] public void Team_NullBranchNav() => AssertGolden(M.Map<TeamModel>(F.Team(withBranchNav: false)), Team_NullBranchNavGolden);
     // ── Apply ONTO a populated destination (the UpdateReference path) ────────────────────────────────────
     // The destination arrives with real values, which is the whole point: the question is which members get
     // overwritten and which survive. BranchID is the Cosmos PARTITION KEY and is deliberately never rewritten
-    // — asserting the whole document is what pins that, where an equality check between two implementations
-    // only ever proved they agreed.
+    // — the profile IGNORES it on these three maps, so the mapper's update overload never touches it. Asserting
+    // the whole document is what pins that, where an equality check between two implementations only ever
+    // proved they agreed.
 
-    [Fact] public void Brand_AppliedOntoExistingSubItem() => AssertGolden(ApplyOnto(d => F.Brand().ApplyToCompanyBranchSubItem(d)), Brand_ApplyToSubItemGolden);
-    [Fact] public void Service_AppliedOntoExistingSubItem() => AssertGolden(ApplyOnto(d => F.Service().ApplyToCompanyBranchSubItem(d)), Service_ApplyToSubItemGolden);
-    [Fact] public void Department_AppliedOntoExistingSubItem() => AssertGolden(ApplyOnto(d => F.Department().ApplyToCompanyBranchSubItem(d)), Department_ApplyToSubItemGolden);
+    [Fact] public void Brand_AppliedOntoExistingSubItem() => AssertGolden(ApplyOnto(d => M.Map(F.Brand(), d)), Brand_ApplyToSubItemGolden);
+    [Fact] public void Service_AppliedOntoExistingSubItem() => AssertGolden(ApplyOnto(d => M.Map(F.Service(), d)), Service_ApplyToSubItemGolden);
+    [Fact] public void Department_AppliedOntoExistingSubItem() => AssertGolden(ApplyOnto(d => M.Map(F.Department(), d)), Department_ApplyToSubItemGolden);
     // ── Tombstones ────────────────────────────────────────────────────────────────────────────────────────
     // Every other fixture is IsDeleted = false, so the deleted-row document — the entire reason replication
     // propagates the flag at all — had zero coverage across all 22 original facts.
 
-    [Fact] public void Brand_Deleted() => AssertGolden(F.Brand(deleted: true).ToBrandModel(), Brand_DeletedGolden);
-    [Fact] public void CompanyBranch_Deleted() => AssertGolden(F.CompanyBranch(deleted: true).ToCompanyBranchModel(), CompanyBranch_DeletedGolden);
+    [Fact] public void Brand_Deleted() => AssertGolden(M.Map<BrandModel>(F.Brand(deleted: true)), Brand_DeletedGolden);
+    [Fact] public void CompanyBranch_Deleted() => AssertGolden(M.Map<CompanyBranchModel>(F.CompanyBranch(deleted: true)), CompanyBranch_DeletedGolden);
 }

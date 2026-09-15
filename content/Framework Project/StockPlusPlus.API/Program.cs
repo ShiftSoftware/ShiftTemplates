@@ -162,9 +162,10 @@ if (IsCosmosEnabled)
         string databaseId = IdentityDatabaseAndContainerNames.DatabaseName;
         var client = x.Services.GetRequiredService<CosmosClient>();
 
-        // Reusable, AutoMapper-free replication setup. Each SetUpXReplication (+ this aggregate) lives in
-        // ShiftIdentity.Dashboard.AspNetCore/Replication and supplies manual ToXModel() mapping delegates
-        // (ShiftIdentity.Data/Replication). Call individual SetUpXReplication<DB>(...) methods to customize.
+        // Reusable replication setup. Each SetUpXReplication (+ this aggregate) lives in
+        // ShiftIdentity.Dashboard.AspNetCore/Replication and passes no mapping delegates: the documents are mapped
+        // through the ShiftMapper mapper AddShiftIdentityDashboard<DB>() (below) registers. Call individual
+        // SetUpXReplication<DB>(...) methods to customize.
         x.SetUpAllIdentityReplications<DB>(client, databaseId);
     });
 

@@ -115,23 +115,39 @@ both sides, or use the `existing`-aware `map.ForEntity(...)` overload. The block
 ### Replication mappings (Cosmos)
 
 Replication mappings do not live in the `(entity, list, view)` triple and never will — they are N documents per
-entity, merged onto existing documents. Port them as plain static methods:
+entity, merged onto existing documents. Declare them as ShiftMapper maps in a `ShiftMapperProfile`:
 
 ```csharp
-public static BrandModel ToBrandModel(this Brand src) => new BrandModel { ... };
+public class BrandReplicationProfile : ShiftMapperProfile
+{
+    // `id` needs nothing: it matches the entity's `ID` case-insensitively and converts invariantly (long → string).
+    // What DOES need saying is that `ReplicationModel.ID` — which writes through to `id` — is not a second writer.
+    public BrandReplicationProfile() =>
+        CreateMap<Brand, BrandModel>()
+            .ForMember(d => d.ID, o => o.Ignore());
+}
 ```
 
-then pass them explicitly:
+add the profile to the host's mapper (`AddProfile<BrandReplicationProfile>()` inside a `ShiftMapperBase` registered with
+`AddShiftMapper<…>()`), and leave the delegate off the call site:
 
 ```csharp
-.Replicate<BrandModel>(containerName, x => x.ToBrandModel())
+.Replicate<BrandModel>(containerName)   // mapped through the registered ShiftMapper mapper
 ```
 
-**Two transcription traps.** Get these wrong and the failure is invisible, because replication swallows per-row
+A call site can still pass a delegate (`x => …`) for a document shape no map declares. ShiftIdentity ships its own
+profile and a ready-made mapper, and the identity registrations (`AddShiftIdentityDashboard<DB>()`, the Functions
+worker's `AddShiftIdentity(issuer, key)`) register it for you; a host that wires identity replication without either
+calls `services.AddShiftIdentityReplicationMapper()` itself (idempotent). What a missing map does is the point of the
+design: the pipeline resolves the mapper and asks it `CanMap` before touching any row, so the failure is an exception
+out of the run, not dirty rows under a clean watermark.
+
+**Three transcription traps.** Get these wrong and the failure is invisible, because replication swallows per-row
 errors and still stamps a clean watermark:
 
-1. **Null-navigation propagation.** AutoMapper silently yielded null when it walked through a null navigation. A hand-written port dereferences and throws — inside a swallowed `catch`. Use `?.` and `?? default` throughout.
-2. **`default(long)` became `"0"`, not `""`.** If a document's id came from a null navigation, AutoMapper wrote `"0"`. Preserve that, or you change live document content in a partitioned store.
+1. **Null-navigation propagation.** AutoMapper silently yielded null when it walked through a null navigation. A `MapFrom` tree runs exactly as written, and `?.` is not allowed in an expression tree — write the guard as a ternary (`s.Service == null ? null : s.Service.Name`). A nested member (a child DOCUMENT mapped through its own `CreateMap`) is guarded only when the entity annotates the navigation nullable (`City? City`); annotate it, or the map throws on a null child.
+2. **`default(long)` became `"0"`, not `""`.** If a document's id came from a null navigation, AutoMapper wrote `"0"`. Preserve that (`o.MapFromSource(s => s.Nav == null ? 0L : s.Nav.ID)` — the conversion table formats it), or you change live document content in a partitioned store.
+3. **`ReplicationModel.ID` writes through to `id`.** It matches the entity's `ID` by name, so ignore it on every map (`.ForMember(d => d.ID, o => o.Ignore())`) and let the customised `id` be the only writer — otherwise which value lands depends on emission order.
 
 Capture golden JSON snapshots of the current AutoMapper output **before** you port anything, and diff against
 them. These are documents in a partitioned store: a wrong write stamps a clean watermark and never retries.

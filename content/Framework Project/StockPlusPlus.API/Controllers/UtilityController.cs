@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using ShiftSoftware.ShiftEntity.CosmosDbReplication.Services;
 using ShiftSoftware.ShiftEntity.Model.Replication;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
-using ShiftSoftware.ShiftIdentity.Data.Replication;
 using StockPlusPlus.Data.DbContext;
 
 namespace StockPlusPlus.API.Controllers;
@@ -183,68 +182,68 @@ public class UtilityController : ControllerBase
     /// <summary>
     /// One-shot full backfill of every identity entity into Cosmos.
     /// <para>
-    /// EVERY <c>Replicate</c> call passes its mapping delegate explicitly. That is the point of this method as
-    /// template content: these twelve calls used to omit the delegate and fall through to AutoMapper, and this
-    /// is the file every new microservice is scaffolded from — so each new service inherited the dependency
-    /// without anyone choosing it. Failures here are swallowed per row by the replication pipeline, so a
-    /// broken mapping shows up as permanently-dirty rows under a clean-looking watermark rather than as an
-    /// exception. Copy this shape for your own entities.
+    /// No <c>Replicate</c> call here passes a mapping delegate: each document is mapped through the ShiftMapper
+    /// mapper that <c>AddShiftIdentityDashboard&lt;DB&gt;()</c> in <c>Program.cs</c> registers — the same
+    /// <c>IdentityReplicationProfile</c> the save trigger uses, so a backfilled document is byte-identical to one
+    /// a live save produces. The pipeline resolves and pair-checks that mapper BEFORE touching any row, so a host
+    /// with no usable mapper gets an exception out of <c>RunAsync</c>, not permanently-dirty rows under a
+    /// clean-looking watermark (which is how the old AutoMapper fallback failed).
     /// </para>
     /// <para>
-    /// The delegates are the same hand-written <c>ToXModel()</c> extensions the trigger side uses
-    /// (<c>ShiftIdentity.Data.Replication</c>), so a backfilled document is byte-identical to one a live save
-    /// produces.
+    /// Copy this shape for your own entities: declare <c>CreateMap&lt;YourEntity, YourModel&gt;()</c> in a mapper (or
+    /// a profile your mapper adds) and leave the delegate out — or pass one explicitly when a document needs
+    /// something a map cannot say.
     /// </para>
     /// </summary>
     public static async Task ReplicateAll(CosmosDBReplication replication, CosmosClient client, string databaseId)
     {
         await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Team>(client, databaseId)
-            .Replicate<TeamModel>(IdentityDatabaseAndContainerNames.TeamContainerName, x => x.ToTeamModel())
+            .Replicate<TeamModel>(IdentityDatabaseAndContainerNames.TeamContainerName)
             .RunAsync(true);
 
         await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Country>(client, databaseId, x => x.Include(x => x.Regions))
-            .Replicate<CountryModel>(IdentityDatabaseAndContainerNames.CountryContainerName, x => x.ToCountryModel())
+            .Replicate<CountryModel>(IdentityDatabaseAndContainerNames.CountryContainerName)
             .RunAsync(true);
 
         await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Region>(client, databaseId)
-            .Replicate<RegionModel>(IdentityDatabaseAndContainerNames.CountryContainerName, x => x.ToRegionModel())
+            .Replicate<RegionModel>(IdentityDatabaseAndContainerNames.CountryContainerName)
             .RunAsync(true);
 
         await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.City>(client, databaseId)
-            .Replicate<CityModel>(IdentityDatabaseAndContainerNames.CountryContainerName, x => x.ToCityModel())
+            .Replicate<CityModel>(IdentityDatabaseAndContainerNames.CountryContainerName)
             .RunAsync(true);
 
         await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Company>(client, databaseId)
-            .Replicate<CompanyModel>(IdentityDatabaseAndContainerNames.CompanyContainerName, x => x.ToCompanyModel())
+            .Replicate<CompanyModel>(IdentityDatabaseAndContainerNames.CompanyContainerName)
             .RunAsync(true);
 
         await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.CompanyBranch>(client, databaseId,
             q => q.Include(x => x.City).ThenInclude(x => x.Region).Include(x => x.Company))
-            .Replicate<CompanyBranchModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.ToCompanyBranchModel())
+            .Replicate<CompanyBranchModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName)
             .RunAsync(true);
 
         await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.CompanyBranchDepartment>(client, databaseId, x => x.Include(i => i.Department))
-            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.ToCompanyBranchSubItemModel())
+            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName)
             .RunAsync(true);
 
         await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.CompanyBranchService>(client, databaseId, x => x.Include(i => i.Service))
-            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.ToCompanyBranchSubItemModel())
+            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName)
             .RunAsync(true);
 
         await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.CompanyBranchBrand>(client, databaseId, x => x.Include(i => i.Brand))
-            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName, x => x.ToCompanyBranchSubItemModel())
+            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName)
             .RunAsync(true);
 
         await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Department>(client, databaseId)
-            .Replicate<DepartmentModel>(IdentityDatabaseAndContainerNames.DepartmentContainerName, x => x.ToDepartmentModel())
+            .Replicate<DepartmentModel>(IdentityDatabaseAndContainerNames.DepartmentContainerName)
             .RunAsync(true);
 
         await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Service>(client, databaseId)
-            .Replicate<ServiceModel>(IdentityDatabaseAndContainerNames.ServiceContainerName, x => x.ToServiceModel())
+            .Replicate<ServiceModel>(IdentityDatabaseAndContainerNames.ServiceContainerName)
             .RunAsync(true);
 
         await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Brand>(client, databaseId)
-            .Replicate<BrandModel>(IdentityDatabaseAndContainerNames.BrandContainerName, x => x.ToBrandModel())
+            .Replicate<BrandModel>(IdentityDatabaseAndContainerNames.BrandContainerName)
             .RunAsync(true);
     }
 }

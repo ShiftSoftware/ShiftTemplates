@@ -1,8 +1,10 @@
 # AutoMapper Removal — Status
 
-**Last updated:** 2026-08-25 — **AutoMapper is removed from the framework.** Stages D, E and F complete;
-Stages A and B substantially complete — **A10 and B2 are still open**, see their rows; Stage C partial (C1
-second half outstanding, and its window has now closed — see below).
+**Last updated:** 2026-09-16 — **Cosmos replication maps through ShiftMapper**: the mapping delegate is optional
+again and a call site without one maps through the host's registered `IShiftMapper` (see the log). Otherwise as of
+2026-08-25: **AutoMapper is removed from the framework.** Stages D, E and F complete; Stages A and B substantially
+complete — **A10 and B2 are still open**, see their rows; Stage C partial (C1 second half outstanding, and its window
+has now closed — see below).
 
 **Scope:** `ShiftEntity` + `ShiftIdentity` + `ShiftTemplates` + CI. Consumer services (`ADP.*`,
 `ADP.SyncAgent`, `Menu`) are out of scope — see [`README.md`](README.md#scope--framework-only).
@@ -88,7 +90,7 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 | StockPlusPlus sample | 3 profiles / 83 lines | 🟡 | **Effectively already migrated** — the Stage C inventory found every sample triple on a generated mapper or a repository override. The remaining profile maps are NOT triples: `CompanyBranchModel→CompanyBranchListDTO` and `Product→ProductCategoryListDTO` feed **Cosmos `ProjectTo`** in two controllers, and `Product→ProductModel` is replication. Those are **F3** and **E3** respectively, not this row. |
 | ShiftIdentity.Data | 11 profiles / 352 lines | 🟡 | **Also effectively migrated.** Reading the profiles: 10 of the 11 are *purely* replication maps (`Entity→*Model`), already superseded by hand-written `ToXModel()` delegates and pinned by C2's goldens. Only `User.cs` still carries triple maps (`User→UserDTO`/`UserListDTO`) plus `UserDataDTO`, which is **F2**. The replication maps must stay until **E3** — they are the fallback that keeps un-migrated `Replicate` call sites working. |
 | E2 Template's 12 replication sites | — | ✅ | All 12 now pass their `ToXModel()` delegate explicitly. **The plan's fix did not work as written:** `ReplicateAllAsync` lives in `ShiftIdentity.AzureFunctions`, which the API does not reference and should not — so instead of calling it, the calls keep their shape and gain delegates. Better as template content anyway: this is the file every new service is scaffolded from, so it now *demonstrates* passing a delegate rather than hiding the question behind a helper. |
-| E3 Required replication delegate | — | ✅ | **Q9 answered: take the break.** All 9 overloads across both pipelines now require the delegate; all 4 AutoMapper fallbacks and the lazy `FallbackMapper` are gone. **AutoMapper left `ShiftEntity.CosmosDbReplication` entirely** — usings and `PackageReference` — which is F5's first action, arriving early as a consequence. `Utility.BuildStamp` now throws on an empty document id rather than writing a stamp that can never address the document again. |
+| E3 Required replication delegate | — | ✅ | **Superseded 2026-09-15** — the delegate is optional again with a ShiftMapper fallback resolved above the row loop (see the log). Kept as history: **Q9 answered: take the break.** All 9 overloads across both pipelines now require the delegate; all 4 AutoMapper fallbacks and the lazy `FallbackMapper` are gone. **AutoMapper left `ShiftEntity.CosmosDbReplication` entirely** — usings and `PackageReference` — which is F5's first action, arriving early as a consequence. `Utility.BuildStamp` now throws on an empty document id rather than writing a stamp that can never address the document again. |
 | ~~ADP.Surveys / WarrantyClaims / ClaimableItems / Menus / Menu~~ | 37 triples, 16 `AfterMap` | ➖ | **Out of scope.** Consumer services — they migrate on their own schedule via E1 + the compat package. |
 
 ## Stage F — Delete
@@ -99,7 +101,7 @@ Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-re
 | F2 ShiftIdentity's ad-hoc `Map<T>` sites | ✅ | `Mappers/UserProjections.cs` (4 explicit projections) replaces every site; `IMapper` is out of `UserRepository`, `UserEndpoints`, `UserManagerEndpoints`. **All 11 profiles deleted as dead code** — 10 were replication maps already superseded at E3, `User.cs`'s triple maps by `UseGeneratedMapper`. Two findings: one call was a `UserInfoDTO`→`UserInfoDTO` identity map, and the write direction was writing `EmailVerified`/`PhoneVerified`/`IsDeleted`/audit/PK from the request body (see gap C-3). |
 | F3 Project template detached | ✅ | Registrations removed from `API/Program.cs` and `Functions/Program.cs`; 3 profiles deleted; `ProductCategories.cs` now calls `ViewAsync` (its `opt.Items["lang"]` turned out to be read by **nothing**). The two `ProjectTo` controllers split: the SQL one uses `repository.MapToList`, the Cosmos one a hand-written `CompanyBranchProjections.ToListDTO` **verified against AutoMapper before deletion** — the check caught a real `""`-vs-`null` divergence. |
 | F4 ADP.SyncAgent | ➖ | **Out of scope** — no ShiftEntity coupling, nothing blocked by it. Recorded so the release notes say "gone from the framework", not "gone". |
-| F5 Package references + docs | ✅ | `ShiftEntity.Core.csproj` was the last one (replication went early at E3). `grep -rn "AutoMapper" --include=*.csproj` across all three repos now returns **nothing** — with no compat package there is no carve-out. Parity harness retired (`GoldenCapture` deleted, `ParityArms.Baseline` and `ArmKind.AutoMapperFallback` removed). `ShiftFrameworkDocs` rewritten; `auto-mapper-profiles.md` → `mappers.md` + nav. **The docs pass MISSED two pages**, because it grepped for the literal string `AutoMapper` and neither page contains it: `project-setup/data-project/repositories.md` (said `IMapper`, and taught a repository constructor that no longer compiles) and `project-setup/data-project/dependencies.md` (said "Automapper Profiles"). Both fixed in the follow-up audit below. |
+| F5 Package references + docs | ✅ | `ShiftEntity.Core.csproj` was the last one (replication went early at E3; since 2026-09-15 `ShiftEntity.CosmosDbReplication` depends on `ShiftSoftware.ShiftMapper` instead, as its mapping fallback). `grep -rn "AutoMapper" --include=*.csproj` across all three repos now returns **nothing** — with no compat package there is no carve-out. Parity harness retired (`GoldenCapture` deleted, `ParityArms.Baseline` and `ArmKind.AutoMapperFallback` removed). `ShiftFrameworkDocs` rewritten; `auto-mapper-profiles.md` → `mappers.md` + nav. **The docs pass MISSED two pages**, because it grepped for the literal string `AutoMapper` and neither page contains it: `project-setup/data-project/repositories.md` (said `IMapper`, and taught a repository constructor that no longer compiles) and `project-setup/data-project/dependencies.md` (said "Automapper Profiles"). Both fixed in the follow-up audit below. |
 
 ---
 
@@ -125,6 +127,77 @@ A11** (ambiguous case-insensitive match). Next free after that is `012`.
 ---
 
 ## Log
+
+**2026-09-15** — **Replication mapping: the delegate is optional again, and the fallback is ShiftMapper.** (This entry was first drafted on 2026-09-14 in the `.shift` mirror only, ahead of any code; the code landed on 2026-09-15 and the entry was checked against it line by line. When the two disagree, the code repos are the record.)
+
+E3's compile break is reversed on purpose. `Replicate` / `UpdateReference` / `UpdatePropertyReference` on both pipelines
+(`ShiftEntity.CosmosDbReplication` — catch-up `Services/CosmosDBReplication.cs`, trigger `ShiftEntityCosmosDbOptions.cs`)
+take a nullable mapping delegate with a `null` default, exactly the shape they had before E3, and a call site that omits
+it maps the document with **ShiftMapper** (`ShiftSoftware.ShiftMapper`, the standalone package wired in on 2026-09-13):
+the pipeline resolves `IShiftMapper` from the scope it runs under and maps through it — `Map<Entity, Document>(entity)`
+for the create doors, `Map<Entity, Document>(entity, existing)` for the `UpdateReference` merge.
+
+**What keeps Q9's objection answered.** Q9 rejected "keep `= null` and throw at the fallback" because the throw would land
+inside the catch-up `Replicate`'s per-row `catch` — dirty rows under a clean watermark. The fallback is therefore resolved
+by one internal helper, `ReplicationMapper` (`ResolveCreate<Entity, Document>(services, operation)` for the create doors,
+`ResolveMerge<…>` for `UpdateReference`), ONCE per registered action and ABOVE every row loop, and it checks the pair up
+front (`IShiftMapper.CanMap`): no mapper registered, or no mapper that declares the pair, throws
+`InvalidOperationException` out of the run — naming the operation, the pair, and the fix (`AddShiftMapper<…>()` /
+`CreateMap<Entity, Document>()` / pass a delegate). A host may register several mappers (`AddShiftMapper` is additive);
+the last one declaring the pair wins. Pinned by `ShiftEntity.Tests/Replication/ReplicationMapperTests.cs` (4 facts, over
+hand-written `IShiftMapper` doubles — the helper's job is resolution; a generated mapper is exercised by the goldens below).
+The one door `CanMap` does not cover is the update overload, which needs the exact declared pair; that miss is
+ShiftMapper's own exception, thrown before any row is written. In the trigger pipeline a throw is what it always was: the
+fire-and-forget sync task logs it as a failure and the row stays dirty.
+
+`ShiftEntity.CosmosDbReplication` references ShiftMapper the way every sibling is referenced (project when cloned, the
+package at `$(ShiftMapperVersion)` otherwise) — runtime library only, it declares no maps. One knock-on: ShiftMapper pins
+`Microsoft.Extensions.DependencyInjection.Abstractions` 10.0.11, so the three projects that reference that package
+directly AND reach ShiftMapper (`ShiftEntity.CosmosDbReplication`, `ShiftIdentity.AspNetCore`, `ShiftIdentity.AzureFunctions`)
+moved from 10.0.10 to 10.0.11 to clear NU1605; `ShiftEntity.Core`/`Print` and `TypeAuth.Blazor` do not reach it and stay.
+
+**ShiftIdentity's replication maps are now a ShiftMapper profile.** `ShiftIdentity.Data/Replication/IdentityReplicationMappingExtensions.cs`
+(the hand-written `ToXModel()` / `ApplyToCompanyBranchSubItem()` delegates from E2/F2) is deleted; the same 19 pairs are
+declared in `IdentityReplicationProfile` (a `ShiftMapperProfile`, so an application's own mapper can `AddProfile<>()` it),
+carried by the ready-made `ShiftIdentityReplicationMapper`, registered with `services.AddShiftIdentityReplicationMapper()`
+(singleton — the profile has no dependencies). `SetUpAllIdentityReplications` (trigger, Dashboard.AspNetCore) and
+`ReplicateAllAsync` (catch-up, AzureFunctions) pass no delegate any more; the template's `UtilityController.ReplicateAll`
+likewise. **The registration rides on the identity registrations** (2026-09-16, on review — the first cut had both template
+hosts call `AddShiftIdentityReplicationMapper()` themselves): `AddShiftIdentityDashboard<TDbContext>()` (Dashboard.AspNetCore,
+the API side) and the Functions worker's `AddShiftIdentity(issuer, key)` (AzureFunctions, the catch-up side) each call it,
+so a host that hosts identity has nothing extra to wire and the template hosts carry no line for it. It could not ride on
+`SetUpAllIdentityReplications` itself: the trigger's options callback runs per scope over a container that is already
+built. `AddShiftIdentityReplicationMapper()` is idempotent (keyed on the mapper's own type, first registration wins), so a
+host that also calls it explicitly does not end up with two, and it stays public for a host that wires replication without
+either identity registration. Pinned in `IdentityReplicationMapperRegistrationTests` (`AddControllers().AddShiftIdentityDashboard<DB>()`
+alone yields exactly one mapper; two explicit calls yield one).
+`ShiftIdentity.Data` references ShiftMapper with the generator as an analyzer, because a profile's declarations reach a
+consumer only as the assembly attributes the generator writes; the in-assembly mapper also makes ShiftIdentity's own build
+report the profile's diagnostics (there were none: every destination member is matched, customised or ignored).
+
+**The 24 goldens are unchanged and green.** `ReplicationMappingParityTests` now maps every fixture through
+`new ShiftIdentityReplicationMapper()` — `Map<XModel>(entity)`, `Map(entity, existing)` for the apply-onto path — against
+the frozen constants, so the ShiftMapper documents are byte-identical to the hand-written ones (and, through them, to
+AutoMapper's). The transcription traps the migration guide lists are what the profile is built around: `ID` ignored on every
+map so the write-through override cannot race the customised `id`; join-row ids from the FOREIGN key; navigation reads
+as ternaries (`?.` is not allowed in an expression tree); `TeamCompanyBranch.BranchID` as `"0"` when the navigation is null;
+`CountryModel.CountryID` / `RegionModel.RegionID` from `ID` rather than the entities' same-named columns; `BranchID` ignored
+on the three merge maps so the partition key survives; `RecognizePrefixes("Team")` binding `TeamModel.CompanyBranches` to
+`Team.TeamCompanyBranches` (the one nested collection whose names differ — `MapFromSource` goes through the conversion
+table only, not the nested path, so a prefix is the ShiftMapper-native answer). Two things are NOT byte-identical to the
+delegates, both deliberately: `CompanyBranchModel.Location` parses the coordinate strings with the INVARIANT culture (the
+repository writes them that way; the delegate's culture-blind `decimal.Parse` read `"44.1"` as 441 on a comma-decimal
+server), and `PublishTargets`/`Tags` follow ShiftMapper's null-collection policy (a null column arrives as `[]`, which is
+what AutoMapper wrote; the delegates passed null through). Neither is reachable by a golden. One entity change:
+`CompanyBranch.City` is annotated nullable (`CityID` already was), because ShiftMapper null-guards a nested navigation in
+memory only when the entity says it can be null — verified `dotnet ef migrations has-pending-model-changes`: none.
+`StockPlusPlus.Test/Tests/IdentityReplicationMapperRegistrationTests.cs` pins the registration (one instance under both
+`IShiftMapper` and its own type, across scopes) and all 19 pairs without a host, and cross-checks its hand-kept pair list
+against what the mapper actually declares so a pair added to the profile has to be listed — and golden'd — too.
+
+**Rows touched by this:** E3 and F5 stay ✅ as history, with the note below; README's "every replication call site passes
+an explicit mapping delegate" criterion is replaced by "resolves an explicit delegate or a registered ShiftMapper map,
+checked before any row is written"; the migration guide's replication recipe now points at a profile.
 
 **2026-08-25** — **Adversarial audit after Stage F: three things the stage's "done" rows did not cover.**
 
