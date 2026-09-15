@@ -1,6 +1,5 @@
 ﻿
 
-using ShiftSoftware.ShiftEntity.Model.Flags;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Shared.Enums;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace StockPlusPlus.Shared.DTOs.ProductCategory;
 
-public class ProductCategoryDTO : ShiftEntityViewAndUpsertDTO, IHasBrandSelection<ProductCategoryDTO>
+public class ProductCategoryDTO : ShiftEntityViewAndUpsertDTO
 {
     [_ProductCategoryHashId]
     public override string? ID { get; set; }

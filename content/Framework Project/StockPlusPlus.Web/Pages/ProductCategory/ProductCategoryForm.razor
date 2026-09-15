@@ -10,6 +10,13 @@
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductCategory"
                  @bind-Key="@Key">
 
+    <ShiftAutocomplete Label="Brand"
+                       TEntitySet="ShiftSoftware.ShiftIdentity.Core.DTOs.Brand.BrandListDTO"
+                       EntitySet="IdentityBrand"
+                       BaseUrlKey="ShiftIdentityApi"
+                       For="() => context.Item.Brand"
+                       @bind-Value="context.Item.Brand" />
+
     <LocalizedTextField @bind-Value="context.Item.Name"
                         For="() => context.Item.Name"
                         Label="Name" />
