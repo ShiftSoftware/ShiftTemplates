@@ -15,13 +15,21 @@ steps:
   displayName: Build opt-in StockPlusPlus admission preview
 - pwsh: '& "${{ parameters.identityRoot }}/eng/Start-IdentitySql.ps1"'
   displayName: Start owned identity SQL fixture
-- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Tests/ShiftIdentity.Tests.csproj" -Filter "Category=Policy|Category=Http" -Suite identity-policy-http -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
-  displayName: identity-policy-http
-  env:
-    SHIFT_IDENTITY_TEST_SQL: $(IdentitySqlConnection)
+# Policy tests need no database. Http is only ever applied together with Sql, so filtering on it here ran those
+# 206 SQL-backed tests a second time; the identity-sql gate below runs every Sql test exactly once.
+- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Tests/ShiftIdentity.Tests.csproj" -Filter "Category=Policy" -Suite identity-policy -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
+  displayName: identity-policy
 - pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Tests/ShiftIdentity.Tests.csproj" -Filter "Category=Sql" -Suite identity-sql -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
   displayName: identity-sql
   env:
+    SHIFT_IDENTITY_TEST_SQL: $(IdentitySqlConnection)
+# Real-clock timing evidence: the production response floors, tens of seconds of deliberate waiting. Off by default;
+# a tag whose name contains "with-long-running-tests" (release-framework-with-long-running-tests, for example) runs it.
+- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Tests/ShiftIdentity.Tests.csproj" -Filter "Category=LongRunning" -Suite identity-long-running -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
+  displayName: identity-long-running
+  condition: and(succeeded(), contains(variables['Build.SourceBranch'], 'with-long-running-tests'))
+  env:
+    SHIFT_IDENTITY_LONG_RUNNING: '1'
     SHIFT_IDENTITY_TEST_SQL: $(IdentitySqlConnection)
 - pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Blazor.Tests/ShiftIdentity.Blazor.Tests.csproj" -Filter "Category=Ui" -Suite identity-ui -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
   displayName: identity-ui
