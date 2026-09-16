@@ -44,10 +44,14 @@ steps:
  - script: git clone https://github.com/ShiftSoftware/ShiftMapper.git ../ShiftMapper || { echo "##vso[task.logissue type=error]Could not clone https://github.com/ShiftSoftware/ShiftMapper anonymously. The repository must be readable without credentials (public), like every other sibling this pipeline clones, before any release* tag is built."; exit 1; }
    displayName: 'Clone ShiftMapper'
 
- - template: .pipelines/identity-checks.steps.yml
-   parameters:
-    identityRoot: $(Build.SourcesDirectory)/../ShiftIdentity
-    templatesRoot: $(Build.SourcesDirectory)
+ # The identity checks guard the framework packages, so only the tags that publish them pay for the SQL container and
+ # the suites. release-typeauth, release-aspNetCore-authorization and release-shiftmapper never see these steps; each
+ # of those groups has its own tests below. Decided at template-expansion time, so the steps do not appear as skipped.
+ - ${{ if or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) }}:
+   - template: .pipelines/identity-checks.steps.yml
+     parameters:
+      identityRoot: $(Build.SourcesDirectory)/../ShiftIdentity
+      templatesRoot: $(Build.SourcesDirectory)
 
  - script: dotnet build ShiftTemplates.sln --configuration release
    displayName: 'Build template tooling'
