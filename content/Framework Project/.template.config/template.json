@@ -261,7 +261,7 @@
       "description": "Replace ShiftFrameworkVersion",
       "replaces": "$(ShiftFrameworkVersion)",
       "parameters": {
-        "value": "2026.09.08.3"
+        "value": "2026.09.17.1"
       },
       "datatype": "string",
       "generator": "constant"
@@ -281,7 +281,7 @@
       "description": "Replace TypeAuth Version",
       "replaces": "$(TypeAuthVersion)",
       "parameters": {
-        "value": "1.6.28"
+        "value": "1.6.29"
       },
       "datatype": "string",
       "generator": "constant"
@@ -291,7 +291,7 @@
       "description": "Replace ShiftMapper Version",
       "replaces": "$(ShiftMapperVersion)",
       "parameters": {
-        "value": "0.1.0"
+        "value": "0.2.0"
       },
       "datatype": "string",
       "generator": "constant"
