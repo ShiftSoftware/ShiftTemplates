@@ -184,14 +184,14 @@ public class UtilityController : ControllerBase
     /// <para>
     /// No <c>Replicate</c> call here passes a mapping delegate: each document is mapped through the ShiftMapper
     /// mapper that <c>AddShiftIdentityDashboard&lt;DB&gt;()</c> in <c>Program.cs</c> registers — the same
-    /// <c>IdentityReplicationProfile</c> the save trigger uses, so a backfilled document is byte-identical to one
+    /// <c>ShiftIdentityReplicationMapper</c> the save trigger uses, so a backfilled document is byte-identical to one
     /// a live save produces. The pipeline resolves and pair-checks that mapper BEFORE touching any row, so a host
     /// with no usable mapper gets an exception out of <c>RunAsync</c>, not permanently-dirty rows under a
     /// clean-looking watermark (which is how the old AutoMapper fallback failed).
     /// </para>
     /// <para>
     /// Copy this shape for your own entities: declare <c>CreateMap&lt;YourEntity, YourModel&gt;()</c> in a mapper (or
-    /// a profile your mapper adds) and leave the delegate out — or pass one explicitly when a document needs
+    /// a mapper yours includes) and leave the delegate out — or pass one explicitly when a document needs
     /// something a map cannot say.
     /// </para>
     /// </summary>

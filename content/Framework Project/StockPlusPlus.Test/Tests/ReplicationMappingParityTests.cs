@@ -10,14 +10,14 @@ using Xunit;
 namespace StockPlusPlus.Test.Tests;
 
 /// <summary>
-/// Correctness guard for the Cosmos replication mappings of the ShiftIdentity domain — the 19 pairs of
-/// <c>IdentityReplicationProfile</c> (ShiftIdentity.Data/Replication), which both the save trigger
+/// Correctness guard for the Cosmos replication mappings of the ShiftIdentity domain — the 19 pairs
+/// <see cref="ShiftIdentityReplicationMapper"/> (ShiftIdentity.Data/Replication) declares, which both the save trigger
 /// (Dashboard.AspNetCore/Replication) and the catch-up sweep (AzureFunctions/Replication) map through. Each fact maps
-/// a fixture through the ready-made <see cref="ShiftIdentityReplicationMapper"/> — <c>Map&lt;XModel&gt;(entity)</c>
+/// a fixture through that mapper — <c>Map&lt;XModel&gt;(entity)</c>
 /// for the create doors, <c>Map(entity, existing)</c> for the apply-onto (<c>UpdateReference</c>) path — and asserts
 /// the produced document against a GOLDEN: the exact JSON the host's AutoMapper profile produced from the same
 /// fixture, captured while AutoMapper was still in the container, and matched byte-for-byte by the hand-written
-/// delegates that came between. The ShiftMapper profile is the third implementation these constants have pinned.
+/// delegates that came between. The ShiftMapper mapper is the third implementation these constants have pinned.
 /// <para>
 /// It used to assert the two implementations AGREED, resolving <c>IMapper</c> from the running host. That
 /// died when <c>AddShiftIdentityAutoMapper()</c> was deleted — it was never obsoleted first — and the oracle
@@ -32,8 +32,8 @@ namespace StockPlusPlus.Test.Tests;
 /// change, and say why.
 /// </para>
 /// <para>
-/// No host, no database: these are pure unit tests. The mapper is constructed directly — its profile takes no
-/// dependencies, which is what keeps <c>new ShiftIdentityReplicationMapper()</c> legal outside DI — so they are
+/// No host, no database: these are pure unit tests. The mapper is constructed directly — it takes no dependencies
+/// and includes nothing, which is what keeps <c>new ShiftIdentityReplicationMapper()</c> legal outside DI — so they are
 /// also free of the API holding the build lock, which is why they carry no <c>[Collection("API Collection")]</c>.
 /// </para>
 /// </summary>
@@ -42,7 +42,7 @@ public class ReplicationMappingParityTests
     private static readonly ReplicationFixtures F = new();
 
     // One instance for the class: the mapper is stateless apart from its compiled-customization cache, and
-    // building it per fact would only re-run the profile's constructor 24 times.
+    // building it per fact would only re-run its constructor 24 times.
     private static readonly ShiftIdentityReplicationMapper M = new();
 
     // The SAME options the goldens were captured with. Do not "make this more realistic" — with no
@@ -168,9 +168,9 @@ public class ReplicationMappingParityTests
     // The join row is inserted carrying only its FK, so the Service/Department/Brand navigation is null. The
     // mapping must null-propagate to a null name, not throw: a non-null-safe map NREs here and silently kills
     // replication, because the failure lands inside a swallowed per-row catch and the watermark still stamps
-    // clean. These four goldens are the only build-enforced record of that behaviour — the profile reads every
+    // clean. These four goldens are the only build-enforced record of that behaviour — the mapper reads every
     // navigation through a ternary (an expression tree cannot carry `?.`). Note BranchID pinned as "0": the
-    // profile's deliberate `s.CompanyBranch == null ? 0 : s.CompanyBranch.ID`, AutoMapper's default(long). A
+    // mapper's deliberate `s.CompanyBranch == null ? 0 : s.CompanyBranch.ID`, AutoMapper's default(long). A
     // future reader who "fixes" that to null changes live document content in a partitioned store; this is what
     // stops them.
 
@@ -181,7 +181,7 @@ public class ReplicationMappingParityTests
     // ── Apply ONTO a populated destination (the UpdateReference path) ────────────────────────────────────
     // The destination arrives with real values, which is the whole point: the question is which members get
     // overwritten and which survive. BranchID is the Cosmos PARTITION KEY and is deliberately never rewritten
-    // — the profile IGNORES it on these three maps, so the mapper's update overload never touches it. Asserting
+    // — the mapper IGNORES it on these three maps, so its update overload never touches it. Asserting
     // the whole document is what pins that, where an equality check between two implementations only ever
     // proved they agreed.
 

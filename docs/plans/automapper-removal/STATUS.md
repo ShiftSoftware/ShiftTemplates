@@ -1,7 +1,9 @@
 # AutoMapper Removal — Status
 
-**Last updated:** 2026-09-16 — **Cosmos replication maps through ShiftMapper**: the mapping delegate is optional
-again and a call site without one maps through the host's registered `IShiftMapper` (see the log). Otherwise as of
+**Last updated:** 2026-09-17 — **ShiftMapper 0.2.0: profiles are gone, the identity mapper declares its maps
+itself and registers itself the package way** (see the log). 2026-09-16: **Cosmos replication maps through
+ShiftMapper**: the mapping delegate is optional again and a call site without one maps through the host's registered
+`IShiftMapper`. Otherwise as of
 2026-08-25: **AutoMapper is removed from the framework.** Stages D, E and F complete; Stages A and B substantially
 complete — **A10 and B2 are still open**, see their rows; Stage C partial (C1 second half outstanding, and its window
 has now closed — see below).
@@ -128,6 +130,64 @@ A11** (ambiguous case-insensitive match). Next free after that is `012`.
 
 ## Log
 
+**2026-09-17** — **ShiftMapper 0.2.0: profiles replaced by mappers and packs; the framework follows.** ShiftMapper's
+three commits of 2026-09-17 (`869277e` "profiles replaced by mappers and packs", `30393c4` SM0042 / one registry
+per collection, `a3c9f40` shared packs for package-registered mappers) removed `ShiftMapperProfile` and `AddProfile<>()`
+outright. The shareable unit is now an ordinary mapper (`IncludeMapper<T>()`), rules go in a `ShiftMapperConversions`
+PACK (`AddConversions<T>()` / `o.AddConversions<T>()` / `o.ShareConversions<T>()`), registration is
+`services.AddShiftMapper(o => { o.AddMapper<T>(); … })` read by the generator, and `AddShiftMapper` keeps ONE registry
+per collection: `IShiftMapper` is registered once (the mapper, or a `CompositeShiftMapper` over all of them dispatching
+each pair to the FIRST registered mapper that declares it), a mapper registered twice from the same assembly throws,
+two mappers each writing their OWN `CreateMap` for a pair is refused (SM0040 at build, the same check at startup), and a
+package registering its own mapper from its own assembly is the FALLBACK that a host's own registration of that mapper
+replaces in either order. `ShiftMapperVersion` bumped **0.1.0 → 0.2.0** in `ShiftFrameworkGlobalSettings.props` (and the
+standalone fallback in ShiftMapper's `Directory.Build.props`); a 0.x minor, because the declaration API changed. The
+first release carrying this must be `release-all` (or `release-shiftmapper` first), as before.
+
+What changed in the framework, per repo:
+
+- **ShiftIdentity.Data** — `Replication/IdentityReplicationProfile.cs` is DELETED; its 19 `CreateMap`s now sit in the
+  constructor of `ShiftIdentityReplicationMapper` itself (a partial `ShiftMapperBase`), with the profile's transcription
+  rules moved onto the mapper's remarks. There was no reason for two classes once an included mapper is an ordinary
+  mapper: a host with its own mapper writes `IncludeMapper<ShiftIdentityReplicationMapper>()` (or
+  `o.AddMapper<AppMapper>(m => m.IncludeMapper<…>())`) where it wrote `AddProfile<IdentityReplicationProfile>()`.
+  `AddShiftIdentityReplicationMapper()` is now the "package registers itself" shape: an inline
+  `services.AddShiftMapper(o => { o.Lifetime = lifetime; o.AddMapper<ShiftIdentityReplicationMapper>(); })` made from
+  ShiftIdentity.Data — the mapper's own assembly, so no adapter is needed and a host registering the mapper itself wins
+  whichever call comes first. **Deliberately the lambda, not `AddShiftMapper<T>(lifetime)`**: the short form finds the
+  registering assembly through `Assembly.GetCallingAssembly()`, which the JIT can hand the wrong frame once the method
+  is inlined into `AddShiftIdentityDashboard` / the Functions `AddShiftIdentity` (both in other assemblies), and a
+  wrong registering assembly is "no adapter was generated" at startup; the lambda's closure type pins it. The
+  `services.Any(ServiceType == typeof(ShiftIdentityReplicationMapper))` idempotency guard is now load-bearing rather
+  than a courtesy, because the registry throws on a duplicate — it is what lets both identity registrations and an
+  explicit host call coexist, and it yields to a host's adapter (registered under the same type) exactly as ShiftMapper's
+  own fallback rule would. No pack: the identity maps declare no conversions or member conventions, and a rule written
+  on a mapper reaches only that mapper's maps anyway; should one ever be needed it is `o.ShareConversions<…>()` in the
+  same call. Doc comments in `IdentityReplicationExtensions` (Dashboard) and `IdentityCatchUpReplicationExtensions`
+  (Functions) now say "includes `ShiftIdentityReplicationMapper`" instead of "adds the profile".
+- **ShiftEntity.CosmosDbReplication** — `ReplicationMapper.Resolve` no longer does `GetServices<IShiftMapper>()` +
+  "last one that `CanMap` wins": that rule was written against a container holding several `IShiftMapper` descriptors,
+  and there is now exactly one (the mapper or the composite, whose own rule is FIRST wins and whose conflicts are
+  refused before startup). It resolves the one door, asks it `CanMap`, and when the answer is no names every mapper
+  behind a `CompositeShiftMapper` (`composite.Mappers`) rather than "CompositeShiftMapper". Messages say "includes a
+  mapper that does" instead of "adds a profile that does". The ONCE-per-action, ABOVE-the-row-loop placement is
+  unchanged — that is still the whole design. `ReplicationMapperTests` re-pinned: the `Host(...)` helper now builds
+  what `AddShiftMapper` would (one mapper, or one composite), `SeveralMappers_TheLastOneDeclaringThePairWins` became
+  `…TheCompositeAnswers_AndTheFirstOneDeclaringThePairWins`, and a new fact pins that the no-pair message names every
+  mapper behind the composite (5 facts, green).
+- **ShiftTemplates** — `IdentityReplicationMapperRegistrationTests.ExpectedPairs_MatchWhatTheProfileActuallyDeclares` →
+  `…WhatTheMapperActuallyDeclares`, reading `ShiftMapperDeclaredMapAttribute.DeclaredBy` (was `.Profile`) for
+  `typeof(ShiftIdentityReplicationMapper)`; the other five facts unchanged and still green, which is the proof that the
+  self-registration survives the new registry (`AddControllers().AddShiftIdentityDashboard<DB>()` alone still yields
+  exactly one mapper and one `IShiftMapper`; two explicit calls yield one). **The 24 goldens are untouched and green** —
+  the maps did not move, only the class they are written in. `UtilityController.ReplicateAll`,
+  `IdentityReplicationFunctions` and the parity tests' remarks renamed profile → mapper; `CLAUDE.md` rewritten for the
+  new registration model; the migration guide's replication recipe now declares a mapper and includes it.
+
+Verified: `ShiftIdentity.Data`, `ShiftEntity.Tests`, `StockPlusPlus.Test`, `.API`, `.Functions`, `.Web.Tests` build
+clean; `ReplicationMapperTests` 5/5; `IdentityReplicationMapperRegistrationTests` + `ReplicationMappingParityTests`
+30/30.
+
 **2026-09-15** — **Replication mapping: the delegate is optional again, and the fallback is ShiftMapper.** (This entry was first drafted on 2026-09-14 in the `.shift` mirror only, ahead of any code; the code landed on 2026-09-15 and the entry was checked against it line by line. When the two disagree, the code repos are the record.)
 
 E3's compile break is reversed on purpose. `Replicate` / `UpdateReference` / `UpdatePropertyReference` on both pipelines
@@ -144,7 +204,8 @@ by one internal helper, `ReplicationMapper` (`ResolveCreate<Entity, Document>(se
 front (`IShiftMapper.CanMap`): no mapper registered, or no mapper that declares the pair, throws
 `InvalidOperationException` out of the run — naming the operation, the pair, and the fix (`AddShiftMapper<…>()` /
 `CreateMap<Entity, Document>()` / pass a delegate). A host may register several mappers (`AddShiftMapper` is additive);
-the last one declaring the pair wins. Pinned by `ShiftEntity.Tests/Replication/ReplicationMapperTests.cs` (4 facts, over
+the last one declaring the pair wins. *(Superseded 2026-09-17: ShiftMapper 0.2.0 registers `IShiftMapper` once and the
+helper resolves that one door — see the log entry above.)* Pinned by `ShiftEntity.Tests/Replication/ReplicationMapperTests.cs` (4 facts, over
 hand-written `IShiftMapper` doubles — the helper's job is resolution; a generated mapper is exercised by the goldens below).
 The one door `CanMap` does not cover is the update overload, which needs the exact declared pair; that miss is
 ShiftMapper's own exception, thrown before any row is written. In the trigger pipeline a throw is what it always was: the
@@ -156,7 +217,9 @@ package at `$(ShiftMapperVersion)` otherwise) — runtime library only, it decla
 directly AND reach ShiftMapper (`ShiftEntity.CosmosDbReplication`, `ShiftIdentity.AspNetCore`, `ShiftIdentity.AzureFunctions`)
 moved from 10.0.10 to 10.0.11 to clear NU1605; `ShiftEntity.Core`/`Print` and `TypeAuth.Blazor` do not reach it and stay.
 
-**ShiftIdentity's replication maps are now a ShiftMapper profile.** `ShiftIdentity.Data/Replication/IdentityReplicationMappingExtensions.cs`
+**ShiftIdentity's replication maps are now a ShiftMapper profile.** *(2026-09-17: the profile is gone with ShiftMapper
+0.2.0 — the same 19 pairs are declared in `ShiftIdentityReplicationMapper` itself; see the log entry above.)*
+`ShiftIdentity.Data/Replication/IdentityReplicationMappingExtensions.cs`
 (the hand-written `ToXModel()` / `ApplyToCompanyBranchSubItem()` delegates from E2/F2) is deleted; the same 19 pairs are
 declared in `IdentityReplicationProfile` (a `ShiftMapperProfile`, so an application's own mapper can `AddProfile<>()` it),
 carried by the ready-made `ShiftIdentityReplicationMapper`, registered with `services.AddShiftIdentityReplicationMapper()`

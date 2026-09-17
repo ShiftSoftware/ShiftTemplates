@@ -22,8 +22,14 @@ namespace StockPlusPlus.Test.Tests;
 /// registers the mapper through the same idempotent call; its builder type is not referenced here.)
 /// <para>
 /// No host, no database. The last fact cross-checks the hand-kept list below against what the assembly actually
-/// declares, so a pair ADDED to <c>IdentityReplicationProfile</c> has to be listed here — and golden'd in
+/// declares, so a pair ADDED to <see cref="ShiftIdentityReplicationMapper"/> has to be listed here — and golden'd in
 /// <see cref="ReplicationMappingParityTests"/> — before the build goes green.
+/// </para>
+/// <para>
+/// The registration is ShiftMapper's "package registers itself" shape: made from ShiftIdentity.Data, the mapper's own
+/// assembly, through an inline <c>AddShiftMapper(o =&gt; …)</c> lambda its generator read at build time. ShiftMapper
+/// keeps one registry per collection and refuses a mapper registered twice, which is why the idempotency below is
+/// the identity registration's own guard and not something the container forgives.
 /// </para>
 /// </summary>
 public class IdentityReplicationMapperRegistrationTests
@@ -54,7 +60,7 @@ public class IdentityReplicationMapperRegistrationTests
         services.AddShiftIdentityReplicationMapper(ServiceLifetime.Scoped);
 
         //One of each, and the FIRST registration's lifetime — a later call asking for another is a no-op, not a
-        //second mapper the pipeline would have to choose between.
+        //second registration ShiftMapper would refuse as a duplicate.
         Assert.Equal(1, Registrations(services, typeof(ShiftIdentityReplicationMapper)));
         Assert.Equal(1, Registrations(services, typeof(IShiftMapper)));
         Assert.Equal(ServiceLifetime.Singleton, services.Single(d => d.ServiceType == typeof(ShiftIdentityReplicationMapper)).Lifetime);
@@ -103,7 +109,7 @@ public class IdentityReplicationMapperRegistrationTests
     [Fact]
     public void Registration_IsASingleton_SharedAcrossScopes()
     {
-        //The profile has no dependencies and the maps read nothing scoped, so one instance serves the whole host —
+        //The mapper has no dependencies and the maps read nothing scoped, so one instance serves the whole host —
         //and its compiled customizations are built once rather than once per request.
         using var host = Host();
 
@@ -131,15 +137,15 @@ public class IdentityReplicationMapperRegistrationTests
     }
 
     [Fact]
-    public void ExpectedPairs_MatchWhatTheProfileActuallyDeclares()
+    public void ExpectedPairs_MatchWhatTheMapperActuallyDeclares()
     {
         //Read from the declaration metadata ShiftMapper's generator writes into ShiftIdentity.Data — the same
-        //attributes a consuming mapper's AddProfile<>() reads — rather than from the generated methods, so this
-        //is the profile's contract as the package ships it.
-        var declared = typeof(IdentityReplicationProfile).Assembly
+        //attributes a consuming mapper's IncludeMapper<>() (or a host's o.AddMapper<>()) reads — rather than from
+        //the generated methods, so this is the mapper's contract as the package ships it.
+        var declared = typeof(ShiftIdentityReplicationMapper).Assembly
             .GetCustomAttributes(typeof(ShiftMapperDeclaredMapAttribute), inherit: false)
             .Cast<ShiftMapperDeclaredMapAttribute>()
-            .Where(attribute => attribute.Profile == typeof(IdentityReplicationProfile))
+            .Where(attribute => attribute.DeclaredBy == typeof(ShiftIdentityReplicationMapper))
             .Select(attribute => (attribute.Source, attribute.Destination))
             .ToHashSet();
 
@@ -149,9 +155,9 @@ public class IdentityReplicationMapperRegistrationTests
         var unlisted = declared.Except(expected).Select(Describe).ToList();
 
         Assert.True(undeclared.Count == 0,
-            "Listed here but not declared by IdentityReplicationProfile:\n  " + string.Join("\n  ", undeclared));
+            "Listed here but not declared by ShiftIdentityReplicationMapper:\n  " + string.Join("\n  ", undeclared));
         Assert.True(unlisted.Count == 0,
-            "Declared by IdentityReplicationProfile but not listed here (list it, and add a golden to " +
+            "Declared by ShiftIdentityReplicationMapper but not listed here (list it, and add a golden to " +
             "ReplicationMappingParityTests):\n  " + string.Join("\n  ", unlisted));
 
         static string Describe((Type Source, Type Destination) pair) => $"{pair.Source.Name} -> {pair.Destination.Name}";
