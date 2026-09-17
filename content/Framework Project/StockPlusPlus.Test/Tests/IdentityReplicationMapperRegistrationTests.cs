@@ -15,7 +15,7 @@ namespace StockPlusPlus.Test.Tests;
 /// <summary>
 /// Pins the things a host relies on without ever spelling them out: that hosting identity
 /// (<c>AddShiftIdentityDashboard&lt;DB&gt;()</c>) puts ONE replication mapper where the replication pipeline looks for it
-/// (<see cref="IShiftMapper"/>) — and only one, however many times the registration is reached — and that the
+/// (<see cref="IMapper"/>) — and only one, however many times the registration is reached — and that the
 /// mapper declares every pair <c>SetUpAllIdentityReplications</c> / <c>ReplicateAllAsync</c> map without a delegate.
 /// The pipeline checks each pair with <c>CanMap</c> before writing anything, so a pair missing here would fail loudly
 /// at the first sync — this test moves that failure to the build. (The Functions worker's <c>AddShiftIdentity</c>
@@ -27,13 +27,20 @@ namespace StockPlusPlus.Test.Tests;
 /// </para>
 /// <para>
 /// The registration is ShiftMapper's "package registers itself" shape: made from ShiftIdentity.Data, the mapper's own
-/// assembly, through an inline <c>AddShiftMapper(o =&gt; …)</c> lambda its generator read at build time. ShiftMapper
-/// keeps one registry per collection and refuses a mapper registered twice, which is why the idempotency below is
-/// the identity registration's own guard and not something the container forgives.
+/// assembly, through an inline <c>AddShiftMapper(o =&gt; …)</c> lambda its generator read at build time. What lands in
+/// the container is that assembly's GENERATED mapper — the class the generator wrote, named by the assembly's own
+/// <see cref="ShiftMapperGeneratedAttribute"/>, never the mapper class itself — plus <see cref="Mapper"/> and
+/// <see cref="IMapper"/> over everything registered. ShiftMapper keeps one registry per collection and a second
+/// registration of the same generated mapper changes nothing, which is why the idempotency below needs no guard of
+/// the identity registration's own.
 /// </para>
 /// </summary>
 public class IdentityReplicationMapperRegistrationTests
 {
+    /// <summary>The generated mapper of ShiftIdentity.Data — the one thing <c>AddShiftIdentityReplicationMapper()</c> registers of its own.</summary>
+    private static readonly Type Generated = Mapper.GeneratedIn(typeof(ShiftIdentityReplicationMapper).Assembly)
+        ?? throw new InvalidOperationException("ShiftIdentity.Data was built without the ShiftMapper generator.");
+
     private static int Registrations(IServiceCollection services, Type serviceType) =>
         services.Count(descriptor => descriptor.ServiceType == serviceType);
 
@@ -47,8 +54,10 @@ public class IdentityReplicationMapperRegistrationTests
 
         services.AddControllers().AddShiftIdentityDashboard<DB>(new ShiftIdentityConfiguration());
 
-        Assert.Equal(1, Registrations(services, typeof(ShiftIdentityReplicationMapper)));
-        Assert.Equal(1, Registrations(services, typeof(IShiftMapper)));
+        Assert.Equal(1, Registrations(services, Generated));
+        Assert.Equal(1, Registrations(services, typeof(Mapper)));
+        Assert.Equal(1, Registrations(services, typeof(IMapper)));
+        Assert.Equal(0, Registrations(services, typeof(ShiftIdentityReplicationMapper)));
     }
 
     [Fact]
@@ -59,11 +68,13 @@ public class IdentityReplicationMapperRegistrationTests
         services.AddShiftIdentityReplicationMapper();
         services.AddShiftIdentityReplicationMapper(ServiceLifetime.Scoped);
 
-        //One of each, and the FIRST registration's lifetime — a later call asking for another is a no-op, not a
-        //second registration ShiftMapper would refuse as a duplicate.
-        Assert.Equal(1, Registrations(services, typeof(ShiftIdentityReplicationMapper)));
-        Assert.Equal(1, Registrations(services, typeof(IShiftMapper)));
-        Assert.Equal(ServiceLifetime.Singleton, services.Single(d => d.ServiceType == typeof(ShiftIdentityReplicationMapper)).Lifetime);
+        //One generated mapper, and the FIRST registration's lifetime — a later call asking for another is a no-op
+        //in ShiftMapper's registry, not a second registration. Mapper and IMapper are re-registered on every call
+        //(a later call could add a generated mapper), but there is still one of each.
+        Assert.Equal(1, Registrations(services, Generated));
+        Assert.Equal(1, Registrations(services, typeof(Mapper)));
+        Assert.Equal(1, Registrations(services, typeof(IMapper)));
+        Assert.Equal(ServiceLifetime.Singleton, services.Single(d => d.ServiceType == Generated).Lifetime);
     }
     /// <summary>
     /// Every (entity, document) pair the identity replication wiring maps through the registered mapper. Kept by
@@ -96,36 +107,40 @@ public class IdentityReplicationMapperRegistrationTests
         new ServiceCollection().AddShiftIdentityReplicationMapper().BuildServiceProvider();
 
     [Fact]
-    public void Registration_ExposesOneInstance_UnderIShiftMapperAndItsOwnType()
+    public void Registration_ExposesOneInstance_UnderIMapperAndMapper()
     {
+        //The interface is the door the replication pipeline resolves; the class is what application code injects.
+        //ShiftMapper resolves the interface THROUGH the class registration, so they are one object per scope.
         using var host = Host();
 
-        var byInterface = host.GetRequiredService<IShiftMapper>();
-        var byType = host.GetRequiredService<ShiftIdentityReplicationMapper>();
+        var byInterface = host.GetRequiredService<IMapper>();
+        var byType = host.GetRequiredService<Mapper>();
 
         Assert.Same(byType, byInterface);
+        Assert.Equal(new[] { Generated }, byType.Registered.Select(x => x.GetType()).ToArray());
     }
 
     [Fact]
     public void Registration_IsASingleton_SharedAcrossScopes()
     {
-        //The mapper has no dependencies and the maps read nothing scoped, so one instance serves the whole host —
-        //and its compiled customizations are built once rather than once per request.
+        //The mapper class has no dependencies and the maps read nothing scoped, so one instance serves the whole
+        //host — and its compiled customizations are built once rather than once per request. Mapper takes the
+        //shortest lifetime of what it holds, which here is the one Singleton.
         using var host = Host();
 
         using var first = host.CreateScope();
         using var second = host.CreateScope();
 
         Assert.Same(
-            first.ServiceProvider.GetRequiredService<IShiftMapper>(),
-            second.ServiceProvider.GetRequiredService<IShiftMapper>());
+            first.ServiceProvider.GetRequiredService<IMapper>(),
+            second.ServiceProvider.GetRequiredService<IMapper>());
     }
 
     [Fact]
     public void Mapper_DeclaresEveryPairTheReplicationWiringNeeds()
     {
         using var host = Host();
-        var mapper = host.GetRequiredService<IShiftMapper>();
+        var mapper = host.GetRequiredService<IMapper>();
 
         var missing = ExpectedPairs
             .Where(pair => !mapper.CanMap(pair.Source, pair.Destination))
@@ -140,8 +155,8 @@ public class IdentityReplicationMapperRegistrationTests
     public void ExpectedPairs_MatchWhatTheMapperActuallyDeclares()
     {
         //Read from the declaration metadata ShiftMapper's generator writes into ShiftIdentity.Data — the same
-        //attributes a consuming mapper's IncludeMapper<>() (or a host's o.AddMapper<>()) reads — rather than from
-        //the generated methods, so this is the mapper's contract as the package ships it.
+        //attributes a consuming project's generator reads to fold these pairs into ITS generated mapper — rather
+        //than from the generated methods, so this is the mapper's contract as the package ships it.
         var declared = typeof(ShiftIdentityReplicationMapper).Assembly
             .GetCustomAttributes(typeof(ShiftMapperDeclaredMapAttribute), inherit: false)
             .Cast<ShiftMapperDeclaredMapAttribute>()

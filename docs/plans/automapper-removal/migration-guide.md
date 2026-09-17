@@ -115,11 +115,12 @@ both sides, or use the `existing`-aware `map.ForEntity(...)` overload. The block
 ### Replication mappings (Cosmos)
 
 Replication mappings do not live in the `(entity, list, view)` triple and never will — they are N documents per
-entity, merged onto existing documents. Declare them as ShiftMapper maps in an ordinary mapper (a partial
-`ShiftMapperBase`; ShiftMapper 0.2.0 removed profiles — an included mapper is the shareable unit):
+entity, merged onto existing documents. Declare them as ShiftMapper maps in an ordinary mapper class (a
+`ShiftMapperBase` — not partial, nothing is generated onto it, nothing injects it; ShiftMapper 0.2.0 removed profiles
+and the mapper class is now only a place to write declarations):
 
 ```csharp
-public partial class BrandReplicationMapper : ShiftMapperBase
+public class BrandReplicationMapper : ShiftMapperBase
 {
     // `id` needs nothing: it matches the entity's `ID` case-insensitively and converts invariantly (long → string).
     // What DOES need saying is that `ReplicationModel.ID` — which writes through to `id` — is not a second writer.
@@ -129,25 +130,27 @@ public partial class BrandReplicationMapper : ShiftMapperBase
 }
 ```
 
-register it — on its own, or included by the host's mapper — and leave the delegate off the call site:
+register the ASSEMBLY — nothing names the class; the generator reads every `ShiftMapperBase` in the project, and every
+one the referenced packages declare, into ONE generated mapper per assembly — and leave the delegate off the call site:
 
 ```csharp
-services.AddShiftMapper(o => o.AddMapper<BrandReplicationMapper>());          // on its own, or:
-services.AddShiftMapper(o => o.AddMapper<AppMapper>(m => m.IncludeMapper<BrandReplicationMapper>()));
+services.AddShiftMapper();               // the calling assembly's generated mapper, plus Mapper and IMapper over it
 
-.Replicate<BrandModel>(containerName)   // mapped through the registered ShiftMapper mapper (IShiftMapper)
+.Replicate<BrandModel>(containerName)   // mapped through the registered mapper (IMapper, the run-time door)
 ```
 
-`IShiftMapper` is one door however many mappers you register: with several, it is a composite that hands each pair to
-the first registered mapper declaring it, and two mappers each writing their own `CreateMap` for one pair is a build
-error (SM0040) — include, do not re-declare. A call site can still pass a delegate (`x => …`) for a document shape no
-map declares. ShiftIdentity ships its mapper (`ShiftIdentityReplicationMapper`, the 19 identity pairs) and registers it
-itself: the identity registrations (`AddShiftIdentityDashboard<DB>()`, the Functions worker's
-`AddShiftIdentity(issuer, key)`) call `AddShiftIdentityReplicationMapper()` for you; a host that wires identity
-replication without either calls it itself (idempotent), and a host that wants those pairs inside its own mapper writes
-`IncludeMapper<ShiftIdentityReplicationMapper>()`. What a missing map does is the point of the
-design: the pipeline resolves the mapper and asks it `CanMap` before touching any row, so the failure is an exception
-out of the run, not dirty rows under a clean watermark.
+`IMapper` is one door however many assemblies register: `Mapper` (what application code injects; the interface
+resolves to the same object) dispatches each pair to the first registered generated mapper declaring it, the
+application's own first because it re-bakes every package's maps. Two mapper classes each writing their own
+`CreateMap` for one pair is a build error (SM0042) — reference, do not re-declare. A call site can still pass a
+delegate (`x => …`) for a document shape no map declares. ShiftIdentity ships its mapper class
+(`ShiftIdentityReplicationMapper`, the 19 identity pairs) and registers its generated mapper itself: the identity
+registrations (`AddShiftIdentityDashboard<DB>()`, the Functions worker's `AddShiftIdentity(issuer, key)`) call
+`AddShiftIdentityReplicationMapper()` for you; a host that wires identity replication without either calls it itself
+(idempotent — ShiftMapper's registry ignores a repeat), and a host with a generator of its own already has those 19
+pairs in its own generated mapper, typed methods included, because it references the package. What a missing map does
+is the point of the design: the pipeline resolves the mapper and asks it `CanMap` before touching any row, so the
+failure is an exception out of the run, not dirty rows under a clean watermark.
 
 **Three transcription traps.** Get these wrong and the failure is invisible, because replication swallows per-row
 errors and still stamps a clean watermark:

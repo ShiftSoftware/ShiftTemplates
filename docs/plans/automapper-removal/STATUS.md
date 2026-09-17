@@ -1,9 +1,10 @@
 # AutoMapper Removal — Status
 
-**Last updated:** 2026-09-17 — **ShiftMapper 0.2.0: profiles are gone, the identity mapper declares its maps
-itself and registers itself the package way** (see the log). 2026-09-16: **Cosmos replication maps through
-ShiftMapper**: the mapping delegate is optional again and a call site without one maps through the host's registered
-`IShiftMapper`. Otherwise as of
+**Last updated:** 2026-09-17 (later) — **ShiftMapper's one-generated-mapper-per-assembly model: `IShiftMapper` →
+`IMapper`, `Mapper` is the object, mapper classes are declarations only; the framework follows** (see the log).
+Earlier the same day: **ShiftMapper 0.2.0: profiles are gone, the identity mapper declares its maps itself and
+registers itself the package way**. 2026-09-16: **Cosmos replication maps through ShiftMapper**: the mapping delegate
+is optional again and a call site without one maps through the host's registered `IMapper`. Otherwise as of
 2026-08-25: **AutoMapper is removed from the framework.** Stages D, E and F complete; Stages A and B substantially
 complete — **A10 and B2 are still open**, see their rows; Stage C partial (C1 second half outstanding, and its window
 has now closed — see below).
@@ -129,6 +130,63 @@ A11** (ambiguous case-insensitive match). Next free after that is `012`.
 ---
 
 ## Log
+
+**2026-09-17 (later)** — **ShiftMapper unifies generation and registration; `IShiftMapper` becomes `IMapper`; the
+framework follows.** ShiftMapper's next two commits (`125abd4` "unify mapper generation & registration model",
+`1514014` "rename IShiftMapper to IMapper") changed WHERE the mapping code lives. Nothing is generated onto a mapper
+class any more — it need not be `partial`, nothing injects it, it is a place to write `CreateMap`s. The generator
+writes ONE generated class per assembly (`ShiftMapper.Generated.<Assembly>.GeneratedMapper`, named by an
+`[assembly: ShiftMapperGenerated]` attribute) holding every map from every mapper class in the project AND every
+mapper class the referenced packages declare, re-baked with the project's rules; the typed methods
+(`mapper.Map<BrandDto>(brand)`, `mapper.MapToBrandDto(brand)`, `ProjectTo`) are extension methods on **`Mapper`**, the
+one object application code injects. `AddShiftMapper()` registers the CALLING ASSEMBLY's generated mapper — nothing is
+named — plus `Mapper` and **`IMapper`** (the renamed run-time door, same five members) over every generated mapper any
+call registered, dispatching each pair to the first that declares it, the application's own first. `CompositeShiftMapper`
+is gone (`Mapper` is the composite); `IncludeMapper` is internal (the generator includes everything it can see);
+`o.AddMapper<T>()` only means something under `MapperDiscovery.LocalAndRegistered` / `Registered` and is reported
+(SM0046) under the default `All`; a second `AddShiftMapper` from the same assembly is a documented no-op in the
+registry rather than a throw. No version bump: `ShiftMapperVersion` stays **0.2.0**, which has not been published yet
+(no `release-shiftmapper` / `release-all` tag since it was set), so the API change ships under the number already
+waiting.
+
+What changed in the framework, per repo:
+
+- **ShiftEntity.CosmosDbReplication** — `ReplicationMapper` resolves `IMapper` (was `IShiftMapper`); a `Mapper` with
+  nothing registered (what `AddShiftMapper` leaves behind when only a map-less assembly called it) is reported as
+  "no ShiftMapper mapper is registered" with the framework's fix rather than ShiftMapper's own `Mapper.Create` advice;
+  the no-pair message names the ASSEMBLIES behind `Mapper.Registered` (the generated classes all share a name) instead
+  of `composite.Mappers`; the fix text says "declare `CreateMap<E, D>()` in a `ShiftMapperBase` class and call
+  `services.AddShiftMapper()` from that assembly" instead of `o.AddMapper<YourMapper>()`. Placement unchanged: once
+  per action, above the row loop. XML `cref`s in `CosmosDBReplication` and `ShiftEntityCosmosDbOptions` renamed.
+  `ReplicationMapperTests` re-pinned over `IMapper` doubles: the two composite facts are gone (which generated mapper
+  answers for a pair is `Mapper`'s rule, pinned in ShiftMapper's tests), replaced by the bare-`Mapper` fact and a
+  single-door fact (5 facts, green).
+- **ShiftIdentity.Data** — `ShiftIdentityReplicationMapper` is no longer `partial` (nothing is generated onto it) and
+  its remarks describe the new shape. `AddShiftIdentityReplicationMapper()` is now just
+  `services.AddShiftMapper(o => o.Lifetime = lifetime)` made from ShiftIdentity.Data: the `o.AddMapper<…>()` line went
+  (a no-op under `All`, SM0046), and the `services.Any(ServiceType == typeof(ShiftIdentityReplicationMapper))` guard
+  went with it — the mapper class is never in the container now, and ShiftMapper's registry ignores a repeat
+  registration of the same generated mapper (first lifetime wins), so the idempotency the identity registrations rely
+  on is ShiftMapper's own. Still the inline lambda, for the same `GetCallingAssembly` reason as before. A host with a
+  generator of its own no longer writes anything to get the 19 pairs: they are in its generated mapper because it
+  references the package, and `Mapper` answers from the host's first. Comments in the Dashboard and Functions
+  registrations and the csproj note renamed to match.
+- **ShiftTemplates** — `ReplicationMappingParityTests` maps through `Mapper.Create(typeof(ShiftIdentityReplicationMapper).Assembly)`
+  held as `IMapper` — the package's own generated mapper through the run-time door, which is exactly what the pipeline
+  resolves in a host without a generator; the 24 fact lines are unchanged because `IMapper.Map<TDestination>(object)`
+  and `Map(source, destination)` bind to the same spelling. **The 24 goldens are untouched and green.**
+  `IdentityReplicationMapperRegistrationTests` now asserts what is actually in the container: one descriptor for the
+  generated type (`Mapper.GeneratedIn(assembly)`), one `Mapper`, one `IMapper`, none for the mapper class;
+  `…UnderIMapperAndMapper` checks the interface and the class are one instance and `Mapper.Registered` is exactly the
+  identity generated mapper. `StockPlusPlus.Data` now also carries a generated mapper of its own (the 19 identity pairs
+  re-baked, `MapToBrandModel` etc.) simply because it references ShiftIdentity.Data with the generator attached; it is
+  not registered (the sample makes no `AddShiftMapper` call), so at run time the door is ShiftIdentity.Data's. Migration
+  guide's replication recipe rewritten (no `partial`, `AddShiftMapper()` with nothing named, `IMapper`); `CLAUDE.md`
+  rewritten for the new model.
+
+Verified: `ShiftEntity.CosmosDbReplication`, `ShiftEntity.Tests`, `ShiftIdentity.sln`, `StockPlusPlus.Test`,
+`.Functions` build clean with no SM diagnostics; `ReplicationMapperTests` 5/5; `IdentityReplicationMapperRegistrationTests`
++ `ReplicationMappingParityTests` 30/30.
 
 **2026-09-17** — **ShiftMapper 0.2.0: profiles replaced by mappers and packs; the framework follows.** ShiftMapper's
 three commits of 2026-09-17 (`869277e` "profiles replaced by mappers and packs", `30393c4` SM0042 / one registry

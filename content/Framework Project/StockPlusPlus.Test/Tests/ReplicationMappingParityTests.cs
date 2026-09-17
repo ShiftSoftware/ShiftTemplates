@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using ShiftMapper;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
 using ShiftSoftware.ShiftIdentity.Data.Replication;
 using StockPlusPlus.Test.Tests.Parity;
@@ -32,9 +33,13 @@ namespace StockPlusPlus.Test.Tests;
 /// change, and say why.
 /// </para>
 /// <para>
-/// No host, no database: these are pure unit tests. The mapper is constructed directly — it takes no dependencies
-/// and includes nothing, which is what keeps <c>new ShiftIdentityReplicationMapper()</c> legal outside DI — so they are
-/// also free of the API holding the build lock, which is why they carry no <c>[Collection("API Collection")]</c>.
+/// No host, no database: these are pure unit tests. The mapper is built outside DI with <see cref="Mapper.Create"/>
+/// over ShiftIdentity.Data — the assembly's own GENERATED mapper, which is legal because the mapper class takes no
+/// dependencies — so they are also free of the API holding the build lock, which is why they carry no
+/// <c>[Collection("API Collection")]</c>. It is held as <see cref="IMapper"/>, the run-time door, on purpose: that is
+/// the door the replication pipeline resolves (it cannot name the host's types), and the typed methods the generator
+/// writes onto <see cref="Mapper"/> are extension methods of whichever assembly runs the generator — this one does
+/// not, and giving it one would pin THIS assembly's re-baked maps rather than the package's own.
 /// </para>
 /// </summary>
 public class ReplicationMappingParityTests
@@ -42,8 +47,8 @@ public class ReplicationMappingParityTests
     private static readonly ReplicationFixtures F = new();
 
     // One instance for the class: the mapper is stateless apart from its compiled-customization cache, and
-    // building it per fact would only re-run its constructor 24 times.
-    private static readonly ShiftIdentityReplicationMapper M = new();
+    // building it per fact would only re-run the mapper class's constructor 24 times.
+    private static readonly IMapper M = Mapper.Create(typeof(ShiftIdentityReplicationMapper).Assembly);
 
     // The SAME options the goldens were captured with. Do not "make this more realistic" — with no
     // IHashIdService in scope the hash-id converters short-circuit and IDs serialize raw. That was harmless
