@@ -44,14 +44,17 @@ steps:
  - script: git clone https://github.com/ShiftSoftware/ShiftMapper.git ../ShiftMapper || { echo "##vso[task.logissue type=error]Could not clone https://github.com/ShiftSoftware/ShiftMapper anonymously. The repository must be readable without credentials (public), like every other sibling this pipeline clones, before any release* tag is built."; exit 1; }
    displayName: 'Clone ShiftMapper'
 
- # The identity checks guard the framework packages, so only the tags that publish them pay for the SQL container and
- # the suites. release-typeauth, release-aspNetCore-authorization and release-shiftmapper never see these steps; each
- # of those groups has its own tests below. Decided at template-expansion time, so the steps do not appear as skipped.
+ # The identity checks guard the framework packages, so only the tags that publish them run them. release-typeauth,
+ # release-aspNetCore-authorization and release-shiftmapper never see these steps; each of those groups has its own tests
+ # below. Decided at template-expansion time, so the steps do not appear as skipped. The template's fast tier runs on
+ # every such tag; its long-running tier (the SQL container, the SQL-backed identity tests and the consumer contract)
+ # only when the tag name contains "with-long-running-tests".
  - ${{ if or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')) }}:
    - template: .pipelines/identity-checks.steps.yml
      parameters:
       identityRoot: $(Build.SourcesDirectory)/../ShiftIdentity
       templatesRoot: $(Build.SourcesDirectory)
+      longRunning: ${{ contains(variables['Build.SourceBranch'], 'with-long-running-tests') }}
 
  - script: dotnet build ShiftTemplates.sln --configuration release
    displayName: 'Build template tooling'
@@ -168,8 +171,11 @@ steps:
    condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-shiftmapper')))
    displayName: 'Test ShiftMapper'
 
+ # Every generator test compiles a snippet with Roslyn; the 484 of them take well over the pipeline budget on a hosted
+ # agent, so they run here only for a tag whose name contains "with-long-running-tests". ShiftMapper's own GitHub
+ # workflow still runs them on every push.
  - script: dotnet test ../ShiftMapper/ShiftMapper.Generator.Tests --configuration Release
-   condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-shiftmapper')))
+   condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-shiftmapper')), contains(variables['Build.SourceBranch'], 'with-long-running-tests'))
    displayName: 'Test ShiftMapper.Generator'
 
  - script: dotnet pack ../ShiftMapper/ShiftMapper --configuration Release --output $(Build.ArtifactStagingDirectory)/ShiftMapper

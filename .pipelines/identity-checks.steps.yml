@@ -1,4 +1,11 @@
 # Only the maintained ShiftTemplates framework pipeline includes these gates.
+#
+# Two tiers. The fast tier runs on every tag that publishes the framework packages: ShiftIdentity.Tests (database-free
+# policy and token tests plus the shared fixtures) and ShiftIdentity.Blazor.Tests (bUnit). Each finishes in seconds.
+# The long-running tier needs the SQL Server container and takes minutes: ShiftIdentity.Tests.LongRunning (every
+# SQL-backed identity test and the real-clock response-floor evidence) and the identity consumer contract in
+# StockPlusPlus.Test. It runs only when the caller passes longRunning: true, which the pipeline derives from a tag
+# name that contains "with-long-running-tests" (release-framework-with-long-running-tests, for example).
 parameters:
 - name: identityRoot
   type: string
@@ -6,6 +13,9 @@ parameters:
 - name: templatesRoot
   type: string
   default: $(Build.SourcesDirectory)
+- name: longRunning
+  type: boolean
+  default: false
 steps:
 - task: UseDotNet@2
   inputs:
@@ -13,30 +23,32 @@ steps:
     version: '10.0.x'
 - pwsh: 'dotnet build "${{ parameters.templatesRoot }}/content/Framework Project/StockPlusPlus.API/StockPlusPlus.API.csproj" --configuration Debug -p:IdentityAdmissionPreview=true'
   displayName: Build opt-in StockPlusPlus admission preview
-- pwsh: '& "${{ parameters.identityRoot }}/eng/Start-IdentitySql.ps1"'
-  displayName: Start owned identity SQL fixture
-# Policy tests need no database. Http is only ever applied together with Sql, so filtering on it here ran those
-# 206 SQL-backed tests a second time; the identity-sql gate below runs every Sql test exactly once.
-- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Tests/ShiftIdentity.Tests.csproj" -Filter "Category=Policy" -Suite identity-policy -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
+# One Release build for the fast tier, so each gate below only runs its tests instead of restoring and building again.
+- pwsh: |
+    dotnet build "${{ parameters.identityRoot }}/ShiftIdentity.Tests/ShiftIdentity.Tests.csproj" --configuration Release
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    dotnet build "${{ parameters.identityRoot }}/ShiftIdentity.Blazor.Tests/ShiftIdentity.Blazor.Tests.csproj" --configuration Release
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+  displayName: Build identity test projects
+# No SQL connection on purpose: a SQL-backed test that lands in ShiftIdentity.Tests by mistake fails here.
+- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Tests/ShiftIdentity.Tests.csproj" -Suite identity-policy -ResultsRoot "$(Agent.TempDirectory)/identity-results" -NoBuild'
   displayName: identity-policy
-- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Tests/ShiftIdentity.Tests.csproj" -Filter "Category=Sql" -Suite identity-sql -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
-  displayName: identity-sql
-  env:
-    SHIFT_IDENTITY_TEST_SQL: $(IdentitySqlConnection)
-# Real-clock timing evidence: the production response floors, tens of seconds of deliberate waiting. Off by default;
-# a tag whose name contains "with-long-running-tests" (release-framework-with-long-running-tests, for example) runs it.
-- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Tests/ShiftIdentity.Tests.csproj" -Filter "Category=LongRunning" -Suite identity-long-running -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
-  displayName: identity-long-running
-  condition: and(succeeded(), contains(variables['Build.SourceBranch'], 'with-long-running-tests'))
-  env:
-    SHIFT_IDENTITY_LONG_RUNNING: '1'
-    SHIFT_IDENTITY_TEST_SQL: $(IdentitySqlConnection)
-- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Blazor.Tests/ShiftIdentity.Blazor.Tests.csproj" -Filter "Category=Ui" -Suite identity-ui -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
+- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Blazor.Tests/ShiftIdentity.Blazor.Tests.csproj" -Suite identity-ui -ResultsRoot "$(Agent.TempDirectory)/identity-results" -NoBuild'
   displayName: identity-ui
-- pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.templatesRoot }}/content/Framework Project/StockPlusPlus.Test/StockPlusPlus.Test.csproj" -Filter "Category=IdentityConsumer" -Suite identity-consumer-contract -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
-  displayName: identity-consumer-contract
-  env:
-    SHIFT_IDENTITY_TEST_SQL: $(IdentitySqlConnection)
+- ${{ if parameters.longRunning }}:
+  - pwsh: '& "${{ parameters.identityRoot }}/eng/Start-IdentitySql.ps1"'
+    displayName: Start owned identity SQL fixture
+  - pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.identityRoot }}/ShiftIdentity.Tests.LongRunning/ShiftIdentity.Tests.LongRunning.csproj" -Suite identity-long-running -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
+    displayName: identity-long-running
+    env:
+      SHIFT_IDENTITY_TEST_SQL: $(IdentitySqlConnection)
+  - pwsh: '& "${{ parameters.identityRoot }}/eng/Test-IdentitySuite.ps1" -Project "${{ parameters.templatesRoot }}/content/Framework Project/StockPlusPlus.Test/StockPlusPlus.Test.csproj" -Filter "Category=IdentityConsumer" -Suite identity-consumer-contract -ResultsRoot "$(Agent.TempDirectory)/identity-results"'
+    displayName: identity-consumer-contract
+    env:
+      SHIFT_IDENTITY_TEST_SQL: $(IdentitySqlConnection)
+  - pwsh: '& "${{ parameters.identityRoot }}/eng/Stop-IdentitySql.ps1" -Container "$(IdentitySqlContainer)"'
+    condition: always()
+    displayName: Remove owned identity SQL fixture
 - task: PublishTestResults@2
   condition: always()
   inputs:
@@ -44,6 +56,3 @@ steps:
     testResultsFiles: '$(Agent.TempDirectory)/identity-results/**/*.trx'
     failTaskOnFailedTests: true
     failTaskOnMissingResultsFile: true
-- pwsh: '& "${{ parameters.identityRoot }}/eng/Stop-IdentitySql.ps1" -Container "$(IdentitySqlContainer)"'
-  condition: always()
-  displayName: Remove owned identity SQL fixture
