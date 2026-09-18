@@ -1,7 +1,7 @@
 # Repository mapping on ShiftMapper — Plan
 
 **Created:** 2026-09-18 · **Revised:** 2026-09-18 (no programmer attributes; configuration in the repository; mapper class overrides)
-**Status:** Stage 0 (the frozen oracle) is done; Stages 1–5 not started. See [`STATUS.md`](STATUS.md).
+**Status:** Stages 0 (the frozen oracle) and 1 (the ShiftMapper features, unreleased) are done; Stages 2–5 not started. See [`STATUS.md`](STATUS.md).
 
 > **This is the primary working copy of this plan.** It lives in
 > `ShiftTemplates/docs/plans/repository-mapping-on-shiftmapper/`. The `.shift` mapping plan

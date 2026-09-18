@@ -65,6 +65,13 @@ None of these mentions ShiftEntity. Each is a general feature with its own gener
 `ShiftMapper.Generator.Tests` and a section in `docs/extension-points.md`. **M1 blocks M2 and M3; M4, M5,
 M6 are independent.**
 
+**Done 2026-09-18 — see [`STATUS.md`](STATUS.md) for what each became.** The names below are the ones that
+shipped, with three differences from the first draft: the marker's `Flattening` is a `DeclaredOption`
+(three-state) rather than a bool; there is no `ConfiguredBy` on the marker — a lambda over any
+`ShiftMapperConfigurationSurface` subclass is read wherever it is, and its pairs come from the surface's
+`MapExpression` properties; and the runtime pull has a hook, `IShiftMapperConfiguratorResolver`, for a framework
+whose configuring type is not what the container knows the configuration by. The declaration contract is 3.
+
 ### M1 Implicit maps from a marked generic type
 
 **What.** A framework marks an open generic class or attribute class — in its own package, once:

@@ -5,7 +5,7 @@
 		<ShiftFrameworkVersion>2026.09.17.1</ShiftFrameworkVersion>
 		<TypeAuthVersion>1.6.29</TypeAuthVersion>
 		<AzureFunctionsAspNetCoreAuthorizationVersion>0.0.36</AzureFunctionsAspNetCoreAuthorizationVersion>
-		<ShiftMapperVersion>0.2.0</ShiftMapperVersion>
+		<ShiftMapperVersion>0.3.0</ShiftMapperVersion>
 	</PropertyGroup>
 
 	<!--
