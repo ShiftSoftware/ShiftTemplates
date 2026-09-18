@@ -23,7 +23,7 @@ to check that ShiftMapper produces the same thing. So the first step is to write
 One markdown table per repository — sample, `ShiftIdentity.Data` — listing every `(entity, list, view)`
 triple, how it maps today (generated / partial class / override / hand-written), every nested pair the
 generator discovered, every fluent customization, and every use of the three attributes. This is the
-checklist Stage 3 migrates against. Known today:
+checklist Stage 3 migrates against. **Done 2026-09-18 — [`05-inventory.md`](05-inventory.md) §1, 23 triples.** Known at planning time:
 
 ```
 | Triple                                   | Door             | Nested pairs                          | Customizations / attributes |
@@ -36,8 +36,10 @@ checklist Stage 3 migrates against. Known today:
 
 ### 0.2 Parity goldens
 
-`StockPlusPlus.Test/Tests/RepositoryMappingParityTests.cs` (and the same in `ShiftIdentity.Tests`): for every
-triple, a fixed entity graph goes through all four directions and the result is compared to a frozen file:
+`StockPlusPlus.Test/Tests/RepositoryMappingParityTests.cs`, over BOTH assemblies (the sample host registers
+ShiftIdentity's repositories and endpoints, so their real, configured mappers resolve from the same scope — a
+second suite in `ShiftIdentity.Tests` would need a second host and pin the same objects): for every triple, a
+fixed entity graph goes through all four directions and the result is compared to a frozen file:
 
 - `MapToView` → JSON of the DTO;
 - `MapToEntity` over a fixed `existing` entity → JSON of the entity afterwards;
@@ -46,13 +48,14 @@ triple, a fixed entity graph goes through all four directions and the result is 
 - `CopyEntity` → JSON of the target.
 
 Same recipe as `ReplicationMappingParityTests.cs`. The goldens are written by the OLD generator, committed, and
-never regenerated; Stage 2.9 diffs ShiftMapper against them.
+never regenerated; Stage 2.8 diffs ShiftMapper against them. **Done 2026-09-18 — see [`05-inventory.md`](05-inventory.md) §2**
+for the fixture rules, the capture switch and what the files visibly pin.
 
 ### 0.3 Baseline the diagnostics
 
 Build the sample and ShiftIdentity once and save the `SHENGEN` warnings they print today. Each of those must
 later be either a ShiftMapper `SM` warning on the same member or a recorded decision that it is no longer
-needed.
+needed. **Done 2026-09-18 — 11 distinct warnings, each with its target `SM` rule, in [`05-inventory.md`](05-inventory.md) §3.**
 
 ---
 

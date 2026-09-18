@@ -1,7 +1,8 @@
 # Repository mapping on ShiftMapper — Status
 
-**Last updated:** 2026-09-18 — plan revised after discussion (no programmer attributes; `o.Mapping(m => …)`
-in the repository; mapper class overrides; maps usable anywhere). Nothing built.
+**Last updated:** 2026-09-18 — **Stage 0 done**: 23 triples inventoried, goldens captured from the old generator
+(138 assertions, byte-identical on recapture), 11 SHENGEN warnings baselined — all in [`05-inventory.md`](05-inventory.md).
+Stages 1–5 not started.
 
 Update this file as steps land. Keep it factual: what shipped, what it changed, what surprised you.
 Plan: [`01-steps.md`](01-steps.md) · Decisions: [`02-open-decisions.md`](02-open-decisions.md) ·
@@ -15,9 +16,9 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 
 | Step | Status | Notes |
 |------|--------|-------|
-| 0.1 Inventory every triple, nested pair and attribute use (sample + ShiftIdentity) | ⬜ | |
-| 0.2 Parity goldens written by the OLD generator | ⬜ | The window closes at Stage 4. |
-| 0.3 Baseline the SHENGEN warnings | ⬜ | |
+| 0.1 Inventory every triple, nested pair and attribute use (sample + ShiftIdentity) | ✅ | **2026-09-18.** 23 triples (10 sample, 13 identity), arms resolved from the host, nested members read off the goldens, every fluent call and attribute use listed. `[ShiftEntityMapperIgnore]` and a live `[ShiftEntityMapperMaxDepth]` have zero framework-owned uses. [`05-inventory.md`](05-inventory.md) §1. |
+| 0.2 Parity goldens written by the OLD generator | ✅ | **2026-09-18.** `StockPlusPlus.Test/Tests/RepositoryMappingParityTests.cs` + `Tests/Parity/RepositoryMapping/` (deterministic fixture builder, runner, 23 golden files, 536 KB). Six theories per triple, 138 tests, ~2 s. ONE suite over both assemblies — the sample host resolves ShiftIdentity's configured mappers too, so the planned second suite in `ShiftIdentity.Tests` was not needed. Capture switch `SHIFT_TEST_CAPTURE_REPOSITORY_MAPPING_GOLDENS=1`. The window closes at Stage 4. |
+| 0.3 Baseline the SHENGEN warnings | ✅ | **2026-09-18.** 11 distinct warnings (004 ×2, 007 ×4, 008 ×3, 010 ×2), each with its target `SM` rule; one (Product SHENGEN007) is noise because the repository overrides `MapToList`. [`05-inventory.md`](05-inventory.md) §3. |
 
 ## Stage 1 — ShiftMapper features (0.3.0)
 
@@ -90,6 +91,17 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 | Q11 blank select on nullable FK clears; on required FK is a 400 | ⬜ | recommended: keep today's behaviour |
 
 ## Log
+
+- **2026-09-18 (Stage 0)** — Goldens captured through the running host rather than from the registry, so a
+  repository's `UseGeneratedMapper(map => …)` configuration and a repository's overrides are what is pinned (the
+  `Arm` field in each file says which). Fixtures are built by reflection, deterministically, with string members
+  filled to whatever the same-named member on the other side can parse — the alternative, a hand-written fixture
+  per entity, would have been 23 fixtures nobody would keep honest. Two things were tuned after the first capture
+  and are worth knowing: collections below the second level carry one element, and the "existing" row a DTO is
+  written onto is built one level deep — a full-depth existing graph pinned 40 KB of untouched fixture per file
+  and said nothing about mapping. No fixture holes on any triple. Surprise: none of the identity repositories
+  needed anything beyond the host's own registrations to construct; `ParityArms` resolved all 23 without a
+  `RegistryOnly` fallback.
 
 - **2026-09-18 (revised)** — After discussion: (1) **no attributes for the programmer** — `[ShiftEntityMapper]`,
   `[ShiftEntityMapperIgnore]`, `[ShiftEntityMapperMaxDepth]`, `ShiftEntityMapperDefaults` and the

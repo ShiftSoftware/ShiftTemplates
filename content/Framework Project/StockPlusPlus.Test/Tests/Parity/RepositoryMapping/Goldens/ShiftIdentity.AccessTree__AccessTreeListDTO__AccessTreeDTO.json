@@ -1,0 +1,49 @@
+{
+  "Triple": "AccessTree / AccessTreeListDTO / AccessTreeDTO",
+  "Arm": "Generated_AccessTree_AccessTreeListDTO_AccessTreeDTO_c2de64ec",
+  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "FixtureNotes": [],
+  "View": {
+    "ID": "1003",
+    "Name": "Name-6",
+    "Tree": "Tree-7",
+    "Revisions": null,
+    "CreateDate": "2026-01-03T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-06T03:04:05\u002B00:00",
+    "CreatedByUserID": "1002",
+    "LastSavedByUserID": "1005",
+    "IsDeleted": false
+  },
+  "Entity": {
+    "Name": "Name-6",
+    "Tree": "Tree-15",
+    "CreateDate": "2026-01-03T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-06T03:04:05\u002B00:00",
+    "CreatedByUserID": 3002,
+    "LastSavedByUserID": 3005,
+    "IsDeleted": false,
+    "ReloadAfterSave": false,
+    "AuditFieldsAreSet": false,
+    "ID": 5003
+  },
+  "List": [
+    {
+      "ID": "1003",
+      "Name": "Name-6",
+      "IsDeleted": false
+    }
+  ],
+  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.AccessTree[].Select(e =\u003E new AccessTreeListDTO() {ID = e.ID.ToString(), Name = e.Name, IsDeleted = e.IsDeleted})",
+  "Copy": {
+    "Name": "Name-6",
+    "Tree": "Tree-7",
+    "CreateDate": "2026-01-03T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-06T03:04:05\u002B00:00",
+    "CreatedByUserID": 1002,
+    "LastSavedByUserID": 1005,
+    "IsDeleted": false,
+    "ReloadAfterSave": false,
+    "AuditFieldsAreSet": false,
+    "ID": 5003
+  }
+}

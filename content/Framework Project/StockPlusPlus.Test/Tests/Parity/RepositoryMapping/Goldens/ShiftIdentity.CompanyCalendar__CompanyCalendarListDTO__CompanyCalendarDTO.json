@@ -1,0 +1,471 @@
+{
+  "Triple": "CompanyCalendar / CompanyCalendarListDTO / CompanyCalendarDTO",
+  "Arm": "Generated_CompanyCalendar_CompanyCalendarListDTO_CompanyCalendarDTO_b6415603",
+  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "FixtureNotes": [],
+  "View": {
+    "ID": "1011",
+    "Title": "Title-42",
+    "StartDate": "2026-02-12T03:04:05Z",
+    "EndDate": "2026-01-12T03:04:05Z",
+    "EntryType": 2,
+    "Priority": 1016,
+    "Company": {
+      "Value": "1007"
+    },
+    "Branches": [
+      {
+        "Value": "1001"
+      },
+      {
+        "Value": "1004"
+      }
+    ],
+    "ShiftGroups": [
+      {
+        "Departments": [
+          {
+            "Value": "kLEnP",
+            "Text": null,
+            "Nested": null
+          },
+          {
+            "Value": "81x3P",
+            "Text": null,
+            "Nested": null
+          }
+        ],
+        "Brands": [
+          {
+            "Value": "r0yBx",
+            "Text": null,
+            "Nested": null
+          },
+          {
+            "Value": "XvzeX",
+            "Text": null,
+            "Nested": null
+          }
+        ],
+        "Days": [
+          1019,
+          1020
+        ],
+        "Shifts": [
+          {
+            "Title": "Title-25",
+            "StartTimeTicks": 1024,
+            "EndTimeTicks": 1023
+          },
+          {
+            "Title": "Title-28",
+            "StartTimeTicks": 1027,
+            "EndTimeTicks": 1026
+          }
+        ]
+      },
+      {
+        "Departments": [
+          {
+            "Value": "8Jnz8",
+            "Text": null,
+            "Nested": null
+          },
+          {
+            "Value": "kO64M",
+            "Text": null,
+            "Nested": null
+          }
+        ],
+        "Brands": [
+          {
+            "Value": "rlEpx",
+            "Text": null,
+            "Nested": null
+          },
+          {
+            "Value": "K534r",
+            "Text": null,
+            "Nested": null
+          }
+        ],
+        "Days": [
+          1031,
+          1032
+        ],
+        "Shifts": [
+          {
+            "Title": "Title-37",
+            "StartTimeTicks": 1036,
+            "EndTimeTicks": 1035
+          },
+          {
+            "Title": "Title-40",
+            "StartTimeTicks": 1039,
+            "EndTimeTicks": 1038
+          }
+        ]
+      }
+    ],
+    "WeekendGroups": [
+      {
+        "Departments": [
+          {
+            "Value": "PaGOM",
+            "Text": null,
+            "Nested": null
+          },
+          {
+            "Value": "Pp37k",
+            "Text": null,
+            "Nested": null
+          }
+        ],
+        "Brands": [
+          {
+            "Value": "xWdWK",
+            "Text": null,
+            "Nested": null
+          },
+          {
+            "Value": "rEg4K",
+            "Text": null,
+            "Nested": null
+          }
+        ],
+        "Weekends": [
+          {
+            "Day": 1047,
+            "Repeat": 1048,
+            "Skip": 1049
+          },
+          {
+            "Day": 1050,
+            "Repeat": 1051,
+            "Skip": 1052
+          }
+        ]
+      },
+      {
+        "Departments": [
+          {
+            "Value": "PgdO8",
+            "Text": null,
+            "Nested": null
+          },
+          {
+            "Value": "PnZRP",
+            "Text": null,
+            "Nested": null
+          }
+        ],
+        "Brands": [
+          {
+            "Value": "xyLar",
+            "Text": null,
+            "Nested": null
+          },
+          {
+            "Value": "Xz3yr",
+            "Text": null,
+            "Nested": null
+          }
+        ],
+        "Weekends": [
+          {
+            "Day": 1057,
+            "Repeat": 1058,
+            "Skip": 1059
+          },
+          {
+            "Day": 1060,
+            "Repeat": 1061,
+            "Skip": 1062
+          }
+        ]
+      }
+    ],
+    "CreateDate": "2026-01-10T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-16T03:04:05\u002B00:00",
+    "CreatedByUserID": "1009",
+    "LastSavedByUserID": "1015",
+    "IsDeleted": false
+  },
+  "Entity": {
+    "LastReplicationDate": "2026-01-14T03:04:05\u002B00:00",
+    "LastReplicationStamp": "LastReplicationStamp-13",
+    "Title": "Title-44",
+    "StartDate": "2026-02-14T03:04:05Z",
+    "EndDate": "2026-01-08T03:04:05Z",
+    "EntryType": 2,
+    "Priority": 3010,
+    "CompanyID": 3003,
+    "ShiftGroups": [
+      {
+        "DepartmentIds": [
+          0,
+          0
+        ],
+        "BrandIds": [
+          0,
+          0
+        ],
+        "Days": [
+          3013,
+          3014
+        ],
+        "Shifts": [
+          {
+            "Title": "Title-21",
+            "StartTimeTicks": 3020,
+            "EndTimeTicks": 3018
+          },
+          {
+            "Title": "Title-26",
+            "StartTimeTicks": 3025,
+            "EndTimeTicks": 3023
+          }
+        ]
+      },
+      {
+        "DepartmentIds": [
+          0,
+          0
+        ],
+        "BrandIds": [
+          0,
+          0
+        ],
+        "Days": [
+          3029,
+          3030
+        ],
+        "Shifts": [
+          {
+            "Title": "Title-37",
+            "StartTimeTicks": 3036,
+            "EndTimeTicks": 3034
+          },
+          {
+            "Title": "Title-42",
+            "StartTimeTicks": 3041,
+            "EndTimeTicks": 3039
+          }
+        ]
+      }
+    ],
+    "WeekendGroups": [
+      {
+        "DepartmentIds": [
+          0,
+          0
+        ],
+        "BrandIds": [
+          0,
+          0
+        ],
+        "Weekends": [
+          {
+            "Day": 3049,
+            "Repeat": 3050,
+            "Skip": 3051
+          },
+          {
+            "Day": 3052,
+            "Repeat": 3053,
+            "Skip": 3054
+          }
+        ]
+      },
+      {
+        "DepartmentIds": [
+          0,
+          0
+        ],
+        "BrandIds": [
+          0,
+          0
+        ],
+        "Weekends": [
+          {
+            "Day": 3059,
+            "Repeat": 3060,
+            "Skip": 3061
+          },
+          {
+            "Day": 3062,
+            "Repeat": 3063,
+            "Skip": 3064
+          }
+        ]
+      }
+    ],
+    "Branches": [
+      {
+        "Id": 5003,
+        "CompanyCalendarID": 5002,
+        "CompanyCalendar": null,
+        "CompanyBranchID": 5001
+      },
+      {
+        "Id": 5006,
+        "CompanyCalendarID": 5005,
+        "CompanyCalendar": null,
+        "CompanyBranchID": 5004
+      }
+    ],
+    "CreateDate": "2026-01-06T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-10T03:04:05\u002B00:00",
+    "CreatedByUserID": 3005,
+    "LastSavedByUserID": 3009,
+    "IsDeleted": false,
+    "ReloadAfterSave": false,
+    "AuditFieldsAreSet": false,
+    "ID": 5011
+  },
+  "List": [
+    {
+      "ID": "1011",
+      "Title": "Title-42",
+      "EntryType": 2,
+      "StartDate": "2026-02-12T03:04:05Z",
+      "EndDate": "2026-01-12T03:04:05Z",
+      "Priority": 1016,
+      "CompanyID": "1007",
+      "IsDeleted": false
+    }
+  ],
+  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.CompanyCalendar[].Select(e =\u003E new CompanyCalendarListDTO() {ID = e.ID.ToString(), Title = e.Title, EntryType = e.EntryType, StartDate = e.StartDate, EndDate = e.EndDate, Priority = e.Priority, CompanyID = IIF(e.CompanyID.HasValue, e.CompanyID.Value.ToString(), null), IsDeleted = e.IsDeleted})",
+  "Copy": {
+    "LastReplicationDate": "2026-01-14T03:04:05\u002B00:00",
+    "LastReplicationStamp": "LastReplicationStamp-13",
+    "Title": "Title-42",
+    "StartDate": "2026-02-12T03:04:05Z",
+    "EndDate": "2026-01-12T03:04:05Z",
+    "EntryType": 2,
+    "Priority": 1016,
+    "CompanyID": 1007,
+    "ShiftGroups": [
+      {
+        "DepartmentIds": [
+          1021,
+          1022
+        ],
+        "BrandIds": [
+          1017,
+          1018
+        ],
+        "Days": [
+          1019,
+          1020
+        ],
+        "Shifts": [
+          {
+            "Title": "Title-25",
+            "StartTimeTicks": 1024,
+            "EndTimeTicks": 1023
+          },
+          {
+            "Title": "Title-28",
+            "StartTimeTicks": 1027,
+            "EndTimeTicks": 1026
+          }
+        ]
+      },
+      {
+        "DepartmentIds": [
+          1033,
+          1034
+        ],
+        "BrandIds": [
+          1029,
+          1030
+        ],
+        "Days": [
+          1031,
+          1032
+        ],
+        "Shifts": [
+          {
+            "Title": "Title-37",
+            "StartTimeTicks": 1036,
+            "EndTimeTicks": 1035
+          },
+          {
+            "Title": "Title-40",
+            "StartTimeTicks": 1039,
+            "EndTimeTicks": 1038
+          }
+        ]
+      }
+    ],
+    "WeekendGroups": [
+      {
+        "DepartmentIds": [
+          1045,
+          1046
+        ],
+        "BrandIds": [
+          1043,
+          1044
+        ],
+        "Weekends": [
+          {
+            "Day": 1047,
+            "Repeat": 1048,
+            "Skip": 1049
+          },
+          {
+            "Day": 1050,
+            "Repeat": 1051,
+            "Skip": 1052
+          }
+        ]
+      },
+      {
+        "DepartmentIds": [
+          1055,
+          1056
+        ],
+        "BrandIds": [
+          1053,
+          1054
+        ],
+        "Weekends": [
+          {
+            "Day": 1057,
+            "Repeat": 1058,
+            "Skip": 1059
+          },
+          {
+            "Day": 1060,
+            "Repeat": 1061,
+            "Skip": 1062
+          }
+        ]
+      }
+    ],
+    "Branches": [
+      {
+        "Id": 1003,
+        "CompanyCalendarID": 1002,
+        "CompanyCalendar": null,
+        "CompanyBranchID": 1001
+      },
+      {
+        "Id": 1006,
+        "CompanyCalendarID": 1005,
+        "CompanyCalendar": null,
+        "CompanyBranchID": 1004
+      }
+    ],
+    "CreateDate": "2026-01-10T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-16T03:04:05\u002B00:00",
+    "CreatedByUserID": 1009,
+    "LastSavedByUserID": 1015,
+    "IsDeleted": false,
+    "ReloadAfterSave": false,
+    "AuditFieldsAreSet": false,
+    "ID": 5011
+  }
+}

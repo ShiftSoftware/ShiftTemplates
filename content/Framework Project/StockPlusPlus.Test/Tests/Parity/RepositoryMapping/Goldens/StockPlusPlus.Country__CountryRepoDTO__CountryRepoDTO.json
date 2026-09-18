@@ -1,0 +1,53 @@
+{
+  "Triple": "Country / CountryRepoDTO / CountryRepoDTO",
+  "Arm": "Generated_Country_CountryRepoDTO_CountryRepoDTO_790dc0e9",
+  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "FixtureNotes": [],
+  "View": {
+    "ID": "1003",
+    "Name": "Name-7",
+    "Revisions": null,
+    "CreateDate": "2026-01-03T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-07T03:04:05\u002B00:00",
+    "CreatedByUserID": "1002",
+    "LastSavedByUserID": "1006",
+    "IsDeleted": false
+  },
+  "Entity": {
+    "Name": "Name-6",
+    "IdempotencyKey": "00000000-0000-0000-0000-000000005004",
+    "CreateDate": "2026-01-03T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-06T03:04:05\u002B00:00",
+    "CreatedByUserID": 3002,
+    "LastSavedByUserID": 3005,
+    "IsDeleted": false,
+    "ReloadAfterSave": false,
+    "AuditFieldsAreSet": false,
+    "ID": 5003
+  },
+  "List": [
+    {
+      "ID": "1003",
+      "Name": "Name-7",
+      "Revisions": null,
+      "CreateDate": "2026-01-03T03:04:05\u002B00:00",
+      "LastSaveDate": "2026-01-07T03:04:05\u002B00:00",
+      "CreatedByUserID": "1002",
+      "LastSavedByUserID": "1006",
+      "IsDeleted": false
+    }
+  ],
+  "ListShape": "StockPlusPlus.Data.Entities.Country[].Select(e =\u003E new CountryRepoDTO() {ID = e.ID.ToString(), Name = e.Name, CreateDate = e.CreateDate, LastSaveDate = e.LastSaveDate, CreatedByUserID = IIF(e.CreatedByUserID.HasValue, e.CreatedByUserID.Value.ToString(), null), LastSavedByUserID = IIF(e.LastSavedByUserID.HasValue, e.LastSavedByUserID.Value.ToString(), null), IsDeleted = e.IsDeleted})",
+  "Copy": {
+    "Name": "Name-7",
+    "IdempotencyKey": "00000000-0000-0000-0000-000000001004",
+    "CreateDate": "2026-01-03T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-07T03:04:05\u002B00:00",
+    "CreatedByUserID": 1002,
+    "LastSavedByUserID": 1006,
+    "IsDeleted": false,
+    "ReloadAfterSave": false,
+    "AuditFieldsAreSet": false,
+    "ID": 5003
+  }
+}

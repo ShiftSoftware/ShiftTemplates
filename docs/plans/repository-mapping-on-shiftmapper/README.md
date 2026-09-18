@@ -1,7 +1,7 @@
 # Repository mapping on ShiftMapper — Plan
 
 **Created:** 2026-09-18 · **Revised:** 2026-09-18 (no programmer attributes; configuration in the repository; mapper class overrides)
-**Status:** proposal — nothing has been built yet. See [`STATUS.md`](STATUS.md).
+**Status:** Stage 0 (the frozen oracle) is done; Stages 1–5 not started. See [`STATUS.md`](STATUS.md).
 
 > **This is the primary working copy of this plan.** It lives in
 > `ShiftTemplates/docs/plans/repository-mapping-on-shiftmapper/`. The `.shift` mapping plan
@@ -21,6 +21,7 @@ fluent builder and mapping attributes are deleted.
 | [`02-open-decisions.md`](02-open-decisions.md) | The judgment calls, with a recommendation for each. |
 | [`03-coverage.md`](03-coverage.md) | Every convention the old generator has today, and how ShiftMapper covers it — so nothing is lost by accident. Plus the new gaps this plan fills. |
 | [`04-migration-guide.md`](04-migration-guide.md) | Line-by-line: what each old spelling becomes. For the sample, ShiftIdentity, `ADP.*`, `Menu`. |
+| [`05-inventory.md`](05-inventory.md) | **Stage 0's output**: every triple and how it maps today, the goldens and how they were captured, the SHENGEN baseline. |
 | [`STATUS.md`](STATUS.md) | Live tracker. |
 
 ---

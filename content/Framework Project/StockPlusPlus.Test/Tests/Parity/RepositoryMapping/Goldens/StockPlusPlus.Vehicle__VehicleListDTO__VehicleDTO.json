@@ -1,0 +1,57 @@
+{
+  "Triple": "Vehicle / VehicleListDTO / VehicleDTO",
+  "Arm": "VehicleRepository (method override)",
+  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "FixtureNotes": [],
+  "View": {
+    "ID": "1004",
+    "VIN": "VIN-8",
+    "Company": {
+      "Value": "1001"
+    },
+    "IntermediaryCompany": {
+      "Value": "1005"
+    },
+    "CreateDate": "2026-01-04T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-08T03:04:05\u002B00:00",
+    "CreatedByUserID": "1003",
+    "LastSavedByUserID": "1007",
+    "IsDeleted": false
+  },
+  "Entity": {
+    "VIN": "VIN-8",
+    "CompanyID": 3001,
+    "IntermediaryCompanyID": 3005,
+    "CreateDate": "2026-01-04T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-08T03:04:05\u002B00:00",
+    "CreatedByUserID": 5003,
+    "LastSavedByUserID": 5007,
+    "IsDeleted": false,
+    "ReloadAfterSave": false,
+    "AuditFieldsAreSet": false,
+    "ID": 5004
+  },
+  "List": [
+    {
+      "ID": "1004",
+      "VIN": "VIN-8",
+      "CompanyID": "1001",
+      "IntermediaryCompanyID": "1005",
+      "IsDeleted": false
+    }
+  ],
+  "ListShape": "StockPlusPlus.Data.Entities.Vehicle[].Select(vehicle =\u003E new VehicleListDTO() {ID = vehicle.ID.ToString(), IsDeleted = vehicle.IsDeleted, VIN = vehicle.VIN, CompanyID = IIF(vehicle.CompanyID.HasValue, vehicle.CompanyID.Value.ToString(), null), IntermediaryCompanyID = IIF(vehicle.IntermediaryCompanyID.HasValue, vehicle.IntermediaryCompanyID.Value.ToString(), null)})",
+  "Copy": {
+    "VIN": "VIN-8",
+    "CompanyID": 1001,
+    "IntermediaryCompanyID": 1005,
+    "CreateDate": "2026-01-04T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-08T03:04:05\u002B00:00",
+    "CreatedByUserID": 1003,
+    "LastSavedByUserID": 1007,
+    "IsDeleted": false,
+    "ReloadAfterSave": false,
+    "AuditFieldsAreSet": false,
+    "ID": 5004
+  }
+}

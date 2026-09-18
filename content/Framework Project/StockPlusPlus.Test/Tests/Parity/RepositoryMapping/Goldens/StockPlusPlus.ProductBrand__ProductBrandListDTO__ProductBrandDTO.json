@@ -1,0 +1,68 @@
+{
+  "Triple": "ProductBrand / ProductBrandListDTO / ProductBrandDTO",
+  "Arm": "ProductBrandMapper",
+  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "FixtureNotes": [],
+  "View": {
+    "ID": "1007",
+    "Name": "Name-11",
+    "Description": "Description-6",
+    "Code": "Code-1",
+    "Team": {
+      "Value": "1013"
+    },
+    "CreateDate": "2026-01-06T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-11T03:04:05\u002B00:00",
+    "CreatedByUserID": "1005",
+    "LastSavedByUserID": "1010",
+    "IsDeleted": false
+  },
+  "Entity": {
+    "Name": "Name-8",
+    "Description": "Description-4",
+    "Code": "Code-1",
+    "TeamID": 3009,
+    "RegionID": 5012,
+    "CompanyID": 5003,
+    "CompanyBranchID": 5002,
+    "IdempotencyKey": "00000000-0000-0000-0000-000000005008",
+    "CreateDate": "2026-01-04T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-08T03:04:05\u002B00:00",
+    "CreatedByUserID": 3003,
+    "LastSavedByUserID": 3007,
+    "IsDeleted": false,
+    "ReloadAfterSave": false,
+    "AuditFieldsAreSet": false,
+    "ID": 5007
+  },
+  "List": [
+    {
+      "ID": "1007",
+      "Name": "Name-11",
+      "Description": "Description-6",
+      "Code": "Code-1",
+      "CreatedByUserID": "1005",
+      "TeamID": "1013",
+      "IsDeleted": false
+    }
+  ],
+  "ListShape": "StockPlusPlus.Data.Entities.ProductBrand[].Select(e =\u003E new ProductBrandListDTO() {ID = e.ID.ToString(), Name = e.Name, Description = e.Description, CreatedByUserID = IIF(e.CreatedByUserID.HasValue, e.CreatedByUserID.Value.ToString(), null), TeamID = IIF(e.TeamID.HasValue, e.TeamID.Value.ToString(), null), IsDeleted = e.IsDeleted, Code = (e.Code ?? \u0022(No Code)\u0022)})",
+  "Copy": {
+    "Name": "Name-11",
+    "Description": "Description-6",
+    "Code": "Code-1",
+    "TeamID": 1013,
+    "RegionID": 1012,
+    "CompanyID": 1003,
+    "CompanyBranchID": 1002,
+    "IdempotencyKey": "00000000-0000-0000-0000-000000001008",
+    "CreateDate": "2026-01-06T03:04:05\u002B00:00",
+    "LastSaveDate": "2026-01-11T03:04:05\u002B00:00",
+    "CreatedByUserID": 1005,
+    "LastSavedByUserID": 1010,
+    "IsDeleted": false,
+    "ReloadAfterSave": false,
+    "AuditFieldsAreSet": false,
+    "ID": 5007
+  }
+}
