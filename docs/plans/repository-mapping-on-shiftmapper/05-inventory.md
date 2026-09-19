@@ -8,6 +8,10 @@ This file is the record of what Stage 0 froze: every triple (0.1), the goldens t
 directions (0.2), and the generator warnings the two data projects print today (0.3). Stage 2.8 diffs
 ShiftMapper against §2, and Stage 3 migrates against §1 and §3.
 
+> **2026-09-20:** the harness described here — the goldens, the runner, the fixture builder, the enumerator
+> and the arms — was deleted after Stage 3 closed the comparison (STATUS log). This file stays as the record of
+> what was frozen and how; none of the paths below exist any more, and the capture switch is gone.
+
 ---
 
 ## 1. Inventory — every triple, and how it maps today (0.1)

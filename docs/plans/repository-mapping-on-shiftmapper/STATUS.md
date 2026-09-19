@@ -1,14 +1,15 @@
 # Repository mapping on ShiftMapper — Status
 
-**Last updated:** 2026-09-19 — **Stage 3 done (flipped and migrated)**: ShiftMapper is the repository's default
-mapper, ahead of the old registry (which stays for one release, Q7); the sample, the item template's files and
-ShiftIdentity.Data are migrated — no `UseGeneratedMapper(...)`, no `UseGeneratedMapper = true`, no
-`[ShiftEntityMapper]` partial anywhere in framework-owned code, every customization as `o.Mapping(m => …)` or an
-ordinary mapper class. **All 23 goldens are green through ShiftMapper** (138 theories), re-frozen with exactly three
-recorded changes (Q10, Q15, the Invoice `Total` demonstration) after every other difference was fixed — including all
-13 identity triples matching the old generator member for member — and the expression-shape golden was replaced
-by the SQL each list projection translates to. Six more ShiftMapper additions (0.3.0, still unreleased). Stages 0–2
-done 2026-09-18/19. Stages 4–5 not started; Stage 4 is the deletion, one framework release after this ships.
+**Last updated:** 2026-09-20 — **Stage 3 done (flipped and migrated); the parity harness removed.** ShiftMapper
+is the repository's default mapper, ahead of the old registry (which stays for one release, Q7); the sample, the
+item template's files and ShiftIdentity.Data are migrated — no `UseGeneratedMapper(...)`, no
+`UseGeneratedMapper = true`, no `[ShiftEntityMapper]` partial anywhere in framework-owned code, every customization
+as `o.Mapping(m => …)` or an ordinary mapper class. The comparison closed green: all 23 goldens passed through
+ShiftMapper (138 theories) with exactly three recorded changes (Q10, Q15, the Invoice `Total` demonstration), all
+13 identity triples matching the old generator member for member. **The goldens and the harness were then deleted
+(2026-09-20)** — the comparison they existed for is over; the behaviour is pinned by the end-to-end suites and
+ShiftMapper's own tests. Six more ShiftMapper additions (0.3.0, still unreleased). Stages 0–2 done 2026-09-18/19.
+Stages 4–5 not started; Stage 4 is the deletion, one framework release after this ships.
 
 Update this file as steps land. Keep it factual: what shipped, what it changed, what surprised you.
 Plan: [`01-steps.md`](01-steps.md) · Decisions: [`02-open-decisions.md`](02-open-decisions.md) ·
@@ -23,7 +24,7 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 | Step | Status | Notes |
 |------|--------|-------|
 | 0.1 Inventory every triple, nested pair and attribute use (sample + ShiftIdentity) | ✅ | **2026-09-18.** 23 triples (10 sample, 13 identity), arms resolved from the host, nested members read off the goldens, every fluent call and attribute use listed. `[ShiftEntityMapperIgnore]` and a live `[ShiftEntityMapperMaxDepth]` have zero framework-owned uses. [`05-inventory.md`](05-inventory.md) §1. |
-| 0.2 Parity goldens written by the OLD generator | ✅ | **2026-09-18.** `StockPlusPlus.Test/Tests/RepositoryMappingParityTests.cs` + `Tests/Parity/RepositoryMapping/` (deterministic fixture builder, runner, 23 golden files, 536 KB). Six theories per triple, 138 tests, ~2 s. ONE suite over both assemblies — the sample host resolves ShiftIdentity's configured mappers too, so the planned second suite in `ShiftIdentity.Tests` was not needed. Capture switch `SHIFT_TEST_CAPTURE_REPOSITORY_MAPPING_GOLDENS=1`. The window closes at Stage 4. |
+| 0.2 Parity goldens written by the OLD generator | ✅ | **2026-09-18.** `StockPlusPlus.Test/Tests/RepositoryMappingParityTests.cs` + `Tests/Parity/RepositoryMapping/` (deterministic fixture builder, runner, 23 golden files, 536 KB). Six theories per triple, 138 tests, ~2 s. ONE suite over both assemblies — the sample host resolves ShiftIdentity's configured mappers too, so the planned second suite in `ShiftIdentity.Tests` was not needed. Capture switch `SHIFT_TEST_CAPTURE_REPOSITORY_MAPPING_GOLDENS=1`. **Deleted 2026-09-20** with the rest of the harness, after 3.6 closed the comparison (see the log). |
 | 0.3 Baseline the SHENGEN warnings | ✅ | **2026-09-18.** 11 distinct warnings (004 ×2, 007 ×4, 008 ×3, 010 ×2), each with its target `SM` rule; one (Product SHENGEN007) is noise because the repository overrides `MapToList`. [`05-inventory.md`](05-inventory.md) §3. |
 
 ## Stage 1 — ShiftMapper features (0.3.0)
@@ -61,13 +62,13 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 | 3.3 Item template migrated | 🟡 | **2026-09-19.** The item template takes the sample's `ProductBrandMapper.cs` and `ProductBrandRepository.cs` as they are, so both `#if (includeItemTemplateContent)` halves are migrated with 3.2. The Builder run is **not possible until ShiftMapper 0.3.0 and the framework are published**: `dotnet new shift` restores packages, and nothing on nuget.org carries the markers. Verify with a Builder run after the first `release-all`. |
 | 3.4 ShiftIdentity.Data migrated | ✅ | **2026-09-19.** The 10 attribute properties removed; `City`, `Region`, `Team`, `CompanyCalendar` (entities) and `CompanyBranchRepository`, `CompanyRepository`, `UserRepository` converted line for line to `o.Mapping(m => …)`; the calendar groups' hashid-encoded `Departments`/`Brands` are a mapper class (`Mappers/CompanyCalendarGroupMapper.cs`, four child pairs, read from `Services` at map time so `Mapper.Create(identity assembly)` — the replication goldens — still constructs without a container). `User`'s `AccessTrees` is now ignored on the write map explicitly (the hook writes the rows), which the old generator excluded by not converting the junction. The replication maps untouched; `ShiftIdentity.Tests` green. |
 | 3.5 `SelectWithTags` obsolete | ✅ | **2026-09-19.** `[Obsolete]`, behaviour kept for one release; `ShiftTagMapper` untouched (DI still wins for the tag endpoints). |
-| 3.6 Goldens green | ✅ | **2026-09-19.** 138 theories green through ShiftMapper on all 23 triples (sample + identity), re-frozen after the last diff showed only the three recorded changes: `Copy.IdempotencyKey` on 7 entities (Q10), `View.Name` on `api/country-generated` (Q15 — one DTO type as list and view is one map) and `List[0].Total` on Invoice (the 3.2 demonstration). `ListShape` (the old generator's expression tree) retired; `ListSql` — `ToQueryString()` over the host's DbContext, no connection — pins each list projection's SQL instead, and every one of the 23 translates. **Gate for Stage 4 passed.** |
+| 3.6 Goldens green | ✅ | **2026-09-19.** 138 theories green through ShiftMapper on all 23 triples (sample + identity), re-frozen after the last diff showed only the three recorded changes: `Copy.IdempotencyKey` on 7 entities (Q10), `View.Name` on `api/country-generated` (Q15 — one DTO type as list and view is one map) and `List[0].Total` on Invoice (the 3.2 demonstration). `ListShape` (the old generator's expression tree) retired; `ListSql` — `ToQueryString()` over the host's DbContext, no connection — pinned each list projection's SQL instead, and every one of the 23 translated. **Gate for Stage 4 passed.** **2026-09-20:** the harness deleted at the user's request — `RepositoryMappingParityTests.cs`, `Tests/Parity/RepositoryMapping/` (runner, fixture builder, the 23 files), `TripleEnumerator`, `ParityArms`, `MappingTriple`, `TripleInventoryTests`. `MemberPathDiff` and `ReplicationFixtures` stay: the 24 replication goldens and the Cosmos projection test use them. |
 
 ## Stage 4 — Delete
 
 | Step | Status | Notes |
 |------|--------|-------|
-| 4.1 Old generator + the three attributes + `UseGeneratedMapper` + registry + builder + tests removed | ⬜ | One release after 3.6 (Q7). No attribute replaces any of them. |
+| 4.1 Old generator + the three attributes + `UseGeneratedMapper` + registry + builder + tests removed | ⬜ | One release after 3.6 (Q7). No attribute replaces any of them. Verification is the end-to-end suites (the goldens are gone — see the 2026-09-20 log entry): `StockPlusPlus.Test`'s mapping, discovery and translation tests, `ShiftIdentity.Tests`, `ShiftEntity.Tests`. |
 | 4.2 SHENGEN006 re-homed | ⬜ | Needs Q6. |
 
 ## Stage 5 — Docs, CLAUDE.md, pipeline
@@ -101,6 +102,19 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 
 ## Log
 
+- **2026-09-20 (harness removed)** — With 3.6 green and the old-vs-new comparison read as closed, the user
+  asked for the comparison files to go: `RepositoryMappingParityTests.cs`, `Tests/Parity/RepositoryMapping/`
+  (the runner, `DeterministicGraph`, the 23 golden files), and the Stage-0 enumeration pieces it was built on —
+  `TripleEnumerator`, `ParityArms`, `MappingTriple`, `TripleInventoryTests` (these four dated from the
+  AutoMapper removal's Step C1 and resolved the OLD registry, which Stage 4 deletes anyway). Kept:
+  `MemberPathDiff` (+ its guard tests) and `ReplicationFixtures`, which the 24 replication goldens and
+  `CosmosProjectionParityTests` still use. What this gives up: a member-for-member regression net over all 23
+  triples through the *repository's* resolved mapper, and the 23 SQL texts. What still pins the behaviour: the
+  sample's end-to-end suites (`ManualMappingTests`, `SourceGeneratedMappingTests`, `DeepMappingTests`,
+  `DeepListMappingTests`, `DeepListTranslationTests`, the two discovery tests), `ShiftIdentity.Tests`,
+  `ShiftEntity.Tests` (`ShiftMapperResolutionTests` and the rest) and ShiftMapper's 532 + 245. Stage 4's gate
+  is therefore "those suites green", not "goldens green". `05-inventory.md` stays as the record of what was
+  frozen and how; the capture switch no longer exists.
 - **2026-09-19 (Stage 3)** — The flip was a three-line reorder; the migration was line for line as the guide
   says; the goldens are where the day went, and they earned it. Once the sample's and identity's configurations
   were moved, the parity suite showed FOUR things the Stage 2 diff could not have shown, all fixed in ShiftMapper:

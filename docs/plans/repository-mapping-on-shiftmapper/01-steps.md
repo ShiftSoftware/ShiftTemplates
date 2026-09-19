@@ -49,7 +49,8 @@ fixed entity graph goes through all four directions and the result is compared t
 
 Same recipe as `ReplicationMappingParityTests.cs`. The goldens are written by the OLD generator, committed, and
 never regenerated; Stage 2.8 diffs ShiftMapper against them. **Done 2026-09-18 — see [`05-inventory.md`](05-inventory.md) §2**
-for the fixture rules, the capture switch and what the files visibly pin.
+for the fixture rules, the capture switch and what the files visibly pin. **Deleted 2026-09-20**, once 3.6 had
+closed the comparison (STATUS log).
 
 ### 0.3 Baseline the diagnostics
 
@@ -513,7 +514,8 @@ and is later simplified to the framework pairs.
 ### 3.6 Goldens green
 
 Every 0.2 golden passes through ShiftMapper on the sample and ShiftIdentity, with the accepted changes
-recorded. **This is the gate for Stage 4.**
+recorded. **This is the gate for Stage 4.** Passed 2026-09-19; the harness was deleted the day after, so Stage 4
+verifies against the end-to-end suites instead (STATUS log, 2026-09-20).
 
 ---
 
@@ -532,7 +534,7 @@ recorded. **This is the gate for Stage 4.**
 | `ShiftRepositoryOptions.UseGeneratedMapper(...)` | the default IS ShiftMapper | `o.Mapping(m => …)` |
 | `ShiftEntityMapperRegistry`, `GeneratedMapperFactory`, the module initializers | nothing registers by type any more | `AddShiftMapper()` |
 | `ShiftMapperBuilder`, `ShiftChildMapperBuilder`, `IShiftMapperConfigurable`, `IShiftObjectMapper` | the fluent vocabulary is ShiftMapper's | `MapExpression<,>`, nested maps |
-| `ShiftEntity.Tests/Mapping/*` generator tests and `MapperGeneratorHarness` | | ShiftMapper generator tests + goldens |
+| `ShiftEntity.Tests/Mapping/*` generator tests and `MapperGeneratorHarness` | | ShiftMapper generator tests + the sample's end-to-end suites |
 | `SelectWithTags` (after its obsolete release) | | plain `Select` |
 | the registry link in `InitCommon` and in `ShiftEntityMapperValidation` | resolution is options → DI → `IMapper` → throw | |
 

@@ -23,8 +23,9 @@ namespace StockPlusPlus.Test.Tests;
 /// object <c>ProductBrandRepository</c> maps through and any service can inject (as <c>Mapper</c>, for the typed
 /// methods, or as <c>IMapper</c>).
 /// <para>
-/// Member-for-member parity with the old generator is pinned separately, for every triple, by
-/// <see cref="RepositoryMappingParityTests"/>; these tests read as the sample's documentation.
+/// Member-for-member parity with the old generator was proven once, for every triple, by a golden harness that
+/// was removed after the migration closed (plan: <c>docs/plans/repository-mapping-on-shiftmapper</c>); these
+/// tests read as the sample's documentation and are the regression net.
 /// </para>
 /// </summary>
 [Collection("API Collection")]
