@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.JsonWebTokens;
 using ShiftSoftware.ShiftEntity.Model.Enums;
 using ShiftSoftware.ShiftIdentity.Data;
 using StockPlusPlus.Shared.ActionTrees;
@@ -31,7 +32,9 @@ public class AuthEndpointTests
         => e.EnumerateObject().First(p => string.Equals(p.Name, name, System.StringComparison.OrdinalIgnoreCase)).Value;
 
     // The host skips DB seeding under the Test environment, so seed a login-able SuperUser ourselves (idempotent —
-    // DBSeed checks existence). Mirrors app.SeedDBAsync("SuperUser","OneTwo",…) from the host's Program.cs.
+    // DBSeed checks existence). Mirrors app.SeedDBAsync("SuperUser","OneTwo",…) from the host's Program.cs, including
+    // the security row the seed creates with the user when the identity authority is registered: the authority's
+    // startup expansion ran before this seed, and an admission never defaults a missing row.
     private static readonly SemaphoreSlim _seedLock = new(1, 1);
     private static bool _seeded;
     private async Task EnsureSeededAsync()
@@ -56,7 +59,7 @@ public class AuthEndpointTests
                 CompanyShortCode = "SFT", CompanyExternalId = "-1", CompanyAlternativeExternalId = "shift-software",
                 CompanyType = CompanyTypes.NotSpecified,
                 CompanyBranchExternalId = "-11", CompanyBranchShortCode = "SFT-EBL",
-            }).SeedAsync();
+            }) { CreateSecurityState = true }.SeedAsync();
             _seeded = true;
         }
         finally { _seedLock.Release(); }
@@ -128,12 +131,20 @@ public class AuthEndpointTests
         Assert.NotEqual(HttpStatusCode.OK, resp.StatusCode);
     }
 
-    // AuthCode requires an authenticated user (the test client is authenticated) and a registered app; an unknown
-    // app can't produce a code → 400. Proves the endpoint is wired + reaches AuthCodeService (not 404/500/200).
+    // AuthCode requires a signed-in identity session (under the authority the factory's synthetic bearer is not one and
+    // gets 401) and a registered app; with a real session an unknown app can't produce a code → 400. Proves the
+    // endpoint is wired + reaches the app-code service (not 404/500/200).
     [Fact]
     public async Task AuthCode_ForUnknownApp_Returns400()
     {
         var client = factory.CreateClient();
+        await EnsureSeededAsync();
+
+        var login = await client.PostAsJsonAsync("api/Auth/Login", new { Username = "SuperUser", Password = "OneTwo" });
+        login.EnsureSuccessStatusCode();
+        using var loginDoc = JsonDocument.Parse(await login.Content.ReadAsStringAsync());
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",
+            Prop(Prop(loginDoc.RootElement, "Entity"), "Token").GetString());
 
         var resp = await client.PostAsJsonAsync("api/Auth/AuthCode", new { AppId = "no-such-app", CodeChallenge = "abc", ReturnUrl = "http://localhost/back" });
 
@@ -149,5 +160,30 @@ public class AuthEndpointTests
         var resp = await client.PostAsJsonAsync("api/Auth/TokenWithAppIdOnly", new { AppId = "no-such-app" });
 
         Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+    }
+
+    // This host runs the identity authority (Settings:Authority:Enabled in appsettings.json): the deployed login issues
+    // a versioned authority session (schema claim "2", bound to the configured client), the host's own bearer accepts
+    // it on a deployed route, and the authority's api/identity/v2 routes are mapped.
+    [Fact]
+    public async Task Login_IssuesAnAuthoritySession_ThatThisHostAccepts()
+    {
+        var client = factory.CreateClient();
+        await EnsureSeededAsync();
+
+        var login = await client.PostAsJsonAsync("api/Auth/Login", new { Username = "SuperUser", Password = "OneTwo" });
+        login.EnsureSuccessStatusCode();
+        using var loginDoc = JsonDocument.Parse(await login.Content.ReadAsStringAsync());
+        var access = Prop(Prop(loginDoc.RootElement, "Entity"), "Token").GetString()!;
+        var token = new JsonWebToken(access);
+        Assert.Equal("2", token.GetPayloadValue<string>("shift_schema"));
+        Assert.Equal("StockPlusPlus-Dev", token.GetPayloadValue<string>("shift_client"));
+
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", access);
+        var profile = await client.GetAsync("api/UserManager/UserData");
+        Assert.Equal(HttpStatusCode.OK, profile.StatusCode);
+        var status = await client.GetAsync("api/identity/v2/mfa");
+        Assert.Equal(HttpStatusCode.OK, status.StatusCode);
+        Assert.Contains("authenticatorStatus", await status.Content.ReadAsStringAsync());
     }
 }
