@@ -1,4 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using ShiftSoftware.ShiftEntity.Model;
+using ShiftSoftware.ShiftEntity.Model.Dtos;
+using ShiftSoftware.ShiftIdentity.AspNetCore.Authentication;
+using ShiftSoftware.ShiftIdentity.Core;
+using ShiftSoftware.ShiftIdentity.Core.Authentication;
+using ShiftSoftware.ShiftIdentity.Core.DTOs.User;
+using ShiftSoftware.ShiftIdentity.Data.Authentication;
 using Microsoft.IdentityModel.JsonWebTokens;
 using ShiftSoftware.ShiftEntity.Model.Enums;
 using ShiftSoftware.ShiftIdentity.Data;
@@ -78,6 +86,82 @@ public class AuthEndpointTests
         var entity = Prop(doc.RootElement, "Entity");
         Assert.False(string.IsNullOrEmpty(Prop(entity, "Token").GetString()));
         Assert.False(string.IsNullOrEmpty(Prop(entity, "RefreshToken").GetString()));
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public async Task Real_host_security_links_use_the_adapter_inbox_and_explicit_completion(bool verification, bool adminRequest)
+    {
+        using var client = factory.CreateClient();
+        await EnsureSeededAsync();
+        using var login = await client.PostAsJsonAsync("api/Auth/Login", new { Username = "SuperUser", Password = "OneTwo" });
+        var token = Prop(Prop(await login.Content.ReadFromJsonAsync<JsonElement>(), "Entity"), "Token").GetString();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", token);
+        var username = "link-host-" + Guid.NewGuid().ToString("N");
+        string branch;
+        using (var scope = factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ShiftIdentityDbContext>();
+            branch = scope.ServiceProvider.GetRequiredService<ShiftSoftware.ShiftEntity.Core.IHashIdService>()
+                .Encode<ShiftSoftware.ShiftIdentity.Core.DTOs.CompanyBranch.CompanyBranchDTO>(await db.CompanyBranches.Select(x => x.ID).FirstAsync());
+            Assert.True(db.Model.FindEntityType(typeof(ShiftSoftware.ShiftIdentity.Data.Entities.User))!.IsTemporal());
+            // The real default sink, not the development app's injected sink, was resolved by startup.
+            Assert.Equal("HostSecurityEmailSink", scope.ServiceProvider.GetRequiredService<ISecurityEmailSink>().GetType().Name);
+        }
+        using var created = await client.PostAsJsonAsync("api/IdentityUser", new
+        {
+            Username = username, FullName = "Synthetic Link User", Email = username + "@example.invalid",
+            Password = "Original synthetic phrase 84!", RequireChangeAtNextLogin = false,
+            SendVerification = verification && !adminRequest, IsActive = true, AccessTree = "{}",
+            CompanyBranchID = new ShiftEntitySelectDTO { Value = branch }
+        });
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        // Verification exercises the form's real post-commit send. Reset exercises the anonymous public request.
+        if (adminRequest)
+        {
+            var encodedKey = Prop(Prop(await created.Content.ReadFromJsonAsync<JsonElement>(), "Entity"), "ID").GetString();
+            using var requested = await client.PostAsJsonAsync("api/identity/v2/" + (verification ? "email-verification" : "password-reset") + "/admin", new { UserKey = encodedKey });
+            Assert.Equal(HttpStatusCode.Accepted, requested.StatusCode);
+        }
+        else if (!verification)
+        {
+            client.DefaultRequestHeaders.Authorization = null;
+            using var requested = await client.PostAsJsonAsync("api/identity/v2/password-reset/request", new RequestSecurityEmail(username));
+            Assert.Equal(HttpStatusCode.Accepted, requested.StatusCode);
+        }
+        var email = Assert.Single(factory.SecurityEmails.Messages, x => x.User.Username == username);
+        Assert.Equal(verification, email.Verification); Assert.Equal(username + "@example.invalid", email.User.Email);
+        Assert.Equal("Synthetic Link User", email.User.FullName);
+        var uri = new Uri(email.Link);
+        Assert.Equal("dashboard.example.invalid", uri.Host); Assert.Equal("", uri.Query);
+        var grant = Uri.UnescapeDataString(uri.Fragment.Split("#grant=")[1].Split('&')[0]);
+        var purpose = verification ? AuthenticationOperationPurpose.EmailVerify : AuthenticationOperationPurpose.PasswordResetEmail;
+        using var opened = await client.PostAsJsonAsync("api/identity/v2/security-link/open", new OpenSecurityLinkRequest(grant, purpose));
+        var page = Assert.IsType<SecurityLinkOpened>(await opened.Content.ReadFromJsonAsync<AuthOutcome>());
+        using (var scope = factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ShiftIdentityDbContext>();
+            var user = await db.Users.SingleAsync(x => x.Username == username);
+            Assert.False(user.EmailVerified); Assert.Null(user.VerificationSASToken);
+            Assert.Equal(1, (await db.Set<UserSecurityState>().SingleAsync(x => x.UserID == user.ID)).SecurityVersion);
+        }
+        using var completed = verification
+            ? await client.PostAsJsonAsync("api/identity/v2/email-verification/complete", new CompleteEmailVerificationRequest(page.PageHandle))
+            : await client.PostAsJsonAsync("api/identity/v2/password-reset/complete", new CompletePasswordResetRequest(page.PageHandle, "New synthetic phrase 85!"));
+        var result = await completed.Content.ReadFromJsonAsync<AuthOutcome>();
+        if (verification) Assert.Equal("https://dashboard.example.invalid/", Assert.IsType<EmailVerificationCompleted>(result).RedirectUrl);
+        else Assert.IsType<ReturnToLogin>(result);
+        using var replay = await client.PostAsJsonAsync("api/identity/v2/security-link/open", new OpenSecurityLinkRequest(grant, purpose));
+        Assert.IsType<AuthenticationRefused>(await replay.Content.ReadFromJsonAsync<AuthOutcome>());
+        using var checkScope = factory.Services.CreateScope();
+        var check = checkScope.ServiceProvider.GetRequiredService<ShiftIdentityDbContext>();
+        var saved = await check.Users.SingleAsync(x => x.Username == username);
+        Assert.True(saved.EmailVerified); Assert.Null(saved.VerificationSASToken);
+        Assert.True(HashService.VerifyVersionedPassword(verification ? "Original synthetic phrase 84!" : "New synthetic phrase 85!", saved.Salt, saved.PasswordHash));
+        Assert.Equal(verification ? 1 : 2, (await check.Set<UserSecurityState>().SingleAsync(x => x.UserID == saved.ID)).SecurityVersion);
     }
 
     [Fact]

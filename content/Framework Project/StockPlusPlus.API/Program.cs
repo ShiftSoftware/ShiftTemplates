@@ -241,6 +241,8 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
         // (the AddIdentitySecurity migration); a host without them stops at startup and says so.
         Authority = builder.Configuration.GetSection("Settings:Authority").Get<AuthoritySettingsModel>() ?? new(),
         FactorProtection = builder.Configuration.GetSection("Settings:FactorProtection").Get<FactorProtectionSettings>() ?? new(),
+        FrontEndUrl = builder.Configuration.GetValue<string>("Settings:FrontEndUrl"),
+        EmailVerificationRedirectUrl = builder.Configuration.GetValue<string>("Settings:EmailVerificationRedirectUrl"),
         TemporaryTokenSettings = new TemporaryTokenSettingsModel
         {
             Key = builder.Configuration.GetValue<string>("Settings:TokenSettings:TemporaryTokenKey")!,

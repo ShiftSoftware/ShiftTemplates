@@ -7,13 +7,14 @@ public class SendEmailService : ISendEmailVerification, ISendEmailResetPassword
 {
     public Task SendEmailResetPasswordAsync(string url, UserDataDTO user)
     {
-        Console.WriteLine($"Sending reset password {url} to {user.Email}");
+        // Sample sender only. A real host accepts delivery here; never log a security link.
+        Console.WriteLine("Password reset email accepted by the sample sender.");
         return Task.CompletedTask;
     }
 
     public Task SendEmailVerificationAsync(string url, UserDataDTO user)
     {
-        Console.WriteLine($"Sending email verification {url} to {user.Email}");
+        Console.WriteLine("Email verification accepted by the sample sender.");
         return Task.CompletedTask;
     }
 }

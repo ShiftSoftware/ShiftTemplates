@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using OtpNet;
 using ShiftIdentity.Tests.Infrastructure;
 using ShiftSoftware.ShiftEntity.Model;
+using ShiftSoftware.ShiftEntity.Model.Dtos;
 using ShiftSoftware.ShiftIdentity.Core.Authentication;
 using ShiftSoftware.ShiftIdentity.Core.DTOs;
+using ShiftSoftware.ShiftIdentity.Core.DTOs.User;
 using ShiftSoftware.ShiftIdentity.Data.Authentication;
 using StockPlusPlus.Data.DbContext;
 
@@ -187,6 +189,37 @@ public sealed class IdentityConsumerContractTests : IAsyncLifetime
                 result = await host.CompleteAsync(challenge.Challenge.Handle!, (await fixture.GetSyntheticFactorAsync(username)).Code!, proof.Verifier);
             return Assert.IsType<SessionIssued>(result);
         }
+    }
+
+    [Fact]
+    public async Task Consumer_bulk_verification_keeps_the_deployed_selection_and_response_envelope()
+    {
+        await fixture.ResetAsync();
+        var admin = "links-admin-" + Guid.NewGuid().ToString("N");
+        await fixture.CreateSyntheticUserAsync(admin,
+            "{\"ShiftIdentityActions\":{\"Users\":[\"r\",\"w\"],\"DataLevelAccess\":{\"Countries\":[\"r\",\"w\"],\"Regions\":[\"r\",\"w\"],\"Companies\":[\"r\",\"w\"],\"Branches\":[\"r\",\"w\"]}}}");
+        await using (var db = fixture.CreateContext())
+        {
+            var user = await db.Users.SingleAsync(x => x.ID == fixture.UserID);
+            var state = await db.Set<UserSecurityState>().SingleAsync(x => x.UserID == fixture.UserID);
+            user.Email = "consumer-links@example.invalid"; state.EmailLookupKey = RecoveryContact.Key(user.Email);
+            await db.SaveChangesAsync();
+        }
+        using var host = new LegacyIdentityHttpHost<ConsumerIdentityContext>(fixture, authority: true);
+        using var login = await host.Client.PostAsJsonAsync("api/Auth/Login", new LoginDTO { Username = admin, Password = fixture.Password });
+        var session = (await login.Content.ReadFromJsonAsync<ShiftEntityResponse<TokenDTO>>())!.Entity!;
+        host.Client.DefaultRequestHeaders.Authorization = new("Bearer", session.Token);
+        using var response = await host.Client.PostAsJsonAsync("api/IdentityUser/VerifyEmails",
+            new SelectStateDTO<UserListDTO> { Items = [new() { ID = fixture.UserID.ToString() }] });
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var envelope = (await response.Content.ReadFromJsonAsync<ShiftEntityResponse<IEnumerable<UserInfoDTO>>>())!;
+        Assert.Equal(fixture.Username, Assert.Single(envelope.Entity!).Username); Assert.Null(envelope.Message);
+        Assert.Equal("Requested", Assert.IsType<System.Text.Json.JsonElement>(envelope.Additional!["EmailVerification"]).GetProperty(fixture.UserID.ToString()).GetString());
+        Assert.Single(Assert.IsType<LocalSecurityInbox>(fixture.EmailSink).Messages);
+        Assert.Empty(host.Verifications.Sent);
+        await using var check = fixture.CreateContext();
+        Assert.Null((await check.Users.SingleAsync(x => x.ID == fixture.UserID)).VerificationSASToken);
+        Assert.Equal(AuthenticationOperationPurpose.EmailVerify, (await check.Set<AuthenticationOperation>().SingleAsync()).Purpose);
     }
 
     private sealed class ConsumerIdentityContext(DbContextOptions<DB> options) : DB(options)

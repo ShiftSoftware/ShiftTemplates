@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using StockPlusPlus.API;
 using StockPlusPlus.Data.DbContext;
@@ -18,6 +19,7 @@ public class CustomWebApplicationFactory : ShiftCustomWebApplicationFactory<WebM
 {
     // Completed once this factory has created the test database (see CreateHost).
     private readonly TaskCompletionSource databaseReady = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    public SecurityEmailInbox SecurityEmails { get; } = new();
 
     public CustomWebApplicationFactory() : base(
         "SQLServer_Test",
@@ -52,7 +54,15 @@ public class CustomWebApplicationFactory : ShiftCustomWebApplicationFactory<WebM
         // therefore have to wait for the database this factory creates: this gate is registered before every other
         // hosted service (they start in registration order) and holds them until CreateHost has created the database.
         builder.ConfigureServices(services =>
-            services.Insert(0, ServiceDescriptor.Singleton<IHostedService>(new DatabaseReadyGate(databaseReady.Task))));
+        {
+            services.Insert(0, ServiceDescriptor.Singleton<IHostedService>(new DatabaseReadyGate(databaseReady.Task)));
+            // Keep the framework's default ISecurityEmailSink so these tests cover its real registration. Replace
+            // only the host providers with a local inbox: no sample or configured provider can send from a test.
+            services.RemoveAll<ISendEmailVerification>();
+            services.RemoveAll<ISendEmailResetPassword>();
+            services.AddSingleton<ISendEmailVerification>(SecurityEmails);
+            services.AddSingleton<ISendEmailResetPassword>(SecurityEmails);
+        });
     }
 
     protected override IHost CreateHost(IHostBuilder builder)
