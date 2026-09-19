@@ -1,11 +1,11 @@
 {
   "Triple": "Country / CountryGeneratedDTO / CountryGeneratedDTO",
-  "Arm": "Generated_Country_CountryGeneratedDTO_CountryGeneratedDTO_3751704f",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1003",
-    "Name": "Name-7",
+    "Name": "Name-7 (via IConfiguresShiftRepository)",
     "Revisions": null,
     "CreateDate": "2026-01-03T03:04:05\u002B00:00",
     "LastSaveDate": "2026-01-07T03:04:05\u002B00:00",
@@ -37,10 +37,10 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "StockPlusPlus.Data.Entities.Country[].Select(e =\u003E new CountryGeneratedDTO() {ID = e.ID.ToString(), CreateDate = e.CreateDate, LastSaveDate = e.LastSaveDate, CreatedByUserID = IIF(e.CreatedByUserID.HasValue, e.CreatedByUserID.Value.ToString(), null), LastSavedByUserID = IIF(e.LastSavedByUserID.HasValue, e.LastSavedByUserID.Value.ToString(), null), IsDeleted = e.IsDeleted, Name = (e.Name \u002B \u0022 (via IConfiguresShiftRepository)\u0022)})",
+  "ListSql": "SELECT CONVERT(varchar(20), [c].[ID]) AS [ID], [c].[CreateDate], [c].[LastSaveDate], CASE\r\n    WHEN [c].[CreatedByUserID] IS NOT NULL THEN CONVERT(varchar(20), [c].[CreatedByUserID])\r\nEND AS [CreatedByUserID], CASE\r\n    WHEN [c].[LastSavedByUserID] IS NOT NULL THEN CONVERT(varchar(20), [c].[LastSavedByUserID])\r\nEND AS [LastSavedByUserID], [c].[IsDeleted], [c].[Name] \u002B N\u0027 (via IConfiguresShiftRepository)\u0027 AS [Name]\r\nFROM [Countries] AS [c]",
   "Copy": {
     "Name": "Name-7",
-    "IdempotencyKey": "00000000-0000-0000-0000-000000001004",
+    "IdempotencyKey": "00000000-0000-0000-0000-000000005004",
     "CreateDate": "2026-01-03T03:04:05\u002B00:00",
     "LastSaveDate": "2026-01-07T03:04:05\u002B00:00",
     "CreatedByUserID": 1002,

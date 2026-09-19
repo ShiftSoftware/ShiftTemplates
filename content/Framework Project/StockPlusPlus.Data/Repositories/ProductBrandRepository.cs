@@ -8,13 +8,14 @@ namespace StockPlusPlus.Data.Repositories;
 
 public class ProductBrandRepository : ShiftRepository<DB, Entities.ProductBrand, ProductBrandListDTO, ProductBrandDTO>
 {
-    // ProductBrand demonstrates the [ShiftEntityMapper] PARTIAL-CLASS form of source generation:
-    // ProductBrandMapper is a declared partial class the generator fills (the customization path —
-    // implement any method there to take it over), plugged explicitly via UseMapper.
+    // ProductBrand demonstrates the MAPPER CLASS door: Mappers/ProductBrandMapper.cs is an ordinary ShiftMapper
+    // class (ShiftMapperBase) declaring only the pairs it customizes; a CreateMap there REPLACES the automatic
+    // map for that pair, and the other pairs of the triple stay automatic. Nothing is plugged in here — the
+    // repository resolves the host's mapper, which carries the class's maps and the automatic ones alike.
     // Tags need no repository plumbing: the framework auto-includes them for IShiftEntityTaggable entities,
     // which is why the taggable and non-taggable arms of this class used to be identical apart from an
     // Include that did nothing.
-    public ProductBrandRepository(DB db) : base(db, x => x.UseMapper(new ProductBrandMapper()))
+    public ProductBrandRepository(DB db) : base(db)
     {
     }
 #if (includeItemTemplateContent)

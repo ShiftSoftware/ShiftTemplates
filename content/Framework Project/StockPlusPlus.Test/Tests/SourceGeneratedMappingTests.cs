@@ -1,29 +1,45 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using ShiftMapper;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
+using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
-using StockPlusPlus.Data.Mappers;
 using StockPlusPlus.Data.Repositories;
 using StockPlusPlus.Shared.DTOs;
+using StockPlusPlus.Shared.DTOs.Invoice;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 using StockPlusPlus.Shared.DTOs.ProductCategory;
 
 namespace StockPlusPlus.Test.Tests;
 
 /// <summary>
-/// DB-independent unit tests for the [ShiftEntityMapper] PARTIAL-CLASS form of source generation:
-/// ProductBrandMapper is a declared (empty) partial class whose four methods are produced by the
-/// ShiftEntity source generator at compile time — the customization path (implement a method in the
-/// partial class to take it over).
+/// The MAPPER CLASS door: <c>Mappers/ProductBrandMapper.cs</c> is an ordinary <c>ShiftMapperBase</c> declaring
+/// only the two pairs it customizes (the list map's <c>Code</c>, the write map's <c>AfterMap</c>); those replace
+/// the automatic maps for their pairs, the other two pairs of the triple stay automatic, and the framework's
+/// conventions apply to all four. Everything is asserted through the host's <see cref="IMapper"/> — the same
+/// object <c>ProductBrandRepository</c> maps through and any service can inject (as <c>Mapper</c>, for the typed
+/// methods, or as <c>IMapper</c>).
+/// <para>
+/// Member-for-member parity with the old generator is pinned separately, for every triple, by
+/// <see cref="RepositoryMappingParityTests"/>; these tests read as the sample's documentation.
+/// </para>
 /// </summary>
-public class SourceGeneratedMapperTests
+[Collection("API Collection")]
+public class MapperClassDoorTests
 {
+    private readonly CustomWebApplicationFactory factory;
+
+    public MapperClassDoorTests(CustomWebApplicationFactory factory) => this.factory = factory;
+
     [Fact]
     public void MapToView_MapsScalars_ForeignKey_AndBaseFields()
     {
+        using var scope = factory.Services.CreateScope();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+
         var entity = new ProductBrand
         {
             Name = "Gen Brand",
@@ -33,17 +49,17 @@ public class SourceGeneratedMapperTests
             CreateDate = new DateTimeOffset(2026, 1, 2, 0, 0, 0, TimeSpan.Zero),
         };
 
-        var dto = new ProductBrandMapper().MapToView(entity);
+        // The view pair is AUTOMATIC: the class declares nothing for it.
+        var dto = mapper.Map<ProductBrand, ProductBrandDTO>(entity);
 
         Assert.Equal("Gen Brand", dto.Name);
         Assert.Equal("Generated mapping", dto.Description);
         Assert.Equal("GB-01", dto.Code);
 
-        // FK → ShiftEntitySelectDTO (no Team navigation on the entity, so no Text)
+        // FK → ShiftEntitySelectDTO by the framework's convention (no Team navigation on the entity, so no Text)
         Assert.NotNull(dto.Team);
         Assert.Equal("42", dto.Team!.Value);
 
-        // Audit/base fields via MapBaseFields
         Assert.Equal(entity.ID.ToString(), dto.ID);
         Assert.Equal(entity.CreateDate, dto.CreateDate);
         Assert.False(dto.IsDeleted);
@@ -52,151 +68,266 @@ public class SourceGeneratedMapperTests
     [Fact]
     public void MapToView_NullForeignKey_YieldsNullSelectDTO()
     {
-        var dto = new ProductBrandMapper().MapToView(new ProductBrand { Name = "No Team", TeamID = null });
+        using var scope = factory.Services.CreateScope();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
-        Assert.Null(dto.Team);
+        var dto = mapper.Map<ProductBrand, ProductBrandDTO>(new ProductBrand { Name = "No Team", TeamID = null });
+
+        Assert.Null(dto.Team);   // no key, no value
     }
 
     [Fact]
-    public void MapToEntity_MapsScalars_AndNullableForeignKey()
+    public void MapToEntity_MapsScalars_AndNullableForeignKey_ThenRunsTheAfterMap()
     {
+        using var scope = factory.Services.CreateScope();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+
         var existing = new ProductBrand();
 
-        new ProductBrandMapper().MapToEntity(new ProductBrandDTO
+        mapper.Map<ProductBrandDTO, ProductBrand>(new ProductBrandDTO
         {
             Name = "Updated",
             Description = "New description",
-            Code = "UP-01",
+            Code = "  UP-01  ",
             Team = new ShiftEntitySelectDTO { Value = "7" },
         }, existing);
 
         Assert.Equal("Updated", existing.Name);
         Assert.Equal("New description", existing.Description);
-        Assert.Equal("UP-01", existing.Code);
+        Assert.Equal("UP-01", existing.Code);   // the class's AfterMap trims, after every convention ran
         Assert.Equal(7, existing.TeamID);
     }
 
     [Fact]
     public void MapToEntity_NullTeam_SetsNullForeignKey()
     {
+        using var scope = factory.Services.CreateScope();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+
         var existing = new ProductBrand { TeamID = 99 };
 
-        new ProductBrandMapper().MapToEntity(new ProductBrandDTO { Name = "X", Team = null }, existing);
+        mapper.Map<ProductBrandDTO, ProductBrand>(new ProductBrandDTO { Name = "X", Team = null }, existing);
 
         Assert.Null(existing.TeamID);
     }
 
     [Fact]
-    public void MapToList_ProjectsScalars_IdsAndNullableLongsAsStrings()
+    public void MapToList_ProjectsScalars_AndTheClassCustomizesCode()
     {
+        using var scope = factory.Services.CreateScope();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+
         var brands = new[]
         {
             new ProductBrand { Name = "A", Description = "dA", Code = "cA", TeamID = 5 },
-            new ProductBrand { Name = "B", Description = "dB", Code = "cB", TeamID = null },
+            new ProductBrand { Name = "B", Description = "dB", Code = null, TeamID = null },
         }.AsQueryable();
 
-        var list = new ProductBrandMapper().MapToList(brands).ToList();
+        var list = mapper.ProjectTo<ProductBrand, ProductBrandListDTO>(brands).ToList();
 
         Assert.Equal(2, list.Count);
         Assert.Equal("A", list[0].Name);
         Assert.Equal("dA", list[0].Description);
         Assert.Equal("cA", list[0].Code);
         Assert.Equal("5", list[0].TeamID);
-        Assert.Null(list[1].TeamID);
+        Assert.Null(list[1].TeamID);   // an absent key stays absent, in memory and in SQL alike
+        Assert.Equal("(No Code)", list[1].Code);   // the class's ForMember, composed into the projection
     }
 
     [Fact]
     public void CopyEntity_CopiesProperties_PreservingReloadAfterSave()
     {
+        using var scope = factory.Services.CreateScope();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+
         var source = new ProductBrand { Name = "Fresh", Description = "From DB", TeamID = 3 };
         var target = new ProductBrand { Name = "Stale", ReloadAfterSave = true };
 
-        new ProductBrandMapper().CopyEntity(source, target);
+        mapper.Map<ProductBrand, ProductBrand>(source, target);
 
         Assert.Equal("Fresh", target.Name);
         Assert.Equal("From DB", target.Description);
         Assert.Equal(3, target.TeamID);
-        Assert.True(target.ReloadAfterSave); // intentionally NOT copied
+        Assert.True(target.ReloadAfterSave);   // the pack ignores it in both roles
+    }
+
+    [Fact]
+    public void TheRepository_MapsThroughTheSameMapper()
+    {
+        using var scope = factory.Services.CreateScope();
+        var repo = scope.ServiceProvider.GetRequiredService<ProductBrandRepository>();
+
+        var resolved = Assert.IsType<ShiftMapperEntityMapper<ProductBrand, ProductBrandListDTO, ProductBrandDTO>>(repo.ShiftRepositoryOptions.Mapper);
+        Assert.Same(scope.ServiceProvider.GetRequiredService<IMapper>(), resolved.Mapper);
+
+        var list = repo.MapToList(new[] { new ProductBrand { Name = "X", Code = null } }.AsQueryable()).ToList();
+        Assert.Equal("(No Code)", list[0].Code);
     }
 }
 
 /// <summary>
-/// DB-independent unit tests for the ZERO-CODE (auto-discovery) form of source generation: no mapper
-/// class is declared anywhere for Country's (Country, CountryGeneratedDTO, CountryGeneratedDTO) triple —
-/// the generator discovers it from the api/country-generated endpoint attribute, emits an auto-named mapper,
-/// and registers it in ShiftEntityMapperRegistry via a module initializer. (CountryRepository demonstrates the
-/// same zero-code form discovered from a REPOSITORY instead, on its own CountryRepoDTO triple.)
+/// The AUTOMATIC door, with nothing written: the maps a marked endpoint attribute or a
+/// <c>ShiftRepository&lt;,,,&gt;</c> closing declares on their own, with the framework's conventions —
+/// <c>ShiftEntitySelectDTO</c> ↔ foreign key, files ↔ JSON, hash ids, the members the pipeline owns, and a
+/// blank required key answered as a 400 naming the field.
 /// </summary>
-public class AutoDiscoveredGeneratedMapperTests
+[Collection("API Collection")]
+public class AutomaticMappingTests
 {
-    private static IShiftEntityMapper<Country, CountryGeneratedDTO, CountryGeneratedDTO> ResolveMapper()
-    {
-        // The registration is a module initializer in the Data assembly; force it, since a test may
-        // run before any Data-assembly code has executed.
-        System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor(typeof(Country).Module.ModuleHandle);
+    private readonly CustomWebApplicationFactory factory;
 
-        var mapperType = ShiftEntityMapperRegistry.Find(typeof(Country), typeof(CountryGeneratedDTO), typeof(CountryGeneratedDTO));
-        Assert.NotNull(mapperType);
+    public AutomaticMappingTests(CustomWebApplicationFactory factory) => this.factory = factory;
 
-        return (IShiftEntityMapper<Country, CountryGeneratedDTO, CountryGeneratedDTO>)Activator.CreateInstance(mapperType!)!;
-    }
+    private IMapper Door(IServiceScope scope) => scope.ServiceProvider.GetRequiredService<IMapper>();
 
     [Fact]
-    public void Registry_ContainsAutoGeneratedMapper_ForTheTriple()
+    public void TheEndpointAttribute_DeclaresAllFourMaps()
     {
-        var mapper = ResolveMapper();
+        using var scope = factory.Services.CreateScope();
+        var mapper = Door(scope);
 
-        Assert.StartsWith("Generated_", mapper.GetType().Name);
+        // api/country-generated: nothing is written for the triple but the attribute.
+        Assert.True(mapper.CanMap(typeof(Country), typeof(CountryGeneratedDTO)));
+        Assert.True(mapper.CanMap(typeof(CountryGeneratedDTO), typeof(Country)));
+        Assert.True(mapper.CanMap(typeof(Country), typeof(CountryGeneratedDTO)));
+        Assert.True(mapper.CanMap(typeof(Country), typeof(Country)));
+
+        // api/countrymapped is the hand-written CountryMapper's: no marker on the WithMapper attribute.
+        Assert.False(mapper.CanMap(typeof(Country), typeof(CountryMappedDTO)));
     }
 
     [Fact]
     public void MapToView_MapsNameAndBaseFields()
     {
+        using var scope = factory.Services.CreateScope();
+
         var entity = new Country
         {
             Name = "Genland",
             CreateDate = new DateTimeOffset(2026, 3, 4, 0, 0, 0, TimeSpan.Zero),
         };
 
-        var dto = ResolveMapper().MapToView(entity);
+        var dto = Door(scope).Map<Country, CountryGeneratedDTO>(entity);
 
-        Assert.Equal("Genland", dto.Name);
+        // api/country-generated uses ONE DTO type as both list and view, so its entity → DTO map is ONE map:
+        // the customization Country.ConfigureRepository writes on m.List is the view's too (Q15 of the plan).
+        // A triple that wants the two to differ uses two DTO types, as every other sample triple does.
+        Assert.Equal("Genland (via IConfiguresShiftRepository)", dto.Name);
         Assert.Equal(entity.ID.ToString(), dto.ID);
         Assert.Equal(entity.CreateDate, dto.CreateDate);
         Assert.False(dto.IsDeleted);
     }
 
     [Fact]
-    public void MapToEntity_MapsName()
+    public void MapToEntity_MapsName_AndNeverTheKey()
     {
-        var existing = new Country { Name = "Old" };
+        using var scope = factory.Services.CreateScope();
 
-        ResolveMapper().MapToEntity(new CountryGeneratedDTO { Name = "New" }, existing);
+        var existing = new Country { ID = 7, Name = "Old" };
+
+        Door(scope).Map<CountryGeneratedDTO, Country>(new CountryGeneratedDTO { ID = "99", Name = "New" }, existing);
 
         Assert.Equal("New", existing.Name);
+        Assert.Equal(7, existing.ID);   // ID is the database's: ignored as a destination by the pack
     }
 
     [Fact]
-    public void MapToList_ProjectsNameAndId()
+    public void MapToView_ConvertsPhotosJsonToFileList_AndBrandFkToSelectDTO()
     {
-        var countries = new[]
+        using var scope = factory.Services.CreateScope();
+
+        var entity = new ProductCategory
         {
-            new Country { Name = "Alpha" },
-            new Country { Name = "Beta" },
-        }.AsQueryable();
+            Name = "Files & FK Category",
+            Photos = new List<ShiftFileDTO>
+            {
+                new ShiftFileDTO { Blob = "photos/cat1.jpg", Name = "cat1.jpg" },
+                new ShiftFileDTO { Blob = "photos/cat2.jpg", Name = "cat2.jpg" },
+            }.ToJsonString(),
+            BrandID = 9,
+        };
 
-        var list = ResolveMapper().MapToList(countries).ToList();
+        var dto = Door(scope).Map<ProductCategory, ProductCategoryDTO>(entity);
 
-        Assert.Equal(2, list.Count);
-        Assert.Equal("Alpha", list[0].Name);
-        Assert.Equal("Beta", list[1].Name);
+        Assert.NotNull(dto.Photos);
+        Assert.Equal(2, dto.Photos!.Count);
+        Assert.Equal("photos/cat1.jpg", dto.Photos[0].Blob);
+        Assert.Equal("cat1.jpg", dto.Photos[0].Name);
+        Assert.Equal("photos/cat2.jpg", dto.Photos[1].Blob);
+
+        Assert.NotNull(dto.Brand);
+        Assert.Equal("9", dto.Brand!.Value);
+    }
+
+    [Fact]
+    public void MapToView_NullPhotos_YieldsEmptyList_AndNullBrand_YieldsNullSelectDTO()
+    {
+        using var scope = factory.Services.CreateScope();
+
+        var dto = Door(scope).Map<ProductCategory, ProductCategoryDTO>(new ProductCategory { Name = "Empty", Photos = null, BrandID = null });
+
+        Assert.NotNull(dto.Photos);
+        Assert.Empty(dto.Photos!);
+        Assert.Null(dto.Brand);
+    }
+
+    [Fact]
+    public void MapToEntity_SerializesPhotos_AndParsesBrandFk()
+    {
+        using var scope = factory.Services.CreateScope();
+
+        var existing = new ProductCategory();
+
+        Door(scope).Map<ProductCategoryDTO, ProductCategory>(new ProductCategoryDTO
+        {
+            Name = "Upserted",
+            Photos = new List<ShiftFileDTO> { new ShiftFileDTO { Blob = "photos/new.jpg", Name = "new.jpg" } },
+            Brand = new ShiftEntitySelectDTO { Value = "12" },
+        }, existing);
+
+        Assert.NotNull(existing.Photos);
+        var roundTripped = existing.Photos.ToShiftFiles();
+        Assert.Single(roundTripped!);
+        Assert.Equal("photos/new.jpg", roundTripped![0].Blob);
+        Assert.Equal("new.jpg", roundTripped[0].Name);
+
+        Assert.Equal(12, existing.BrandID);
+    }
+
+    [Fact]
+    public void MapToEntity_NullBrand_ClearsTheNullableForeignKey()
+    {
+        using var scope = factory.Services.CreateScope();
+
+        var existing = new ProductCategory { BrandID = 5 };
+
+        Door(scope).Map<ProductCategoryDTO, ProductCategory>(new ProductCategoryDTO { Name = "X", Brand = null }, existing);
+
+        Assert.Null(existing.BrandID);
+    }
+
+    /// <summary>
+    /// A blank select on a REQUIRED key is the client's mistake: a 400 naming the field, the same shape
+    /// <c>MappingHelpers.ToForeignKey</c> throws — never a silent 0 that saves a row pointing at nothing.
+    /// </summary>
+    [Fact]
+    public void MapToEntity_BlankRequiredForeignKey_IsA400NamingTheSelect()
+    {
+        using var scope = factory.Services.CreateScope();
+
+        var ex = Assert.Throws<ShiftEntityException>(() =>
+            Door(scope).Map<InvoiceLineDTO, InvoiceLine>(new InvoiceLineDTO { Description = "x", Price = 1, Product = new ShiftEntitySelectDTO { Value = "" } }, new InvoiceLine()));
+
+        Assert.Equal(400, ex.HttpStatusCode);
+        Assert.Equal("Product", ex.Message.For);
+        Assert.Equal("'Product' is required.", ex.Message.Body);
     }
 }
 
 /// <summary>
-/// End-to-end integration tests for the ZERO-CODE form: CountryRepository opts in via
-/// options.UseGeneratedMapper(), which resolves the auto-discovered, auto-generated mapper from the
-/// registry — no mapper class is declared anywhere. CRUD flows through generated code.
+/// End-to-end integration tests for the ZERO-CODE form: <c>CountryRepository</c> closes
+/// <c>ShiftRepository&lt;DB, Country, CountryRepoDTO, CountryRepoDTO&gt;</c> and nothing else — the repository
+/// resolves the automatic maps through the host's mapper and CRUD flows through them.
 /// </summary>
 [Collection("API Collection")]
 public class SourceGeneratedMappingTests
@@ -209,11 +340,13 @@ public class SourceGeneratedMappingTests
     }
 
     [Fact]
-    public async Task Country_InsertAndView_ThroughAutoGeneratedMapper()
+    public async Task Country_InsertAndView_ThroughTheAutomaticMaps()
     {
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<DB>();
         var countryRepo = scope.ServiceProvider.GetRequiredService<CountryRepository>();
+
+        Assert.IsType<ShiftMapperEntityMapper<Country, CountryRepoDTO, CountryRepoDTO>>(countryRepo.ShiftRepositoryOptions.Mapper);
 
         var dto = new CountryRepoDTO { Name = "SourceGen Country" };
 
@@ -234,7 +367,7 @@ public class SourceGeneratedMappingTests
     }
 
     [Fact]
-    public async Task Country_Update_ThroughAutoGeneratedMapper()
+    public async Task Country_Update_ThroughTheAutomaticMaps()
     {
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<DB>();
@@ -283,198 +416,78 @@ public class SourceGeneratedMappingTests
 }
 
 /// <summary>
-/// Proves the generated code uses the existing MappingHelpers for the two special conventions —
-/// ShiftEntitySelectDTO (FK ↔ SelectDTO via ToSelectDTO / ToNullableForeignKey) and ShiftFileDTO
-/// (string JSON ↔ List&lt;ShiftFileDTO&gt; via ToShiftFiles / ToJsonString) — using ProductCategory,
-/// whose DTO has BOTH (Photos + Brand). The mapper under test is the AUTO-generated one from the
-/// registry — the same one ProductCategoryRepository now uses in production via UseGeneratedMapper().
-/// </summary>
-public class AutoDiscoveredSelectDtoAndFileDtoMappingTests
-{
-    private static IShiftEntityMapper<ProductCategory, ProductCategoryListDTO, ProductCategoryDTO> ResolveMapper()
-    {
-        System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor(typeof(ProductCategory).Module.ModuleHandle);
-
-        var mapperType = ShiftEntityMapperRegistry.Find(typeof(ProductCategory), typeof(ProductCategoryListDTO), typeof(ProductCategoryDTO));
-        Assert.NotNull(mapperType);
-
-        return (IShiftEntityMapper<ProductCategory, ProductCategoryListDTO, ProductCategoryDTO>)Activator.CreateInstance(mapperType!)!;
-    }
-
-    [Fact]
-    public void MapToView_ConvertsPhotosJsonToFileList_AndBrandFkToSelectDTO()
-    {
-        var entity = new ProductCategory
-        {
-            Name = "Files & FK Category",
-            Photos = new List<ShiftFileDTO>
-            {
-                new ShiftFileDTO { Blob = "photos/cat1.jpg", Name = "cat1.jpg" },
-                new ShiftFileDTO { Blob = "photos/cat2.jpg", Name = "cat2.jpg" },
-            }.ToJsonString(),
-            BrandID = 9,
-        };
-
-        var dto = ResolveMapper().MapToView(entity);
-
-        // string (JSON) → List<ShiftFileDTO> via ToShiftFiles
-        Assert.NotNull(dto.Photos);
-        Assert.Equal(2, dto.Photos!.Count);
-        Assert.Equal("photos/cat1.jpg", dto.Photos[0].Blob);
-        Assert.Equal("cat1.jpg", dto.Photos[0].Name);
-        Assert.Equal("photos/cat2.jpg", dto.Photos[1].Blob);
-
-        // FK → ShiftEntitySelectDTO via ToSelectDTO
-        Assert.NotNull(dto.Brand);
-        Assert.Equal("9", dto.Brand!.Value);
-    }
-
-    [Fact]
-    public void MapToView_NullPhotos_YieldsEmptyList_AndNullBrand_YieldsNullSelectDTO()
-    {
-        var dto = ResolveMapper().MapToView(new ProductCategory { Name = "Empty", Photos = null, BrandID = null });
-
-        // ToShiftFiles(null) → empty list; ToSelectDTO((long?)null) → null
-        Assert.NotNull(dto.Photos);
-        Assert.Empty(dto.Photos!);
-        Assert.Null(dto.Brand);
-    }
-
-    [Fact]
-    public void MapToEntity_SerializesPhotos_AndParsesBrandFk()
-    {
-        var existing = new ProductCategory();
-
-        ResolveMapper().MapToEntity(new ProductCategoryDTO
-        {
-            Name = "Upserted",
-            Photos = new List<ShiftFileDTO> { new ShiftFileDTO { Blob = "photos/new.jpg", Name = "new.jpg" } },
-            Brand = new ShiftEntitySelectDTO { Value = "12" },
-        }, existing);
-
-        // List<ShiftFileDTO> → string (JSON) via ToJsonString (round-trip to assert)
-        Assert.NotNull(existing.Photos);
-        var roundTripped = existing.Photos.ToShiftFiles();
-        Assert.Single(roundTripped!);
-        Assert.Equal("photos/new.jpg", roundTripped![0].Blob);
-        Assert.Equal("new.jpg", roundTripped[0].Name);
-
-        // ShiftEntitySelectDTO → FK via ToNullableForeignKey
-        Assert.Equal(12, existing.BrandID);
-    }
-
-    [Fact]
-    public void MapToEntity_NullBrand_ClearsForeignKey()
-    {
-        var existing = new ProductCategory { BrandID = 5 };
-
-        ResolveMapper().MapToEntity(new ProductCategoryDTO { Name = "X", Brand = null }, existing);
-
-        Assert.Null(existing.BrandID);
-    }
-}
-
-/// <summary>
-/// Per-property customization (ShiftMapperBuilder). DB-independent: the partial-class Configure hook
-/// (ProductBrandMapper customizes Description — its convention is automatically suppressed), and
-/// ForEntity / ForList / ForCopy applied to the AUTO-generated Country mapper via AddConfiguration
-/// (the same path the repository's UseGeneratedMapper(configure) uses).
-/// </summary>
-public class MapperCustomizationTests
-{
-    [Fact]
-    public void PartialClass_MethodTakeover_CanCallGeneratedBody_ThenTweak()
-    {
-        // ProductBrandMapper implements MapToEntity itself, calls MapToEntityGenerated (all
-        // conventions run), then trims Code — the partial-class analog of base.MapToEntity(...).
-        var existing = new ProductBrand();
-
-        new ProductBrandMapper().MapToEntity(new ProductBrandDTO { Name = "X", Code = "  GB-9  " }, existing);
-
-        Assert.Equal("GB-9", existing.Code);   // the takeover's post-processing
-        Assert.Equal("X", existing.Name);       // generated conventions still ran
-    }
-
-    [Fact]
-    public void PartialClass_Configure_ForList_ReplacesConvention()
-    {
-        var list = new ProductBrandMapper()
-            .MapToList(new[] { new ProductBrand { Name = "X", Code = null } }.AsQueryable())
-            .ToList();
-
-        Assert.Equal("(No Code)", list[0].Code);   // custom binding composed in, convention (null) replaced
-        Assert.Equal("X", list[0].Name);            // other bindings untouched
-    }
-
-    private static (IShiftEntityMapper<Country, CountryGeneratedDTO, CountryGeneratedDTO> Mapper,
-                    IShiftMapperConfigurable<Country, CountryGeneratedDTO, CountryGeneratedDTO> Configurable) CreateCountryMapper()
-    {
-        System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor(typeof(Country).Module.ModuleHandle);
-
-        var mapperType = ShiftEntityMapperRegistry.Find(typeof(Country), typeof(CountryGeneratedDTO), typeof(CountryGeneratedDTO));
-        Assert.NotNull(mapperType);
-
-        var mapper = (IShiftEntityMapper<Country, CountryGeneratedDTO, CountryGeneratedDTO>)Activator.CreateInstance(mapperType!)!;
-        return (mapper, (IShiftMapperConfigurable<Country, CountryGeneratedDTO, CountryGeneratedDTO>)mapper);
-    }
-
-    // NOTE: runtime AddConfiguration of ForEntity/ForCopy on an already-generated mapper is no longer honored
-    // for baked members — the generator now decides custom-vs-convention at BUILD time from the static config
-    // it can see (a mapper's Configure / a repo's UseGeneratedMapper). See BuildTimeMappingTests for the baked
-    // ForEntity/ForCopy equivalents. ForList still composes at runtime (ComposeList), covered below.
-
-    [Fact]
-    public void AddConfiguration_ForList_ComposesIntoProjection_KeepingOtherBindings()
-    {
-        var (mapper, configurable) = CreateCountryMapper();
-        configurable.AddConfiguration(map => map.ForList(d => d.Name, x => x.Name + " [L]"));
-
-        var list = mapper.MapToList(new[] { new Country { Name = "Alpha" } }.AsQueryable()).ToList();
-
-        Assert.Single(list);
-        Assert.Equal("Alpha [L]", list[0].Name);   // customized binding
-        Assert.Equal("0", list[0].ID);              // convention binding intact
-    }
-
-}
-
-/// <summary>
-/// Repo-site configuration: UseGeneratedMapper(configure) applies AFTER the mapper's own Configure
-/// hook, so the repository (closest to the use site) wins when both customize the same member.
+/// The CONFIGURED door: a customization written in the repository (<c>o.Mapping(m =&gt; …)</c>) or in an entity's
+/// <c>ConfigureRepository</c> is part of the map itself — it applies wherever the map runs, not only inside the
+/// repository. When a service maps the pair before any repository was constructed, the mapper constructs the
+/// configuring repository from DI on its own (<c>ShiftEntityConfiguratorResolver</c>) and the value is there.
 /// </summary>
 [Collection("API Collection")]
-public class MapperRepoConfigurationTests
+public class RepositoryConfigurationTests
 {
     private readonly CustomWebApplicationFactory factory;
 
-    public MapperRepoConfigurationTests(CustomWebApplicationFactory factory)
-    {
-        this.factory = factory;
-    }
+    public RepositoryConfigurationTests(CustomWebApplicationFactory factory) => this.factory = factory;
 
-    private class BrandRepoWithConfig : ShiftRepository<DB, ProductBrand, ProductBrandListDTO, ProductBrandDTO>
+    // The lines carry their Product: the list projection composes it, and a required navigation is not
+    // null-guarded in the projection (a join always matches), so LINQ-to-objects needs it filled.
+    private static Invoice InvoiceWithLines() => new()
     {
-        // Overrides the SAME member the mapper's Configure customizes — Code, via ForList (see
-        // ProductBrandMapper.Configure: Code => Code ?? "(No Code)"). The repo's UseGeneratedMapper(configure)
-        // runs AFTER Configure, so it wins. ForList composes at runtime (ComposeList), so the override is
-        // honored for this fixture repo without the Data-only generator having to bake anything for it.
-        public BrandRepoWithConfig(DB db) : base(db, x => x.UseGeneratedMapper(map =>
-            map.ForList(d => d.Code, entity => "repo override")))
+        ManualReference = "INV-T",
+        InvoiceLines = new HashSet<InvoiceLine>
         {
-        }
+            new InvoiceLine { Description = "A", Price = 2.5m, ProductID = 1, Product = new Product { ID = 1, Name = "P1" } },
+            new InvoiceLine { Description = "B", Price = 4m, ProductID = 2, Product = new Product { ID = 2, Name = "P2" } },
+        },
+    };
+
+    [Fact]
+    public void ARepositoryCustomization_AppliesThroughTheRepository()
+    {
+        using var scope = factory.Services.CreateScope();
+        var repo = scope.ServiceProvider.GetRequiredService<InvoiceRepository>();
+
+        var row = repo.MapToList(new[] { InvoiceWithLines() }.AsQueryable()).Single();
+
+        Assert.Equal(6.5m, row.Total);   // InvoiceRepository: m.List.ForMember(d => d.Total, ... Sum(l => l.Price))
     }
 
     [Fact]
-    public void RepoConfiguration_Overrides_PartialClassConfigure()
+    public void ARepositoryCustomization_AppliesToTheSameMapAnywhere_BeforeAnyRepositoryRan()
+    {
+        // A FRESH scope in which no InvoiceRepository has been constructed: the map is used first by a
+        // "service". The customized member's value is pulled by constructing the repository from DI.
+        using var scope = factory.Services.CreateScope();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+
+        var row = mapper.ProjectTo<Invoice, InvoiceListDTO>(new[] { InvoiceWithLines() }.AsQueryable()).Single();
+
+        Assert.Equal(6.5m, row.Total);
+        Assert.Equal(2, row.InvoiceLines.Count);   // and the children still nest, with nothing configured for them
+    }
+
+    [Fact]
+    public void AnEntityConfiguration_AppliesToTheSameMapAnywhere_BeforeAnyRepositoryRan()
+    {
+        // Country.ConfigureRepository (IConfiguresShiftRepository) customizes the api/country-generated list
+        // map. The configuring type is the ENTITY, so the pull constructs the built-in repository closed over
+        // it — through the host's DbContextOptions — rather than the entity.
+        using var scope = factory.Services.CreateScope();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+
+        var row = mapper.ProjectTo<Country, CountryGeneratedDTO>(new[] { new Country { Name = "Alpha" } }.AsQueryable()).Single();
+
+        Assert.Equal("Alpha (via IConfiguresShiftRepository)", row.Name);
+        Assert.Equal("0", row.ID);   // the convention binding beside it is untouched
+    }
+
+    [Fact]
+    public void ATripleWithNoCustomization_HasNothingToPull()
     {
         using var scope = factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<DB>();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
-        var repo = new BrandRepoWithConfig(db);
-        var list = repo.MapToList(new[] { new ProductBrand { Name = "X", Code = null } }.AsQueryable()).ToList();
+        var row = mapper.ProjectTo<Country, CountryRepoDTO>(new[] { new Country { Name = "Beta" } }.AsQueryable()).Single();
 
-        // The mapper's Configure sets Code => "(No Code)"; the repo's UseGeneratedMapper(configure) is
-        // applied on top (later wins) — Code comes from the repo config, not the Configure hook.
-        Assert.Equal("repo override", list[0].Code);
+        Assert.Equal("Beta", row.Name);
     }
 }

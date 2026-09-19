@@ -1,7 +1,7 @@
 {
   "Triple": "City / CityListDTO / CityDTO",
-  "Arm": "Generated_City_CityListDTO_CityDTO_630c25cd",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1784",
@@ -174,7 +174,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.City[].Select(e =\u003E new CityListDTO() {ID = e.ID.ToString(), Name = e.Name, IntegrationId = e.IntegrationId, CountryID = IIF(e.CountryID.HasValue, e.CountryID.Value.ToString(), null), RegionID = IIF(e.RegionID.HasValue, e.RegionID.Value.ToString(), null), DisplayOrder = e.DisplayOrder, IsDeleted = e.IsDeleted, Region = IIF((e.Region != null), e.Region.Name, null), Country = IIF(((e.Region != null) AndAlso (e.Region.Country != null)), e.Region.Country.Name, null), CountryDisplayOrder = IIF(((e.Region != null) AndAlso (e.Region.Country != null)), e.Region.Country.DisplayOrder, null), RegionDisplayOrder = IIF((e.Region != null), e.Region.DisplayOrder, null)})",
+  "ListSql": "SELECT CONVERT(varchar(20), [c].[ID]) AS [ID], [c].[Name], [c].[IntegrationId], CASE\r\n    WHEN [c].[CountryID] IS NOT NULL THEN CONVERT(varchar(20), [c].[CountryID])\r\nEND AS [CountryID], CASE\r\n    WHEN [c].[RegionID] IS NOT NULL THEN CONVERT(varchar(20), [c].[RegionID])\r\nEND AS [RegionID], [c].[DisplayOrder], [c].[IsDeleted], [r].[Name] AS [Region], CASE\r\n    WHEN [r].[ID] IS NOT NULL AND [c0].[ID] IS NOT NULL THEN [c0].[Name]\r\nEND AS [Country], CASE\r\n    WHEN [r].[ID] IS NOT NULL AND [c0].[ID] IS NOT NULL THEN [c0].[DisplayOrder]\r\nEND AS [CountryDisplayOrder], [r].[DisplayOrder] AS [RegionDisplayOrder]\r\nFROM [ShiftIdentity].[Cities] AS [c]\r\nLEFT JOIN [ShiftIdentity].[Regions] AS [r] ON [c].[RegionID] = [r].[ID]\r\nLEFT JOIN [ShiftIdentity].[Countries] AS [c0] ON [r].[CountryID] = [c0].[ID]",
   "Copy": {
     "LastReplicationDate": "2028-02-27T03:04:05\u002B00:00",
     "LastReplicationStamp": "LastReplicationStamp-787",

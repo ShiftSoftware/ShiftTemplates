@@ -1,7 +1,7 @@
 {
   "Triple": "ProductCategory / ProductCategoryListDTO / ProductCategoryDTO",
-  "Arm": "Generated_ProductCategory_ProductCategoryListDTO_ProductCategoryDTO_fe71c290",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1008",
@@ -137,7 +137,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "StockPlusPlus.Data.Entities.ProductCategory[].Select(e =\u003E new ProductCategoryListDTO() {ID = e.ID.ToString(), Name = e.Name, Description = e.Description, Code = e.Code, TrackingMethod = e.TrackingMethod, BrandID = IIF(e.BrandID.HasValue, e.BrandID.Value.ToString(), null), IsDeleted = e.IsDeleted})",
+  "ListSql": "SELECT CONVERT(varchar(20), [p].[ID]) AS [ID], [p].[Name], [p].[Description], [p].[Code], [p].[TrackingMethod], CASE\r\n    WHEN [p].[BrandID] IS NOT NULL THEN CONVERT(varchar(20), [p].[BrandID])\r\nEND AS [BrandID], [p].[IsDeleted]\r\nFROM [ProductCategories] AS [p]",
   "Copy": {
     "Name": "Name-12",
     "Description": "Description-7",
@@ -148,7 +148,7 @@
     "RegionID": 1135,
     "CompanyID": 1004,
     "CompanyBranchID": 1003,
-    "IdempotencyKey": "00000000-0000-0000-0000-000000001009",
+    "IdempotencyKey": "00000000-0000-0000-0000-000000005009",
     "Products": [
       {
         "Name": "Name-34",

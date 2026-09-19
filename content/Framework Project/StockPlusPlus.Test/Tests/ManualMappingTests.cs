@@ -14,11 +14,10 @@ namespace StockPlusPlus.Test.Tests;
 
 /// <summary>
 /// Integration tests validating the repository mapping layer end-to-end through CRUD operations,
-/// exercising the mapping strategies at once: Product (overrides the mapping methods), ProductCategory
-/// (SOURCE-GENERATED mapper via UseGeneratedMapper — SelectDTO relationship + ShiftFileDTO file
-/// conventions), and Invoice (SOURCE-GENERATED mapper with DEEP child mapping — MapToView auto-composes
-/// InvoiceLines and MapToEntity writes them back via the explicit UseGeneratedMapper(map =>
-/// map.ForEntityChildren(...)) config).
+/// exercising the mapping doors at once: Product (overrides the mapping methods), ProductCategory (the
+/// AUTOMATIC ShiftMapper maps — SelectDTO relationship + ShiftFileDTO file conventions), and Invoice (the
+/// automatic maps with DEEP child mapping — the view composes InvoiceLines and the write direction replaces
+/// them, with nothing configured for the children; the repository customizes one list member).
 /// </summary>
 [Collection("API Collection")]
 public class ManualMappingTests

@@ -90,6 +90,11 @@ generator still present and working); Stage 4 ships in the **next** one. The rel
 [`04-migration-guide.md`](04-migration-guide.md). Consumers migrate on their own schedule within that window;
 a consumer that has not migrated when Stage 4 ships stays on the previous framework version.
 
+**In effect since 2026-09-19 (Stage 3).** `UseGeneratedMapper(...)` and the attribute property are `[Obsolete]`
+with the guide's path in the message; a project still on them builds with warnings and maps exactly as before,
+because the registry answers any triple ShiftMapper does not declare — which is every triple whose repository
+says `UseGeneratedMapper`, since that call marks the options as configured ahead of any resolution.
+
 ## Q8 — Who registers the generated mapper
 
 **The question.** ShiftMapper's model is that the *application* calls `builder.Services.AddShiftMapper()`,
@@ -170,15 +175,22 @@ ordinary one every service gets.
 
 ## Q14 — Dictionary-valued nesting
 
-**Open (found 2026-09-19).** ShiftMapper nests class-typed members and collections of them, and converts
-dictionaries whose keys and values are simple — but `Dictionary<string, CustomField>` →
-`Dictionary<string, CustomFieldDTO>` is SM0002, while the old generator composed it (identity's `Company` and
-`CompanyBranch` view maps; the write side was `IgnoreEntity`'d). Two options: a `ForMember` on each of the two
-maps in Stage 3.4, or dictionary-valued nesting in ShiftMapper (`DescribeComplex` gains the shape; the
-in-memory builder maps each value through the nested map; the projection refuses it as a memory-only member,
-which is what a JSON column is). **Recommended: the ShiftMapper feature**, because a dictionary of DTOs is
-ordinary in the identity model and a hand-written value map per site is the thing conventions exist to avoid.
-Needed by: Step 3.4.
+**Decided 2026-09-19 (Stage 3): the ShiftMapper feature.** A `Dictionary<K, Entity>` fills a
+`Dictionary<K, Dto>` with the keys carried across and each value through the pair's map (which has to exist —
+SM0011 otherwise), in memory only: the projection leaves the member out and the map says so (SM0030, as for a
+conversion without a query form). Identity's `CustomFields` turned out NOT to be the plain case — its read side
+strips password values — so it keeps a `ForMember` on the view maps and an `Ignore` on the write maps, exactly
+as the old configuration did; the feature serves the general case.
+
+## Q15 — One DTO type as both list and view is one map
+
+**Decided 2026-09-19 (Stage 3.6): accepted.** The old generator had four methods, so a `ForList` on a triple
+whose list DTO and view DTO were the SAME type changed the list only. ShiftMapper maps PAIRS, and
+`(Country, CountryGeneratedDTO)` is one pair whether it is read as a list or a view — so a customization on
+`m.List` is on `m.View` too, and the surface's two handles are the same map. Visible on one sample triple
+(`api/country-generated`, whose golden now shows the suffix on the view as well); no identity triple is
+affected. The framework's recommendation stands on its own merits: a list and a view that must differ get two
+DTO types, as every other triple in the sample has.
 
 ## Q12 — Depth default stays 10; a cycle is Info, not error
 

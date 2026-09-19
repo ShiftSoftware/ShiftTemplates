@@ -1,7 +1,7 @@
 {
   "Triple": "Department / DepartmentListDTO / DepartmentDTO",
-  "Arm": "Generated_Department_DepartmentListDTO_DepartmentDTO_6911e030",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1003",
@@ -35,7 +35,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.Department[].Select(e =\u003E new DepartmentListDTO() {ID = e.ID.ToString(), Name = e.Name, IntegrationId = e.IntegrationId, IsDeleted = e.IsDeleted})",
+  "ListSql": "SELECT CONVERT(varchar(20), [d].[ID]) AS [ID], [d].[Name], [d].[IntegrationId], [d].[IsDeleted]\r\nFROM [ShiftIdentity].[Departments] AS [d]",
   "Copy": {
     "LastReplicationDate": "2026-01-07T03:04:05\u002B00:00",
     "LastReplicationStamp": "LastReplicationStamp-6",

@@ -1,7 +1,7 @@
 {
   "Triple": "Product / ProductListDTO / ProductDTO",
   "Arm": "ProductRepository (method override)",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1016",
@@ -191,7 +191,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "StockPlusPlus.Data.Entities.Product[].Select(p =\u003E new ProductListDTO() {ID = p.ID.ToString(), Name = p.Name, Price = p.Price, TrackingMethod = p.TrackingMethod, ReleaseDate = p.ReleaseDate, LastSaveDate = p.LastSaveDate, IsDraft = p.IsDraft, IsDeleted = p.IsDeleted, ProductBrandName = IIF((p.ProductBrand != null), p.ProductBrand.Name, null), Category = IIF((p.ProductCategory != null), p.ProductCategory.Name, null), ProductCategoryID = p.ProductCategoryID.ToString(), ProductBrandID = p.ProductBrandID.ToString(), CityID = IIF(p.CityID.HasValue, p.CityID.Value.ToString(), null), HasActiveAttention = p.HasActiveAttention, HighestSeverity = p.HighestSeverity, ActiveSignalCount = p.ActiveSignalCount, Tags = p.Tags.Select(t =\u003E new TagDTO() {ID = t.ID.ToString(), Name = t.Name, Color = t.Color, Description = t.Description, IntegrationID = t.IntegrationID}).ToList()})",
+  "ListSql": "SELECT CONVERT(varchar(20), [p].[ID]), [p].[Name], [p].[Price], [p].[TrackingMethod], [p].[ReleaseDate], [p].[LastSaveDate], [p].[IsDraft], [p].[IsDeleted], [b].[Name], [p0].[Name], CONVERT(varchar(20), [p].[ProductCategoryID]), CONVERT(varchar(20), [p].[ProductBrandID]), CASE\r\n    WHEN [p].[CityID] IS NOT NULL THEN CONVERT(varchar(20), [p].[CityID])\r\nEND, [p].[HasActiveAttention], [p].[HighestSeverity], [p].[ActiveSignalCount], [p].[ID], [b].[ID], [p0].[ID], [s].[ID], [s].[Name], [s].[Color], [s].[Description], [s].[IntegrationID], [s].[ProductID], [s].[TagsID], [s].[ID0]\r\nFROM [Products] AS [p]\r\nINNER JOIN [Brands] AS [b] ON [p].[ProductBrandID] = [b].[ID]\r\nINNER JOIN [ProductCategories] AS [p0] ON [p].[ProductCategoryID] = [p0].[ID]\r\nLEFT JOIN (\r\n    SELECT CONVERT(varchar(20), [t].[ID]) AS [ID], [t].[Name], [t].[Color], [t].[Description], [t].[IntegrationID], [p1].[ProductID], [p1].[TagsID], [t].[ID] AS [ID0]\r\n    FROM [ProductTags] AS [p1]\r\n    INNER JOIN [Tags] AS [t] ON [p1].[TagsID] = [t].[ID]\r\n) AS [s] ON [p].[ID] = [s].[ProductID]\r\nORDER BY [p].[ID], [b].[ID], [p0].[ID], [s].[ProductID], [s].[TagsID]",
   "Copy": {
     "Name": "Name-20",
     "TrackingMethod": 5,

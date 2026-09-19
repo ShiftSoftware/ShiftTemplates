@@ -14,21 +14,21 @@ namespace StockPlusPlus.Data.Entities;
 // app.MapShiftEntityEndpoints<DB>() in Program.cs.
 //
 // Three endpoints over the same table demonstrate the mapping paths (a distinct DTO per endpoint keeps
-// them isolated — mappers are keyed by the (entity, list, view) triple):
-//   - "api/country"           -> ShiftEntitySecureEndpoint: built-in repository + the SOURCE-GENERATED
-//                                mapper. Nothing is declared for the triple, so the repository resolves the
-//                                mapping itself: options, then DI, then ShiftEntityMapperRegistry.
-//   - "api/countrymapped"     -> ShiftEntitySecureEndpointWithMapper: built-in repository, but the generated
-//                                mapping is replaced by the hand-written CountryMapper.
-//   - "api/country-generated" -> UseGeneratedMapper = true: built-in repository + the SOURCE-GENERATED
-//                                mapper the generator auto-discovers and emits for the triple, pinned at the
-//                                attribute so discovery fails loudly if the generator never emitted one — no
-//                                mapper class is declared anywhere.
+// them isolated — maps are keyed by the (entity, list, view) triple):
+//   - "api/country"           -> ShiftEntitySecureEndpoint: built-in repository + the AUTOMATIC maps. The
+//                                attribute itself declares the triple's four maps in this project's build
+//                                (ShiftMapper's generator reads the marker on the attribute class), and the
+//                                repository resolves them through the host's IMapper. Nothing else is written.
+//   - "api/countrymapped"     -> ShiftEntitySecureEndpointWithMapper: built-in repository, but the automatic
+//                                mapping is replaced by the hand-written CountryMapper (an IShiftEntityMapper).
+//   - "api/country-generated" -> the automatic maps again, CUSTOMIZED from the entity: Country implements
+//                                IConfiguresShiftRepository for this triple and its ConfigureRepository writes
+//                                context.Options.Mapping(m => ...) — the same door a repository class has.
 [TemporalShiftEntity]
 [ShiftEntityKeyAndName(nameof(ID), nameof(Name))]
 [ShiftEntitySecureEndpoint<CountryDTO, CountryDTO, StockPlusPlusActionTree>("api/country", nameof(StockPlusPlusActionTree.Country))]
 [ShiftEntitySecureEndpointWithMapper<CountryMappedDTO, CountryMappedDTO, StockPlusPlusActionTree, CountryMapper>("api/countrymapped", nameof(StockPlusPlusActionTree.Country))]
-[ShiftEntitySecureEndpoint<CountryGeneratedDTO, CountryGeneratedDTO, StockPlusPlusActionTree>("api/country-generated", nameof(StockPlusPlusActionTree.Country), UseGeneratedMapper = true)]
+[ShiftEntitySecureEndpoint<CountryGeneratedDTO, CountryGeneratedDTO, StockPlusPlusActionTree>("api/country-generated", nameof(StockPlusPlusActionTree.Country))]
 public class Country : ShiftEntity<Country>, IEntityHasIdempotencyKey<Country>,
     // The entity-driven trio, all WITHOUT a repository class and all keyed by the DTO triple — so they apply
     // only to the "api/country-generated" endpoint. The plain endpoint ("api/country") and the
@@ -48,10 +48,12 @@ public class Country : ShiftEntity<Country>, IEntityHasIdempotencyKey<Country>,
 
     public void ConfigureRepository(ShiftRepositoryConfigurationContext<Country, CountryGeneratedDTO, CountryGeneratedDTO> context)
     {
-        // A small custom mapping on the built-in repository, no repository class needed. context.Services is
-        // the request scope — resolve scoped services here if the config needs them (current user, tenant, …),
-        // e.g. context.Services.GetService<ICurrentUserProvider>().
-        context.Options.UseGeneratedMapper(map => map.ForList(d => d.Name, e => e.Name + " (via IConfiguresShiftRepository)"));
+        // A small custom mapping on the built-in repository, no repository class needed — one member of the
+        // LIST map, in ShiftMapper's vocabulary; an expression, so it runs in SQL. Read at build time for its
+        // shape, run here for its value. context.Services is the request scope — resolve scoped services here
+        // if the config needs them (current user, tenant, …), e.g. context.Services.GetService<ICurrentUserProvider>(),
+        // and use them inside the MapFrom value.
+        context.Options.Mapping(m => m.List.ForMember(d => d.Name, opt => opt.MapFrom(e => e.Name + " (via IConfiguresShiftRepository)")));
     }
 
     // The upsert hook — the entity's version of `override UpsertAsync(...)`. context.Base() IS

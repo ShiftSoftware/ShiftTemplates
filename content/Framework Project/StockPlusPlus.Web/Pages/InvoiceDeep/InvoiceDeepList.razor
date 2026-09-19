@@ -3,9 +3,9 @@
 
 @using StockPlusPlus.Shared.DTOs.Invoice
 
-@* Lists the "api/invoice-deep" endpoint — the built-in repository served through the SOURCE-GENERATED
-   mapper (UseGeneratedMapper = true). The list projection AUTOMATICALLY composes three levels in SQL:
-   Invoice → InvoiceLines → Product → ProductBrand (no ForListChild calls). *@
+@* Lists the "api/invoice-deep" endpoint — the built-in repository served through the AUTOMATIC ShiftMapper
+   maps the endpoint attribute declares. The list projection composes three levels in SQL with nothing
+   configured: Invoice → InvoiceLines → Product → ProductBrand. *@
 <ShiftList EntitySet="invoice-deep"
            Title="Invoices (Deep)"
            T="InvoiceDeepListDTO"

@@ -1,7 +1,7 @@
 {
   "Triple": "ProductBrand / ProductBrandListDTO / ProductBrandDTO",
-  "Arm": "ProductBrandMapper",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1007",
@@ -46,7 +46,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "StockPlusPlus.Data.Entities.ProductBrand[].Select(e =\u003E new ProductBrandListDTO() {ID = e.ID.ToString(), Name = e.Name, Description = e.Description, CreatedByUserID = IIF(e.CreatedByUserID.HasValue, e.CreatedByUserID.Value.ToString(), null), TeamID = IIF(e.TeamID.HasValue, e.TeamID.Value.ToString(), null), IsDeleted = e.IsDeleted, Code = (e.Code ?? \u0022(No Code)\u0022)})",
+  "ListSql": "SELECT CONVERT(varchar(20), [b].[ID]) AS [ID], [b].[Name], [b].[Description], CASE\r\n    WHEN [b].[CreatedByUserID] IS NOT NULL THEN CONVERT(varchar(20), [b].[CreatedByUserID])\r\nEND AS [CreatedByUserID], CASE\r\n    WHEN [b].[TeamID] IS NOT NULL THEN CONVERT(varchar(20), [b].[TeamID])\r\nEND AS [TeamID], [b].[IsDeleted], COALESCE([b].[Code], N\u0027(No Code)\u0027) AS [Code]\r\nFROM [Brands] AS [b]",
   "Copy": {
     "Name": "Name-11",
     "Description": "Description-6",
@@ -55,7 +55,7 @@
     "RegionID": 1012,
     "CompanyID": 1003,
     "CompanyBranchID": 1002,
-    "IdempotencyKey": "00000000-0000-0000-0000-000000001008",
+    "IdempotencyKey": "00000000-0000-0000-0000-000000005008",
     "CreateDate": "2026-01-06T03:04:05\u002B00:00",
     "LastSaveDate": "2026-01-11T03:04:05\u002B00:00",
     "CreatedByUserID": 1005,

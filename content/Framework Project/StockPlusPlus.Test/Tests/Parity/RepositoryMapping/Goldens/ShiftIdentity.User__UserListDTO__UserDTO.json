@@ -1,7 +1,7 @@
 {
   "Triple": "User / UserListDTO / UserDTO",
-  "Arm": "Generated_User_UserListDTO_UserDTO_f3e3902d",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1564",
@@ -298,7 +298,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.User[].Select(e =\u003E new UserListDTO() {ID = e.ID.ToString(), CompanyBranchID = IIF(e.CompanyBranchID.HasValue, e.CompanyBranchID.Value.ToString(), null), CompanyID = IIF(e.CompanyID.HasValue, e.CompanyID.Value.ToString(), null), FullName = e.FullName, Username = e.Username, IntegrationId = e.IntegrationId, Phone = e.Phone, PhoneVerified = e.PhoneVerified, Email = e.Email, EmailVerified = e.EmailVerified, IsActive = e.IsActive, IsDeleted = e.IsDeleted, CompanyBranch = IIF((e.CompanyBranch != null), e.CompanyBranch.Name, null), TotpEnabled = (e.TotpSecret != null), LastSeen = (IIF(((e.UserLog == null) OrElse (e.UserLog.LastSeen == null)), e.LastSeen, e.UserLog.LastSeen) ?? 0001/01/01 12:00:00 AM \u002B00:00), AccessTrees = e.AccessTrees.Select(y =\u003E new ShiftEntitySelectDTO() {Value = y.AccessTreeID.ToString(), Text = y.AccessTree.Name})})",
+  "ListSql": "SELECT CONVERT(varchar(20), [u].[ID]), CASE\r\n    WHEN [u].[CompanyBranchID] IS NOT NULL THEN CONVERT(varchar(20), [u].[CompanyBranchID])\r\nEND, CASE\r\n    WHEN [u].[CompanyID] IS NOT NULL THEN CONVERT(varchar(20), [u].[CompanyID])\r\nEND, [u].[FullName], [u].[Username], [u].[IntegrationId], [u].[Phone], [u].[PhoneVerified], [u].[Email], [u].[EmailVerified], [u].[IsActive], [u].[IsDeleted], [c].[Name], CASE\r\n    WHEN [u].[TotpSecret] IS NOT NULL THEN CAST(1 AS bit)\r\n    ELSE CAST(0 AS bit)\r\nEND, COALESCE(CASE\r\n    WHEN [u0].[ID] IS NULL OR [u0].[LastSeen] IS NULL THEN [u].[LastSeen]\r\n    ELSE [u0].[LastSeen]\r\nEND, \u00270001-01-01T00:00:00.0000000\u002B00:00\u0027), [u].[ID], [c].[ID], [u0].[ID], [s].[Value], [s].[Text], [s].[ID], [s].[ID0]\r\nFROM [ShiftIdentity].[Users] AS [u]\r\nLEFT JOIN [ShiftIdentity].[CompanyBranches] AS [c] ON [u].[CompanyBranchID] = [c].[ID]\r\nLEFT JOIN [ShiftIdentity].[UserLogs] AS [u0] ON [u].[ID] = [u0].[UserID]\r\nLEFT JOIN (\r\n    SELECT CONVERT(varchar(20), [u1].[AccessTreeID]) AS [Value], [a].[Name] AS [Text], [u1].[ID], [a].[ID] AS [ID0], [u1].[UserID]\r\n    FROM [ShiftIdentity].[UserAccessTrees] AS [u1]\r\n    INNER JOIN [ShiftIdentity].[AccessTrees] AS [a] ON [u1].[AccessTreeID] = [a].[ID]\r\n) AS [s] ON [u].[ID] = [s].[UserID]\r\nORDER BY [u].[ID], [c].[ID], [u0].[ID], [s].[ID]",
   "Copy": {
     "LastReplicationDate": "2027-07-22T03:04:05\u002B00:00",
     "LastReplicationStamp": "LastReplicationStamp-567",

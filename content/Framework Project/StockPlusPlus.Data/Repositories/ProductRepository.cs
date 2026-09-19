@@ -5,7 +5,7 @@ using ShiftSoftware.ShiftEntity.EFCore;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.Product;
-using ShiftSoftware.ShiftEntity.EFCore.Tagging;
+using ShiftSoftware.ShiftEntity.Model.Dtos.Tagging;
 
 namespace StockPlusPlus.Data.Repositories;
 
@@ -60,9 +60,11 @@ public class ProductRepository : ShiftRepository<DB, Entities.Product, ProductLi
         return existing;
     }
 
+    // A hand-written list projection writes its Tags binding itself (the automatic maps project them on their
+    // own, through the framework's Tag → TagDTO map). Plain member-inits, so EF translates it to one query.
     public override IQueryable<ProductListDTO> MapToList(IQueryable<Product> queryable, MappingContext context = default)
     {
-        return queryable.SelectWithTags(p => new ProductListDTO
+        return queryable.Select(p => new ProductListDTO
         {
             ID = p.ID.ToString(),
             Name = p.Name,
@@ -80,6 +82,14 @@ public class ProductRepository : ShiftRepository<DB, Entities.Product, ProductLi
             HasActiveAttention = p.HasActiveAttention,
             HighestSeverity = p.HighestSeverity,
             ActiveSignalCount = p.ActiveSignalCount,
+            Tags = p.Tags.Select(t => new TagDTO
+            {
+                ID = t.ID.ToString(),
+                Name = t.Name,
+                Color = t.Color,
+                Description = t.Description,
+                IntegrationID = t.IntegrationID,
+            }).ToList(),
         });
     }
 

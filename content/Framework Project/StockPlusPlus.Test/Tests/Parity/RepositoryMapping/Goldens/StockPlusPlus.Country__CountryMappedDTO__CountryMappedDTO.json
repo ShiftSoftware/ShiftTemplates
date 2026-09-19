@@ -1,7 +1,7 @@
 {
   "Triple": "Country / CountryMappedDTO / CountryMappedDTO",
   "Arm": "CountryMapper",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1003",
@@ -37,7 +37,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "StockPlusPlus.Data.Entities.Country[].Select(e =\u003E new CountryMappedDTO() {ID = e.ID.ToString(), Name = e.Name, IsDeleted = e.IsDeleted})",
+  "ListSql": "SELECT CONVERT(varchar(20), [c].[ID]) AS [ID], [c].[Name], [c].[IsDeleted]\r\nFROM [Countries] AS [c]",
   "Copy": {
     "Name": "Name-7",
     "IdempotencyKey": "00000000-0000-0000-0000-000000001004",

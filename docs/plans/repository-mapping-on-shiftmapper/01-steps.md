@@ -455,6 +455,13 @@ message for an uncovered triple names `AddShiftMapper()` as the first thing to c
 
 ## Stage 3 — Flip and migrate
 
+**Done 2026-09-19 — see [`STATUS.md`](STATUS.md).** Differences from the text below: the Builder run of 3.3
+waits for the first release (a `dotnet new shift` project restores from nuget.org); 3.6 replaced the
+expression-shape golden with the SQL of each list projection (`ListSql`) rather than adding a LongRunning
+suite — `ToQueryString()` needs no connection; the CompanyCalendar child customizations became a mapper
+class (`CompanyCalendarGroupMapper`) rather than `ForMember`s, since they belong to the child pairs; four
+ShiftMapper fixes and two features were needed on the way (the Stage 3 log entry lists them).
+
 ### 3.1 Flip the order
 
 `IMapper` moves **ahead** of the registry in `InitCommon`. The registry link stays for this stage so a project

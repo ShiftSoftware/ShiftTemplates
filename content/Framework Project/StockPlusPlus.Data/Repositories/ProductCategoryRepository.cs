@@ -17,10 +17,12 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
 {
     private readonly IHashIdService hashIdService;
 
-    // ProductCategory demonstrates SOURCE-GENERATED mapping on an entity with a relationship
-    // (Brand ↔ BrandID via ShiftEntitySelectDTO) AND file upload (Photos ↔ List<ShiftFileDTO> JSON):
-    // the generator auto-discovers this repository's triple, emits the mapper (using the MappingHelpers
-    // conventions), and UseGeneratedMapper() resolves it — no mapper class is declared anywhere.
+    // ProductCategory demonstrates AUTOMATIC mapping on an entity with a relationship (Brand ↔ BrandID via
+    // ShiftEntitySelectDTO) AND file upload (Photos ↔ List<ShiftFileDTO> JSON): ShiftMapper declares the four
+    // maps for this repository's triple from its type arguments, the framework's conventions
+    // (ShiftEntityConversions) shape the select and the files, and nothing is written for it — no mapper
+    // class, no configuration line. The files member is mapped in memory only (a database cannot parse
+    // JSON into objects), so the list projection leaves it out, as the build says (SM0030).
     public ProductCategoryRepository(DB db, ICurrentUserProvider currentUserProvider, IServiceProvider serviceProvider, IHashIdService hashIdService) : base(db, o =>
     {
         //o.FilterByCustomValue<List<long>>(x => x.CustomValue.Contains(x.Entity.ID))
@@ -39,9 +41,6 @@ public class ProductCategoryRepository : ShiftRepository<DB, Entities.ProductCat
         //    Shared.ActionTrees.StockPlusPlusActionTree.DataLevelAccess.ProductBrand,
         //    Constants.CompanyBranchIdClaim
         //);
-
-        // Use the source-generated mapper for this repository's triple.
-        o.UseGeneratedMapper();
     })
     {
         this.hashIdService = hashIdService;

@@ -1,7 +1,7 @@
 {
   "Triple": "Region / RegionListDTO / RegionDTO",
-  "Arm": "Generated_Region_RegionListDTO_RegionDTO_1529b6b2",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1718",
@@ -197,7 +197,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.Region[].Select(e =\u003E new RegionListDTO() {ID = e.ID.ToString(), Name = e.Name, IntegrationId = e.IntegrationId, ShortCode = e.ShortCode, CountryID = IIF(e.CountryID.HasValue, e.CountryID.Value.ToString(), null), DisplayOrder = e.DisplayOrder, IsDeleted = e.IsDeleted, Country = IIF((e.Country != null), e.Country.Name, null), CountryDisplayOrder = IIF((e.Country != null), e.Country.DisplayOrder, null)})",
+  "ListSql": "SELECT CONVERT(varchar(20), [r].[ID]) AS [ID], [r].[Name], [r].[IntegrationId], [r].[ShortCode], CASE\r\n    WHEN [r].[CountryID] IS NOT NULL THEN CONVERT(varchar(20), [r].[CountryID])\r\nEND AS [CountryID], [r].[DisplayOrder], [r].[IsDeleted], [c].[Name] AS [Country], [c].[DisplayOrder] AS [CountryDisplayOrder]\r\nFROM [ShiftIdentity].[Regions] AS [r]\r\nLEFT JOIN [ShiftIdentity].[Countries] AS [c] ON [r].[CountryID] = [c].[ID]",
   "Copy": {
     "LastReplicationDate": "2027-12-23T03:04:05\u002B00:00",
     "LastReplicationStamp": "LastReplicationStamp-721",

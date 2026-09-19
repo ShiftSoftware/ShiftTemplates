@@ -1,7 +1,7 @@
 {
   "Triple": "Team / TeamListDTO / TeamDTO",
-  "Arm": "Generated_Team_TeamListDTO_TeamDTO_88ee10a7",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1256",
@@ -162,7 +162,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.Team[].Select(e =\u003E new TeamListDTO() {ID = e.ID.ToString(), Name = e.Name, IntegrationId = e.IntegrationId, CompanyId = IIF(e.CompanyID.HasValue, e.CompanyID.Value.ToString(), null), IsDeleted = e.IsDeleted, Company = IIF((e.Company != null), e.Company.Name, null)})",
+  "ListSql": "SELECT CONVERT(varchar(20), [t].[ID]) AS [ID], [t].[Name], [t].[IntegrationId], CASE\r\n    WHEN [t].[CompanyID] IS NOT NULL THEN CONVERT(varchar(20), [t].[CompanyID])\r\nEND AS [CompanyId], [t].[IsDeleted], [c].[Name] AS [Company]\r\nFROM [ShiftIdentity].[Teams] AS [t]\r\nLEFT JOIN [ShiftIdentity].[Companies] AS [c] ON [t].[CompanyID] = [c].[ID]",
   "Copy": {
     "LastReplicationDate": "2026-09-17T03:04:05\u002B00:00",
     "LastReplicationStamp": "LastReplicationStamp-259",

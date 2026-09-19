@@ -1,56 +1,41 @@
-using ShiftSoftware.ShiftEntity.Core;
+using ShiftMapper;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 
 namespace StockPlusPlus.Data.Mappers;
 
 /// <summary>
-/// ProductBrand demonstrates the [ShiftEntityMapper] PARTIAL-CLASS form of source generation (the
-/// customization path): declaring this class makes the generator fill the four IShiftEntityMapper
-/// methods into it — instead of emitting an auto-named mapper for the triple — and register THIS class
-/// in the registry. Implement any of the four methods (or add [MapperIgnore]-style tweaks in future
-/// iterations) to customize; the generator skips user-implemented methods. Entities with nothing custom
-/// need no class at all — see Country (api/country-generated + CountryRepository).
+/// ProductBrand demonstrates the MAPPER CLASS door (the customization path). An ordinary ShiftMapper class:
+/// not partial, no attribute, no interface, nothing injects it. A <c>CreateMap</c> here REPLACES the automatic
+/// map ShiftMapper declared for that pair from <c>ProductBrandRepository</c>'s type arguments — the build says so
+/// (SM0047, informational) — and every other pair of the triple stays automatic. The framework's conventions
+/// (hash ids, <c>ShiftEntitySelectDTO</c>, the members the pipeline owns) still apply to the maps written here.
+/// Entities with nothing custom need no class at all — see Country (api/country-generated + CountryRepository).
 /// </summary>
-[ShiftEntityMapper]
-public partial class ProductBrandMapper : IShiftEntityMapper<ProductBrand, ProductBrandListDTO, ProductBrandDTO>
+public class ProductBrandMapper : ShiftMapperBase
 {
+    public ProductBrandMapper()
+    {
 #if (includeItemTemplateContent)
-    // Per-property customization hook: registering a member automatically suppresses the generated
-    // convention for it (everything else stays generated). ForView/ForEntity/ForCopy take plain
-    // lambdas (optionally with an IServiceProvider); ForList takes an expression over the entity,
-    // composed into the single SQL projection.
-    partial void Configure(ShiftMapperBuilder<ProductBrand, ProductBrandListDTO, ProductBrandDTO> map)
-    {
-        map.ForList(d => d.Code, entity => entity.Code ?? "(No Code)");
-    }
+        // Per-member customization, in ShiftMapper's vocabulary. ForMember with an expression composes into
+        // the single SQL projection of the list; everything else stays by convention.
+        CreateMap<ProductBrand, ProductBrandListDTO>()
+            .ForMember(d => d.Code, opt => opt.MapFrom(entity => entity.Code ?? "(No Code)"));
 
-    // Whole-method takeover WITH a base call — the partial-class analog of the repository's
-    // base.MapToEntity(...): MapToEntityGenerated runs all generated conventions (and any
-    // ForEntity customizations), then this method post-processes the result.
-    public ProductBrand MapToEntity(ProductBrandDTO dto, ProductBrand existing, MappingContext context = default)
-    {
-        existing = MapToEntityGenerated(dto, existing, context);
-
-        existing.Code = existing.Code?.Trim();
-
-        return existing;
-    }
+        // "Conventions first, then my code": AfterMap runs after every convention has written the entity —
+        // the mapper-class analog of a repository override that calls base.MapToEntity(...) first.
+        CreateMap<ProductBrandDTO, ProductBrand>()
+            .AfterMap((dto, entity) => entity.Code = entity.Code?.Trim());
 #else
-    // Every member is mapped by convention — the generator fills MapToView / MapToEntity / MapToList /
-    // CopyEntity into this partial class. Customize per property with the generated Configure hook:
-    //
-    //partial void Configure(ShiftMapperBuilder<ProductBrand, ProductBrandListDTO, ProductBrandDTO> map)
-    //{
-    //    map.ForList(d => d.SomeColumn, entity => entity.SomeColumn ?? "(none)");
-    //}
-    //
-    // Or take a whole method over and still get the conventions, by calling the *Generated body:
-    //
-    //public ProductBrand MapToEntity(ProductBrandDTO dto, ProductBrand existing, MappingContext context = default)
-    //{
-    //    existing = MapToEntityGenerated(dto, existing, context);
-    //    return existing;
-    //}
+        // Every member maps by convention; the class exists so there is a place to customize. Per member:
+        //
+        //CreateMap<ProductBrand, ProductBrandListDTO>()
+        //    .ForMember(d => d.SomeColumn, opt => opt.MapFrom(entity => entity.SomeColumn ?? "(none)"));
+        //
+        // Or the conventions first, then your code, on the write direction:
+        //
+        //CreateMap<ProductBrandDTO, ProductBrand>()
+        //    .AfterMap((dto, entity) => entity.Code = entity.Code?.Trim());
 #endif
+    }
 }

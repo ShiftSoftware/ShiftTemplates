@@ -3,9 +3,9 @@
 
 @using StockPlusPlus.Shared.DTOs
 
-@* Lists the "api/country-generated" endpoint — the same Country table served through the
-   SOURCE-GENERATED mapper (UseGeneratedMapper = true on the endpoint attribute; no mapper class is
-   declared anywhere). It's a separate endpoint + DTO from "api/country" (source-generated) and
+@* Lists the "api/country-generated" endpoint — the same Country table served through the AUTOMATIC
+   ShiftMapper maps the endpoint attribute declares, customized from the entity's ConfigureRepository (no
+   mapper class is declared anywhere). It's a separate endpoint + DTO from "api/country" (automatic) and
    "api/countrymapped" (hand-written CountryMapper), so the three are fully isolated. *@
 <ShiftList EntitySet="country-generated"
            Title="Country (Generated) List"

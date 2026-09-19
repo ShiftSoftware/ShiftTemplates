@@ -11,26 +11,25 @@ using Xunit;
 namespace StockPlusPlus.Test.Tests;
 
 /// <summary>
-/// The oracle for replacing ShiftEntity's mapping generator with ShiftMapper — Stage 0.2 of
-/// <c>docs/plans/repository-mapping-on-shiftmapper</c>.
+/// The oracle of the repository mapping — <c>docs/plans/repository-mapping-on-shiftmapper</c>.
 /// <para>
 /// For every (entity, list, view) triple the framework-owned assemblies declare — enumerated, never listed, by
 /// <see cref="TripleEnumerator"/> — a deterministic fixture graph goes through the mapper the triple ACTUALLY
-/// uses (resolved from the running host by <see cref="ParityArms"/>, so a repository's <c>UseGeneratedMapper(map =&gt; …)</c>
-/// configuration and a repository's method overrides are both measured) in all four directions, and the result
-/// is compared member-by-member against a frozen file under <c>Tests/Parity/RepositoryMapping/Goldens</c>.
+/// uses (resolved from the running host by <see cref="ParityArms"/>, so a repository's <c>Mapping(m =&gt; …)</c>
+/// configuration, a mapper class and a repository's method overrides are all measured) in all four directions,
+/// plus the SQL the list projection translates to, and the result is compared member-by-member against a frozen
+/// file under <c>Tests/Parity/RepositoryMapping/Goldens</c>.
 /// </para>
 /// <para>
-/// <b>The goldens were captured from the ShiftEntity source generator and are frozen.</b> Once ShiftMapper
-/// takes the four directions over there is nothing left to regenerate them from — a regenerated golden would be
-/// the implementation under test restating itself. Set <c>SHIFT_TEST_CAPTURE_REPOSITORY_MAPPING_GOLDENS=1</c>
-/// to rewrite them, and only when the output is MEANT to change; record why in the plan's decisions.
+/// <b>The goldens were captured from the ShiftEntity source generator (Stage 0), diffed against ShiftMapper
+/// until every difference was fixed or decided, and re-frozen from ShiftMapper (Stage 3.6).</b> A regenerated
+/// golden is the implementation under test restating itself, so set
+/// <c>SHIFT_TEST_CAPTURE_REPOSITORY_MAPPING_GOLDENS=1</c> to rewrite them only when the output is MEANT to
+/// change, and record why in the plan's decisions.
 /// </para>
 /// <para>
 /// One theory per direction rather than one fact per triple, so a divergence names the direction and the
-/// member path — "Invoice / InvoiceListDTO / InvoiceDTO, List, InvoiceLines[0].Product.Name" — and so the
-/// projection SHAPE can be retired on its own when ShiftMapper produces the tree (see
-/// <see cref="RepositoryMappingGolden.ListShape"/>) without touching the result assertions.
+/// member path — "Invoice / InvoiceListDTO / InvoiceDTO, List, InvoiceLines[0].Product.Name".
 /// </para>
 /// </summary>
 [Collection("API Collection")]
@@ -78,7 +77,7 @@ public class RepositoryMappingParityTests
             Assert.True(arm is not null, $"{site.Triple} resolves no mapper of any kind ({kind}); nothing to pin.");
 
             var actual = RepositoryMappingRun.Run(arm!, scope.ServiceProvider);
-            actual.CapturedBy = "ShiftSoftware.ShiftEntity.SourceGenerator";
+            actual.CapturedBy = "ShiftSoftware.ShiftMapper";
 
             if (RepositoryMappingGolden.CaptureRequested)
             {
@@ -107,20 +106,19 @@ public class RepositoryMappingParityTests
     public void CopyEntity_MatchesGolden(string key) => AssertSection(key, "Copy", g => g.Copy);
 
     /// <summary>
-    /// The projection's expression tree, as text. This is the one assertion that is EXPECTED to be retired when
-    /// ShiftMapper produces the projection — a different generator builds a different tree for the same SQL —
-    /// and replaced by SQL-text goldens in the LongRunning suite. Until then it pins the shape the old generator
-    /// emits: <c>SelectWithTags</c>, correlated child projections, inlined select-DTO member-inits.
+    /// The SQL the list projection translates to. The one assertion the in-memory result cannot stand in for:
+    /// LINQ-to-objects executes what SQL Server refuses, so this is where a projection that stopped translating,
+    /// lost a join, or started leaving a member out shows up.
     /// </summary>
     [Theory]
     [MemberData(nameof(Triples))]
-    public void MapToList_ShapeMatchesGolden(string key)
+    public void MapToList_SqlMatchesGolden(string key)
     {
         var (actual, expected, _) = RunOnce(key);
         var golden = RequireGolden(key, expected);
 
-        Assert.True(string.Equals(golden.ListShape, actual.ListShape, StringComparison.Ordinal),
-            $"{actual.Triple}: the list projection's shape diverged from the golden.\n  expected: {golden.ListShape}\n  actual:   {actual.ListShape}");
+        Assert.True(string.Equals(golden.ListSql, actual.ListSql, StringComparison.Ordinal),
+            $"{actual.Triple}: the list projection's SQL diverged from the golden.\n  expected: {golden.ListSql}\n  actual:   {actual.ListSql}");
     }
 
     /// <summary>

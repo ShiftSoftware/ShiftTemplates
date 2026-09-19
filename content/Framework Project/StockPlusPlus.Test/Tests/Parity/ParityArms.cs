@@ -3,7 +3,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
-using ShiftMapper;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
 
@@ -61,38 +60,6 @@ public static class ParityArms
             return (new MapperArm(Activator.CreateInstance(generated)!, site.Triple, generated.Name), ArmKind.RegistryOnly);
 
         return (null, ArmKind.None);
-    }
-
-    /// <summary>
-    /// The SAME triple through ShiftMapper: the host's registered <see cref="IMapper"/> behind the adapter the
-    /// repository itself resolves when nothing older covers the triple (<see cref="ShiftMapperEntityMapper{EntityType, ListDTO, ViewAndUpsertDTO}"/>).
-    /// Stage 2 of <c>docs/plans/repository-mapping-on-shiftmapper</c>: the old generated mapper still wins in the
-    /// repository, so this arm is what the goldens are DIFFED against, not what they were captured from. Null
-    /// when the host registered no ShiftMapper or its generated mapper does not declare all four maps.
-    /// <para>
-    /// The repository is resolved first so a <c>Mapping(...)</c> configuration it carries reaches the mapper
-    /// before the maps run — exactly the order a request sees.
-    /// </para>
-    /// </summary>
-    public static MapperArm? ShiftMapperArm(IServiceScope scope, TripleSite site)
-    {
-        if (scope.ServiceProvider.GetService<IMapper>() is not { } mapper)
-            return null;
-
-        if (site.RepositoryType is not null)
-        {
-            try { scope.ServiceProvider.GetService(site.RepositoryType); }
-            catch { /* the repository's own construction problems are the generated arm's finding, not this one's */ }
-        }
-
-        var adapter = typeof(ShiftMapperEntityMapper<,,>).MakeGenericType(site.Triple.Entity, site.Triple.ListDto, site.Triple.ViewDto);
-
-        if (adapter.GetMethod("Covers")!.Invoke(null, new object[] { mapper }) is not true)
-            return null;
-
-        var instance = Activator.CreateInstance(adapter, mapper, scope.ServiceProvider.GetService<ShiftEntityMappingContext>())!;
-
-        return new MapperArm(instance, site.Triple, "ShiftMapper (IMapper behind ShiftMapperEntityMapper)");
     }
 
     /// <summary>

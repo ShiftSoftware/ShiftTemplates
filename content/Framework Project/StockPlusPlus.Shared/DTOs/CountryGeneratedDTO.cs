@@ -3,10 +3,11 @@ using ShiftSoftware.ShiftEntity.Model.Dtos;
 
 namespace StockPlusPlus.Shared.DTOs;
 
-// Same shape as CountryDTO, but a DISTINCT type so the SOURCE-GENERATED endpoint at "api/country-generated"
-// (UseGeneratedMapper = true) is fully isolated from the plain endpoint at "api/country" and the
-// custom-mapper endpoint at "api/countrymapped" — mappers are keyed by the (entity, list, view) triple, i.e.
-// by DTO type.
+// Same shape as CountryDTO, but a DISTINCT type so the endpoint at "api/country-generated" (automatic maps,
+// customized from the entity) is fully isolated from the plain endpoint at "api/country" and the
+// custom-mapper endpoint at "api/countrymapped" — maps are keyed by the (entity, list, view) triple, i.e.
+// by DTO type. One type serves as both list and view DTO here, so the entity -> DTO map is ONE map: what the
+// entity's ConfigureRepository customizes on the list is the view's too.
 //
 // This is also the triple Country drives from the ENTITY: IConfiguresShiftRepository (a mapper tweak) plus
 // IUpsertsShiftRepository / IDeletesShiftRepository (the write hooks). The CountryRepository demo deliberately

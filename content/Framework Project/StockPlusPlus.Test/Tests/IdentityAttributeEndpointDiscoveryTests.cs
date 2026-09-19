@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using ShiftMapper;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.ShiftIdentity.Core.DTOs.AccessTree;
@@ -24,9 +25,10 @@ namespace StockPlusPlus.Test.Tests;
 ///   • all 12 endpoints (Brand/Service/Department; Country/Region/City/App; AccessTree/Team/Company/CompanyBranch/
 ///     CompanyCalendar) discover, are secure, and are TypeAuth-action-gated,
 ///   • the exact route strings clients depend on (byte-identical to the old api/[controller] output),
-///   • the built-in-repository (Rung A/B) endpoints resolve a "Generated_*" mapper with NO custom repository,
+///   • the built-in-repository (Rung A/B) endpoints attach NO custom repository and NO mapper — their maps are the
+///     automatic ShiftMapper ones the attribute declares, which the container's IMapper covers,
 ///   • the Rung-C endpoints (Company, CompanyBranch) route through their THIN custom repository (kept for
-///     ApplyPostODataProcessing) and carry no attribute mapper (the repo opts into the generated mapper itself).
+///     ApplyPostODataProcessing) and carry no attribute mapper (the repository customizes the automatic maps itself).
 /// End-to-end CRUD + the entity hooks run against a live DB in the ShiftIdentity dashboard host; here we prove wiring.
 /// </summary>
 public class IdentityAttributeEndpointDiscoveryTests
@@ -64,7 +66,7 @@ public class IdentityAttributeEndpointDiscoveryTests
     }
 
     [Theory]
-    // Rung A/B: built-in repository + source-generated mapper (UseGeneratedMapper = true).
+    // Rung A/B: built-in repository + the automatic ShiftMapper maps the attribute declares.
     [InlineData("api/IdentityCountry", typeof(Country), typeof(CountryListDTO), typeof(CountryDTO), nameof(ShiftIdentityActions.Countries))]
     [InlineData("api/IdentityRegion", typeof(Region), typeof(RegionListDTO), typeof(RegionDTO), nameof(ShiftIdentityActions.Regions))]
     [InlineData("api/IdentityCity", typeof(City), typeof(CityListDTO), typeof(CityDTO), nameof(ShiftIdentityActions.Cities))]
@@ -72,7 +74,7 @@ public class IdentityAttributeEndpointDiscoveryTests
     [InlineData("api/IdentityAccessTree", typeof(AccessTree), typeof(AccessTreeListDTO), typeof(AccessTreeDTO), nameof(ShiftIdentityActions.AccessTrees))]
     [InlineData("api/IdentityTeam", typeof(Team), typeof(TeamListDTO), typeof(TeamDTO), nameof(ShiftIdentityActions.Teams))]
     [InlineData("api/IdentityCompanyCalendar", typeof(CompanyCalendar), typeof(CompanyCalendarListDTO), typeof(CompanyCalendarDTO), nameof(ShiftIdentityActions.CompanyCalendars))]
-    public void BuiltInRepoEndpoint_UsesGeneratedMapper_NoRepository(string route, System.Type entity, System.Type listDto, System.Type viewDto, string actionName)
+    public void BuiltInRepoEndpoint_HasNeitherRepositoryNorMapper_AndShiftMapperCoversIt(string route, System.Type entity, System.Type listDto, System.Type viewDto, string actionName)
     {
         var spec = DiscoverRoute(route);
 
@@ -82,13 +84,34 @@ public class IdentityAttributeEndpointDiscoveryTests
         Assert.Equal(actionName, spec.ActionName);
 
         Assert.Null(spec.Repository);
-        Assert.NotNull(spec.Mapper);
-        Assert.StartsWith("Generated_", spec.Mapper!.Name);
+        Assert.Null(spec.Mapper);
+
+        var mapper = Host().GetRequiredService<IMapper>();
+        Assert.True(mapper.CanMap(entity, viewDto));
+        Assert.True(mapper.CanMap(viewDto, entity));
+        Assert.True(mapper.CanMap(entity, listDto));
+        Assert.True(mapper.CanMap(entity, entity));
+    }
+
+    private static ServiceProvider? host;
+
+    /// <summary>One container over RegisterShiftRepositories(identity data assembly), for the CanMap questions.</summary>
+    private static IServiceProvider Host()
+    {
+        if (host is null)
+        {
+            var services = new ServiceCollection();
+            services.AddOptions();
+            services.RegisterShiftRepositories(IdentityDataAssembly);
+            host = services.BuildServiceProvider();
+        }
+
+        return host;
     }
 
     [Theory]
     // Rung C: the endpoint routes through the THIN custom repository (kept for ApplyPostODataProcessing); no
-    // attribute mapper (the repository opts into the generated mapper in its own builder).
+    // attribute mapper (the repository customizes the automatic maps in its own builder).
     [InlineData("api/IdentityCompany", typeof(Company), typeof(CompanyListDTO), typeof(CompanyDTO), typeof(CompanyRepository), nameof(ShiftIdentityActions.Companies))]
     [InlineData("api/IdentityCompanyBranch", typeof(CompanyBranch), typeof(CompanyBranchListDTO), typeof(CompanyBranchDTO), typeof(CompanyBranchRepository), nameof(ShiftIdentityActions.CompanyBranches))]
     // Phase 4: User's endpoint routes through the surviving heavy repository (IUserRepository + public methods).
@@ -107,22 +130,15 @@ public class IdentityAttributeEndpointDiscoveryTests
     }
 
     [Fact]
-    public void RegisterShiftRepositories_RegistersGeneratedMappers_ForBuiltInRepoTriples()
+    public void RegisterShiftRepositories_RegistersNoIShiftEntityMapper_ForBuiltInRepoTriples()
     {
-        var services = new ServiceCollection();
-        services.AddOptions();
-        services.RegisterShiftRepositories(IdentityDataAssembly);
-
-        using var provider = services.BuildServiceProvider();
-        using var scope = provider.CreateScope();
+        // Nothing is registered by type for the automatic triples: the repository resolves them through
+        // IMapper, and the only IShiftEntityMapper registrations are the ones a WithMapper attribute names.
+        using var scope = Host().CreateScope();
         var sp = scope.ServiceProvider;
 
-        Assert.StartsWith("Generated_", sp.GetService<IShiftEntityMapper<Country, CountryListDTO, CountryDTO>>()!.GetType().Name);
-        Assert.StartsWith("Generated_", sp.GetService<IShiftEntityMapper<Region, RegionListDTO, RegionDTO>>()!.GetType().Name);
-        Assert.StartsWith("Generated_", sp.GetService<IShiftEntityMapper<City, CityListDTO, CityDTO>>()!.GetType().Name);
-        Assert.StartsWith("Generated_", sp.GetService<IShiftEntityMapper<App, AppDTO, AppDTO>>()!.GetType().Name);
-        Assert.StartsWith("Generated_", sp.GetService<IShiftEntityMapper<AccessTree, AccessTreeListDTO, AccessTreeDTO>>()!.GetType().Name);
-        Assert.StartsWith("Generated_", sp.GetService<IShiftEntityMapper<Team, TeamListDTO, TeamDTO>>()!.GetType().Name);
-        Assert.StartsWith("Generated_", sp.GetService<IShiftEntityMapper<CompanyCalendar, CompanyCalendarListDTO, CompanyCalendarDTO>>()!.GetType().Name);
+        Assert.Null(sp.GetService<IShiftEntityMapper<Country, CountryListDTO, CountryDTO>>());
+        Assert.Null(sp.GetService<IShiftEntityMapper<Team, TeamListDTO, TeamDTO>>());
+        Assert.Null(sp.GetService<IShiftEntityMapper<CompanyCalendar, CompanyCalendarListDTO, CompanyCalendarDTO>>());
     }
 }

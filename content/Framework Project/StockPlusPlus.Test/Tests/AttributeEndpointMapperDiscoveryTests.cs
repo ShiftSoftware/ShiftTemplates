@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using ShiftMapper;
 using ShiftSoftware.ShiftEntity.Core;
 using StockPlusPlus.Data.Entities;
 using StockPlusPlus.Data.Mappers;
@@ -34,7 +35,7 @@ public class AttributeEndpointMapperDiscoveryTests
     }
 
     // The plain (no trailing generic) "api/country" endpoint attaches neither a repository nor a mapper: it
-    // stays on the built-in repository, which resolves the source-generated mapper for the triple itself.
+    // stays on the built-in repository, which resolves the triple's automatic ShiftMapper maps itself.
     [Fact]
     public void Discover_PlainEndpoint_HasNeitherRepositoryNorMapper()
     {
@@ -64,8 +65,8 @@ public class AttributeEndpointMapperDiscoveryTests
     }
 
     // The distinct-DTO isolation: CountryMapper is keyed by CountryMappedDTO, so nothing is registered in DI
-    // for the plain endpoint's (Country, CountryDTO) triple. There is no fallback — the built-in repository
-    // resolves that triple's source-generated mapper from ShiftEntityMapperRegistry instead.
+    // for the plain endpoint's (Country, CountryDTO) triple. The built-in repository resolves that triple's
+    // automatic maps through IMapper instead.
     [Fact]
     public void RegisterShiftRepositories_DoesNotRegisterMapper_ForPlainEndpoint()
     {
@@ -82,26 +83,25 @@ public class AttributeEndpointMapperDiscoveryTests
         Assert.Null(mapper);
     }
 
-    // Country's "api/country-generated" endpoint sets UseGeneratedMapper = true: discovery must resolve
-    // the AUTO-GENERATED mapper from the registry (the generator discovers the triple from the attribute
-    // itself and emits + registers the mapper — no mapper class is declared anywhere).
+    // Country's "api/country-generated" endpoint attaches nothing either: its maps are declared by the attribute
+    // itself (ShiftMapper reads the marker on the attribute class in the data project's build), customized from
+    // the entity's ConfigureRepository, and resolved by the built-in repository through the host's IMapper.
     [Fact]
-    public void Discover_UseGeneratedMapperFlag_ResolvesGeneratedMapperFromRegistry()
+    public void Discover_AutomaticEndpoint_HasNeitherRepositoryNorMapper()
     {
         var specs = ShiftEntityEndpointDiscovery.Discover(new[] { DataAssembly });
 
         var generated = specs.Single(s => s.Route == "api/country-generated");
-        Assert.NotNull(generated.Mapper);
-        Assert.True(typeof(IShiftEntityMapper<Country, CountryGeneratedDTO, CountryGeneratedDTO>).IsAssignableFrom(generated.Mapper));
-        Assert.StartsWith("Generated_", generated.Mapper!.Name);
+        Assert.Null(generated.Mapper);
         Assert.Null(generated.Repository);
         Assert.Equal(typeof(Country), generated.Entity);
     }
 
-    // The flag flows through the same registration path as WithMapper: the generated mapper ends up
-    // registered as IShiftEntityMapper<Entity, List, View>, which the built-in repository resolves.
+    // RegisterShiftRepositories registers ShiftMapper for the scanned assembly: the container's IMapper declares
+    // the four maps of every plain endpoint's triple — and NOT the WithMapper endpoint's, whose mapping is the
+    // hand-written class. Proven here without a DbContext.
     [Fact]
-    public void RegisterShiftRepositories_RegistersGeneratedMapper_AsIShiftEntityMapper()
+    public void RegisterShiftRepositories_RegistersShiftMapper_CoveringThePlainEndpointsTriples()
     {
         var services = new ServiceCollection();
         services.AddOptions();
@@ -110,30 +110,16 @@ public class AttributeEndpointMapperDiscoveryTests
         using var provider = services.BuildServiceProvider();
         using var scope = provider.CreateScope();
 
-        var mapper = scope.ServiceProvider
-            .GetService<IShiftEntityMapper<Country, CountryGeneratedDTO, CountryGeneratedDTO>>();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
-        Assert.NotNull(mapper);
-        Assert.StartsWith("Generated_", mapper!.GetType().Name);
+        foreach (var (list, view) in new[] { (typeof(CountryDTO), typeof(CountryDTO)), (typeof(CountryGeneratedDTO), typeof(CountryGeneratedDTO)) })
+        {
+            Assert.True(mapper.CanMap(typeof(Country), view));
+            Assert.True(mapper.CanMap(view, typeof(Country)));
+            Assert.True(mapper.CanMap(typeof(Country), list));
+            Assert.True(mapper.CanMap(typeof(Country), typeof(Country)));
+        }
+
+        Assert.False(mapper.CanMap(typeof(Country), typeof(CountryMappedDTO)));
     }
-
-    // Setting the flag on a triple the generator never saw must fail loudly at discovery, not leave the
-    // endpoint to quietly resolve something else.
-    [Fact]
-    public void Discover_UseGeneratedMapperFlag_WithoutRegisteredMapper_Throws()
-    {
-        var ex = Assert.Throws<System.InvalidOperationException>(() =>
-            ShiftEntityEndpointDiscovery.Discover(new[] { typeof(AttributeEndpointMapperDiscoveryTests).Assembly }));
-
-        Assert.Contains("no source-generated mapper", ex.Message);
-        Assert.Contains(nameof(FlagWithoutGeneratedMapperEntity), ex.Message);
-    }
-}
-
-// Deliberately broken: UseGeneratedMapper = true, but the source generator does not run on the test
-// assembly, so no mapper exists for this triple. Only
-// Discover_UseGeneratedMapperFlag_WithoutRegisteredMapper_Throws scans the test assembly.
-[ShiftEntityEndpointAttribute<StockPlusPlus.Shared.DTOs.ProductBrand.ProductBrandListDTO, StockPlusPlus.Shared.DTOs.ProductBrand.ProductBrandDTO>("api/flag-without-generated-mapper", UseGeneratedMapper = true)]
-public class FlagWithoutGeneratedMapperEntity : ShiftEntity<FlagWithoutGeneratedMapperEntity>
-{
 }

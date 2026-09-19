@@ -1,7 +1,7 @@
 {
   "Triple": "Invoice / InvoiceDeepListDTO / InvoiceDeepDTO",
-  "Arm": "Generated_Invoice_InvoiceDeepListDTO_InvoiceDeepDTO_a5693870",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1009",
@@ -221,7 +221,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "StockPlusPlus.Data.Entities.Invoice[].Select(e =\u003E new InvoiceDeepListDTO() {ID = e.ID.ToString(), ManualReference = e.ManualReference, InvoiceNo = e.InvoiceNo, InvoiceLines = IIF((e.InvoiceLines == null), null, e.InvoiceLines.Select(__l0 =\u003E new InvoiceLineDeepDTO() {Description = __l0.Description, Price = __l0.Price, Product = IIF((__l0.Product == null), null, new ProductDeepDTO() {Name = __l0.Product.Name, Price = __l0.Product.Price, ProductBrand = IIF((__l0.Product.ProductBrand == null), null, new ProductBrandDeepDTO() {Name = __l0.Product.ProductBrand.Name})})}).ToList()), IsDeleted = e.IsDeleted})",
+  "ListSql": "SELECT CONVERT(varchar(20), [i].[ID]), [i].[ManualReference], [i].[InvoiceNo], [i].[IsDeleted], [i].[ID], [s].[Description], [s].[Price], [s].[Name], [s].[Price0], [s].[c], [s].[Name0], [s].[ID], [s].[ID0], [s].[ID1]\r\nFROM [Invoices] AS [i]\r\nLEFT JOIN (\r\n    SELECT [i0].[Description], [i0].[Price], [p].[Name], [p].[Price] AS [Price0], CAST(0 AS bit) AS [c], [b].[Name] AS [Name0], [i0].[ID], [p].[ID] AS [ID0], [b].[ID] AS [ID1], [i0].[InvoiceID]\r\n    FROM [InvoiceLines] AS [i0]\r\n    INNER JOIN [Products] AS [p] ON [i0].[ProductID] = [p].[ID]\r\n    INNER JOIN [Brands] AS [b] ON [p].[ProductBrandID] = [b].[ID]\r\n) AS [s] ON [i].[ID] = [s].[InvoiceID]\r\nORDER BY [i].[ID], [s].[ID], [s].[ID0]",
   "Copy": {
     "ManualReference": "ManualReference-159",
     "InvoiceDate": "2026-01-13T03:04:05\u002B00:00",
@@ -231,7 +231,7 @@
     "RegionID": 1160,
     "CompanyID": 1004,
     "CompanyBranchID": 1003,
-    "IdempotencyKey": "00000000-0000-0000-0000-000000001010",
+    "IdempotencyKey": "00000000-0000-0000-0000-000000005010",
     "CityID": 1002,
     "CountryID": 1005,
     "HasActiveAttention": true,

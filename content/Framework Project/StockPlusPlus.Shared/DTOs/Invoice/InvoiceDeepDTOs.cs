@@ -3,10 +3,10 @@ using ShiftSoftware.ShiftEntity.Model.Dtos;
 namespace StockPlusPlus.Shared.DTOs.Invoice;
 
 // A DEEP read-only demo triple for "api/invoice-deep": Invoice → InvoiceLines → Product → ProductBrand.
-// Everything is composed AUTOMATICALLY by the source generator (no ForXxxChild calls) up to the max auto
-// depth — in BOTH the list projection (correlated SQL) and the view (pair composition). The nested DTOs are
-// plain classes shared by list and view (member names match the entity navigation names so the generator
-// finds them). Set [ShiftEntityMapperMaxDepth(n)] on the Invoice entity to watch the cap take effect:
+// Everything nests AUTOMATICALLY — ShiftMapper declares the nested pairs from the DTO graph (ten levels by
+// default) — in BOTH the list projection (correlated SQL) and the view. The nested DTOs are plain classes
+// shared by list and view (member names match the entity navigation names). To cap the depth, write
+// context.Options.Mapping(m => m.Nested(n)) in Invoice.ConfigureRepository:
 //   depth 1 = InvoiceLines, depth 2 = Product, depth 3 = ProductBrand.
 
 public class InvoiceDeepDTO : ShiftEntityViewAndUpsertDTO

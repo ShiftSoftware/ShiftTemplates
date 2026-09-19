@@ -1,14 +1,14 @@
 # Repository mapping on ShiftMapper — Status
 
-**Last updated:** 2026-09-19 — **Stage 2 done (ShiftEntity side, additive)**: `ShiftEntity.Core` and
-`ShiftEntity.EFCore` reference ShiftMapper with its generator; the rules pack, the framework tag maps, the markers
-on `ShiftRepository<,,,>` and the two built-in-repository endpoint attributes, `o.Mapping(...)`,
-`IShiftEntityMappingContext`, the `IMapper` door behind the registry, the registration and the `CanMap` startup
-path are in; the sample's data project declares its 40 maps (10 triples + nested) with nothing written in it.
-Diffed against the 23 goldens through ShiftMapper: the **10 triples that configure nothing match exactly** (one
-accepted difference, Q10), the other 12 differ only where a `UseGeneratedMapper(map => …)`, a mapper partial or an
-override is waiting for Stage 3, and one is a `WithMapper` triple ShiftMapper does not declare. Seven small
-ShiftMapper additions rode along (0.3.0, still unreleased). Stages 0 and 1 done 2026-09-18. Stages 3–5 not started.
+**Last updated:** 2026-09-19 — **Stage 3 done (flipped and migrated)**: ShiftMapper is the repository's default
+mapper, ahead of the old registry (which stays for one release, Q7); the sample, the item template's files and
+ShiftIdentity.Data are migrated — no `UseGeneratedMapper(...)`, no `UseGeneratedMapper = true`, no
+`[ShiftEntityMapper]` partial anywhere in framework-owned code, every customization as `o.Mapping(m => …)` or an
+ordinary mapper class. **All 23 goldens are green through ShiftMapper** (138 theories), re-frozen with exactly three
+recorded changes (Q10, Q15, the Invoice `Total` demonstration) after every other difference was fixed — including all
+13 identity triples matching the old generator member for member — and the expression-shape golden was replaced
+by the SQL each list projection translates to. Six more ShiftMapper additions (0.3.0, still unreleased). Stages 0–2
+done 2026-09-18/19. Stages 4–5 not started; Stage 4 is the deletion, one framework release after this ships.
 
 Update this file as steps land. Keep it factual: what shipped, what it changed, what surprised you.
 Plan: [`01-steps.md`](01-steps.md) · Decisions: [`02-open-decisions.md`](02-open-decisions.md) ·
@@ -56,12 +56,12 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 
 | Step | Status | Notes |
 |------|--------|-------|
-| 3.1 `IMapper` ahead of the registry | ⬜ | |
-| 3.2 Sample migrated (automatic / `o.Mapping` / mapper class all demonstrated) | ⬜ | |
-| 3.3 Item template migrated (Builder run) | ⬜ | |
-| 3.4 ShiftIdentity.Data migrated (10 `UseGeneratedMapper = true`; repositories to `o.Mapping`) | ⬜ | |
-| 3.5 `SelectWithTags` obsolete | ⬜ | |
-| 3.6 Goldens green | ⬜ | Gate for Stage 4. |
+| 3.1 `IMapper` ahead of the registry | ✅ | **2026-09-19.** `ShiftRepository.InitCommon`: options → DI `IShiftEntityMapper` → **ShiftMapper** → the old registry → nothing. `UseGeneratedMapper(...)` and the attribute's `UseGeneratedMapper` property are `[Obsolete]` with the migration guide in the message; the old generator's output disables CS0618 for its own `SelectWithTags` call. `ShiftMapperResolutionTests` pins the order both ways (ShiftMapper wins; the registry still answers a triple ShiftMapper does not declare). |
+| 3.2 Sample migrated | ✅ | **2026-09-19.** Per the table in `01-steps.md`, plus: `InvoiceListDTO.Total` (a real customization, summed in SQL); `ProductRepository.MapToList` writes its own `Tags` binding; `Invoice.ConfigureRepository` shows `m.Nested(2)` as a comment. Tests rewritten against `IMapper`: `SourceGeneratedMappingTests.cs` now holds `MapperClassDoorTests`, `AutomaticMappingTests`, the end-to-end `SourceGeneratedMappingTests` and `RepositoryConfigurationTests` (the configured value reaching a map used first in a scope — repository and entity configurators both, the entity one through `DbContextOptions`); `DeepMappingTests`, `DeepListMappingTests`, the two discovery tests updated; the Stage 2 diff test and arm deleted (the parity suite IS ShiftMapper now). `Program.cs` and the DTO/razor comments say what the code does. |
+| 3.3 Item template migrated | 🟡 | **2026-09-19.** The item template takes the sample's `ProductBrandMapper.cs` and `ProductBrandRepository.cs` as they are, so both `#if (includeItemTemplateContent)` halves are migrated with 3.2. The Builder run is **not possible until ShiftMapper 0.3.0 and the framework are published**: `dotnet new shift` restores packages, and nothing on nuget.org carries the markers. Verify with a Builder run after the first `release-all`. |
+| 3.4 ShiftIdentity.Data migrated | ✅ | **2026-09-19.** The 10 attribute properties removed; `City`, `Region`, `Team`, `CompanyCalendar` (entities) and `CompanyBranchRepository`, `CompanyRepository`, `UserRepository` converted line for line to `o.Mapping(m => …)`; the calendar groups' hashid-encoded `Departments`/`Brands` are a mapper class (`Mappers/CompanyCalendarGroupMapper.cs`, four child pairs, read from `Services` at map time so `Mapper.Create(identity assembly)` — the replication goldens — still constructs without a container). `User`'s `AccessTrees` is now ignored on the write map explicitly (the hook writes the rows), which the old generator excluded by not converting the junction. The replication maps untouched; `ShiftIdentity.Tests` green. |
+| 3.5 `SelectWithTags` obsolete | ✅ | **2026-09-19.** `[Obsolete]`, behaviour kept for one release; `ShiftTagMapper` untouched (DI still wins for the tag endpoints). |
+| 3.6 Goldens green | ✅ | **2026-09-19.** 138 theories green through ShiftMapper on all 23 triples (sample + identity), re-frozen after the last diff showed only the three recorded changes: `Copy.IdempotencyKey` on 7 entities (Q10), `View.Name` on `api/country-generated` (Q15 — one DTO type as list and view is one map) and `List[0].Total` on Invoice (the 3.2 demonstration). `ListShape` (the old generator's expression tree) retired; `ListSql` — `ToQueryString()` over the host's DbContext, no connection — pins each list projection's SQL instead, and every one of the 23 translates. **Gate for Stage 4 passed.** |
 
 ## Stage 4 — Delete
 
@@ -90,16 +90,39 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 | Q4 flattening off on implicit maps | ⬜ | recommended: off |
 | Q5 null collections → empty | ✅ | accepted; the goldens never exercised it (fixtures fill every collection), so no golden changed |
 | Q6 SHENGEN006 → analyzer | ⬜ | recommended: re-home |
-| Q7 one release with both spellings | ⬜ | recommended: yes |
+| Q7 one release with both spellings | ✅ | in effect: Stage 3's release carries both, Stage 4's deletes the old; `[Obsolete]` messages point at the migration guide |
 | Q8 who registers the generated mapper | ✅ | both — `RegisterShiftRepositories` registers what it scans through the new `AddShiftMapper(Assembly)`; the host line is optional and comes with 3.2 |
 | Q9 signal on the base class: attribute inside ShiftEntity | ✅ | attribute — agreed in discussion 2026-09-18 and implemented (`ShiftMapperDeclaresMap`) |
 | Q10 `CopyEntity` no longer copies `Tags` — nor `IdempotencyKey` | ✅ | accepted from the diff: both are pipeline-owned destinations; the fresh row a copy refreshes from carries the same key. The only difference on the automatic triples. |
 | Q11 blank select on nullable FK clears; on required FK is a 400 | ✅ | kept exactly: ShiftMapper's `ParseOrNull` already clears a nullable; the pack's `string? → long` throws the same 400 `ToForeignKey` did, naming the select |
 | Q13 `Tag → TagDTO` maps every member, not `TagProjection`'s five | ✅ | accepted: the audit members of a tag are harmless on a DTO and the map is the ordinary one |
-| Q14 dictionary-valued nesting (`CustomFields`) | 🟡 | ShiftMapper does not nest dictionary VALUES (`Dictionary<string, CustomField>` → `Dictionary<string, CustomFieldDTO>` is SM0002); the old generator did. Two identity triples. Recommended: add it to ShiftMapper in Stage 3 rather than hand-write two `ForMember`s |
+| Q14 dictionary-valued nesting (`CustomFields`) | ✅ | added to ShiftMapper (in memory; the projection leaves the member out with SM0030). Identity's `CustomFields` still needs its `ForMember` — the read side strips passwords — so the feature serves the general case, not this one |
+| Q15 one DTO type as both list and view is ONE map | ✅ | accepted: `api/country-generated`'s list customization is its view's too; use two DTO types where the two must differ (every other sample triple does) |
 
 ## Log
 
+- **2026-09-19 (Stage 3)** — The flip was a three-line reorder; the migration was line for line as the guide
+  says; the goldens are where the day went, and they earned it. Once the sample's and identity's configurations
+  were moved, the parity suite showed FOUR things the Stage 2 diff could not have shown, all fixed in ShiftMapper:
+  (1) several `m.View.ForMember(...)` STATEMENTS from one lambda kept only the first — the surface reader
+  treated a second access of the same handle as "the same lambda read twice"; now merged member by member;
+  (2) an explicit `CreateMap` for a nested child (the calendar groups) stopped implicit declaration BELOW it —
+  its own children were SM0011; now the pairs below an explicit map reached through nesting are declared to the
+  marker's depth; (3) a PROJECTION used before the configuring repository ran left the customized members out
+  in silence — `Compose` read the store without the pull the create method makes; now the generated projection
+  wraps its template in `Customizations.Configured(configurator, members, …)`, which pulls first (and the
+  `ShiftEntityConfiguratorResolver` constructs the built-in repository for an entity configurator through the
+  host's `DbContextOptions.ContextType`, as designed); (4) `Nullable<T>.ToString()` in the query spelling —
+  EF translates it as `COALESCE(CONVERT(...), '')`, so a null key would have arrived as EMPTY TEXT in every list;
+  the query now says `x.HasValue ? x.Value.ToString() : null`, which is what the old generator said. Two more
+  ShiftMapper additions: dictionary-valued nesting (Q14, in memory) and `m.Nested(n)` honoured when written by
+  an entity configuring a repository class's pair. One design fact worth remembering: the generated mapper
+  constructs EVERY class it composes on first use, so a mapper class with a constructor dependency makes the
+  whole assembly's mapper unusable outside a container (`Mapper.Create`) — read `Services` at map time instead,
+  as `CompanyCalendarGroupMapper` does. The SQL goldens replaced the expression-tree shape as planned, and
+  double as the proof that all 23 list projections translate. Environmental: the sample's Cosmos tests fail
+  without the emulator, as before; nothing else in the 381 sample tests, the 285 identity tests, the 535
+  ShiftEntity tests or the 532 + 245 ShiftMapper tests is red.
 - **2026-09-19 (Stage 2)** — Everything the stage listed, plus seven ShiftMapper additions the diff and the
   design forced, all small and general: `AddShiftMapper(Assembly)` (Q8; lifetime only, and the generator does not
   read it as a registration of the caller); `ShiftMapperConversionException` with `SourceMember`; a conversion

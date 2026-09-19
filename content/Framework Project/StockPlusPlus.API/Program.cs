@@ -110,16 +110,21 @@ builder.Services.AddAttentionConsumer<StockPlusPlus.API.Services.AttentionLoggin
 // switches that subscribe and react land in Iteration 9.
 builder.Services.AddAttentionHub();
 
-// Mapping strategy is chosen per-repository — no global DI registration of mappers:
-//   - Product         -> overrides MapToView/MapToEntity/MapToList in ProductRepository
-//   - Invoice         -> SOURCE-GENERATED with DEEP children, via options.UseGeneratedMapper(map => ...)
-//   - ProductCategory -> SOURCE-GENERATED (auto-discovered) mapper via options.UseGeneratedMapper()
-//                        (covers the SelectDTO relationship + ShiftFileDTO file conventions)
-//   - ProductBrand    -> [ShiftEntityMapper] partial class (generator fills it) via options.UseMapper(...)
-//   - Country         -> zero-code source generation: CountryRepository (UseGeneratedMapper) and the
-//                        api/country-generated endpoint (UseGeneratedMapper = true)
-// Every triple is covered by one of these. There is no global fallback to fall back TO any more: a triple
-// with no mapper throws at startup rather than mapping by convention at request time.
+// Mapping: every repository's four maps (entity <-> view, entity -> list, entity -> entity) are declared by
+// ShiftMapper from the repository's type arguments and the endpoint attributes, in the Data project's build,
+// with the framework's conventions — nothing is registered here; RegisterShiftRepositories above registers
+// the Data assembly's generated mapper. The sample shows every door:
+//   - Country, ProductCategory -> AUTOMATIC: nothing written (CountryRepository, ProductCategoryRepository,
+//                                the api/country endpoint)
+//   - Invoice, api/country-generated -> automatic maps CUSTOMIZED where the repository is configured:
+//                                options.Mapping(m => m.List.ForMember(...)) in InvoiceRepository, and the
+//                                same from the entity's ConfigureRepository for api/country-generated
+//   - ProductBrand    -> a MAPPER CLASS (Mappers/ProductBrandMapper.cs, an ordinary ShiftMapperBase) whose
+//                        CreateMaps replace the automatic maps for the pairs it declares
+//   - Product         -> overrides MapToView/MapToEntity/MapToList in ProductRepository (unchanged door)
+//   - api/countrymapped -> a hand-written IShiftEntityMapper (Mappers/CountryMapper.cs) (unchanged door)
+// The same maps serve any service that injects Mapper (typed methods) or IMapper. A triple nothing covers
+// throws at startup (ShiftEntityMapperValidation) rather than mapping by convention at request time.
 
 builder.Services.AddDbContext<DB>(dbOptionBuilder);
 builder.Services.AddHttpClient();

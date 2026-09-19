@@ -1,7 +1,7 @@
 {
   "Triple": "Service / ServiceListDTO / ServiceDTO",
-  "Arm": "Generated_Service_ServiceListDTO_ServiceDTO_8af0017d",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1003",
@@ -35,7 +35,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.Service[].Select(e =\u003E new ServiceListDTO() {ID = e.ID.ToString(), Name = e.Name, IntegrationId = e.IntegrationId, IsDeleted = e.IsDeleted})",
+  "ListSql": "SELECT CONVERT(varchar(20), [s].[ID]) AS [ID], [s].[Name], [s].[IntegrationId], [s].[IsDeleted]\r\nFROM [ShiftIdentity].[Services] AS [s]",
   "Copy": {
     "LastReplicationDate": "2026-01-07T03:04:05\u002B00:00",
     "LastReplicationStamp": "LastReplicationStamp-6",

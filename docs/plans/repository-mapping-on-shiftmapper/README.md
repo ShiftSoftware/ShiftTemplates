@@ -1,7 +1,7 @@
 # Repository mapping on ShiftMapper — Plan
 
 **Created:** 2026-09-18 · **Revised:** 2026-09-18 (no programmer attributes; configuration in the repository; mapper class overrides)
-**Status:** Stages 0 (the frozen oracle), 1 (the ShiftMapper features, unreleased) and 2 (the ShiftEntity side, additive — both mappers on one host, the old one still winning, the goldens diffed) are done; Stages 3–5 not started. See [`STATUS.md`](STATUS.md).
+**Status:** Stages 0 (the frozen oracle), 1 (the ShiftMapper features, unreleased), 2 (the ShiftEntity side, additive) and 3 (the flip and the migration — ShiftMapper is the repository's mapper, the sample and ShiftIdentity are migrated, all 23 goldens are green through it) are done; Stage 4 (delete the old generator, one release later) and 5 not started. See [`STATUS.md`](STATUS.md).
 
 > **This is the primary working copy of this plan.** It lives in
 > `ShiftTemplates/docs/plans/repository-mapping-on-shiftmapper/`. The `.shift` mapping plan

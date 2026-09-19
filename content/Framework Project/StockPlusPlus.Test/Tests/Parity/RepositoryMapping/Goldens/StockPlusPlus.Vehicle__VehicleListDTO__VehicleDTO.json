@@ -1,7 +1,7 @@
 {
   "Triple": "Vehicle / VehicleListDTO / VehicleDTO",
   "Arm": "VehicleRepository (method override)",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1004",
@@ -40,7 +40,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "StockPlusPlus.Data.Entities.Vehicle[].Select(vehicle =\u003E new VehicleListDTO() {ID = vehicle.ID.ToString(), IsDeleted = vehicle.IsDeleted, VIN = vehicle.VIN, CompanyID = IIF(vehicle.CompanyID.HasValue, vehicle.CompanyID.Value.ToString(), null), IntermediaryCompanyID = IIF(vehicle.IntermediaryCompanyID.HasValue, vehicle.IntermediaryCompanyID.Value.ToString(), null)})",
+  "ListSql": "SELECT CONVERT(varchar(20), [v].[ID]) AS [ID], [v].[IsDeleted], [v].[VIN], CASE\r\n    WHEN [v].[CompanyID] IS NOT NULL THEN CONVERT(varchar(20), [v].[CompanyID])\r\nEND AS [CompanyID], CASE\r\n    WHEN [v].[IntermediaryCompanyID] IS NOT NULL THEN CONVERT(varchar(20), [v].[IntermediaryCompanyID])\r\nEND AS [IntermediaryCompanyID]\r\nFROM [Vehicles] AS [v]",
   "Copy": {
     "VIN": "VIN-8",
     "CompanyID": 1001,

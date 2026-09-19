@@ -1,39 +1,30 @@
 using System.Linq;
-using ShiftSoftware.ShiftEntity.Core;
+using Microsoft.Extensions.DependencyInjection;
+using ShiftMapper;
 using StockPlusPlus.Data.Entities;
+using StockPlusPlus.Data.Repositories;
 using StockPlusPlus.Shared.DTOs.Invoice;
 
 namespace StockPlusPlus.Test.Tests;
 
 /// <summary>
-/// DEEP LIST mapping, the EXPLICIT per-level form. The (InvoiceLine, InvoiceLineListDTO) and
-/// (Product, InvoiceLineProductListDTO) pairs are generated purely from the ForListChildren / nested
-/// ForChild CALLS (config-driven opt-in — no partial, no attribute), and that call's callback (a
-/// direction-scoped ShiftListChildMapper) can customize the child's own properties via For.
-/// <para>
-/// Scoped to the <c>InvoiceListDTO</c> triple on purpose. Automatic deep composition in the list direction
-/// landed with Stage A and is exercised by the <c>InvoiceDeepListDTO</c> triple, which builds three levels
-/// from a bare <c>UseGeneratedMapper()</c> — see <see cref="DeepListTranslationTests"/>. An explicit
-/// <c>ForListChild(ren)</c> takes precedence over the automatic composition for that member, which is what
-/// these tests pin.
-/// </para>
+/// DEEP LIST mapping: the list projection composes <c>InvoiceListDTO.InvoiceLines</c> and, inside each line, the
+/// custom <c>InvoiceLineProductListDTO</c>, from the pairs ShiftMapper declares below the repository's list map —
+/// no partial, no attribute, no configuration. The same map carries the ONE customization the repository wrote
+/// (<c>Total</c>). <c>api/invoice-deep</c> builds three levels the same way (<see cref="DeepListTranslationTests"/>
+/// pins its SQL).
 /// <para>
 /// These tests run LINQ-to-objects, so they assert VALUES — which <c>ToQueryString()</c> cannot. The
 /// translation suite is the other half and does not replace this one: LINQ-to-objects happily executes
 /// constructs EF cannot translate, so a green run here says nothing about SQL.
 /// </para>
 /// </summary>
+[Collection("API Collection")]
 public class DeepListMappingTests
 {
-    private static IShiftEntityMapper<Invoice, InvoiceListDTO, InvoiceDTO> ResolveInvoiceMapper()
-    {
-        System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor(typeof(Invoice).Module.ModuleHandle);
+    private readonly CustomWebApplicationFactory factory;
 
-        var mapperType = ShiftEntityMapperRegistry.Find(typeof(Invoice), typeof(InvoiceListDTO), typeof(InvoiceDTO));
-        Assert.NotNull(mapperType);
-
-        return (IShiftEntityMapper<Invoice, InvoiceListDTO, InvoiceDTO>)Activator.CreateInstance(mapperType!)!;
-    }
+    public DeepListMappingTests(CustomWebApplicationFactory factory) => this.factory = factory;
 
     private static Invoice[] SampleInvoices() => new[]
     {
@@ -56,52 +47,53 @@ public class DeepListMappingTests
     };
 
     [Fact]
-    public void ConfigCalls_GenerateBothPairs_NoPartialNoAttribute()
+    public void MapToList_ComposesTheLines_AndTheProductInsideThem()
     {
-        // Both the line pair AND the grandchild product pair are registered purely because of the
-        // ForListChildren / nested ForChild calls in the config below — no [ShiftEntityMapper].
-        System.Runtime.CompilerServices.RuntimeHelpers.RunModuleConstructor(typeof(Invoice).Module.ModuleHandle);
+        using var scope = factory.Services.CreateScope();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
-        Assert.NotNull(ShiftEntityMapperRegistry.FindPairListProjection(typeof(InvoiceLine), typeof(InvoiceLineListDTO)));
-        Assert.NotNull(ShiftEntityMapperRegistry.FindPairListProjection(typeof(Product), typeof(InvoiceLineProductListDTO)));
-    }
-
-    [Fact]
-    public void MapToList_ExplicitChild_ComposesCustomProduct_AndAppliesCustomNameMapping()
-    {
-        var mapper = ResolveInvoiceMapper();
-        ((IShiftMapperConfigurable<Invoice, InvoiceListDTO, InvoiceDTO>)mapper)
-            .AddConfiguration(map => map.ForListChildren(d => d.InvoiceLines, e => e.InvoiceLines, line =>
-                line.ForChild(l => l.Product, il => il.Product, product =>
-                    product.For(p => p.Name, prod => prod.Name + " + Custom Mapping"))));
-
-        var row = mapper.MapToList(SampleInvoices().AsQueryable()).Single();
+        var row = mapper.ProjectTo<Invoice, InvoiceListDTO>(SampleInvoices().AsQueryable()).Single();
 
         var listLine = Assert.Single(row.InvoiceLines);
         Assert.Equal("100", listLine.ID);
         Assert.Equal("Widget", listLine.Description);
         Assert.Equal(9.5m, listLine.Price);
 
-        // The explicitly-composed custom product DTO, with the per-property customization applied.
+        // The grandchild: a custom product DTO (not a select), composed from the navigation.
         Assert.NotNull(listLine.Product);
         Assert.Equal("5", listLine.Product.ID);
-        Assert.Equal("Super Widget + Custom Mapping", listLine.Product.Name);   // For customization
-        Assert.Equal(120, listLine.Product.Price);                             // convention, untouched
+        Assert.Equal("Super Widget", listLine.Product.Name);
+        Assert.Equal(120, listLine.Product.Price);
+
+        // The repository's customization rides on the same map.
+        Assert.Equal(9.5m, row.Total);
     }
 
     [Fact]
-    public void MapToList_WithoutExplicitChild_LeavesProductNull()
+    public void MapToList_ThroughTheRepository_IsTheSameProjection()
     {
-        // No nested ForChild → the product object is NOT composed. Nothing goes deep automatically
-        // in the list direction; the line's own scalar columns still project.
-        var mapper = ResolveInvoiceMapper();
-        ((IShiftMapperConfigurable<Invoice, InvoiceListDTO, InvoiceDTO>)mapper)
-            .AddConfiguration(map => map.ForListChildren(d => d.InvoiceLines, e => e.InvoiceLines));
+        using var scope = factory.Services.CreateScope();
+        var repo = scope.ServiceProvider.GetRequiredService<InvoiceRepository>();
 
-        var row = mapper.MapToList(SampleInvoices().AsQueryable()).Single();
+        var row = repo.MapToList(SampleInvoices().AsQueryable()).Single();
 
-        var listLine = Assert.Single(row.InvoiceLines);
-        Assert.Equal("Widget", listLine.Description);
-        Assert.Null(listLine.Product);
+        Assert.Equal("Super Widget", Assert.Single(row.InvoiceLines).Product.Name);
+        Assert.Equal(9.5m, row.Total);
+    }
+
+    [Fact]
+    public void MapToList_ThreeLevels_ForTheDeepEndpoint()
+    {
+        using var scope = factory.Services.CreateScope();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+
+        var invoice = SampleInvoices()[0];
+        invoice.InvoiceLines.First().Product.ProductBrand = new ProductBrand { ID = 9, Name = "Acme" };
+
+        var row = mapper.ProjectTo<Invoice, InvoiceDeepListDTO>(new[] { invoice }.AsQueryable()).Single();
+
+        var line = Assert.Single(row.InvoiceLines);
+        Assert.Equal("Super Widget", line.Product.Name);
+        Assert.Equal("Acme", line.Product.ProductBrand.Name);   // depth 3, nothing configured
     }
 }

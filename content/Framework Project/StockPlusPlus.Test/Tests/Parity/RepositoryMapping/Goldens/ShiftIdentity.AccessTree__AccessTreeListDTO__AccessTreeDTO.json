@@ -1,7 +1,7 @@
 {
   "Triple": "AccessTree / AccessTreeListDTO / AccessTreeDTO",
-  "Arm": "Generated_AccessTree_AccessTreeListDTO_AccessTreeDTO_c2de64ec",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1003",
@@ -33,7 +33,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.AccessTree[].Select(e =\u003E new AccessTreeListDTO() {ID = e.ID.ToString(), Name = e.Name, IsDeleted = e.IsDeleted})",
+  "ListSql": "SELECT CONVERT(varchar(20), [a].[ID]) AS [ID], [a].[Name], [a].[IsDeleted]\r\nFROM [ShiftIdentity].[AccessTrees] AS [a]",
   "Copy": {
     "Name": "Name-6",
     "Tree": "Tree-7",

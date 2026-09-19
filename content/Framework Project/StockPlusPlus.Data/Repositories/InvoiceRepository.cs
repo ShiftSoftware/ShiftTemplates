@@ -10,23 +10,25 @@ namespace StockPlusPlus.Data.Repositories;
 
 public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceListDTO, InvoiceDTO>
 {
-    // Invoice demonstrates SOURCE-GENERATED mapping with DEEP (child collection) mapping:
-    //   - MapToView AUTO-composes the InvoiceLines child collection (InvoiceLine → InvoiceLineDTO) via the
-    //     auto pair mapper — zero-code, side-effect-free DTO building.
-    //   - MapToEntity AUTO-writes the children back (replace-with-new via the pair's MapBack into fresh
-    //     instances — the repository owns the old lines via the delete-and-recreate in UpsertAsync below).
-    //   - MapToList is EXPLICIT and per level (deep children change the SQL query shape, so nothing goes
-    //     deep silently): ForListChildren composes the lines, and its nested ForChild composes each line's
-    //     custom Product DTO. This also opts the (InvoiceLine, InvoiceLineListDTO) and
-    //     (Product, InvoiceLineProductListDTO) pair projections into source generation. EF translates it to JOINs.
+    // Invoice demonstrates the automatic maps with DEEP (child collection) mapping AND a customization
+    // configured IN the repository:
+    //   - The children nest with nothing written: InvoiceDTO.InvoiceLines maps through InvoiceLine ↔
+    //     InvoiceLineDTO and InvoiceListDTO.InvoiceLines through InvoiceLine → InvoiceLineListDTO → its
+    //     Product (InvoiceLineProductListDTO), in memory AND in the list projection, which EF translates
+    //     to JOINs. ShiftMapper declares those nested pairs from the DTO graph (ten levels deep by default;
+    //     m.Nested(n) caps it). The write direction replaces the lines with new instances — the repository
+    //     owns the old ones through the delete-and-recreate in UpsertAsync below — and the build says so (SM0049).
+    //   - One member is CUSTOMIZED here, in ShiftMapper's vocabulary: InvoiceListDTO.Total has no column, so
+    //     the list map is told to sum the lines. It is an expression, so it runs in SQL. The same customization
+    //     applies wherever the map runs — the endpoint, a report service injecting Mapper — because the
+    //     repository hands it to the host's mapper when it is constructed, and the mapper constructs the
+    //     repository on its own when a service maps the pair first.
 
     private static readonly Action<ShiftRepositoryOptions<Invoice, InvoiceListDTO, InvoiceDTO>> IncludeOptions =
         option =>
         {
             option.IncludeRelatedEntitiesWithFindAsync(x => x.Include(entity => entity.InvoiceLines));
-            option.UseGeneratedMapper(map => map
-                .ForListChildren(d => d.InvoiceLines, e => e.InvoiceLines, line =>
-                    line.ForChild(l => l.Product, il => il.Product)));
+            option.Mapping(m => m.List.ForMember(d => d.Total, opt => opt.MapFrom(i => i.InvoiceLines.Sum(l => l.Price))));
         };
 
     public InvoiceRepository(DB db) : base(db, IncludeOptions)

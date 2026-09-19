@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 using ShiftSoftware.ShiftEntity.Core;
 
 namespace StockPlusPlus.Test.Tests.Parity.RepositoryMapping;
@@ -16,10 +17,12 @@ namespace StockPlusPlus.Test.Tests.Parity.RepositoryMapping;
 /// <c>RepositoryMappingParityTests</c> compares against.
 /// <para>
 /// Captured ONCE from the ShiftEntity source generator (Stage 0.2 of
-/// <c>docs/plans/repository-mapping-on-shiftmapper</c>) and committed. When ShiftMapper takes the four
-/// directions over, these files are the only statement of what "the same result" means; the generator that
-/// wrote them will not exist to ask. Regenerate a file only when its output is MEANT to change, and record why
-/// in the plan's decisions — a golden regenerated from the implementation under test pins nothing.
+/// <c>docs/plans/repository-mapping-on-shiftmapper</c>), diffed member by member against ShiftMapper through
+/// Stages 2 and 3, and RE-FROZEN from ShiftMapper on 2026-09-19 (Stage 3.6) once every difference was either
+/// fixed or recorded as a decision in the plan (<c>02-open-decisions.md</c> Q10, Q13, Q15 and the Invoice
+/// <c>Total</c> demonstration). From then on they pin ShiftMapper's behaviour: regenerate a file only when its
+/// output is MEANT to change, and record why — a golden regenerated from the implementation under test pins
+/// nothing.
 /// </para>
 /// </summary>
 public sealed class RepositoryMappingGolden
@@ -47,12 +50,14 @@ public sealed class RepositoryMappingGolden
     public JsonNode? List { get; set; }
 
     /// <summary>
-    /// The projection's expression tree, as text. Pins the SHAPE — <c>SelectWithTags</c>, the correlated child
-    /// projections, the inlined select-DTO member-inits — which the result alone cannot show. Expected to be
-    /// retired when ShiftMapper produces the projection (its tree is a different tree), in favour of SQL-text
-    /// goldens in the LongRunning suite.
+    /// The SQL the list projection translates to, from <c>ToQueryString()</c> over the host's DbContext — no
+    /// connection is opened. Pins what the result alone cannot show: that EF translates the projection at all
+    /// (a LINQ-to-objects run happily executes what SQL Server cannot), which joins it takes, and which members
+    /// the projection leaves out (a memory-only conversion such as files). Replaced the old generator's
+    /// expression-tree shape when ShiftMapper took the projection over (Stage 3.6): a different generator
+    /// builds a different tree for the same SQL, and the SQL is what production runs.
     /// </summary>
-    public string? ListShape { get; set; }
+    public string? ListSql { get; set; }
 
     /// <summary><c>CopyEntity(source, target)</c> — the populated <c>target</c> afterwards.</summary>
     public JsonNode? Copy { get; set; }
@@ -125,6 +130,7 @@ public static class RepositoryMappingRun
     }
 
     private static RepositoryMappingGolden RunTyped<TEntity, TList, TView>(object mapperObject, IServiceProvider services)
+        where TEntity : class
     {
         var mapper = (IShiftEntityMapper<TEntity, TList, TView>)mapperObject;
         var golden = new RepositoryMappingGolden();
@@ -147,13 +153,13 @@ public static class RepositoryMappingRun
             return mapper.MapToEntity(Dto(), existing, write) ?? existing;
         });
 
-        IQueryable<TList>? query = null;
-        golden.List = Section(notes, "List", () =>
-        {
-            query = mapper.MapToList(new[] { Entity() }.AsQueryable(), read);
-            return query.ToList();
-        });
-        golden.ListShape = query?.Expression.ToString();
+        golden.List = Section(notes, "List", () => mapper.MapToList(new[] { Entity() }.AsQueryable(), read).ToList());
+
+        // The SQL, over the host's DbContext (the sample's DB holds the identity entities too). A translation
+        // failure is pinned as the exception type, like any other direction, rather than lost.
+        golden.ListSql = services.GetService(typeof(StockPlusPlus.Data.DbContext.DB)) is DbContext db
+            ? Sql(notes, () => mapper.MapToList(db.Set<TEntity>().AsNoTracking(), read).ToQueryString())
+            : null;
 
         golden.Copy = Section(notes, "Copy", () =>
         {
@@ -172,6 +178,21 @@ public static class RepositoryMappingRun
         var value = graph.Build<T>();
         notes.AddRange(graph.Notes);
         return value;
+    }
+
+    /// <summary>The SQL text, or the exception type as text when the provider refuses the projection.</summary>
+    private static string Sql(List<string> notes, Func<string> run)
+    {
+        try
+        {
+            return run();
+        }
+        catch (Exception ex)
+        {
+            var inner = ex is TargetInvocationException { InnerException: { } i } ? i : ex;
+            notes.Add($"ListSql: threw {inner.GetType().Name} — {inner.Message}");
+            return "error: " + inner.GetType().FullName;
+        }
     }
 
     /// <summary>Runs one direction; a direction that throws is pinned as its exception TYPE rather than lost.</summary>

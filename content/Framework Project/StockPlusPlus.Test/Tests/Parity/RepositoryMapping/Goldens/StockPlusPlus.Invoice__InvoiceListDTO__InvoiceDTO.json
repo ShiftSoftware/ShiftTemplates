@@ -1,7 +1,7 @@
 {
   "Triple": "Invoice / InvoiceListDTO / InvoiceDTO",
-  "Arm": "Generated_Invoice_InvoiceListDTO_InvoiceDTO_550df5b8",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1009",
@@ -114,6 +114,7 @@
       "HasActiveAttention": true,
       "HighestSeverity": 3,
       "ActiveSignalCount": 1001,
+      "Total": 2111.0,
       "InvoiceLines": [
         {
           "ID": "1015",
@@ -139,7 +140,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "StockPlusPlus.Data.Entities.Invoice[].Select(e =\u003E new InvoiceListDTO() {ID = e.ID.ToString(), ManualReference = e.ManualReference, InvoiceDate = e.InvoiceDate, InvoiceNo = e.InvoiceNo, HasActiveAttention = e.HasActiveAttention, HighestSeverity = e.HighestSeverity, ActiveSignalCount = e.ActiveSignalCount, IsDeleted = e.IsDeleted, InvoiceLines = e.InvoiceLines.Select(e =\u003E new InvoiceLineListDTO() {ID = e.ID.ToString(), Description = e.Description, Price = e.Price, Product = IIF((e.Product == null), null, new InvoiceLineProductListDTO() {ID = e.Product.ID.ToString(), Name = e.Product.Name, Price = e.Product.Price})}).ToList()})",
+  "ListSql": "SELECT CONVERT(varchar(20), [i].[ID]), [i].[ManualReference], [i].[InvoiceDate], [i].[InvoiceNo], [i].[HasActiveAttention], [i].[HighestSeverity], [i].[ActiveSignalCount], [i].[IsDeleted], (\r\n    SELECT COALESCE(SUM([i0].[Price]), 0.0)\r\n    FROM [InvoiceLines] AS [i0]\r\n    WHERE [i].[ID] = [i0].[InvoiceID]), [i].[ID], [s].[ID], [s].[Description], [s].[Price], [s].[ID0], [s].[Name], [s].[Price0], [s].[ID1], [s].[ID2]\r\nFROM [Invoices] AS [i]\r\nLEFT JOIN (\r\n    SELECT CONVERT(varchar(20), [i1].[ID]) AS [ID], [i1].[Description], [i1].[Price], CONVERT(varchar(20), [p].[ID]) AS [ID0], [p].[Name], [p].[Price] AS [Price0], [i1].[ID] AS [ID1], [p].[ID] AS [ID2], [i1].[InvoiceID]\r\n    FROM [InvoiceLines] AS [i1]\r\n    INNER JOIN [Products] AS [p] ON [i1].[ProductID] = [p].[ID]\r\n) AS [s] ON [i].[ID] = [s].[InvoiceID]\r\nORDER BY [i].[ID], [s].[ID1]",
   "Copy": {
     "ManualReference": "ManualReference-159",
     "InvoiceDate": "2026-01-13T03:04:05\u002B00:00",
@@ -149,7 +150,7 @@
     "RegionID": 1160,
     "CompanyID": 1004,
     "CompanyBranchID": 1003,
-    "IdempotencyKey": "00000000-0000-0000-0000-000000001010",
+    "IdempotencyKey": "00000000-0000-0000-0000-000000005010",
     "CityID": 1002,
     "CountryID": 1005,
     "HasActiveAttention": true,

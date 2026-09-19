@@ -1,7 +1,7 @@
 {
   "Triple": "App / AppDTO / AppDTO",
-  "Arm": "Generated_App_AppDTO_AppDTO_83231371",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1007",
@@ -48,7 +48,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.App[].Select(e =\u003E new AppDTO() {ID = e.ID.ToString(), DisplayName = e.DisplayName, AppId = e.AppId, AppSecret = e.AppSecret, Description = e.Description, RedirectUri = e.RedirectUri, CreateDate = e.CreateDate, LastSaveDate = e.LastSaveDate, CreatedByUserID = IIF(e.CreatedByUserID.HasValue, e.CreatedByUserID.Value.ToString(), null), LastSavedByUserID = IIF(e.LastSavedByUserID.HasValue, e.LastSavedByUserID.Value.ToString(), null), IsDeleted = e.IsDeleted})",
+  "ListSql": "SELECT CONVERT(varchar(20), [a].[ID]) AS [ID], [a].[DisplayName], [a].[AppId], [a].[AppSecret], [a].[Description], [a].[RedirectUri], [a].[CreateDate], [a].[LastSaveDate], CASE\r\n    WHEN [a].[CreatedByUserID] IS NOT NULL THEN CONVERT(varchar(20), [a].[CreatedByUserID])\r\nEND AS [CreatedByUserID], CASE\r\n    WHEN [a].[LastSavedByUserID] IS NOT NULL THEN CONVERT(varchar(20), [a].[LastSavedByUserID])\r\nEND AS [LastSavedByUserID], [a].[IsDeleted]\r\nFROM [ShiftIdentity].[Apps] AS [a]",
   "Copy": {
     "DisplayName": "DisplayName-6",
     "AppId": "1001",

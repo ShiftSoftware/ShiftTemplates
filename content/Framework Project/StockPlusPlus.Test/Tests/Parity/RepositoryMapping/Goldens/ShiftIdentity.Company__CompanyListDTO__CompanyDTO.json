@@ -1,7 +1,7 @@
 {
   "Triple": "Company / CompanyListDTO / CompanyDTO",
-  "Arm": "Generated_Company_CompanyListDTO_CompanyDTO_88e5d72d",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1718",
@@ -225,7 +225,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.Company[].Select(e =\u003E new CompanyListDTO() {ID = e.ID.ToString(), Name = e.Name, LegalName = e.LegalName, ShortCode = e.ShortCode, IntegrationId = e.IntegrationId, CompanyType = Convert(e.CompanyType, Nullable\u00601), ParentCompanyID = IIF(e.ParentCompanyID.HasValue, e.ParentCompanyID.Value.ToString(), null), TerminationDate = e.TerminationDate, DisplayOrder = e.DisplayOrder, IsDeleted = e.IsDeleted, ParentCompanyName = IIF((e.ParentCompany == null), null, e.ParentCompany.Name), Brands = e.CompanyBranches.SelectMany(x =\u003E x.CompanyBranchBrands).Select(x =\u003E x.BrandID).Distinct().Select(x =\u003E new ShiftEntitySelectDTO() {Value = x.ToString()}).ToList()})",
+  "ListSql": "SELECT CONVERT(varchar(20), [c].[ID]), [c].[Name], [c].[LegalName], [c].[ShortCode], [c].[IntegrationId], [c].[CompanyType], CASE\r\n    WHEN [c].[ParentCompanyID] IS NOT NULL THEN CONVERT(varchar(20), [c].[ParentCompanyID])\r\nEND, [c].[TerminationDate], [c].[DisplayOrder], [c].[IsDeleted], [c0].[Name], [c].[ID], [c0].[ID], CONVERT(varchar(20), [s].[BrandID]), [s].[BrandID]\r\nFROM [ShiftIdentity].[Companies] AS [c]\r\nLEFT JOIN [ShiftIdentity].[Companies] AS [c0] ON [c].[ParentCompanyID] = [c0].[ID]\r\nOUTER APPLY (\r\n    SELECT DISTINCT [c2].[BrandID]\r\n    FROM [ShiftIdentity].[CompanyBranches] AS [c1]\r\n    INNER JOIN [ShiftIdentity].[CompanyBranchBrands] AS [c2] ON [c1].[ID] = [c2].[CompanyBranchID]\r\n    WHERE [c].[ID] = [c1].[CompanyID]\r\n) AS [s]\r\nORDER BY [c].[ID], [c0].[ID]",
   "Copy": {
     "LastReplicationDate": "2027-12-23T03:04:05\u002B00:00",
     "LastReplicationStamp": "LastReplicationStamp-721",

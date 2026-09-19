@@ -1,7 +1,7 @@
 {
   "Triple": "CompanyCalendar / CompanyCalendarListDTO / CompanyCalendarDTO",
-  "Arm": "Generated_CompanyCalendar_CompanyCalendarListDTO_CompanyCalendarDTO_b6415603",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1011",
@@ -335,7 +335,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.CompanyCalendar[].Select(e =\u003E new CompanyCalendarListDTO() {ID = e.ID.ToString(), Title = e.Title, EntryType = e.EntryType, StartDate = e.StartDate, EndDate = e.EndDate, Priority = e.Priority, CompanyID = IIF(e.CompanyID.HasValue, e.CompanyID.Value.ToString(), null), IsDeleted = e.IsDeleted})",
+  "ListSql": "SELECT CONVERT(varchar(20), [c].[ID]) AS [ID], [c].[Title], [c].[EntryType], [c].[StartDate], [c].[EndDate], [c].[Priority], CASE\r\n    WHEN [c].[CompanyID] IS NOT NULL THEN CONVERT(varchar(20), [c].[CompanyID])\r\nEND AS [CompanyID], [c].[IsDeleted]\r\nFROM [ShiftIdentity].[CompanyCalendars] AS [c]",
   "Copy": {
     "LastReplicationDate": "2026-01-14T03:04:05\u002B00:00",
     "LastReplicationStamp": "LastReplicationStamp-13",

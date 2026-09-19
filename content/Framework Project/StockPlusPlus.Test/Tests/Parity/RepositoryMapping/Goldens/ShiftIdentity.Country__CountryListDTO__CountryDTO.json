@@ -1,7 +1,7 @@
 {
   "Triple": "Country / CountryListDTO / CountryDTO",
-  "Arm": "Generated_Country_CountryListDTO_CountryDTO_5d1aaa90",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1008",
@@ -117,7 +117,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.Country[].Select(e =\u003E new CountryListDTO() {ID = e.ID.ToString(), Name = e.Name, IntegrationId = e.IntegrationId, ShortCode = e.ShortCode, CallingCode = e.CallingCode, DisplayOrder = e.DisplayOrder, IsDeleted = e.IsDeleted})",
+  "ListSql": "SELECT CONVERT(varchar(20), [c].[ID]) AS [ID], [c].[Name], [c].[IntegrationId], [c].[ShortCode], [c].[CallingCode], [c].[DisplayOrder], [c].[IsDeleted]\r\nFROM [ShiftIdentity].[Countries] AS [c]",
   "Copy": {
     "LastReplicationDate": "2026-01-12T03:04:05\u002B00:00",
     "LastReplicationStamp": "LastReplicationStamp-11",

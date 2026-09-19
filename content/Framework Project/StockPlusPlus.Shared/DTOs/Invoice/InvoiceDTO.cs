@@ -30,17 +30,17 @@ public class InvoiceListDTO : ShiftEntityListDTO, IHasAttentionSummary
     public AttentionSeverity? HighestSeverity { get; set; }
     public int ActiveSignalCount { get; set; }
 
-    // DEEP LIST mapping. Automatic composition now covers the list direction too — `api/invoice-deep` builds
-    // three levels from a bare UseGeneratedMapper(). Invoice configures its children EXPLICITLY anyway
-    // (InvoiceRepository's IncludeOptions → ForListChildren → ForChild) to demonstrate the directional form and
-    // to control exactly which grandchild is projected; an explicit ForXxxChild(ren) takes precedence over the
-    // automatic composition for that member.
+    // No column behind it: InvoiceRepository's Mapping(...) tells the list map to sum the lines (in SQL).
+    public decimal Total { get; set; }
+
+    // DEEP LIST mapping. The children nest automatically — list → lines → product — from the DTO graph
+    // alone; `api/invoice-deep` builds three levels the same way with nothing configured.
     public List<InvoiceLineListDTO> InvoiceLines { get; set; } = new List<InvoiceLineListDTO>();
 }
 
 // The nested line shape carried inside the invoice LIST row. Its Product is a CUSTOM complex DTO
-// (NOT a ShiftEntitySelectDTO). The generated list projection composes it recursively — list → lines →
-// product — purely from the ForListChildren call in InvoiceRepository (no partial, no attribute).
+// (NOT a ShiftEntitySelectDTO). The list projection composes it recursively — list → lines → product —
+// from the nested pairs ShiftMapper declares (no partial, no attribute, no configuration).
 public class InvoiceLineListDTO
 {
     public string? ID { get; set; }
@@ -51,8 +51,8 @@ public class InvoiceLineListDTO
 }
 
 // A CUSTOM product DTO (not ShiftEntitySelectDTO) on the invoice LIST line: id + name + one more of the
-// product's own columns. Composed from the InvoiceLine.Product navigation by the generated list projection,
-// SQL-translatable: e.Product == null ? null : new InvoiceLineProductListDTO { ID = ..., Name = ..., ... }.
+// product's own columns. Composed from the InvoiceLine.Product navigation by the list projection,
+// SQL-translatable: new InvoiceLineProductListDTO { ID = ..., Name = ..., ... } grafted into the line's.
 public class InvoiceLineProductListDTO
 {
     [_ProductHashId]

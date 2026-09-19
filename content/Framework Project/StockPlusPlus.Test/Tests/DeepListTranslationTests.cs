@@ -48,9 +48,9 @@ public class DeepListTranslationTests
     private const string RootSoftDelete = @"\[IsDeleted\] = CAST\(0 AS bit\)";
 
     /// <summary>
-    /// <c>api/invoice-deep</c> — Invoice → InvoiceLines → Product → ProductBrand, composed AUTOMATICALLY from a
-    /// bare <c>UseGeneratedMapper()</c>. Three levels, zero configuration, the whole member-init baked into
-    /// <c>__shiftListProjection</c>.
+    /// <c>api/invoice-deep</c> — Invoice → InvoiceLines → Product → ProductBrand, composed AUTOMATICALLY from
+    /// the pairs ShiftMapper declares below the endpoint's list map. Three levels, zero configuration, one
+    /// projection EF turns into one query.
     /// </summary>
     [Fact]
     public void InvoiceDeepList_AutoDeepThreeLevels_Translates()

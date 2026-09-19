@@ -1,7 +1,7 @@
 {
   "Triple": "Country / CountryDTO / CountryDTO",
-  "Arm": "Generated_Country_CountryDTO_CountryDTO_0f5319c5",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1003",
@@ -37,10 +37,10 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "StockPlusPlus.Data.Entities.Country[].Select(e =\u003E new CountryDTO() {ID = e.ID.ToString(), Name = e.Name, CreateDate = e.CreateDate, LastSaveDate = e.LastSaveDate, CreatedByUserID = IIF(e.CreatedByUserID.HasValue, e.CreatedByUserID.Value.ToString(), null), LastSavedByUserID = IIF(e.LastSavedByUserID.HasValue, e.LastSavedByUserID.Value.ToString(), null), IsDeleted = e.IsDeleted})",
+  "ListSql": "SELECT CONVERT(varchar(20), [c].[ID]) AS [ID], [c].[Name], [c].[CreateDate], [c].[LastSaveDate], CASE\r\n    WHEN [c].[CreatedByUserID] IS NOT NULL THEN CONVERT(varchar(20), [c].[CreatedByUserID])\r\nEND AS [CreatedByUserID], CASE\r\n    WHEN [c].[LastSavedByUserID] IS NOT NULL THEN CONVERT(varchar(20), [c].[LastSavedByUserID])\r\nEND AS [LastSavedByUserID], [c].[IsDeleted]\r\nFROM [Countries] AS [c]",
   "Copy": {
     "Name": "Name-7",
-    "IdempotencyKey": "00000000-0000-0000-0000-000000001004",
+    "IdempotencyKey": "00000000-0000-0000-0000-000000005004",
     "CreateDate": "2026-01-03T03:04:05\u002B00:00",
     "LastSaveDate": "2026-01-07T03:04:05\u002B00:00",
     "CreatedByUserID": 1002,

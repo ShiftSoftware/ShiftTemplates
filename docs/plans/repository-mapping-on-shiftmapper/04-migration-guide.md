@@ -37,7 +37,7 @@ also available to any code that injects `Mapper`.
 | `[ShiftEntityMapperIgnore]` on a property | the `Ignore` line above for each direction | no attribute replaces it |
 | `map.ForViewChildren(d => d.Lines, e => e.Lines)` / `ForEntityChildren` / `ForListChildren` (no `configureChild`) | *(nothing)* — children nest automatically | |
 | `… , child => child.For(c => c.X, …)` | customize the child pair once, in a mapper class: `CreateMap<Line, LineDTO>().ForMember(c => c.X, …)` | applies inside every parent |
-| `map.MaxDepth(n)` / `[ShiftEntityMapperMaxDepth(n)]` | `m.Nested(n)` | no attribute replaces it |
+| `map.MaxDepth(n)` / `[ShiftEntityMapperMaxDepth(n)]` | `m.Nested(n)` | no attribute replaces it; a constant, read at build time |
 | `map.CaseSensitive()` | in a mapper class: `CreateMap<…>(o => o.Matching = PropertyMatching.CaseSensitive)` | |
 | `[ShiftEntityMapper] partial class Foo : IShiftEntityMapper<E,L,V>` with `Configure` | `class FooMapper : ShiftMapperBase` declaring the customized pairs | not partial, no attribute, no interface; overrides the repository for those pairs |
 | `public E MapToEntity(...) { existing = MapToEntityGenerated(...); …; return existing; }` | `CreateMap<V, E>().AfterMap((dto, entity) => …)` | "conventions first, then my code" |
@@ -49,6 +49,16 @@ also available to any code that injects `Mapper`.
 repository when it is a few lines about this repository. Move it to a mapper class when it is long, when a
 child pair is customized (it applies inside every parent), or when two repositories share a pair (only one
 may configure it in the repository — the build tells you). A mapper class always wins for the pair it declares.
+
+**Two things that are different, not merely renamed:**
+
+- **One DTO type as both list and view is one map.** The old generator had four methods, so `ForList` on such
+  a triple touched the list only; ShiftMapper maps pairs, and `m.List` and `m.View` are then the same map. Use
+  two DTO types when the list and the view must differ.
+- **A mapper class with a constructor dependency** makes the whole assembly's generated mapper need a
+  container — every class it composes is constructed on first use. For a dependency only a map needs (a
+  hash-id service), read it from `Services` inside the value instead of injecting it, and `Mapper.Create(assembly)`
+  keeps working.
 
 ## A complete before/after
 

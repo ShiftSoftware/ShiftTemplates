@@ -1,7 +1,7 @@
 {
   "Triple": "Brand / BrandListDTO / BrandDTO",
-  "Arm": "Generated_Brand_BrandListDTO_BrandDTO_5d0c5def",
-  "CapturedBy": "ShiftSoftware.ShiftEntity.SourceGenerator \u2014 captured 2026-09-18",
+  "Arm": "ShiftMapperEntityMapper\u00603",
+  "CapturedBy": "ShiftSoftware.ShiftMapper \u2014 captured 2026-09-19",
   "FixtureNotes": [],
   "View": {
     "ID": "1004",
@@ -36,7 +36,7 @@
       "IsDeleted": false
     }
   ],
-  "ListShape": "ShiftSoftware.ShiftIdentity.Data.Entities.Brand[].Select(e =\u003E new BrandListDTO() {ID = e.ID.ToString(), Name = e.Name, IntegrationId = e.IntegrationId, IsDeleted = e.IsDeleted})",
+  "ListSql": "SELECT CONVERT(varchar(20), [b].[ID]) AS [ID], [b].[Name], [b].[IntegrationId], [b].[IsDeleted]\r\nFROM [ShiftIdentity].[Brands] AS [b]",
   "Copy": {
     "LastReplicationDate": "2026-01-08T03:04:05\u002B00:00",
     "LastReplicationStamp": "LastReplicationStamp-7",
