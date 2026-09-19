@@ -1,5 +1,6 @@
 using ShiftSoftware.ShiftFrameworkTestingTools;
 using ShiftSoftware.ShiftIdentity.Core;
+using ShiftSoftware.ShiftIdentity.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -56,13 +57,19 @@ public class CustomWebApplicationFactory : ShiftCustomWebApplicationFactory<WebM
         builder.ConfigureServices(services =>
         {
             services.Insert(0, ServiceDescriptor.Singleton<IHostedService>(new DatabaseReadyGate(databaseReady.Task)));
-            // Keep the framework's default ISecurityEmailSink so these tests cover its real registration. Replace
-            // only the host providers with a local inbox: no sample or configured provider can send from a test.
-            services.RemoveAll<ISendEmailVerification>();
-            services.RemoveAll<ISendEmailResetPassword>();
-            services.AddSingleton<ISendEmailVerification>(SecurityEmails);
-            services.AddSingleton<ISendEmailResetPassword>(SecurityEmails);
+            ConfigureSecurityEmailProviders(services);
         });
+    }
+
+    protected virtual void ConfigureSecurityEmailProviders(IServiceCollection services)
+    {
+        // Keep the real default sink. Ordinary tests use the inbox; the SMTP fixture overrides this hook
+        // only after supplying its owned loopback endpoint and removing all configured SMTP options.
+        services.RemoveAll<ISendEmailVerification>();
+        services.RemoveAll<ISendEmailResetPassword>();
+        services.RemoveAll<ISecurityEmailSender>();
+        services.AddSingleton<ISendEmailVerification>(SecurityEmails);
+        services.AddSingleton<ISendEmailResetPassword>(SecurityEmails);
     }
 
     protected override IHost CreateHost(IHostBuilder builder)

@@ -19,6 +19,7 @@ using StockPlusPlus.Shared.DTOs.Service;
 #endif
 
 #if (internalShiftIdentityHosting)
+using ShiftSoftware.ShiftIdentity.AspNetCore.Authentication;
 using StockPlusPlus.API.Services;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
@@ -209,6 +210,11 @@ mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:Tok
 
 #if (internalShiftIdentityHosting)
 
+// Configure SecurityEmail:Smtp locally (credentials in user secrets). Missing settings fail delivery;
+// no message is reported accepted until the SMTP server accepts it.
+builder.Services.Configure<SecurityEmailSmtpOptions>(builder.Configuration.GetSection("SecurityEmail:Smtp"));
+builder.Services.AddScoped<SmtpSecurityEmailSender>();
+builder.Services.AddScoped<ISecurityEmailSender, SendEmailService>();
 builder.Services.AddScoped<ISendEmailVerification, SendEmailService>();
 builder.Services.AddScoped<ISendEmailResetPassword, SendEmailService>();
 
