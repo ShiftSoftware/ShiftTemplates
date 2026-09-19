@@ -1,10 +1,14 @@
 # Repository mapping on ShiftMapper — Status
 
-**Last updated:** 2026-09-18 — **Stage 1 done (ShiftMapper 0.3.0, unreleased)**: implicit maps, nested
-declaration, configuration surfaces, pack-level ignore rules, element conventions and the update-rebuild note are
-implemented in the ShiftMapper repo with 39 new generator tests (523 total, all green) and the runtime suite green;
-the sample builds against it and every Stage 0 golden still passes. The `release-shiftmapper` tag is the one thing
-left of Stage 1. Stage 0 done earlier the same day. Stages 2–5 not started.
+**Last updated:** 2026-09-19 — **Stage 2 done (ShiftEntity side, additive)**: `ShiftEntity.Core` and
+`ShiftEntity.EFCore` reference ShiftMapper with its generator; the rules pack, the framework tag maps, the markers
+on `ShiftRepository<,,,>` and the two built-in-repository endpoint attributes, `o.Mapping(...)`,
+`IShiftEntityMappingContext`, the `IMapper` door behind the registry, the registration and the `CanMap` startup
+path are in; the sample's data project declares its 40 maps (10 triples + nested) with nothing written in it.
+Diffed against the 23 goldens through ShiftMapper: the **10 triples that configure nothing match exactly** (one
+accepted difference, Q10), the other 12 differ only where a `UseGeneratedMapper(map => …)`, a mapper partial or an
+override is waiting for Stage 3, and one is a `WithMapper` triple ShiftMapper does not declare. Seven small
+ShiftMapper additions rode along (0.3.0, still unreleased). Stages 0 and 1 done 2026-09-18. Stages 3–5 not started.
 
 Update this file as steps land. Keep it factual: what shipped, what it changed, what surprised you.
 Plan: [`01-steps.md`](01-steps.md) · Decisions: [`02-open-decisions.md`](02-open-decisions.md) ·
@@ -38,15 +42,15 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 
 | Step | Status | Notes |
 |------|--------|-------|
-| 2.1 Reference ShiftMapper from Model + Core | ⬜ | |
-| 2.2 `ShiftEntityConversions` pack (ignores, select convention, files) | ⬜ | |
-| 2.3 `ShiftEntityFrameworkMaps` (tag pairs) | ⬜ | |
-| 2.4 Marker on `ShiftRepository<,,,>` + endpoint attributes; `ShiftEntityMapping<,,>` surface; `Options.Mapping(...)` | ⬜ | |
-| 2.5 `IShiftEntityMappingContext` | ⬜ | |
-| 2.6 Repository maps through `IMapper` (behind the registry) + 400 translation | ⬜ | |
-| 2.7 Registration (`ShareConversions`; scanned assemblies; host `AddShiftMapper()`) | ⬜ | Needs Q8. |
-| 2.8 Golden diff | ⬜ | Q5, Q10, Q11 answered here. |
-| 2.9 Startup validation via `CanMap` | ⬜ | |
+| 2.1 Reference ShiftMapper from Core + EFCore | ✅ | **2026-09-19.** From `ShiftEntity.Core` and `ShiftEntity.EFCore`, NOT Model: Model is `netstandard2.0` and ShiftMapper is `net10.0`-only, so the pack moved to Core (`Core/Mapping/`). CosmosDbReplication's pattern (project when the checkout exists, package at `$(ShiftMapperVersion)` otherwise) plus the generator as an analyzer in dev mode; Core's `DependencyInjection.Abstractions` to 10.0.11. Core's build writes the pack's declarations (contract 3), EFCore's writes its generated mapper, the shared pack and the tag maps. |
+| 2.2 `ShiftEntityConversions` pack | ✅ | **2026-09-19.** `ShiftEntity.Core/Mapping/ShiftEntityConversions.cs`: seven ignore rules (`ID`/`IdempotencyKey`/`Tags`/`Revisions` as destinations, `ReloadAfterSave`/`AuditFieldsAreSet` both ways), the select convention with a `Name` fallback and the element half, the files conversions (memory only), and `string? → long` **throwing a 400 on blank or non-numeric text, naming the field** (Q11) — through a ShiftMapper conversion that takes the mapping. |
+| 2.3 `ShiftEntityFrameworkMaps` (tag pairs) | ✅ | **2026-09-19.** `ShiftEntity.EFCore/Tagging/ShiftEntityFrameworkMaps.cs`, two `CreateMap`s. `ProductDTO.Tags` maps through it with nothing written; `SelectWithTags` is no longer needed on the ShiftMapper path. `ShiftTagMapper` (DI) still serves the tag endpoints themselves. |
+| 2.4 Markers, surface, `Options.Mapping(...)` | ✅ | **2026-09-19.** Three markers on `ShiftRepository<,,,>` (view + reverse, list, copy — the copy nests nothing, so it stays the reference-copy `ShallowCopyTo` was) and on `ShiftEntityEndpointAttribute<,>` / `ShiftEntitySecureEndpointAttribute<,,>` with `this`; `ShiftEntityMapping<E,L,V>` (`View`/`Entity`/`List`/`Copy`) in EFCore; `ShiftRepositoryOptions.Mapping(...)` (composable); `InitCommon` runs the lambda and calls `IMapper.Configure` before choosing a mapper, so the configuration is in the store whichever mapper serves the repository. `ShiftEntityConfiguratorResolver` (`IShiftMapperConfiguratorResolver`) constructs a repository class from DI, or the built-in repository closed over the host's `DbContextOptions.ContextType` for an `IConfiguresShiftRepository` entity. |
+| 2.5 `IShiftEntityMappingContext` | ✅ | **2026-09-19.** Interface in Core (`Core/Mapping/`), scoped `ShiftEntityMappingContext` in EFCore; the adapter publishes `Insert`/`Update` around `MapToEntity` and restores what was there after. |
+| 2.6 Repository maps through `IMapper` (behind the registry) + 400 translation | ✅ | **2026-09-19.** `ShiftMapperEntityMapper<E,L,V>` (public, EFCore) resolved fourth in `InitCommon` when `IMapper` can map all four pairs. `ShiftMapperConversionException` (new in ShiftMapper: value, target type, mapping, `SourceMember`) → `ShiftEntityException` 400 `Model Validation Error`, `For` = the DTO member the client sent. Old behaviour for a non-numeric scalar was an uncaught `ShiftEntityMappingException` (a 500); this is the improvement the plan asked for. 11 tests in `ShiftEntity.Tests/Repository/ShiftMapperResolutionTests.cs`. |
+| 2.7 Registration | ✅ | **2026-09-19.** `RegisterShiftRepositories`: `AddShiftMapper(o => o.ShareConversions<ShiftEntityConversions>())` (inline lambda, from EFCore), `AddShiftMapper(assembly)` per scanned assembly (Q8: the new ShiftMapper overload), the context and the resolver. The sample's host needed **no line** — `RegisterShiftRepositories(typeof(Marker).Assembly)` covers it; the template's own `builder.Services.AddShiftMapper()` is left to 3.2, where the host gains maps of its own. |
+| 2.8 Golden diff | ✅ | **2026-09-19.** `StockPlusPlus.Test/Tests/RepositoryMappingShiftMapperDiffTests.cs`: 23 `Report` theories (never fail; the per-member worklist for Stage 3) + 40 asserting theories over the 10 triples that configure nothing, all green. Findings and decisions below (Q5, Q10 extended, Q11, Q13, Q14). |
+| 2.9 Startup validation via `CanMap` | ✅ | **2026-09-19.** `ShiftEntityMapperValidation` builds `Mapper.Create(...)` over the generated mappers the collection registers and accepts a triple when all four pairs `CanMap`; the message names `RegisterShiftRepositories`/`AddShiftMapper()` first. Exercised by every sample host boot; its own test arrives with Stage 3, when the registry link goes and every triple runs through it. `IMapper.CanMap` on a mapper with nothing registered now answers false instead of throwing. |
 
 ## Stage 3 — Flip and migrate
 
@@ -84,16 +88,40 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 | Q2 two repositories configuring one pair → error | 🟡 | implemented as recommended (SM0050, error); confirm |
 | Q3 the mapper may construct the repository from DI | 🟡 | implemented as recommended, with `IShiftMapperConfiguratorResolver` as the framework's override; confirm |
 | Q4 flattening off on implicit maps | ⬜ | recommended: off |
-| Q5 null collections → empty | ⬜ | recommended: accept ShiftMapper's default |
+| Q5 null collections → empty | ✅ | accepted; the goldens never exercised it (fixtures fill every collection), so no golden changed |
 | Q6 SHENGEN006 → analyzer | ⬜ | recommended: re-home |
 | Q7 one release with both spellings | ⬜ | recommended: yes |
-| Q8 who registers the generated mapper | ⬜ | recommended: both |
+| Q8 who registers the generated mapper | ✅ | both — `RegisterShiftRepositories` registers what it scans through the new `AddShiftMapper(Assembly)`; the host line is optional and comes with 3.2 |
 | Q9 signal on the base class: attribute inside ShiftEntity | ✅ | attribute — agreed in discussion 2026-09-18 and implemented (`ShiftMapperDeclaresMap`) |
-| Q10 `CopyEntity` no longer copies `Tags` | ⬜ | recommended: accept pending goldens |
-| Q11 blank select on nullable FK clears; on required FK is a 400 | ⬜ | recommended: keep today's behaviour |
+| Q10 `CopyEntity` no longer copies `Tags` — nor `IdempotencyKey` | ✅ | accepted from the diff: both are pipeline-owned destinations; the fresh row a copy refreshes from carries the same key. The only difference on the automatic triples. |
+| Q11 blank select on nullable FK clears; on required FK is a 400 | ✅ | kept exactly: ShiftMapper's `ParseOrNull` already clears a nullable; the pack's `string? → long` throws the same 400 `ToForeignKey` did, naming the select |
+| Q13 `Tag → TagDTO` maps every member, not `TagProjection`'s five | ✅ | accepted: the audit members of a tag are harmless on a DTO and the map is the ordinary one |
+| Q14 dictionary-valued nesting (`CustomFields`) | 🟡 | ShiftMapper does not nest dictionary VALUES (`Dictionary<string, CustomField>` → `Dictionary<string, CustomFieldDTO>` is SM0002); the old generator did. Two identity triples. Recommended: add it to ShiftMapper in Stage 3 rather than hand-write two `ForMember`s |
 
 ## Log
 
+- **2026-09-19 (Stage 2)** — Everything the stage listed, plus seven ShiftMapper additions the diff and the
+  design forced, all small and general: `AddShiftMapper(Assembly)` (Q8; lifetime only, and the generator does not
+  read it as a registration of the caller); `ShiftMapperConversionException` with `SourceMember`; a conversion
+  that takes the mapping (`Func<TSource, string, TDestination>`, `TakesMapping` in the metadata,
+  `ConversionWithMapping` at run time) — without it a blank required select could only be a 400 that names no
+  field; the "no key, no value" guard on a shaped member whose required entry reads a nullable source member
+  (the old `ToSelectDTO(long?)` returned null; ShiftMapper built a select with a null `Value`); a later
+  convention entry for an already-filled target as a fallback (the old generator fell back to `Name` when
+  `[ShiftEntityKeyAndName]` was absent — `Product`, `City`, `Company` in the sample and identity); a marker's
+  `Rules` pack at the furthest level of EVERY map in a project that closes the marker (an override `CreateMap`
+  keeps the framework's rules; without this a data project that never calls `AddShiftMapper` got no rules on its
+  own maps); and `CanMap` answering false on an empty mapper. Three things the plan did not foresee: (1)
+  `ShiftEntity.Model` is `netstandard2.0`, so the pack lives in Core; (2) the endpoint attributes need the copy
+  marker too (`this → this`), since nothing else closes `ShiftRepository<,,,>` for an attribute endpoint; (3)
+  ShiftMapper's built-in `Parse<long>` writes 0 for blank text, which for a foreign key is a row pointing at
+  nothing — hence the pack conversion and the mapping-aware form. The diff itself: the 10 un-customized
+  triples match the old generator's output member for member except `Copy.IdempotencyKey` (Q10); every other
+  difference is a customization Stage 3 carries over, the `WithMapper` triple is not ShiftMapper's, and the one
+  real gap is dictionary-valued nesting (Q14). The startup validation's `CanMap` path is exercised by every
+  sample boot but has no test of its own until Stage 3 removes the registry link. The sample was built in
+  Release for the diff because a Visual Studio debug session held the API's Debug output; nothing about the
+  result depends on the configuration.
 - **2026-09-18 (Stage 1)** — All six ShiftMapper features, in one pass, in the ShiftMapper repo. Three things
   the plan did not foresee: (1) the generated mapper implements `IMapper` explicitly, so adding `Configure` to the
   interface broke every existing test until the generator emitted it — worth remembering for any future `IMapper`

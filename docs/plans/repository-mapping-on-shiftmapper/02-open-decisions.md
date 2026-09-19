@@ -123,7 +123,15 @@ metadata format byte-exact.
 invisible to the programmer, and the generic-mapper-class spelling can be added later as sugar if it reads
 better. Needed by: M1.
 
-## Q10 — `CopyEntity` no longer copies `Tags`
+## Q10 — `CopyEntity` no longer copies `Tags` (nor `IdempotencyKey`)
+
+**Decided 2026-09-19 (Stage 2.8): accepted, for both.** The diff showed exactly one difference on every
+un-customized triple: `Copy.IdempotencyKey`, because the pack ignores it as a destination on every map and the
+old shallow copy carried it. The copy refreshes a tracked row from a fresh load of the SAME row, whose key is the
+same; nothing depends on the copy. No narrowing added. To be clear about the key itself (asked 2026-09-19): it is
+client-generated — the UI sends it so a retried POST creates one row — but it travels in the `Idempotency-Key`
+HEADER and the repository's upsert stamps it onto the entity after mapping; the mapper never wrote it, under the
+old generator or now, and the duplicate-key protection is untouched.
 
 **The question.** `CopyEntity` (entity → entity, used by `ReloadAfterSave`) today copies everything except
 `ID`, `ReloadAfterSave`, `AuditFieldsAreSet` — so it copies `Tags`. With `Tags` ignored as a destination by
@@ -135,6 +143,14 @@ functional difference, the `IgnoreMember` rule gains a "when the source is X" na
 
 ## Q11 — A blank select DTO on a NULLABLE foreign key clears it; on a required one it is a 400
 
+**Decided 2026-09-19 (Stage 2.2): kept exactly.** ShiftMapper's `ParseOrNull<long>` already turns blank into
+null; its `Parse<long>` turns blank into **0**, which the pack overrides with `string? → long` throwing the
+same `ShiftEntityException` (`Model Validation Error`, `For` = the select) that `ToForeignKey` throws. Naming
+the field needed a conversion that knows what it is converting — ShiftMapper gained the
+`Func<TSource, string, TDestination>` form of `CreateConversion` for it. Non-numeric text on any other scalar
+(an `int`, a date) is now ALSO a 400 naming the field, translated by the adapter from
+`ShiftMapperConversionException`; before it was an uncaught exception.
+
 **The question.** Today `ToNullableForeignKey` returns `null` for a blank `Value` (clearing the FK is
 legitimate) and `ToForeignKey` throws a **400** naming the field. ShiftMapper's derived write parses
 `dto.Brand.Value` with its own converter; what it does with `""` on `long?` and on `long` must be verified.
@@ -143,6 +159,26 @@ legitimate) and `ToForeignKey` throws a **400** naming the field. ShiftMapper's 
 two conversions (`string? → long?` treating blank as null; `string → long` throwing) — a registered pair
 beats the built-in table, and the repository's exception translation (Step 2.6) turns the throw into the
 same 400. Verified in Stage 2.8.
+
+## Q13 — `Tag → TagDTO` maps every member
+
+**Decided 2026-09-19 (Stage 2.8): accepted.** `TagProjection.ToDto` filled five members (`ID`, `Name`,
+`Color`, `Description`, `IntegrationID`); the framework map `Tag → TagDTO` fills the DTO's base members too
+(`CreateDate`, `LastSaveDate`, `CreatedByUserID`, `LastSavedByUserID`, `IsDeleted`). Visible only on
+`Product`'s list golden, whose repository overrides `MapToList` anyway. Harmless on a DTO, and the map is the
+ordinary one every service gets.
+
+## Q14 — Dictionary-valued nesting
+
+**Open (found 2026-09-19).** ShiftMapper nests class-typed members and collections of them, and converts
+dictionaries whose keys and values are simple — but `Dictionary<string, CustomField>` →
+`Dictionary<string, CustomFieldDTO>` is SM0002, while the old generator composed it (identity's `Company` and
+`CompanyBranch` view maps; the write side was `IgnoreEntity`'d). Two options: a `ForMember` on each of the two
+maps in Stage 3.4, or dictionary-valued nesting in ShiftMapper (`DescribeComplex` gains the shape; the
+in-memory builder maps each value through the nested map; the projection refuses it as a memory-only member,
+which is what a JSON column is). **Recommended: the ShiftMapper feature**, because a dictionary of DTOs is
+ordinary in the identity model and a hand-written value map per site is the thing conventions exist to avoid.
+Needed by: Step 3.4.
 
 ## Q12 — Depth default stays 10; a cycle is Info, not error
 

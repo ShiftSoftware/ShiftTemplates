@@ -152,3 +152,20 @@ ShiftMapper takes over, per [`03-coverage.md`](03-coverage.md); Stage 2.8 checks
 
 Not present in the baseline, and therefore nothing to carry: SHENGEN003 (no cycle in any DTO graph), SHENGEN005/009
 (no conditional configuration), SHENGEN006 (no entity+builder clash), SHENGEN011 (no case-ambiguous member).
+
+## 4. ShiftMapper baseline after Stage 2 (2026-09-19)
+
+`dotnet build --no-incremental` of `StockPlusPlus.Data` with the markers in place (rebuilds `ShiftIdentity.Data`).
+**72 distinct SM warnings; no errors.** Every one is either a customization Stage 3 carries over as
+`o.Mapping(...)` (the `Report` theories of `RepositoryMappingShiftMapperDiffTests` list the same members with
+their old values), an accepted cost, or the one open gap (Q14). Stage 3 drives this to the "accepted" rows only.
+
+| Rule | Count | What they are | After Stage 3 |
+|---|---|---|---|
+| SM0001 unmapped destination | 34 | the members the old `ForList`/`ForView` supplied (`City`, `CompanyBranch`, `Company`, `Region`, `Team`, `User`, `Product`, the calendar groups' `Brands`/`Departments`, the shift items' times) plus the write-only DTO members (`UserDTO.Password`, `RequireChangeAtNextLogin`, `SendVerification`) and `CompanyDTO.AlternativeExternalId` (SHENGEN baseline row 1) | `ForMember`/`Ignore` in `o.Mapping`; `Product`'s three stay if the override stays |
+| SM0002 no conversion | 14 | the same members where the DTO member is a `string` fed from a navigation (`Region?` → `string`), the M:N selects written through junction rows (`User.AccessTrees`, `CompanyCalendar.Branches`), `CustomFields` dictionaries ×4 (Q14), and `UserDTO.CompanyBranchID` (a select named with an `ID` suffix, so `{Member}ID` resolves nothing) | `ForMember` in `o.Mapping`; Q14 |
+| SM0030 no query form | 10 | the five entities carrying `List<ShiftFileDTO>` files as JSON (`Company`, `CompanyBranch`, `Country`, `ProductCategory`, `Region`), both directions | accepted — SHENGEN007 said the same; lists never project files |
+| SM0034 convention cannot fill | 14 | the M:N `List<ShiftEntitySelectDTO>` members read through junction entities (`CompanyBranch.Brands/Departments/Services`, `Team.CompanyBranches/Users`, the calendar groups, `Company.Brands`) — the element convention wants a navigation collection of that name — and `UserDTO.CompanyBranchID` | one `ForMember` each, as [`01-steps.md`](01-steps.md) 3.4 already says |
+
+One ShiftMapper nit seen in the list, not blocking: the SM0002 for a member a convention claimed and then dropped
+prints an empty source type (`does not convert '' to 'ShiftEntitySelectDTO?'`).

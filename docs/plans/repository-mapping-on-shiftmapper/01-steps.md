@@ -292,6 +292,15 @@ inert for consumers.
 At the end of this stage both mappers exist on the same host: the old generated mapper still wins, ShiftMapper
 sits behind it in the resolution order, and the goldens can be diffed against ShiftMapper's output.
 
+**Done 2026-09-19 — see [`STATUS.md`](STATUS.md) for what each step became.** Differences from the text below:
+the pack and the mapping context interface live in `ShiftEntity.Core/Mapping/` (Model is `netstandard2.0`);
+the endpoint attributes carry the copy marker as well; the pack also registers `string? → long` (Q11) through
+ShiftMapper's new mapping-aware conversion and gives the select convention a `Name` fallback; the host line of
+2.7 was not needed by the sample and moves to 3.2; the golden diff is a second test class over a `ShiftMapper`
+arm rather than a fixture switch, with a report theory per triple and asserting theories for the un-customized
+ten. The `ShiftEntityConfiguratorResolver` finds the built-in repository for an `IConfiguresShiftRepository`
+entity through the host's `DbContextOptions.ContextType`.
+
 ### 2.1 Reference ShiftMapper from `ShiftEntity.Model` and `ShiftEntity.Core`
 
 Same TypeAuth pattern as `ShiftEntity.CosmosDbReplication`: `ProjectReference` when the sibling checkout
