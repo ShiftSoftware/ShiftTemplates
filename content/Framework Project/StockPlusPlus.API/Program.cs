@@ -19,6 +19,7 @@ using StockPlusPlus.Shared.DTOs.Service;
 #endif
 
 #if (internalShiftIdentityHosting)
+using ShiftSoftware.ShiftIdentity.AspNetCore.Authentication;
 using StockPlusPlus.API.Services;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Extentsions;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
@@ -209,6 +210,11 @@ mvcBuilder.AddShiftIdentity(builder.Configuration.GetValue<string>("Settings:Tok
 
 #if (internalShiftIdentityHosting)
 
+// Configure SecurityEmail:Smtp locally (credentials in user secrets). Missing settings fail delivery;
+// no message is reported accepted until the SMTP server accepts it.
+builder.Services.Configure<SecurityEmailSmtpOptions>(builder.Configuration.GetSection("SecurityEmail:Smtp"));
+builder.Services.AddScoped<SmtpSecurityEmailSender>();
+builder.Services.AddScoped<ISecurityEmailSender, SendEmailService>();
 builder.Services.AddScoped<ISendEmailVerification, SendEmailService>();
 builder.Services.AddScoped<ISendEmailResetPassword, SendEmailService>();
 
@@ -234,6 +240,15 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
             Mandatory = builder.Configuration.GetValue<bool>("Settings:Mfa:Mandatory", false),
             Totp = new TotpSettingsModel { IssuerName = "identity.shift.software" }
         },
+        // The identity authority (Settings:Authority): SQL-admitted logins, versioned sessions, protected
+        // authenticators and the api/identity/v2 account flows, with the deployed routes keeping their shapes.
+        // Settings:FactorProtection holds the keys that protect stored authenticators. The Web client's
+        // ShiftIdentityAuthority setting must match Authority:Enabled. Requires the identity security tables
+        // (the AddIdentitySecurity migration); a host without them stops at startup and says so.
+        Authority = builder.Configuration.GetSection("Settings:Authority").Get<AuthoritySettingsModel>() ?? new(),
+        FactorProtection = builder.Configuration.GetSection("Settings:FactorProtection").Get<FactorProtectionSettings>() ?? new(),
+        FrontEndUrl = builder.Configuration.GetValue<string>("Settings:FrontEndUrl"),
+        EmailVerificationRedirectUrl = builder.Configuration.GetValue<string>("Settings:EmailVerificationRedirectUrl"),
         TemporaryTokenSettings = new TemporaryTokenSettingsModel
         {
             Key = builder.Configuration.GetValue<string>("Settings:TokenSettings:TemporaryTokenKey")!,

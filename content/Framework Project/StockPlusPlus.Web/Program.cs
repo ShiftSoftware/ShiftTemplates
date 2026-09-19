@@ -93,6 +93,9 @@ builder.Services.AddShiftIdentityDashboardBlazor(x =>
     x.ShiftIdentityHostingType = ShiftSoftware.ShiftIdentity.Core.ShiftIdentityHostingTypes.External;
     x.LogoPath = "/img/shift-full.png";
     x.Title = "StockPlusPlus";
+    // Must match the API's Settings:Authority:Enabled: the account screens (password change, authenticator)
+    // then run the authority's flows instead of the deployed routes, which refuse them under the authority.
+    x.StagedAuthority = builder.Configuration.GetValue<bool>("ShiftIdentityAuthority");
 #if IDENTITY_DEVELOPMENT_APP
     x.DynamicTypeAuthActionExpander = () => Task.CompletedTask;
 #else
