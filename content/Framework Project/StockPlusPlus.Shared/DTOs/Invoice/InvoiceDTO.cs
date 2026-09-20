@@ -30,7 +30,7 @@ public class InvoiceListDTO : ShiftEntityListDTO, IHasAttentionSummary
     public AttentionSeverity? HighestSeverity { get; set; }
     public int ActiveSignalCount { get; set; }
 
-    // No column behind it: InvoiceRepository's Mapping(...) tells the list map to sum the lines (in SQL).
+    // No column behind it: Mappers/StockPlusPlusMapper.cs tells the list map to sum the lines (in SQL).
     public decimal Total { get; set; }
 
     // DEEP LIST mapping. The children nest automatically — list → lines → product — from the DTO graph

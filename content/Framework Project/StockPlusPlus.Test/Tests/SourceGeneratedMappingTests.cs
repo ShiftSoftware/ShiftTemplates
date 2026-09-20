@@ -16,10 +16,10 @@ using StockPlusPlus.Shared.DTOs.ProductCategory;
 namespace StockPlusPlus.Test.Tests;
 
 /// <summary>
-/// The MAPPER CLASS door: <c>Mappers/ProductBrandMapper.cs</c> is an ordinary <c>ShiftMapperBase</c> declaring
-/// only the two pairs it customizes (the list map's <c>Code</c>, the write map's <c>AfterMap</c>); those replace
-/// the automatic maps for their pairs, the other two pairs of the triple stay automatic, and the framework's
-/// conventions apply to all four. Everything is asserted through the host's <see cref="IMapper"/> — the same
+/// The MAPPER CLASS door, on ProductBrand: <c>Mappers/StockPlusPlusMapper.cs</c> — the project's one mapper
+/// class, an ordinary <c>ShiftMapperBase</c> — declares only the two ProductBrand pairs it customizes (the list
+/// map's <c>Code</c>, the write map's <c>AfterMap</c>); those replace the automatic maps for their pairs, the
+/// other two pairs of the triple stay automatic, and the framework's conventions apply to all four. Everything is asserted through the host's <see cref="IMapper"/> — the same
 /// object <c>ProductBrandRepository</c> maps through and any service can inject (as <c>Mapper</c>, for the typed
 /// methods, or as <c>IMapper</c>).
 /// <para>
@@ -211,9 +211,10 @@ public class AutomaticMappingTests
         var dto = Door(scope).Map<Country, CountryGeneratedDTO>(entity);
 
         // api/country-generated uses ONE DTO type as both list and view, so its entity → DTO map is ONE map:
-        // the customization Country.ConfigureRepository writes on m.List is the view's too (Q15 of the plan).
-        // A triple that wants the two to differ uses two DTO types, as every other sample triple does.
-        Assert.Equal("Genland (via IConfiguresShiftRepository)", dto.Name);
+        // the customization Mappers/StockPlusPlusMapper.cs writes for the pair is the view's and the list's
+        // alike (Q15 of the plan). A triple that wants the two to differ uses two DTO types, as every other
+        // sample triple does.
+        Assert.Equal("Genland (via StockPlusPlusMapper)", dto.Name);
         Assert.Equal(entity.ID.ToString(), dto.ID);
         Assert.Equal(entity.CreateDate, dto.CreateDate);
         Assert.False(dto.IsDeleted);
@@ -417,17 +418,19 @@ public class SourceGeneratedMappingTests
 }
 
 /// <summary>
-/// The CONFIGURED door: a customization written in the repository (<c>o.Mapping(m =&gt; …)</c>) or in an entity's
-/// <c>ConfigureRepository</c> is part of the map itself — it applies wherever the map runs, not only inside the
-/// repository. When a service maps the pair before any repository was constructed, the mapper constructs the
-/// configuring repository from DI on its own (<c>ShiftEntityConfiguratorResolver</c>) and the value is there.
+/// A customization is the MAP's, never the repository's. The project's one mapper class,
+/// <c>Mappers/StockPlusPlusMapper.cs</c>, replaces one automatic map for Invoice (a repository class's triple)
+/// and one for <c>api/country-generated</c> (an attribute-driven endpoint with no repository class) — and the
+/// customized map is the one everything uses: the repository, and any service mapping the pair in a scope where no repository was ever
+/// constructed. Nothing is pulled from a repository at run time; the repository's only word about its maps is
+/// how deep they nest (<c>o.Mapping(m =&gt; m.Nested(n))</c>), and that is read at build time.
 /// </summary>
 [Collection("API Collection")]
-public class RepositoryConfigurationTests
+public class MapperClassCustomizationTests
 {
     private readonly CustomWebApplicationFactory factory;
 
-    public RepositoryConfigurationTests(CustomWebApplicationFactory factory) => this.factory = factory;
+    public MapperClassCustomizationTests(CustomWebApplicationFactory factory) => this.factory = factory;
 
     // The lines carry their Product: the list projection composes it, and a required navigation is not
     // null-guarded in the projection (a join always matches), so LINQ-to-objects needs it filled.
@@ -442,47 +445,57 @@ public class RepositoryConfigurationTests
     };
 
     [Fact]
-    public void ARepositoryCustomization_AppliesThroughTheRepository()
+    public void AMapperClassCustomization_AppliesThroughTheRepository()
     {
         using var scope = factory.Services.CreateScope();
         var repo = scope.ServiceProvider.GetRequiredService<InvoiceRepository>();
 
         var row = repo.MapToList(new[] { InvoiceWithLines() }.AsQueryable()).Single();
 
-        Assert.Equal(6.5m, row.Total);   // InvoiceRepository: m.List.ForMember(d => d.Total, ... Sum(l => l.Price))
+        Assert.Equal(6.5m, row.Total);   // StockPlusPlusMapper: CreateMap<Invoice, InvoiceListDTO>().ForMember(d => d.Total, ... Sum(l => l.Price))
     }
 
     [Fact]
-    public void ARepositoryCustomization_AppliesToTheSameMapAnywhere_BeforeAnyRepositoryRan()
+    public void AMapperClassCustomization_IsTheSameMapAnywhere_WithNoRepositoryInTheScope()
     {
         // A FRESH scope in which no InvoiceRepository has been constructed: the map is used first by a
-        // "service". The customized member's value is pulled by constructing the repository from DI.
+        // "service". The customization is in the map itself, so there is nothing to construct first.
         using var scope = factory.Services.CreateScope();
         var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
         var row = mapper.ProjectTo<Invoice, InvoiceListDTO>(new[] { InvoiceWithLines() }.AsQueryable()).Single();
 
         Assert.Equal(6.5m, row.Total);
-        Assert.Equal(2, row.InvoiceLines.Count);   // and the children still nest, with nothing configured for them
+        Assert.Equal(2, row.InvoiceLines.Count);   // and the children still nest, with nothing written for them
     }
 
     [Fact]
-    public void AnEntityConfiguration_AppliesToTheSameMapAnywhere_BeforeAnyRepositoryRan()
+    public void AnAttributeEndpointsMap_IsCustomizedByAMapperClass_TheSameWay()
     {
-        // Country.ConfigureRepository (IConfiguresShiftRepository) customizes the api/country-generated list
-        // map. The configuring type is the ENTITY, so the pull constructs the built-in repository closed over
-        // it — through the host's DbContextOptions — rather than the entity.
+        // api/country-generated has no repository class: its maps come from the endpoint attribute on Country,
+        // and StockPlusPlusMapper replaces one of them exactly as it does for Invoice's repository.
         using var scope = factory.Services.CreateScope();
         var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
         var row = mapper.ProjectTo<Country, CountryGeneratedDTO>(new[] { new Country { Name = "Alpha" } }.AsQueryable()).Single();
 
-        Assert.Equal("Alpha (via IConfiguresShiftRepository)", row.Name);
+        Assert.Equal("Alpha (via StockPlusPlusMapper)", row.Name);
         Assert.Equal("0", row.ID);   // the convention binding beside it is untouched
     }
 
     [Fact]
-    public void ATripleWithNoCustomization_HasNothingToPull()
+    public void TheRepositorySaysNothingAboutItsMaps_ButTheDepth()
+    {
+        // The repository's options carry no mapping configuration: Mapping(...) records the nesting depth the
+        // repository asked for, and InvoiceRepository asked for none (the framework's default, 10).
+        using var scope = factory.Services.CreateScope();
+        var repo = scope.ServiceProvider.GetRequiredService<InvoiceRepository>();
+
+        Assert.Null(repo.ShiftRepositoryOptions.NestedMappingDepth);
+    }
+
+    [Fact]
+    public void ATripleWithNoMapperClass_IsAutomatic()
     {
         using var scope = factory.Services.CreateScope();
         var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();

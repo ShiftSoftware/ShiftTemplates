@@ -1,6 +1,10 @@
 # Repository mapping on ShiftMapper — Status
 
-**Last updated:** 2026-09-20 — **Stage 4 done (the old generator is gone).** `ShiftEntity.SourceGenerator`, the
+**Last updated:** 2026-09-20 — **Stage 4b done: mapping configuration is out of the repository.** `o.Mapping(m => …)`
+accepts only `m.Nested(n)`; every `m.X.ForMember(…)` in the sample and ShiftIdentity.Data is a mapper class now
+(ONE class for all of identity, `ShiftIdentityMapper`, the calendar group mapper folded in; ONE for the sample, `StockPlusPlusMapper`, `ProductBrandMapper` folded in and the item template's scaffolded mapper dropped),
+`IMapper.Configure` is no longer called by the repository and `ShiftEntityConfiguratorResolver` is deleted. ShiftMapper unchanged (Q16 asks whether to retire the unused half). Earlier the same day — **Stage 4
+done (the old generator is gone).** `ShiftEntity.SourceGenerator`, the
 three attributes, `ShiftEntityMapperDefaults`, `UseGeneratedMapper(...)` and the attribute property, the registry,
 `GeneratedMapperFactory`, the builder types, `SelectWithTags` and the 128 generator tests are deleted; the
 repository resolves options → DI `IShiftEntityMapper` → ShiftMapper → nothing. SHENGEN006 lives on as
@@ -71,6 +75,15 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 | 4.1 Old generator + the three attributes + `UseGeneratedMapper` + registry + builder + tests removed | ✅ | **2026-09-20.** Deleted from ShiftEntity: `ShiftEntity.SourceGenerator/` (2,664 lines), `ShiftEntityMapperAttribute`, `ShiftEntityMapperConfigAttributes.cs` (`MaxDepth`, `Ignore`, `ShiftEntityMapperDefaults`), `ShiftEntityMapperRegistry`, `ShiftMapperBuilder`, `ShiftChildMapperBuilder`, `IShiftMapperConfigurable`, `IShiftObjectMapper`, `GeneratedMapperFactory`, `TaggableProjectionExtensions` (both the Core class and the EFCore shim — `SelectWithTags` did not get its obsolete release either, same call as Q7), `UseGeneratedMapper(...)` on the options, the attribute property and its discovery branch, the registry link in `InitCommon` and `ShiftEntityMapperValidation` (with `EnsureRegistryPopulated`, the conflict and binding checks); `ShiftEntity.Tests/Mapping/` (18 files, the harness included) and the two registry-era `Repository/` test files, with the "nothing covers it" and "an explicit mapper still wins" cases folded into `ShiftMapperResolutionTests`. In the consumers: the dev-mode analyzer references in `ShiftIdentity.Data.csproj` / `StockPlusPlus.Data.csproj` and the two `.sln` entries now point at `ShiftEntity.Analyzers`; `StockPlusPlus.Test.csproj` lost its `ExcludeFixtureMapperGeneration` target. Kept, as planned: `IShiftEntityMapper`, `MappingContext`, `MappingHelpers`, the `WithMapper` attributes, the four virtual methods, `ShiftEntityMapperValidation` (DI → ShiftMapper `CanMap` → override), `[ShiftEntityKeyAndName]`, `TagProjection` (the view read and `ShiftTagMapper` still use it). Green: ShiftEntity 415 (was 535: −128 generator tests, +8 analyzer tests), ShiftIdentity 302, sample 240 + the 2 Cosmos-emulator failures as before. |
 | 4.2 SHENGEN006 re-homed | ✅ | **2026-09-20.** `ShiftEntity.Analyzers/RepositoryConfigurationAnalyzer.cs` — a `DiagnosticAnalyzer`, ~90 lines, the rule byte-for-byte (direct `ShiftRepository<,,,>` base only, every base-reaching constructor must pass a builder, `base(db, null)` is no builder, `: this(...)` is not a base call), reported as **SHENT001** (Error) so nothing "SHENGEN" survives the deletion. Packed into `ShiftSoftware.ShiftEntity` under `analyzers/dotnet/cs` exactly as the generator was; dev mode references it from the two data projects. The seven generator tests moved to `ShiftEntity.Tests/Analyzers/RepositoryConfigurationAnalyzerTests.cs` over `CompilationWithAnalyzers`; a throwaway repository in the sample confirmed it fires through the dev-mode wiring. |
 
+## Stage 4b — Mapping configuration leaves the repository *(added 2026-09-20)*
+
+| Step | Status | Notes |
+|------|--------|-------|
+| 4b.1 `ShiftEntityMapping<E,L,V>` keeps `Nested(n)` only | ✅ | **2026-09-20.** The four `MapExpression` handles (`View`/`Entity`/`List`/`Copy`) removed; a `new Nested(int)` records `Depth`. `ShiftRepositoryOptions.Mapping(...)` runs the lambda immediately and records `NestedMappingDepth` (public, read-only) instead of storing the lambda for `InitCommon`; `InitCommon` no longer calls `IMapper.Configure`; `ShiftEntityConfiguratorResolver` and its `TryAddSingleton` are deleted. The generator is untouched: it already read `m.Nested(n)` off any lambda over a `ShiftMapperConfigurationSurface` subclass, so the depth still bakes. `ShiftMapperResolutionTests`: the two surface tests became three depth tests (recorded, default null, last call wins; the fake mapper's `Configured` list stays empty). ShiftEntity 416 green. |
+| 4b.2 ShiftIdentity.Data → ONE mapper class | ✅ | **2026-09-20.** `Mappers/ShiftIdentityMapper.cs` — one `ShiftMapperBase` for every CRUD-map customization of the identity triples (Region, City, Team, CompanyCalendar and its four JSON-group child pairs — the former `CompanyCalendarGroupMapper.cs`, deleted and folded in — CompanyBranch, Company, User), each `ForMember` moved line for line; first landed as seven per-entity classes, collapsed to one on the user's call the same day. `Replication/ShiftIdentityReplicationMapper.cs` stays separate (different pairs, different job, its `DeclaredBy` is pinned by tests). The entities' `ConfigureRepository` keep their Includes, `CompanyRepository` is `base(db)`, the other two builders hold Includes only. Two things a `CreateMap` does not inherit from the automatic map it replaces had to be written: the write map as `.ReverseMap()` of the view map (a forward `CreateMap<DTO, Entity>` reports every entity-only member as SM0001 — 42 new warnings on the first try; a reverse map reports them as the quiet SM0006, as the marker's `Reverse = true` did), and `ConfigureDefaults(o => o.Flattening = false)` (the marker's Q4 choice). With both, the ShiftMapper diagnostic set of `ShiftIdentity.Data` is **identical** before and after (11 messages; compared with both repos stashed). ShiftIdentity.Tests 302 green. |
+| 4b.3 Sample → ONE mapper class | ✅ | **2026-09-20.** `Mappers/StockPlusPlusMapper.cs` — the project's one `ShiftMapperBase`, carrying ProductBrand's two maps (the former `ProductBrandMapper.cs`, deleted; still behind `#if (includeItemTemplateContent)` like the `Code` member), Invoice's list `Total` and `api/country-generated`'s `Name` (first landed as `InvoiceMapper` + `CountryGeneratedMapper`, collapsed the same day on the user's call; `sourceName` renames the class `<Project>Mapper` in a generated project). `InvoiceRepository`'s builder keeps the Include only; `Country.ConfigureRepository` is a comment-only body (what belongs there: includes, filters, data-level access, `Mapping(m => m.Nested(n))`); the `" (via IConfiguresShiftRepository)"` demo suffix became `" (via StockPlusPlusMapper)"` — the door it demonstrates is now "the mapper class customizes an attribute-endpoint triple with no repository class". `RepositoryConfigurationTests` → `MapperClassCustomizationTests` (through the repository, through `IMapper` in a repository-less scope, the attribute endpoint, `NestedMappingDepth` null, the automatic triple); `AttributeEndpointTests` updated. **Item template:** `ProductBrandMapper.cs` left its `include`/`rename` lists — one mapper class per project means `dotnet new shiftentity` scaffolds no mapper; the scaffolded `ProductBrandRepository.cs` comment points at the project's class instead (a sample-app-free project has none and creates one when it first needs a customization). Undoes the B2 template edit of the AutoMapper removal (its STATUS row says so). Sample 243 green. |
+| 4b.4 Docs | ✅ | **2026-09-20.** README amended in place (§2, §4, §5, §6, §7 M3, §8, §9), Q16 added, this table, `03-coverage.md` rows and `04-migration-guide.md` rewritten to "mapper class" (the repository option is gone), CLAUDE.md. |
+
 ## Stage 5 — Docs, CLAUDE.md, pipeline
 
 | Step | Status | Notes |
@@ -86,8 +99,8 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 | Q | Status | Decision |
 |---|--------|----------|
 | Q1 one map per pair per assembly | ⬜ | recommended: accept |
-| Q2 two repositories configuring one pair → error | 🟡 | implemented as recommended (SM0050, error); confirm |
-| Q3 the mapper may construct the repository from DI | 🟡 | implemented as recommended, with `IShiftMapperConfiguratorResolver` as the framework's override; confirm |
+| Q2 two repositories configuring one pair → error | ➖ | moot since 2026-09-20: a repository configures no pair (Stage 4b); two mapper classes declaring one pair is SM0042, as always. SM0050 still exists in ShiftMapper (Q16) |
+| Q3 the mapper may construct the repository from DI | ➖ | moot since 2026-09-20: nothing of a repository's reaches a map at run time; `ShiftEntityConfiguratorResolver` deleted. The ShiftMapper hook still exists (Q16) |
 | Q4 flattening off on implicit maps | ⬜ | recommended: off |
 | Q5 null collections → empty | ✅ | accepted; the goldens never exercised it (fixtures fill every collection), so no golden changed |
 | Q6 SHENGEN006 → analyzer | ✅ | re-homed as SHENT001 in `ShiftEntity.Analyzers` (4.2) |
@@ -99,9 +112,30 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 | Q13 `Tag → TagDTO` maps every member, not `TagProjection`'s five | ✅ | accepted: the audit members of a tag are harmless on a DTO and the map is the ordinary one |
 | Q14 dictionary-valued nesting (`CustomFields`) | ✅ | added to ShiftMapper (in memory; the projection leaves the member out with SM0030). Identity's `CustomFields` still needs its `ForMember` — the read side strips passwords — so the feature serves the general case, not this one |
 | Q15 one DTO type as both list and view is ONE map | ✅ | accepted: `api/country-generated`'s list customization is its view's too; use two DTO types where the two must differ (every other sample triple does) |
+| Q16 mapping configuration is not the repository's | ✅ | **2026-09-20, the user's call:** the repository says only how deep (`m.Nested(n)`); a member customization is a mapper class. Open half: whether ShiftMapper retires the now-unused member half of the surface feature (`MapExpression` handles on a surface, `IMapper.Configure`, `IShiftMapperConfiguratorResolver`, SM0050–SM0052) or keeps it as a general feature — recommended: keep until a release forces the question, since 0.3.0 is unreleased and nothing else uses it |
 
 ## Log
 
+- **2026-09-20 (Stage 4b)** — After Stage 4 the user drew the line one step further than the plan had: the
+  repository (and the entity's `ConfigureRepository`) must not say what a member maps from — that is not its
+  responsibility — while it keeps saying how deep the automatic maps nest, and a programmer who needs more writes
+  a mapper class whose `CreateMap` replaces the automatic map. So the M3 surface in ShiftEntity lost its four map
+  handles and kept `Nested`; the run-time half (the store hand-over in `InitCommon`, the DI pull through
+  `ShiftEntityConfiguratorResolver`) went entirely, because a customization that lives in the map needs nothing
+  constructed first. Nine mapper classes replaced the nine `o.Mapping(m => m.X.ForMember(…))` blocks. Two
+  lessons from the migration, both about what an explicit `CreateMap` does NOT inherit from the automatic map it
+  replaces: (1) the automatic write map was the REVERSE of the view map, so its entity-only members were the
+  quiet SM0006; a forward `CreateMap<DTO, Entity>` makes each of them an SM0001 warning (42 of them in
+  ShiftIdentity.Data on the first try) — declare the write map as `.ReverseMap()` of the view map; (2) the
+  automatic maps do not flatten (Q4), a mapper class does by default — `ConfigureDefaults(o => o.Flattening =
+  false)` keeps replacing a map from changing anything but the members written. With both, the ShiftMapper
+  diagnostic set of `ShiftIdentity.Data` is identical before and after (11 messages, compared with both repos
+  stashed) — and still identical after the seven identity classes were collapsed into one `ShiftIdentityMapper`
+  with `CompanyCalendarGroupMapper` folded in (flattening off now covers the group pairs too; nothing changed). ShiftMapper is untouched: the generator already read `m.Nested(n)` from any surface lambda, and the
+  member half of the surface feature is simply unused now (Q16). ProductBrand's write map in the sample's
+  mapper class is still declared forward (three SM0001 on ProductBrand's scope ids) — left as it was, since its
+  tests pin "the view pair is automatic" and a reverse would replace that pair too. Green: ShiftEntity 416, ShiftIdentity 302,
+  sample 243.
 - **2026-09-20 (Stage 4)** — The deletion, on the user's "implement stage 4" the same day the harness went and
   with nothing released since Stage 3 — so the one-release window Q7 planned did not happen (recorded there). It
   was as mechanical as the plan said: `git rm` of the generator, the seven Core/EFCore types and the tests, then

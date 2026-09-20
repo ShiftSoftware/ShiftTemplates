@@ -14,9 +14,9 @@ namespace StockPlusPlus.Data.Repositories;
 /// Note: the attribute-driven api/country* endpoints do NOT use this repository (they use the framework's
 /// built-in repository); this is a plain repository to inject and use directly.
 /// <para>
-/// It owns its own DTO triple on purpose: a pair is customized in ONE place (a repository's <c>Mapping(...)</c>
-/// or an entity's <c>ConfigureRepository</c>), and the build refuses two (SM0050). Country configures the
-/// CountryGeneratedDTO triple from the entity, so this demo stays clear of it.
+/// It owns its own DTO triple on purpose: maps are keyed by DTO type, and the CountryGeneratedDTO pair is
+/// customized in <c>Mappers/StockPlusPlusMapper.cs</c>, so this demo stays clear of it and shows the automatic
+/// maps untouched.
 /// </para>
 /// </summary>
 public class CountryRepository : ShiftRepository<DB, Entities.Country, CountryRepoDTO, CountryRepoDTO>

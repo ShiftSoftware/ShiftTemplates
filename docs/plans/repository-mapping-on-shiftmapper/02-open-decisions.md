@@ -6,8 +6,10 @@ says so. Record the answer here and in [`STATUS.md`](STATUS.md) when it is taken
 Already settled in discussion (2026-09-18), restated so nobody re-opens them:
 - **No attributes for the programmer.** The three ShiftEntity mapping attributes and `UseGeneratedMapper = true`
   are deleted and nothing replaces them with another attribute; the framework's rules are code in a pack.
-- **Configuration in the repository stays**, in ShiftMapper's vocabulary (`o.Mapping(m => …)`).
-- **A mapper class overrides the repository** for the pair it declares.
+- ~~**Configuration in the repository stays**, in ShiftMapper's vocabulary (`o.Mapping(m => …)`).~~
+  **Reversed 2026-09-20 (Q16):** the repository says only how deep (`o.Mapping(m => m.Nested(n))`); a
+  member customization is a mapper class.
+- **A mapper class replaces the automatic map** for the pair it declares.
 - **The maps are usable anywhere**, not only in the repository.
 
 ---
@@ -27,6 +29,10 @@ Needed by: M1, M3.
 
 ## Q2 — Two repositories configuring one pair is a build error
 
+**Moot since 2026-09-20 (Q16):** a repository configures no pair. Two mapper classes declaring one pair is
+SM0042, as it always was. SM0050 remains in ShiftMapper for a framework that uses the member half of the
+surface; ShiftEntity cannot trigger it.
+
 **The question.** When two closing types both call `o.Mapping(...)` for the same pair with different
 content, which one wins? Silently picking by construction order is exactly the coin-flip the old registry
 guarded against.
@@ -35,6 +41,10 @@ guarded against.
 place) or by giving one endpoint a distinct DTO. Needed by: M3.
 
 ## Q3 — The mapper may construct the repository from DI
+
+**Moot since 2026-09-20 (Q16):** nothing of a repository's reaches a map at run time, so there is nothing to
+pull. `ShiftEntityConfiguratorResolver` is deleted; the ShiftMapper hook (`IShiftMapperConfiguratorResolver`)
+remains, unused by ShiftEntity.
 
 **The question.** A repository's `o.Mapping(...)` expressions live in the repository's customization store,
 filled when the repository is constructed. If a service maps `Invoice → InvoiceListDTO` through `Mapper`
@@ -203,6 +213,35 @@ whose list DTO and view DTO were the SAME type changed the list only. ShiftMappe
 (`api/country-generated`, whose golden now shows the suffix on the view as well); no identity triple is
 affected. The framework's recommendation stands on its own merits: a list and a view that must differ get two
 DTO types, as every other triple in the sample has.
+
+## Q16 — Mapping configuration is not the repository's responsibility
+
+**Decided 2026-09-20, the user's call (Stage 4b).** The original design let a repository customize its
+automatic maps member by member (`o.Mapping(m => m.List.ForMember(…))`, M3's member half) and made a mapper
+class the override for a pair the repository also configured. That put two places for one thing and, worse,
+put "what a member maps from" in the repository — a data-access object — where it is nobody's expectation to
+look for it, and it made the maps depend on a repository being constructed (Q3). Now:
+
+- The repository (or the entity's `ConfigureRepository`) says HOW DEEP its automatic maps nest,
+  `o.Mapping(m => m.Nested(n))`, and nothing else. Build-time, a constant.
+- A member customization is an ordinary mapper class; its `CreateMap` replaces the automatic map for that pair
+  (SM0047). The other pairs stay automatic; the pairs below a replaced map still nest.
+- Nothing of a repository's reaches a map at run time. `IMapper.Configure` is not called by ShiftEntity and
+  `ShiftEntityConfiguratorResolver` is gone.
+
+**Two migration rules** that follow from what an explicit `CreateMap` does not inherit from the automatic map
+it replaces: declare the write map as `.ReverseMap()` of the view map (entity-only members stay the quiet
+SM0006 instead of SM0001 each), and turn flattening off in `ConfigureDefaults` when the map must behave as the
+automatic one did (Q4). ShiftIdentity's one class (`ShiftIdentityMapper`, everything for the CRUD triples in
+one place — the user's call; the replication mapper stays its own) does both; the sample's one class
+(`StockPlusPlusMapper`, likewise everything in one place, the item template's per-entity mapper scaffold dropped
+for it) needs neither.
+
+**Still open, ShiftMapper side:** the member half of the surface feature — `MapExpression` handles on a
+`ShiftMapperConfigurationSurface`, `IMapper.Configure`, `IShiftMapperConfiguratorResolver`, SM0050–SM0052, ten
+generator tests — is now unused by any framework. **Recommendation: keep it** as the general feature it is
+until a release forces the question (0.3.0 is unreleased; deleting is a generator + runtime + docs change with
+no consumer asking for it), and revisit if it ever costs a fix.
 
 ## Q12 — Depth default stays 10; a cycle is Info, not error
 

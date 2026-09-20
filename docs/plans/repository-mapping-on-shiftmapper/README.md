@@ -1,5 +1,13 @@
 # Repository mapping on ShiftMapper — Plan
 
+> **Amended 2026-09-20 (Stage 4b).** One design point below changed after the build was done: **a repository
+> no longer configures its maps.** `o.Mapping(m => …)` accepts only `m.Nested(n)` — how deep the automatic maps
+> nest — and every member customization is a `CreateMap` in an ordinary mapper class, which replaces the
+> automatic map for that pair. Sections 2, 4, 5, 6 and 8 are updated in place; the M3 row in §7 describes what
+> ShiftMapper still has, of which ShiftEntity now uses the depth half only. Rationale: what a member maps from
+> is not the repository's responsibility, and a customization that lives in the map needs nothing pulled from a
+> repository at run time (Q3 is moot). See `02-open-decisions.md` Q16 and the STATUS log.
+
 **Created:** 2026-09-18 · **Revised:** 2026-09-18 (no programmer attributes; configuration in the repository; mapper class overrides)
 **Status:** Stages 0 (the frozen oracle), 1 (the ShiftMapper features, unreleased), 2 (the ShiftEntity side, additive), 3 (the flip and the migration — ShiftMapper is the repository's mapper, the sample and ShiftIdentity are migrated, all 23 goldens passed through it; the harness was deleted on 2026-09-20 once the comparison closed) and 4 (the old generator, its attributes, `UseGeneratedMapper`, the registry and `SelectWithTags` deleted on 2026-09-20; SHENGEN006 re-homed as SHENT001 in `ShiftEntity.Analyzers`) are done. Stage 5: CLAUDE.md done; the `.shift` plans, the docs page and the guide's publication open. See [`STATUS.md`](STATUS.md).
 
@@ -64,11 +72,12 @@ knows mapping deeply but nothing about repositories.
 3. **No attributes for mapping.** The three ShiftEntity mapping attributes and the `UseGeneratedMapper = true`
    property are deleted and **nothing replaces them with another attribute**. The framework's own rules are code
    in a rules pack.
-4. **Configuration in the repository still works**, written in ShiftMapper's own vocabulary
-   (`o.Mapping(m => m.List.ForMember(...))`), and flows into the generated map.
-5. **A mapper class overrides the repository.** `CreateMap<E, L>()` in any `ShiftMapperBase` class replaces
-   the automatic map for that pair; every customization for that pair lives there, and the repository's
-   configuration for it is ignored (the build says so).
+4. **The repository says how DEEP its maps nest, and nothing else** (`o.Mapping(m => m.Nested(n))`, read
+   at build time). *Amended 2026-09-20 — it originally also accepted member customizations; those are not
+   the repository's responsibility and moved out (Stage 4b).*
+5. **A member customization is a mapper class.** `CreateMap<E, L>()` in any `ShiftMapperBase` class replaces
+   the automatic map for that pair (SM0047, informational); every customization for that pair lives there,
+   the other pairs of the triple stay automatic, and the pairs below a replaced map still nest automatically.
 6. **The maps work anywhere.** Not only inside the repository: any service, any project that references the
    data project, any library through `IMapper` — see §6.
 7. **The framework's conventions move into ShiftMapper rules**: `FK ↔ ShiftEntitySelectDTO`, `string ↔
@@ -136,21 +145,21 @@ which is already the framework's rule for `WithMapper` endpoints and how the sam
  marker on ShiftRepository<DB, TEntity, TList, TView>  ─closed by─▶  class InvoiceRepository
  marker on ShiftEntityEndpoint<TList, TView>                            : ShiftRepository<DB, Invoice, InvoiceListDTO, InvoiceDTO>
    "declare TEntity↔TView, TEntity→TList, TEntity→TEntity,            {
-    nest 10 deep, apply ShiftEntityConversions"                            base(db, o => o.Mapping(m =>                ◀── optional
-                                                                               m.List.ForMember(d => d.Total, …)))     configuration,
- ShiftEntityConversions (rules pack, code not attributes)              }                                               ShiftMapper vocabulary
-   • IgnoreMember<ShiftEntityBase>(e => e.ID, Destination)                     │
-   • IgnoreMember<IShiftEntityTaggable>(e => e.Tags, Destination)              │  ShiftMapper's generator reads the marker
-   • SelectDTO member convention (single + collection)                         │  and the o.Mapping(...) lambda
-   • string ↔ List<ShiftFileDTO>                                               ▼
-                                                                    CreateMap<Invoice, InvoiceDTO>().ReverseMap()           ┐ automatic
- ShiftEntityFrameworkMaps (mapper class)                            CreateMap<Invoice, InvoiceListDTO>()                    │ maps,
-   • Tag → TagDTO, Tag → TagListDTO                                   .ForMember(d => d.Total, …)   ← from o.Mapping        │ nested
-                                                                    CreateMap<Invoice, Invoice>()                           │ ones
-                                                                    CreateMap<InvoiceLine, InvoiceLineDTO>().ReverseMap()   │ included
-                                                                    CreateMap<InvoiceLine, InvoiceLineListDTO>()            ┘
+    nest 10 deep, apply ShiftEntityConversions"                            base(db, o => o.Mapping(m => m.Nested(2)))  ◀── optional:
+                                                                       }                                               depth only
+ ShiftEntityConversions (rules pack, code not attributes)                      │
+   • IgnoreMember<ShiftEntityBase>(e => e.ID, Destination)                     │  ShiftMapper's generator reads the marker
+   • IgnoreMember<IShiftEntityTaggable>(e => e.Tags, Destination)              │  (and m.Nested(n), if written)
+   • SelectDTO member convention (single + collection)                         ▼
+   • string ↔ List<ShiftFileDTO>                                    CreateMap<Invoice, InvoiceDTO>().ReverseMap()           ┐ automatic
+                                                                    CreateMap<Invoice, InvoiceListDTO>()                    │ maps,
+ ShiftEntityFrameworkMaps (mapper class)                            CreateMap<Invoice, Invoice>()                           │ nested
+   • Tag → TagDTO, Tag → TagListDTO                                 CreateMap<InvoiceLine, InvoiceLineDTO>().ReverseMap()   │ ones
+                                                                    CreateMap<InvoiceLine, InvoiceLineListDTO>()            ┘ included
                                                                                │
-                                                                               │  a mapper class of yours declaring a pair
+                                                                               │  class StockPlusPlusMapper : ShiftMapperBase    ◀── a member
+                                                                               │  { CreateMap<Invoice, InvoiceListDTO>()            customization
+                                                                               │      .ForMember(d => d.Total, …); }                is a mapper class
                                                                                │  REPLACES the automatic map for that pair
                                                                                ▼
                                                                     one generated mapper for the assembly
@@ -166,9 +175,11 @@ which is already the framework's rule for `WithMapper` endpoints and how the sam
 
 ```
 1. a mapper class declaring the pair       — in this project; else the nearest package that declares it
-2. the repository's o.Mapping(...) for it  — one repository per pair
-3. the automatic map from the type arguments, with the framework's rules pack
+2. the automatic map from the type arguments, with the framework's rules pack
 ```
+
+*(Until 2026-09-20 there was a middle rung, "the repository's `o.Mapping(...)` for it"; Stage 4b removed it —
+a repository configures nothing about a map but its depth.)*
 
 Plus the two doors that do not change: overriding the four virtual methods in the repository, and a
 hand-written `IShiftEntityMapper`.
@@ -198,49 +209,32 @@ public CountryRepository(DB db) : base(db) { }
 [ShiftEntitySecureEndpoint<CountryGeneratedDTO, CountryGeneratedDTO, StockPlusPlusActionTree>("api/country-generated", …)]
 ```
 
-### Configure in the repository — same place as today, ShiftMapper's vocabulary
-
-`m.View`, `m.Entity`, `m.List`, `m.Copy` are ShiftMapper's own `MapExpression<,>` for the four automatic maps,
-so `ForMember` / `Ignore` / `MapFrom` / `AfterMap` are the same calls you would write in a mapper class.
+### The repository says how deep — and nothing else *(amended 2026-09-20)*
 
 ```csharp
 public class InvoiceRepository : ShiftRepository<DB, Invoice, InvoiceListDTO, InvoiceDTO>
 {
-    public InvoiceRepository(DB db, IHashIdService hashIds, IShiftEntityMappingContext ctx) : base(db, o =>
+    public InvoiceRepository(DB db) : base(db, o =>
     {
         o.IncludeRelatedEntitiesWithFindAsync(x => x.Include(i => i.InvoiceLines));
-
-        o.Mapping(m =>
-        {
-            m.List.ForMember(d => d.Total, opt => opt.MapFrom(e => e.InvoiceLines.Sum(l => l.Price)));  // runs in SQL
-
-            m.Entity.ForMember(e => e.InvoiceNo, opt => opt.Ignore())
-                    .AfterMap((dto, entity) =>
-                    {
-                        entity.ManualReference = entity.ManualReference?.Trim();
-                        if (ctx.ActionType == ActionTypes.Insert) entity.ReleaseDate = null;
-                    });
-
-            m.View.ForMember(d => d.PublicKey, opt => opt.MapFrom(e => hashIds.Encode(e.ID)));           // a captured service is fine
-
-            m.Nested(2);   // optional: cap automatic nesting for this repository (default 10)
-        });
+        o.Mapping(m => m.Nested(2));   // optional: cap automatic nesting for this repository (default 10)
     })
     { }
 }
 ```
 
 The same `Mapping(...)` is available on `context.Options` inside an entity's
-`IConfiguresShiftRepository.ConfigureRepository` (the built-in-repository case).
+`IConfiguresShiftRepository.ConfigureRepository` (the built-in-repository case). It is read at **build time**
+by the generator (a constant, a plain statement of the lambda — SM0035 otherwise) and baked into the maps the
+closing type declares; at run time it only records `ShiftRepositoryOptions.NestedMappingDepth`. Nothing of a
+repository's reaches a map at run time.
 
-**How it works** — the split ShiftMapper already uses for package mappers: at **build time** the generator
-reads the lambda for its *shape* (which members are customized or ignored, whether there is an `AfterMap`),
-exactly as it reads a mapper class's constructor, so every diagnostic still fires; at **run time** the lambda
-runs when the repository is constructed, as today, and its expressions go into the customization store the
-generated map reads. Two rules follow: the lambda must be inline and unconditional (SM0035 — the same rule
-SHENGEN005 enforces today), and one repository per pair may configure it (Q2).
+*What was here before:* `m.View` / `m.Entity` / `m.List` / `m.Copy` handles on the same surface, so a
+repository could write `m.List.ForMember(d => d.Total, …)` and the mapper pulled the repository from DI when
+the map was used first (Q3). Removed in Stage 4b: what a member maps from is not the repository's
+responsibility, and the customization belongs in the map — a mapper class, below.
 
-### Customize in a mapper class — overrides the repository for that pair
+### Customize in a mapper class — the one place a member customization lives
 
 ```csharp
 // Before — ShiftEntity's own fluent vocabulary, on a partial class the generator fills
@@ -258,13 +252,15 @@ public partial class ProductBrandMapper : IShiftEntityMapper<ProductBrand, Produ
     }
 }
 
-// After — an ordinary class, no attribute, nothing partial, nothing registered.
-// Declaring a pair REPLACES the automatic map for that pair — and anything the repository's
-// o.Mapping(...) said about that pair is ignored (the build says so). The two pairs not
-// mentioned here (entity → view, entity → entity) stay automatic.
-public class ProductBrandMapper : ShiftMapperBase
+// After — an ordinary class, no attribute, nothing partial, nothing registered: the project's
+// ONE mapper class (the sample's is Mappers/StockPlusPlusMapper.cs; ShiftIdentity's is
+// ShiftIdentityMapper). Declaring a pair REPLACES the automatic map for that pair (SM0047,
+// informational). The two pairs not mentioned here (entity → view, entity → entity) stay
+// automatic, and so do the nested pairs below a replaced map. The same door serves an
+// attribute-driven endpoint with no repository class and a repository's triple alike.
+public class StockPlusPlusMapper : ShiftMapperBase
 {
-    public ProductBrandMapper()
+    public StockPlusPlusMapper()
     {
         CreateMap<ProductBrand, ProductBrandListDTO>()
             .ForMember(d => d.Code, opt => opt.MapFrom(e => e.Code ?? "(No Code)"));
@@ -276,14 +272,17 @@ public class ProductBrandMapper : ShiftMapperBase
 ```
 
 The framework's rules (select DTOs, files, `ID` never written, …) still apply to a map you declare yourself:
-they are a pack, not something baked into the automatic map.
+they are a pack, not something baked into the automatic map. Two things the automatic map had that a
+`CreateMap` does not inherit: it did not flatten (`ConfigureDefaults(o => o.Flattening = false)` in the
+class keeps that), and its write direction was the REVERSE of the view map — declare yours as
+`CreateMap<E, V>().ReverseMap().ForMember(…)` so the entity-only members it leaves alone are the quiet
+SM0006 rather than one SM0001 warning each (ShiftIdentity's `ShiftIdentityMapper` does both).
 
 ### Ignore a member — no attribute
 
 ```csharp
 // Before: map.Ignore(d => d.Secret)  /  [ShiftEntityMapperIgnore] on the property
-// After, in the repository:   m.View.ForMember(d => d.Secret, opt => opt.Ignore());
-//        or in a mapper class: CreateMap<Product, ProductDTO>().ForMember(d => d.Secret, opt => opt.Ignore());
+// After, in a mapper class: CreateMap<Product, ProductDTO>().ForMember(d => d.Secret, opt => opt.Ignore());
 ```
 
 One call per direction the member exists in — usually one or two.
@@ -344,9 +343,10 @@ if (mapper.CanMap(typeof(TEntity), typeof(TDto))) dto = mapper.Map<TEntity, TDto
 
 What that gives, without anyone writing anything:
 
-- **Same map everywhere.** A repository's `o.Mapping(...)` customization is part of the map, so the service
-  above gets `Total` too. (ShiftMapper builds the repository from DI the first time the map is used outside
-  it, as it builds a mapper class from DI today — the one design cost, see Q3.)
+- **Same map everywhere.** A mapper class's customization IS the map, so the service above gets `Total`
+  too, in a scope where no repository was ever constructed, with nothing pulled from anywhere. (Until
+  Stage 4b the customization could sit in the repository, and ShiftMapper built the repository from DI on
+  first use — Q3; that cost is gone with the feature.)
 - **Cosmos replication** already maps through `IMapper` when a call site passes no delegate; an entity's
   automatic maps are now candidates there as well.
 - **Every referencing project** (API, Functions, tests) has the same typed methods, because a project's
@@ -360,7 +360,7 @@ What that gives, without anyone writing anything:
 |---|---|---|
 | **M1** | **Implicit maps from a marked generic type.** A marker on an open generic class or attribute class: "every closing type declares maps between these type arguments", with `Reverse`, `Nested`, `Rules`, `Flattening`. Generated as a mapper class that travels like any package mapper. | Fact 1 — automatic discovery of repositories and endpoint attributes. The marker lives in ShiftEntity; nobody else writes it. |
 | **M2** | **Nested declaration** (`Nested = n`): every (class, class) member pair with no declared map gets an implicit map, recursively, to depth *n*; cycles stop with an Info; a member a convention claims is not nested; `m.Nested(n)` in the configuration surface overrides the depth. | Today's automatic pair mappers and `MaxDepth`. |
-| **M3** | **A configuration surface on the closing type.** The marker names a surface type whose properties are the `MapExpression<,>` of the implicit maps; a lambda handed to it (`o.Mapping(m => …)`) is read at build time for shape, and the closing type (the repository) holds the customizations at run time — constructed from DI on first use, like a mapper class. A mapper class declaring the pair replaces it (Info; Warning if the surface also configured it). Two closing types configuring one pair is an error. | "Configuration in the repository flows to ShiftMapper." |
+| **M3** | **A configuration surface on the closing type.** A lambda over a `ShiftMapperConfigurationSurface` subclass (`o.Mapping(m => …)`) is read at build time; `m.Nested(n)` sets the closing type's depth, and the surface's `MapExpression<,>` properties let the closing type customize members, held at run time and pulled from DI on first use. | Only the depth half, since 2026-09-20: `ShiftEntityMapping<E,L,V>` exposes `Nested(n)` and no map handles. The member half (`IMapper.Configure`, `IShiftMapperConfiguratorResolver`, SM0050–SM0052) is unused by ShiftEntity — Q16. |
 | **M4** | **Pack-level member ignore rules**: `IgnoreMember<TDeclaring>(x => x.Member, MemberRole)` in a `ShiftMapperConversions` pack — applies to every map whose source/destination is assignable to `TDeclaring` (interfaces included). | "`ID` is never written from a request", `ReloadAfterSave`, `AuditFieldsAreSet`, `Tags` on write, `Revisions` on read — as code in the framework's pack, with no attribute anywhere. |
 | **M5** | **Collection member conventions**: a `CreateMemberConvention<T>()` that also applies to `IEnumerable<T>` members, filling each element from the matching element of the source collection. | The `List<ShiftEntitySelectDTO>` gap. |
 | **M6** | An Info diagnostic when an **update** map (`Map(source, destination)`) rebuilds a nested collection. | Successor of SHENGEN010 — the one warning that stops a silent orphan/duplicate on save. |
@@ -374,7 +374,8 @@ Everything else is ShiftMapper as it is today. Details and samples per feature a
   convention (single and collection), the files conversions. Shared by the framework's registration.
 - `ShiftEntityFrameworkMaps : ShiftMapperBase` — the framework-owned pairs (`Tag → TagDTO`, `Tag → TagListDTO`).
 - The marker on `ShiftRepository<,,,>` and the endpoint attributes (not the `WithMapper` ones), and the
-  configuration surface `ShiftEntityMapping<E, L, V>` behind `ShiftRepositoryOptions.Mapping(...)`.
+  depth-only surface `ShiftEntityMapping<E, L, V>` behind `ShiftRepositoryOptions.Mapping(...)` (its map
+  handles were removed on 2026-09-20; `NestedMappingDepth` records what was asked).
 - `ShiftRepository` maps through `IMapper`; `IShiftEntityMappingContext` (scoped) carries `ActionType`.
 - `ShiftEntityMapperValidation` asks `IMapper.CanMap` instead of the registry.
 
@@ -383,11 +384,11 @@ Everything else is ShiftMapper as it is today. Details and samples per feature a
 | Deleted | What to write instead |
 |---|---|
 | `[ShiftEntityMapper]` partial mapper class | an ordinary `ShiftMapperBase` class declaring the pairs it customizes |
-| `[ShiftEntityMapperIgnore]` | `ForMember(d => d.X, opt => opt.Ignore())` in `o.Mapping(...)` or a mapper class |
+| `[ShiftEntityMapperIgnore]` | `ForMember(d => d.X, opt => opt.Ignore())` in a mapper class |
 | `[ShiftEntityMapperMaxDepth(n)]` | `m.Nested(n)` in `o.Mapping(...)` |
 | `ShiftEntityMapperDefaults` | the marker's defaults inside ShiftEntity |
 | `UseGeneratedMapper = true` on the endpoint attributes | nothing — always automatic |
-| `UseGeneratedMapper()` / `UseGeneratedMapper(map => …)` | nothing / `o.Mapping(m => …)` |
+| `UseGeneratedMapper()` / `UseGeneratedMapper(map => …)` | nothing / a mapper class declaring the customized pairs (`m.Nested(n)` in `o.Mapping(...)` for the depth) |
 | `ShiftMapperBuilder`, `ShiftChildMapperBuilder`, `IShiftMapperConfigurable`, `IShiftObjectMapper` | ShiftMapper's own `MapExpression<,>` and nested maps |
 | `ShiftEntityMapperRegistry`, `GeneratedMapperFactory`, module initializers | the generated mapper, registered by `AddShiftMapper()` |
 | `ShiftEntity.SourceGenerator` (whole project), all eleven `SHENGEN` diagnostics, `SelectWithTags` | ShiftMapper's generator and `SM` rules |
@@ -412,5 +413,7 @@ methods on `ShiftRepository`.
    repositories; make every golden pass. (Done; the goldens were then removed — the comparison was their job.)
 5. **Delete** the old generator, the attributes and everything attached; update CLAUDE.md, the docs, the
    pipeline notes. (Done 2026-09-20, in the same unreleased window as the flip — see Q7.)
+6. **Take mapping configuration out of the repository** (Stage 4b, 2026-09-20): the surface keeps `Nested(n)`
+   only, the DI pull goes, every `o.Mapping(m => m.X.ForMember(…))` becomes a mapper class. Same window.
 
 Steps are in [`01-steps.md`](01-steps.md).

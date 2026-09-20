@@ -116,11 +116,11 @@ builder.Services.AddAttentionHub();
 // the Data assembly's generated mapper. The sample shows every door:
 //   - Country, ProductCategory -> AUTOMATIC: nothing written (CountryRepository, ProductCategoryRepository,
 //                                the api/country endpoint)
-//   - Invoice, api/country-generated -> automatic maps CUSTOMIZED where the repository is configured:
-//                                options.Mapping(m => m.List.ForMember(...)) in InvoiceRepository, and the
-//                                same from the entity's ConfigureRepository for api/country-generated
-//   - ProductBrand    -> a MAPPER CLASS (Mappers/ProductBrandMapper.cs, an ordinary ShiftMapperBase) whose
-//                        CreateMaps replace the automatic maps for the pairs it declares
+//   - Invoice, ProductBrand, api/country-generated -> the project's ONE MAPPER CLASS
+//                        (Mappers/StockPlusPlusMapper.cs, an ordinary ShiftMapperBase) whose CreateMaps replace
+//                        the automatic maps for the pairs it declares; the other pairs stay automatic. A
+//                        repository says only how DEEP its maps nest (o.Mapping(m => m.Nested(n))), never
+//                        what a member maps from.
 //   - Product         -> overrides MapToView/MapToEntity/MapToList in ProductRepository (unchanged door)
 //   - api/countrymapped -> a hand-written IShiftEntityMapper (Mappers/CountryMapper.cs) (unchanged door)
 // The same maps serve any service that injects Mapper (typed methods) or IMapper. A triple nothing covers

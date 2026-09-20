@@ -42,20 +42,20 @@ public class AttributeEndpointTests
         Assert.Same(db, repo.db);
     }
 
-    // Country implements IConfiguresShiftRepository<Country, CountryGeneratedDTO, CountryGeneratedDTO>, so the
-    // BUILT-IN repository for that triple is configured by the entity (a small mapper tweak) with no repository
-    // class. The config is keyed by the triple, so only this endpoint is affected.
+    // The BUILT-IN repository for the CountryGeneratedDTO triple maps through the automatic maps the endpoint
+    // attribute declares, one of which Mappers/StockPlusPlusMapper.cs replaces — with no repository class
+    // and nothing on the entity. The map is keyed by the pair, so only this endpoint is affected.
     [Fact]
-    public void AttributeEndpoint_EntityConfiguresBuiltInRepository_ViaInterface()
+    public void AttributeEndpoint_BuiltInRepository_MapsThroughTheMapperClass()
     {
         using var scope = factory.Services.CreateScope();
 
         var repo = scope.ServiceProvider.GetRequiredService<ShiftRepository<DB, Country, CountryGeneratedDTO, CountryGeneratedDTO>>();
 
-        // The entity configures the built-in repository via ForList, so the list projection carries the tweak.
+        // The list projection carries the mapper class's customization.
         var row = repo.MapToList(new[] { new Country { Name = "Testland" } }.AsQueryable()).Single();
 
-        Assert.Equal("Testland (via IConfiguresShiftRepository)", row.Name);
+        Assert.Equal("Testland (via StockPlusPlusMapper)", row.Name);
     }
 
     // Country also implements IUpsertsShiftRepository for the CountryGeneratedDTO triple, so the BUILT-IN

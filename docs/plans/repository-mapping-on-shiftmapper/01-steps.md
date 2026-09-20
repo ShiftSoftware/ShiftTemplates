@@ -557,6 +557,28 @@ because the repository passes a builder" — can move to a tiny `DiagnosticAnaly
 
 ---
 
+## Stage 4b — Mapping configuration leaves the repository *(added and done 2026-09-20)*
+
+Not in the original plan. After Stage 4 the user decided that WHAT a member maps from is not the repository's
+responsibility: the repository (or the entity's `ConfigureRepository`) keeps saying HOW DEEP the automatic maps
+nest, and everything else about a map is a mapper class. See [`STATUS.md`](STATUS.md) Stage 4b and Q16.
+
+- **4b.1 ShiftEntity.** `ShiftEntityMapping<E,L,V>` drops `View`/`Entity`/`List`/`Copy` and keeps `Nested(n)`
+  (a `new` overload recording `Depth`); `ShiftRepositoryOptions.Mapping(...)` runs the lambda at once and records
+  `NestedMappingDepth`; `InitCommon` no longer calls `IMapper.Configure`; `ShiftEntityConfiguratorResolver` and
+  its registration are deleted. The generator needs nothing: it reads `m.Nested(n)` off any lambda over a
+  `ShiftMapperConfigurationSurface` subclass.
+- **4b.2 ShiftIdentity.Data.** ONE mapper class, `Mappers/ShiftIdentityMapper.cs`, for every configured
+  entity (`Region`, `City`, `Team`, `CompanyCalendar` + its JSON-group children, `CompanyBranch`, `Company`,
+  `User`) — `CompanyCalendarGroupMapper` folded in; the replication mapper stays separate — the write map
+  declared as `.ReverseMap()` of the view map, flattening off in `ConfigureDefaults`. Diagnostics identical
+  before and after.
+- **4b.3 Sample.** ONE mapper class, `Mappers/StockPlusPlusMapper.cs` (ProductBrand's two maps folded in from
+  `ProductBrandMapper.cs`, Invoice's `Total`, `api/country-generated`'s `Name`); the repositories and the entity
+  carry no mapping configuration; tests renamed to what they now show. The item template stops scaffolding a
+  mapper file (one class per project; the scaffolded repository's comment points at it).
+- **4b.4 Docs.** README amended in place; `03-coverage.md`, `04-migration-guide.md`, CLAUDE.md updated.
+
 ## Stage 5 — Docs, CLAUDE.md, pipeline
 
 - **5.1** `ShiftTemplates/CLAUDE.md`: rewrite "Active Work: Mapping Abstraction", the SHENGEN section, the

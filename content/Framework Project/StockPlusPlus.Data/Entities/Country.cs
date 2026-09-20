@@ -21,9 +21,10 @@ namespace StockPlusPlus.Data.Entities;
 //                                repository resolves them through the host's IMapper. Nothing else is written.
 //   - "api/countrymapped"     -> ShiftEntitySecureEndpointWithMapper: built-in repository, but the automatic
 //                                mapping is replaced by the hand-written CountryMapper (an IShiftEntityMapper).
-//   - "api/country-generated" -> the automatic maps again, CUSTOMIZED from the entity: Country implements
-//                                IConfiguresShiftRepository for this triple and its ConfigureRepository writes
-//                                context.Options.Mapping(m => ...) — the same door a repository class has.
+//   - "api/country-generated" -> the automatic maps again, one of them CUSTOMIZED in the project's mapper class
+//                                (Mappers/StockPlusPlusMapper.cs) — the same door a repository's maps have,
+//                                for an entity that has no repository class. Country also implements the three
+//                                entity-driven hooks for this triple (below).
 [TemporalShiftEntity]
 [ShiftEntityKeyAndName(nameof(ID), nameof(Name))]
 [ShiftEntitySecureEndpoint<CountryDTO, CountryDTO, StockPlusPlusActionTree>("api/country", nameof(StockPlusPlusActionTree.Country))]
@@ -34,7 +35,7 @@ public class Country : ShiftEntity<Country>, IEntityHasIdempotencyKey<Country>,
     // only to the "api/country-generated" endpoint. The plain endpoint ("api/country") and the
     // custom-mapper endpoint ("api/countrymapped") are untouched, because Country doesn't implement these
     // interfaces for their triples.
-    //   - IConfiguresShiftRepository -> shape the built-in repository (includes, mapping, filters, …)
+    //   - IConfiguresShiftRepository -> shape the built-in repository (includes, filters, mapping depth, …)
     //   - IUpsertsShiftRepository    -> take over its upsert   (== overriding UpsertAsync in a repository)
     //   - IDeletesShiftRepository    -> take over its delete   (== overriding DeleteAsync in a repository)
     // All three receive a context deriving from ShiftRepositoryContext, so all three get .Services (the
@@ -48,12 +49,12 @@ public class Country : ShiftEntity<Country>, IEntityHasIdempotencyKey<Country>,
 
     public void ConfigureRepository(ShiftRepositoryConfigurationContext<Country, CountryGeneratedDTO, CountryGeneratedDTO> context)
     {
-        // A small custom mapping on the built-in repository, no repository class needed — one member of the
-        // LIST map, in ShiftMapper's vocabulary; an expression, so it runs in SQL. Read at build time for its
-        // shape, run here for its value. context.Services is the request scope — resolve scoped services here
-        // if the config needs them (current user, tenant, …), e.g. context.Services.GetService<ICurrentUserProvider>(),
-        // and use them inside the MapFrom value.
-        context.Options.Mapping(m => m.List.ForMember(d => d.Name, opt => opt.MapFrom(e => e.Name + " (via IConfiguresShiftRepository)")));
+        // The entity's version of a repository's base-constructor builder: context.Options is the same
+        // ShiftRepositoryOptions — includes (IncludeRelatedEntitiesWithFindAsync), global filters, data-level
+        // access, and how deep the automatic maps nest (context.Options.Mapping(m => m.Nested(n)); Country has
+        // no children, so nothing to cap). context.Services is the request scope, for config that needs a
+        // scoped service (current user, tenant, …). What a member maps FROM is not configured here — that is
+        // the project's mapper class, Mappers/StockPlusPlusMapper.cs.
     }
 
     // The upsert hook — the entity's version of `override UpsertAsync(...)`. context.Base() IS

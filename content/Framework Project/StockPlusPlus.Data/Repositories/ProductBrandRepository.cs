@@ -1,17 +1,19 @@
 ﻿
 using ShiftSoftware.ShiftEntity.EFCore;
 using StockPlusPlus.Data.DbContext;
-using StockPlusPlus.Data.Mappers;
 using StockPlusPlus.Shared.DTOs.ProductBrand;
 
 namespace StockPlusPlus.Data.Repositories;
 
 public class ProductBrandRepository : ShiftRepository<DB, Entities.ProductBrand, ProductBrandListDTO, ProductBrandDTO>
 {
-    // ProductBrand demonstrates the MAPPER CLASS door: Mappers/ProductBrandMapper.cs is an ordinary ShiftMapper
-    // class (ShiftMapperBase) declaring only the pairs it customizes; a CreateMap there REPLACES the automatic
-    // map for that pair, and the other pairs of the triple stay automatic. Nothing is plugged in here — the
-    // repository resolves the host's mapper, which carries the class's maps and the automatic ones alike.
+    // The four maps of this triple are declared automatically from the type arguments above; nothing about
+    // mapping is written in a repository. Where a member needs more than convention, the customization goes in
+    // the project's ONE mapper class — Mappers/StockPlusPlusMapper.cs, an ordinary ShiftMapperBase — as a
+    // CreateMap for that pair, which REPLACES the automatic map for that pair while the other pairs of the
+    // triple stay automatic (ProductBrand's list Code and write AfterMap are there). The repository resolves the
+    // host's mapper, which carries the class's maps and the automatic ones alike; its only word about its maps
+    // would be how deep they nest, o.Mapping(m => m.Nested(n)).
     // Tags need no repository plumbing: the framework auto-includes them for IShiftEntityTaggable entities,
     // which is why the taggable and non-taggable arms of this class used to be identical apart from an
     // Include that did nothing.

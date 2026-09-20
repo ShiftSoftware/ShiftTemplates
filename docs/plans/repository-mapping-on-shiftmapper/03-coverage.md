@@ -25,8 +25,8 @@ The **Verify** column is what Stage 2.8's golden diff must confirm; ✅ there me
 | A10 | `Tags` left to the repository (`ViewAsync` auto-maps them for taggables) | `Tag → TagDTO` framework pair (Step 2.3) makes it an ordinary nested collection; the repository's own auto-map becomes redundant — keep one, not both | no double mapping |
 | A11 | `Revisions` left alone | **pack** rule: `IgnoreMember<…DTO>(d => d.Revisions, Destination)` (M4) | — |
 | A12 | init-only DTO members reported as unmapped (cannot be assigned) | built-in: `init`, `required`, records, primary constructors are all mapped | an improvement, not a parity item |
-| A13 | `ForView(member, (entity, ctx) => …)`; services via `ctx.Services` | `m.View.ForMember(d => d.X, o => o.MapFrom(e => …))` in `o.Mapping` (captured services allowed) or in a mapper class (constructor injection) | — |
-| A14 | `IgnoreView` / `Ignore` / `[ShiftEntityMapperIgnore]` | `m.View.ForMember(d => d.X, o => o.Ignore())` / the same in a mapper class. **No attribute.** | — |
+| A13 | `ForView(member, (entity, ctx) => …)`; services via `ctx.Services` | `CreateMap<E, V>().ForMember(d => d.X, o => o.MapFrom(e => …))` in a mapper class (a service read from `Services` inside the value, or constructor injection). *Since 2026-09-20 there is no repository spelling (Q16).* | — |
+| A14 | `IgnoreView` / `Ignore` / `[ShiftEntityMapperIgnore]` | `CreateMap<E, V>().ForMember(d => d.X, o => o.Ignore())` in a mapper class. **No attribute.** | — |
 | A15 | unmapped view members → SHENGEN004 | SM0001 (warning), with the "Ignore" code fix | same members warned |
 
 ## B. Write side — `MapToEntity` (view DTO → tracked entity, in memory)
@@ -39,9 +39,9 @@ The **Verify** column is what Stage 2.8's golden diff must confirm; ✅ there me
 | B4 | nested children written **replace-with-new** through the pair's `MapBack`; tracked child with a required FK back → SHENGEN010 | update overload rebuilds nested collections (`ToListOrEmpty(source.Lines, MapToLine)`); **M6** SM0049 Info | Invoice lines replaced; `InvoiceRepository.UpsertAsync` keeps its delete-and-recreate |
 | B5 | never written: `ID`, `ReloadAfterSave`, `AuditFieldsAreSet`, `IdempotencyKey`, `Tags` (gated by "is a framework member") | **pack** rules (M4): `IgnoreMember<ShiftEntityBase>(e => e.ID, Destination)`, … , `IgnoreMember<IShiftEntityTaggable>(e => e.Tags, Destination)` — a domain column that happens to be called `Tags` is unaffected, because the rule names the framework's member | insert with `ID = null` does not throw |
 | B6 | `IsDeleted` and the audit columns ARE written (Q7 of the AutoMapper removal); the repository restores stored `IsDeleted` on update | plain name matches; repository unchanged | — |
-| B7 | `ForEntity(member, (dto, ctx) => …)`, `ForEntity(member, (dto, existing, ctx) => …)`, `AfterEntity((dto, existing, ctx) => …)`; `ctx.ActionType` | `m.Entity.ForMember(MapFrom)`; `m.Entity.AfterMap((dto, entity) => …)` for anything needing the entity or the action; `IShiftEntityMappingContext.ActionType` (Step 2.5) — in `o.Mapping` or a mapper class | — |
+| B7 | `ForEntity(member, (dto, ctx) => …)`, `ForEntity(member, (dto, existing, ctx) => …)`, `AfterEntity((dto, existing, ctx) => …)`; `ctx.ActionType` | in a mapper class, on the reverse of the view map: `.ReverseMap().ForMember(MapFrom)`; `.AfterMap((dto, entity) => …)` for anything needing the entity or the action; `IShiftEntityMappingContext.ActionType` (Step 2.5) read from `Services` inside the value | — |
 | B8 | view reads a member the entity never writes → SHENGEN008 | `ReverseMap` reports SM0006 (Info) for a destination the reverse leaves unmapped; the conversion table is symmetric so the old asymmetry cannot arise from a one-way conversion | the members SHENGEN008 warns on today appear as SM0006 |
-| B9 | `IgnoreEntity` | `m.Entity.ForMember(..., Ignore())` / the same in a mapper class | — |
+| B9 | `IgnoreEntity` | `.ReverseMap().ForMember(e => e.X, o => o.Ignore())` in a mapper class | — |
 
 ## C. List side — `MapToList` (one SQL projection)
 
@@ -52,9 +52,9 @@ The **Verify** column is what Stage 2.8's golden diff must confirm; ✅ there me
 | C3 | `ID` (`long` → `ToString()`) and `IsDeleted` always bound — OData's soft-delete filter and hash-id `$filter`/`$orderby` run on the projected DTO | plain name matches; `.ToString()` translates | **mandatory** — a projection missing either is a 500 on every list |
 | C4 | `Tags` spliced in by `SelectWithTags`; `Revisions` skipped | `Tags` is a nested collection through the framework pair; `Revisions` ignored (pack rule) | tags present in the list projection; `SelectWithTags` retired |
 | C5 | conversions restricted to what EF translates (casts, `ToString()`); text parsing in a list DTO → SHENGEN007 instead of a query-time failure | ShiftMapper reports a member/map it cannot project (SM0030 conversion without query form; SM0036/SM0037) instead of failing at query time | list DTOs with `string` → number members, if any |
-| C6 | `ForList(member, expr)` spliced into the projection (closures become SQL parameters) | `m.List.ForMember(d => d.X, o => o.MapFrom(expr))` — spliced, projects | — |
+| C6 | `ForList(member, expr)` spliced into the projection (closures become SQL parameters) | `CreateMap<E, L>().ForMember(d => d.X, o => o.MapFrom(expr))` in a mapper class — spliced, projects | — |
 | C7 | `ForListChild(ren)` + `configureChild` | automatic nesting; customize the child pair once | — |
-| C8 | `IgnoreList` | `m.List.ForMember(..., Ignore())` | — |
+| C8 | `IgnoreList` | `CreateMap<E, L>().ForMember(..., Ignore())` in a mapper class | — |
 | C9 | unmapped list members → SHENGEN007 with a paste-ready `map.ForList(d => d.X, e => e.<flattened guess>)` | SM0001 on the list map. The "would flatten to" hint is lost while flattening is off (Q4) — a nice-to-have for ShiftMapper: mention the path flattening *would* have taken in SM0001 | — |
 | C10 | `AsNoTracking` before projection (`OdataList`) | repository unchanged | — |
 
@@ -73,11 +73,11 @@ The **Verify** column is what Stage 2.8's golden diff must confirm; ✅ there me
 | E1 | triples from `ShiftRepository<,,,>` subclasses and `[ShiftEntity*Endpoint<,>]` attributes (not the `WithMapper` ones) | **M1** marker inside ShiftEntity on the same two places; the programmer's repository is automatic exactly as today | every triple in the 0.1 inventory has its four maps |
 | E2 | `[ShiftEntityMapper] partial class` + `Configure(map)` hook + `*Generated` bodies for takeover-with-base-call | an ordinary `ShiftMapperBase` class declaring the pair(s) it customizes — overrides the repository for that pair; "post-process after the conventions" = `AfterMap`; "replace the whole map" = `ConvertUsing` or a repository override. **Attribute deleted, nothing replaces it.** | — |
 | E3 | `[ShiftEntityMapper] partial class : IShiftObjectMapper<Child, ChildDto>` (custom pair) | `CreateMap<Child, ChildDto>()` in any mapper class; replaces the implicit nested map (SM0047 Info) | — |
-| E4 | `UseGeneratedMapper()` / `UseGeneratedMapper(map => …)` / `UseGeneratedMapper = true` on an attribute | nothing / `o.Mapping(m => …)` (**M3**, same place, ShiftMapper vocabulary) / property deleted — always automatic | — |
+| E4 | `UseGeneratedMapper()` / `UseGeneratedMapper(map => …)` / `UseGeneratedMapper = true` on an attribute | nothing / a mapper class declaring the customized pairs (`o.Mapping(m => m.Nested(n))` for the depth only — Q16) / property deleted — always automatic | — |
 | E5 | `MaxDepth(n)` / `[ShiftEntityMapperMaxDepth(n)]` on repository, mapper class, or assembly | `m.Nested(n)` in `o.Mapping` (M2); marker default 10. **Attribute deleted, nothing replaces it.** | — |
 | E6 | `CaseSensitive()` | `CreateMap<…>(o => o.Matching = PropertyMatching.CaseSensitive)` in a mapper class, or `ConfigureDefaults` | — |
 | E7 | conditional / unbakeable config → SHENGEN005 / SHENGEN009 (errors); cross-assembly config caught at run time by `VerifyBaked` | SM0035 (error) at build, for mapper classes and for `o.Mapping` lambdas alike. No runtime check needed: the shape is read where the lambda is written | — |
-| E8 | one mapper **instance per repository**; registry keyed by triple; conflicts recorded and reported at startup; `VerifyBindings` JIT-prepares mappers to catch ABI skew | one map per pair per assembly (Q1); two repositories configuring one pair → SM0050 error (Q2); SM0042 / SM0027 at build; a consumer built against a ShiftMapper whose conversion was later removed throws on first map (documented as breaking) plus `ConverterApiVersion` for the runtime | — |
+| E8 | one mapper **instance per repository**; registry keyed by triple; conflicts recorded and reported at startup; `VerifyBindings` JIT-prepares mappers to catch ABI skew | one map per pair per assembly (Q1); two mapper classes declaring one pair → SM0042 (a repository configures no pair — Q16); SM0027 at build; a consumer built against a ShiftMapper whose conversion was later removed throws on first map (documented as breaking) plus `ConverterApiVersion` for the runtime | — |
 | E9 | startup validation: every triple resolves a mapper | same, asking `IMapper.CanMap` for the four pairs (Step 2.9) | uncovered triple still fails at startup with the full list |
 | E10 | the generated mapper is reachable only through the repository (or by resolving the registry type by hand) | the maps are ordinary maps: typed `Mapper` methods in the declaring and every referencing project, `IMapper` for libraries (README §6) | a service outside the repository gets the repository's `o.Mapping` customization |
 
@@ -96,8 +96,8 @@ The **Verify** column is what Stage 2.8's golden diff must confirm; ✅ there me
 | SHENGEN010 | deep write replaces tracked child rows | SM0049 Info (M6) |
 | SHENGEN011 | ambiguous case-insensitive match | SM0007 |
 | — | (new) mapper class replaces an implicit map | SM0047 Info |
-| — | (new) two repositories configure one pair | SM0050 error |
-| — | (new) mapper class replaces a pair the repository also configured | SM0051 warning |
+| — | ~~(new) two repositories configure one pair~~ | ~~SM0050 error~~ — unreachable since Q16; SM0042 covers two mapper classes |
+| — | ~~(new) mapper class replaces a pair the repository also configured~~ | ~~SM0051 warning~~ — unreachable since Q16 |
 
 ### Attributes
 
@@ -114,7 +114,7 @@ The **Verify** column is what Stage 2.8's golden diff must confirm; ✅ there me
 | # | Gap | How |
 |---|---|---|
 | F1 | **A collection of `ShiftEntitySelectDTO`** from a navigation collection (`List<ShiftEntitySelectDTO> Departments` ← `ICollection<Department>`), read side, in memory and in SQL | **M5** collection member convention, in the pack |
-| F2 | The same through an explicit **junction entity** (`CompanyBranchDepartments` → `Department`): the source collection's name does not match and the key is on the junction row | one `m.View.ForMember(d => d.Departments, o => o.MapFrom(e => e.CompanyBranchDepartments.Select(x => new ShiftEntitySelectDTO { Value = x.DepartmentID.ToString(), Text = x.Department!.Name })))` — projects; stays explicit on purpose |
+| F2 | The same through an explicit **junction entity** (`CompanyBranchDepartments` → `Department`): the source collection's name does not match and the key is on the junction row | one `.ForMember(d => d.Departments, o => o.MapFrom(e => e.CompanyBranchDepartments.Select(x => new ShiftEntitySelectDTO { Value = x.DepartmentID.ToString(), Text = x.Department!.Name })))` on the CompanyBranch view map in `ShiftIdentityMapper` — projects; stays explicit on purpose |
 | F3 | Write side of a many-to-many | still a reconciliation, in `AfterMap` or the repository/entity upsert hook (as `CompanyBranch` already does); the member is ignored on the write map. SM0049 says so if it is forgotten |
 | F4 | Customize a child once, for every parent that nests it | native — the child pair's own map |
 | F5 | A host overriding a **package's** map (e.g. an app reshaping an identity DTO) | native — near beats far, SM0027 says so |
