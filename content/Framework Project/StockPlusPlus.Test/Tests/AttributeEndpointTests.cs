@@ -124,8 +124,8 @@ public class AttributeEndpointTests
     }
 
     // An attribute-driven endpoint maps without anyone writing a mapper: Country has no repository class and
-    // no hand-written mapper for this triple, so the built-in repository resolves the SOURCE-GENERATED one out
-    // of ShiftEntityMapperRegistry.
+    // no hand-written mapper for this triple, so the built-in repository maps through the ShiftMapper maps the
+    // attribute declares, out of the host's IMapper.
     //
     // This used to assert the same thing about a default AutoMapper map synthesized from the attribute. That
     // synthesis is gone along with AutoMapper, and the property worth keeping is the one a user would notice:

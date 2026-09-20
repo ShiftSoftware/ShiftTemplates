@@ -1,7 +1,7 @@
 # Repository mapping on ShiftMapper — Plan
 
 **Created:** 2026-09-18 · **Revised:** 2026-09-18 (no programmer attributes; configuration in the repository; mapper class overrides)
-**Status:** Stages 0 (the frozen oracle), 1 (the ShiftMapper features, unreleased), 2 (the ShiftEntity side, additive) and 3 (the flip and the migration — ShiftMapper is the repository's mapper, the sample and ShiftIdentity are migrated, all 23 goldens passed through it) are done; the goldens and their harness were deleted on 2026-09-20 once the comparison closed. Stage 4 (delete the old generator, one release later) and 5 not started. See [`STATUS.md`](STATUS.md).
+**Status:** Stages 0 (the frozen oracle), 1 (the ShiftMapper features, unreleased), 2 (the ShiftEntity side, additive), 3 (the flip and the migration — ShiftMapper is the repository's mapper, the sample and ShiftIdentity are migrated, all 23 goldens passed through it; the harness was deleted on 2026-09-20 once the comparison closed) and 4 (the old generator, its attributes, `UseGeneratedMapper`, the registry and `SelectWithTags` deleted on 2026-09-20; SHENGEN006 re-homed as SHENT001 in `ShiftEntity.Analyzers`) are done. Stage 5: CLAUDE.md done; the `.shift` plans, the docs page and the guide's publication open. See [`STATUS.md`](STATUS.md).
 
 > **This is the primary working copy of this plan.** It lives in
 > `ShiftTemplates/docs/plans/repository-mapping-on-shiftmapper/`. The `.shift` mapping plan
@@ -411,6 +411,6 @@ methods on `ShiftRepository`.
 4. **Flip**: `IMapper` ahead of the registry; migrate the sample, the item template and ShiftIdentity's
    repositories; make every golden pass. (Done; the goldens were then removed — the comparison was their job.)
 5. **Delete** the old generator, the attributes and everything attached; update CLAUDE.md, the docs, the
-   pipeline notes.
+   pipeline notes. (Done 2026-09-20, in the same unreleased window as the flip — see Q7.)
 
 Steps are in [`01-steps.md`](01-steps.md).

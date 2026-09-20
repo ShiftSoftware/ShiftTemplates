@@ -79,6 +79,11 @@ re-homed.
 `ShiftEntity.Analyzers` project, packaged as an analyzer inside `ShiftSoftware.ShiftEntity`. It is ~40
 lines of logic and it guards a silent failure that is otherwise found in production. Needed by: Stage 4.2.
 
+**Done 2026-09-20 (Stage 4.2).** `ShiftEntity.Analyzers/RepositoryConfigurationAnalyzer.cs`, reported as
+**SHENT001** rather than SHENGEN006 — the "GEN" family is deleted and a reader grepping for it should find
+nothing — with the rule unchanged and the same seven tests. The project did not exist (the folder held only build
+output), so it was created; it takes the generator's slot in both solutions and in the package.
+
 ## Q7 — One release where both spellings work
 
 **The question.** `ADP.*` and `Menu` have 20 repositories on `UseGeneratedMapper(map => …)` (~250 fluent
@@ -94,6 +99,13 @@ a consumer that has not migrated when Stage 4 ships stays on the previous framew
 with the guide's path in the message; a project still on them builds with warnings and maps exactly as before,
 because the registry answers any triple ShiftMapper does not declare — which is every triple whose repository
 says `UseGeneratedMapper`, since that call marks the options as configured ahead of any resolution.
+
+**Overtaken 2026-09-20 (Stage 4).** The user asked for Stage 4 before anything had been released — Stage 3 and
+ShiftMapper 0.3.0 exist only in the sibling checkouts — so the one-release window never opened: the first
+framework release after this carries the deletion, and `UseGeneratedMapper(...)`, `UseGeneratedMapper = true`,
+`[ShiftEntityMapper]` and `SelectWithTags` are compile errors in it, not warnings. The landing pad is the
+migration guide alone: `ADP.*` and `Menu` migrate in the same upgrade or stay on the previous framework
+version. Noted as a concern at the time; the user's decision.
 
 ## Q8 — Who registers the generated mapper
 

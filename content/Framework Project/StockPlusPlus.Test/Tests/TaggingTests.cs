@@ -588,7 +588,7 @@ public class TaggingTests
 
         db.ChangeTracker.Clear();
 
-        // LIST — the SelectWithTags splice, translated to SQL. Same answer.
+        // LIST — the Tags binding ProductRepository.MapToList writes, translated to SQL. Same answer.
         var queryable = await productRepo.GetIQueryable(
             asOf: null, includes: null, disableDefaultDataLevelAccess: true, disableGlobalFilters: true);
         var row = (await productRepo.OdataList(queryable)).FirstOrDefault(p => p.Name == productName);

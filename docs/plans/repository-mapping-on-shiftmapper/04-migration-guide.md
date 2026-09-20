@@ -1,7 +1,11 @@
 # Migration guide — from ShiftEntity's generated mapping to ShiftMapper
 
-Written to be published with the release notes of the Stage 3 release (see Q7). Applies to any project that
-uses ShiftEntity's generated mapping: the StockPlusPlus sample, ShiftIdentity, `ADP.*`, `Menu`.
+Written to be published with the release notes of the first framework release carrying the change. Applies to
+any project that uses ShiftEntity's generated mapping: `ADP.*`, `Menu` (the StockPlusPlus sample and
+ShiftIdentity are already migrated). **There is no transition release** (Q7): in that release the old spellings —
+`UseGeneratedMapper(...)`, `UseGeneratedMapper = true`, `[ShiftEntityMapper]`, `[ShiftEntityMapperIgnore]`,
+`[ShiftEntityMapperMaxDepth]`, `SelectWithTags` — no longer exist, so the build tells you exactly what is left to
+migrate, and a project that is not ready stays on the previous framework version.
 
 ## The one-paragraph version
 
@@ -142,3 +146,6 @@ public class CampaignReport(Mapper mapper, DB db)
   them in `AfterMap` or the repository, as before.
 - **SM0035** (error) — a declaration inside an `if`/loop/lambda. Register unconditionally and put the
   condition inside the value, exactly as SHENGEN005 required.
+- **SHENT001** (Error, the one ShiftEntity analyzer left) — the former SHENGEN006, unchanged: an entity's
+  `IConfiguresShiftRepository<E, L, V>` while a repository for the same triple passes an options builder. Move
+  the configuration into the builder, or drop the builder.

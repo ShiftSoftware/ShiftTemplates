@@ -55,7 +55,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftEntity.Print", "..\..\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftEntity.Tests", "..\..\..\ShiftEntity\ShiftEntity.Tests\ShiftEntity.Tests.csproj", "{7A3C1E9D-4B82-4F16-9C5A-2E8D6B1F0A77}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftEntity.SourceGenerator", "..\..\..\ShiftEntity\ShiftEntity.SourceGenerator\ShiftEntity.SourceGenerator.csproj", "{8ACA6FEE-21D5-4A7B-97C1-5A828A54051F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftEntity.Analyzers", "..\..\..\ShiftEntity\ShiftEntity.Analyzers\ShiftEntity.Analyzers.csproj", "{8ACA6FEE-21D5-4A7B-97C1-5A828A54051F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftBlazor", "ShiftBlazor", "{1910940D-D140-4B3F-A2F5-6D322EFAC152}"
 EndProject

@@ -521,6 +521,11 @@ verifies against the end-to-end suites instead (STATUS log, 2026-09-20).
 
 ## Stage 4 — Delete
 
+**Done 2026-09-20 — see [`STATUS.md`](STATUS.md).** Differences from the text below: nothing was released between
+Stage 3 and this, so the "after its obsolete release" rows (`UseGeneratedMapper`, the attribute property,
+`SelectWithTags`) went in the same window (Q7); SHENGEN006 was re-homed as **SHENT001**, a fresh ID, in a new
+`ShiftEntity.Analyzers` project (there was no empty project to fill — the folder held only build output).
+
 ### 4.1 Remove the old generator, the attributes and everything attached
 
 | Delete | Because | Replaced by |
@@ -546,7 +551,9 @@ mapping one — the select convention reads it and the UI uses it).
 
 The one old diagnostic that is not about mapping — "the entity's `IConfiguresShiftRepository` will not run
 because the repository passes a builder" — can move to a tiny `DiagnosticAnalyzer` in the empty
-`ShiftEntity.Analyzers` project, or be dropped. Decision Q6.
+`ShiftEntity.Analyzers` project, or be dropped. Decision Q6. **Done: re-homed as SHENT001**
+(`ShiftEntity.Analyzers/RepositoryConfigurationAnalyzer.cs`), packed into `ShiftSoftware.ShiftEntity` under
+`analyzers/dotnet/cs` where the generator was, tested in `ShiftEntity.Tests/Analyzers/`.
 
 ---
 
@@ -554,6 +561,7 @@ because the repository passes a builder" — can move to a tiny `DiagnosticAnaly
 
 - **5.1** `ShiftTemplates/CLAUDE.md`: rewrite "Active Work: Mapping Abstraction", the SHENGEN section, the
   build-time-baked section and the tagging notes that mention `SelectWithTags` / mapper-does-not-handle-Tags.
+  **Done 2026-09-20 with Stage 4.**
 - **5.2** `.shift/repos/shift-entity/mapping-abstraction-plan.md`: refresh "What's Done"; `automapper-removal/STATUS.md`
   gets a log line (the removal plan's Stage F assumed the ShiftEntity generator; say what replaced it).
 - **5.3** `ShiftFrameworkDocs`: one page "Mapping in a repository" written from the README's before/after samples,
@@ -561,6 +569,7 @@ because the repository passes a builder" — can move to a tiny `DiagnosticAnaly
 - **5.4** Pipeline: nothing structural. `ShiftMapper.Generator.Tests` grows (still long-running only);
   the first framework release after Stage 2 must be `release-all` or `release-shiftmapper` first.
 - **5.5** Publish [`04-migration-guide.md`](04-migration-guide.md) for `ADP.*` / `Menu`, whose 20
-  repositories use `UseGeneratedMapper(map => …)` today (and two files use `[ShiftEntityMapper]`). Landing
-  pad: the registry link is deleted only in Stage 4, one framework release after Stage 3 ships, so consumers
-  get one release where both spellings work.
+  repositories use `UseGeneratedMapper(map => …)` today (and two files use `[ShiftEntityMapper]`). The landing
+  pad the plan wanted — one release where both spellings work — did not happen (Stage 4 landed unreleased, Q7):
+  the first release after this carries the guide and the old spellings are compile errors in it, so a consumer
+  migrates in the same upgrade or stays on the previous framework version.

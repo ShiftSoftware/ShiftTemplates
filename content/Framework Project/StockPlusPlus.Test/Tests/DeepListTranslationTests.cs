@@ -122,8 +122,8 @@ public class DeepListTranslationTests
     }
 
     /// <summary>
-    /// The Product list — <c>Tags</c> is spliced into the member-init by <c>SelectWithTags</c>. Not a generated
-    /// deep list, but the identical risk: a collection binding that the OData pipeline then filters and orders
+    /// The Product list — <c>Tags</c> is a binding <c>ProductRepository.MapToList</c> writes by hand. Not an
+    /// automatic deep list, but the identical risk: a collection binding that the OData pipeline then filters and orders
     /// on top of. It is also the one deep list a real user drives with a filter panel (ProductList.razor +
     /// ShiftTagFilter), which makes it the likeliest to break in production.
     /// </summary>

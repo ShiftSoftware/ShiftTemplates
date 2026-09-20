@@ -1,15 +1,15 @@
 # Repository mapping on ShiftMapper — Status
 
-**Last updated:** 2026-09-20 — **Stage 3 done (flipped and migrated); the parity harness removed.** ShiftMapper
-is the repository's default mapper, ahead of the old registry (which stays for one release, Q7); the sample, the
-item template's files and ShiftIdentity.Data are migrated — no `UseGeneratedMapper(...)`, no
-`UseGeneratedMapper = true`, no `[ShiftEntityMapper]` partial anywhere in framework-owned code, every customization
-as `o.Mapping(m => …)` or an ordinary mapper class. The comparison closed green: all 23 goldens passed through
-ShiftMapper (138 theories) with exactly three recorded changes (Q10, Q15, the Invoice `Total` demonstration), all
-13 identity triples matching the old generator member for member. **The goldens and the harness were then deleted
-(2026-09-20)** — the comparison they existed for is over; the behaviour is pinned by the end-to-end suites and
-ShiftMapper's own tests. Six more ShiftMapper additions (0.3.0, still unreleased). Stages 0–2 done 2026-09-18/19.
-Stages 4–5 not started; Stage 4 is the deletion, one framework release after this ships.
+**Last updated:** 2026-09-20 — **Stage 4 done (the old generator is gone).** `ShiftEntity.SourceGenerator`, the
+three attributes, `ShiftEntityMapperDefaults`, `UseGeneratedMapper(...)` and the attribute property, the registry,
+`GeneratedMapperFactory`, the builder types, `SelectWithTags` and the 128 generator tests are deleted; the
+repository resolves options → DI `IShiftEntityMapper` → ShiftMapper → nothing. SHENGEN006 lives on as
+**SHENT001** in the new `ShiftEntity.Analyzers` project, packed where the generator was (4.2, Q6). Done in the
+same unreleased window as Stage 3, not one release later — the user's call, recorded under Q7. Stage 3 (2026-09-19)
+flipped the default and migrated the sample, the item template's files and ShiftIdentity.Data; the 23-golden
+comparison closed green with three recorded changes (Q10, Q15, the Invoice `Total` demonstration) and the harness
+was removed the same day Stage 4 landed. ShiftMapper 0.3.0 is still unreleased. Stage 5: 5.1 (CLAUDE.md) done
+with Stage 4; 5.2–5.5 open.
 
 Update this file as steps land. Keep it factual: what shipped, what it changed, what surprised you.
 Plan: [`01-steps.md`](01-steps.md) · Decisions: [`02-open-decisions.md`](02-open-decisions.md) ·
@@ -68,14 +68,14 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 
 | Step | Status | Notes |
 |------|--------|-------|
-| 4.1 Old generator + the three attributes + `UseGeneratedMapper` + registry + builder + tests removed | ⬜ | One release after 3.6 (Q7). No attribute replaces any of them. Verification is the end-to-end suites (the goldens are gone — see the 2026-09-20 log entry): `StockPlusPlus.Test`'s mapping, discovery and translation tests, `ShiftIdentity.Tests`, `ShiftEntity.Tests`. |
-| 4.2 SHENGEN006 re-homed | ⬜ | Needs Q6. |
+| 4.1 Old generator + the three attributes + `UseGeneratedMapper` + registry + builder + tests removed | ✅ | **2026-09-20.** Deleted from ShiftEntity: `ShiftEntity.SourceGenerator/` (2,664 lines), `ShiftEntityMapperAttribute`, `ShiftEntityMapperConfigAttributes.cs` (`MaxDepth`, `Ignore`, `ShiftEntityMapperDefaults`), `ShiftEntityMapperRegistry`, `ShiftMapperBuilder`, `ShiftChildMapperBuilder`, `IShiftMapperConfigurable`, `IShiftObjectMapper`, `GeneratedMapperFactory`, `TaggableProjectionExtensions` (both the Core class and the EFCore shim — `SelectWithTags` did not get its obsolete release either, same call as Q7), `UseGeneratedMapper(...)` on the options, the attribute property and its discovery branch, the registry link in `InitCommon` and `ShiftEntityMapperValidation` (with `EnsureRegistryPopulated`, the conflict and binding checks); `ShiftEntity.Tests/Mapping/` (18 files, the harness included) and the two registry-era `Repository/` test files, with the "nothing covers it" and "an explicit mapper still wins" cases folded into `ShiftMapperResolutionTests`. In the consumers: the dev-mode analyzer references in `ShiftIdentity.Data.csproj` / `StockPlusPlus.Data.csproj` and the two `.sln` entries now point at `ShiftEntity.Analyzers`; `StockPlusPlus.Test.csproj` lost its `ExcludeFixtureMapperGeneration` target. Kept, as planned: `IShiftEntityMapper`, `MappingContext`, `MappingHelpers`, the `WithMapper` attributes, the four virtual methods, `ShiftEntityMapperValidation` (DI → ShiftMapper `CanMap` → override), `[ShiftEntityKeyAndName]`, `TagProjection` (the view read and `ShiftTagMapper` still use it). Green: ShiftEntity 415 (was 535: −128 generator tests, +8 analyzer tests), ShiftIdentity 302, sample 240 + the 2 Cosmos-emulator failures as before. |
+| 4.2 SHENGEN006 re-homed | ✅ | **2026-09-20.** `ShiftEntity.Analyzers/RepositoryConfigurationAnalyzer.cs` — a `DiagnosticAnalyzer`, ~90 lines, the rule byte-for-byte (direct `ShiftRepository<,,,>` base only, every base-reaching constructor must pass a builder, `base(db, null)` is no builder, `: this(...)` is not a base call), reported as **SHENT001** (Error) so nothing "SHENGEN" survives the deletion. Packed into `ShiftSoftware.ShiftEntity` under `analyzers/dotnet/cs` exactly as the generator was; dev mode references it from the two data projects. The seven generator tests moved to `ShiftEntity.Tests/Analyzers/RepositoryConfigurationAnalyzerTests.cs` over `CompilationWithAnalyzers`; a throwaway repository in the sample confirmed it fires through the dev-mode wiring. |
 
 ## Stage 5 — Docs, CLAUDE.md, pipeline
 
 | Step | Status | Notes |
 |------|--------|-------|
-| 5.1 CLAUDE.md | ⬜ | |
+| 5.1 CLAUDE.md | ✅ | **2026-09-20**, with Stage 4 — the old-generator sections ("Active Work" strategies, build-time baked mapping, SHENGEN diagnostics, SHENGEN006) rewritten as what the code is now; the tagging notes no longer mention `SelectWithTags`. |
 | 5.2 `.shift` plans | ⬜ | |
 | 5.3 ShiftFrameworkDocs page | ⬜ | |
 | 5.4 Pipeline notes | ⬜ | |
@@ -90,7 +90,7 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 | Q3 the mapper may construct the repository from DI | 🟡 | implemented as recommended, with `IShiftMapperConfiguratorResolver` as the framework's override; confirm |
 | Q4 flattening off on implicit maps | ⬜ | recommended: off |
 | Q5 null collections → empty | ✅ | accepted; the goldens never exercised it (fixtures fill every collection), so no golden changed |
-| Q6 SHENGEN006 → analyzer | ⬜ | recommended: re-home |
+| Q6 SHENGEN006 → analyzer | ✅ | re-homed as SHENT001 in `ShiftEntity.Analyzers` (4.2) |
 | Q7 one release with both spellings | ✅ | in effect: Stage 3's release carries both, Stage 4's deletes the old; `[Obsolete]` messages point at the migration guide |
 | Q8 who registers the generated mapper | ✅ | both — `RegisterShiftRepositories` registers what it scans through the new `AddShiftMapper(Assembly)`; the host line is optional and comes with 3.2 |
 | Q9 signal on the base class: attribute inside ShiftEntity | ✅ | attribute — agreed in discussion 2026-09-18 and implemented (`ShiftMapperDeclaresMap`) |
@@ -102,6 +102,18 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 
 ## Log
 
+- **2026-09-20 (Stage 4)** — The deletion, on the user's "implement stage 4" the same day the harness went and
+  with nothing released since Stage 3 — so the one-release window Q7 planned did not happen (recorded there). It
+  was as mechanical as the plan said: `git rm` of the generator, the seven Core/EFCore types and the tests, then
+  the four places that still spoke to the registry (`InitCommon`, the options, discovery, validation) lost their
+  branch and nothing needed re-thinking — the resolution order simply ends at ShiftMapper. Two things worth
+  knowing: (1) `ShiftEntityMapperValidation` lost more than a lookup — the registry conflict report and the
+  `VerifyBindings` JIT-skew check went with it, both of which only ever described generated mappers; a triple is
+  now covered by DI, by `CanMap` on the host's ShiftMapper, or by an override, and that is the whole check.
+  (2) The analyzer project reuses the generator's solution GUID in both `.sln` files, so the configuration
+  blocks did not need touching. The old generator's `bin`/`obj` folders are untracked and still on disk in the
+  ShiftEntity checkout (gitignored; deleting them was declined in the session) — harmless, nothing references
+  them.
 - **2026-09-20 (harness removed)** — With 3.6 green and the old-vs-new comparison read as closed, the user
   asked for the comparison files to go: `RepositoryMappingParityTests.cs`, `Tests/Parity/RepositoryMapping/`
   (the runner, `DeterministicGraph`, the 23 golden files), and the Stage-0 enumeration pieces it was built on —
