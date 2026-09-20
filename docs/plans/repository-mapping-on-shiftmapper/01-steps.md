@@ -586,12 +586,18 @@ nest, and everything else about a map is a mapper class. See [`STATUS.md`](STATU
   **Done 2026-09-20 with Stage 4.**
 - **5.2** `.shift/repos/shift-entity/mapping-abstraction-plan.md`: refresh "What's Done"; `automapper-removal/STATUS.md`
   gets a log line (the removal plan's Stage F assumed the ShiftEntity generator; say what replaced it).
+  **Done 2026-09-20** — the plan was rewritten whole (it described the 2026-05 POC state); the log line is in both
+  STATUS copies; the ShiftMapper plan in `.shift` got a 0.3.0 note.
 - **5.3** `ShiftFrameworkDocs`: one page "Mapping in a repository" written from the README's before/after samples,
-  including §6 "the maps work anywhere".
+  including §6 "the maps work anywhere". **Done 2026-09-20** — `docs/project-setup/data-project/mappers.md`
+  (*Data Project › Mapping*), replacing an uncommitted page that taught the retired generator.
 - **5.4** Pipeline: nothing structural. `ShiftMapper.Generator.Tests` grows (still long-running only);
   the first framework release after Stage 2 must be `release-all` or `release-shiftmapper` first.
+  **Done 2026-09-20** — plus a package check that the SHENT001 analyzer is inside `ShiftSoftware.ShiftEntity`.
 - **5.5** Publish [`04-migration-guide.md`](04-migration-guide.md) for `ADP.*` / `Menu`, whose 20
   repositories use `UseGeneratedMapper(map => …)` today (and two files use `[ShiftEntityMapper]`). The landing
   pad the plan wanted — one release where both spellings work — did not happen (Stage 4 landed unreleased, Q7):
   the first release after this carries the guide and the old spellings are compile errors in it, so a consumer
-  migrates in the same upgrade or stays on the previous framework version.
+  migrates in the same upgrade or stays on the previous framework version. **Done 2026-09-20** — as
+  `migrating-to-shiftmapper.md` on ShiftFrameworkDocs (*Data Project › Migrating to ShiftMapper*), one procedure
+  for both origins; this file stays the source.

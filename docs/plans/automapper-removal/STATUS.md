@@ -1,7 +1,10 @@
 # AutoMapper Removal — Status
 
-**Last updated:** 2026-09-17 (later) — **ShiftMapper's one-generated-mapper-per-assembly model: `IShiftMapper` →
-`IMapper`, `Mapper` is the object, mapper classes are declarations only; the framework follows** (see the log).
+**Last updated:** 2026-09-20 — **the ShiftEntity generator this plan's Stage F migrated onto is itself gone;
+repository mapping is ShiftMapper's now** (see the log entry of that date, and
+`docs/plans/repository-mapping-on-shiftmapper/` in ShiftTemplates). 2026-09-17 (later): **ShiftMapper's
+one-generated-mapper-per-assembly model: `IShiftMapper` → `IMapper`, `Mapper` is the object, mapper classes are
+declarations only; the framework follows** (see the log).
 Earlier the same day: **ShiftMapper 0.2.0: profiles are gone, the identity mapper declares its maps itself and
 registers itself the package way**. 2026-09-16: **Cosmos replication maps through ShiftMapper**: the mapping delegate
 is optional again and a call site without one maps through the host's registered `IMapper`. Otherwise as of
@@ -130,6 +133,25 @@ A11** (ambiguous case-insensitive match). Next free after that is `012`.
 ---
 
 ## Log
+
+**2026-09-20** — **What replaced the generator this plan built on.** Stages D, E and F of this plan assumed that
+the thing a repository maps through, once AutoMapper is gone, is ShiftEntity's own source generator
+(`ShiftEntity.SourceGenerator`: `UseGeneratedMapper(...)`, `[ShiftEntityMapper]` partial classes, the `SHENGEN`
+diagnostics, the registry). That generator was retired by a second plan — `docs/plans/repository-mapping-on-shiftmapper/`
+in ShiftTemplates, Stages 0–4 landed 2026-09-18 → 2026-09-20 — and deleted on 2026-09-20, in the same unreleased
+window. In its place: ShiftMapper declares the four maps of every `ShiftRepository<,,,>` closing and every built-in
+endpoint attribute automatically, from markers on the base types, with the framework's rules in a
+`ShiftMapperConversions` pack; a member customization is an ordinary `ShiftMapperBase` class (one per project)
+whose `CreateMap` replaces the automatic map for that pair; a repository says only how deep its maps nest
+(`o.Mapping(m => m.Nested(n))`); the resolution order is `UseMapper` → DI `IShiftEntityMapper` → ShiftMapper →
+nothing, and startup validation checks exactly that. What this plan established survives intact — the
+`IShiftEntityMapper` abstraction, `MappingHelpers`, the repository overrides, the hand-written-mapper door, the
+"make failure visible before making the mapper required" ordering (now `SM00xx` at build and the startup
+check) — and the AutoMapper-era decisions still stand (Q7 audit columns are map payload, the nullable FK
+clearing, the 400 on a bad value). Two rows above are affected: B2 (the item template no longer scaffolds a
+mapper — one class per project) and the SHENGEN references throughout, which read as history; SHENGEN006 lives
+on as SHENT001 in `ShiftEntity.Analyzers`. Consumers on `UseGeneratedMapper` (ADP) migrate with the docs page
+*Migrating to ShiftMapper*, published 2026-09-20 on ShiftFrameworkDocs.
 
 **2026-09-17 (later)** — **ShiftMapper unifies generation and registration; `IShiftMapper` becomes `IMapper`; the
 framework follows.** ShiftMapper's next two commits (`125abd4` "unify mapper generation & registration model",

@@ -95,9 +95,26 @@ steps:
    condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')))
    displayName: 'pack ShiftIdentity.Dashboard.Blazor'
 
+ # The ShiftEntity package (PackageId ShiftSoftware.ShiftEntity, packed from ShiftEntity.Core) carries the SHENT001
+ # analyzer under analyzers/dotnet/cs — where the retired ShiftEntity.SourceGenerator used to be — through a None item
+ # whose path is the analyzer project's build output. A wrong path there packs silently without it, so the package is
+ # inspected right after it is built. Repository mapping itself is ShiftMapper's (the framework packages depend on
+ # ShiftSoftware.ShiftMapper at ShiftMapperVersion), which is why the first framework release after a ShiftMapper bump
+ # must be release-all, or release-shiftmapper first: a release-framework alone would reference a package version that
+ # is not on nuget.org yet.
  - script: dotnet pack ../ShiftEntity/ShiftEntity.Core --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
    condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')))
    displayName: 'pack ShiftEntity.Core'
+
+ - script: |
+    set -euo pipefail
+    package=$(ls $(Build.ArtifactStagingDirectory)/Framework/ShiftSoftware.ShiftEntity.[0-9]*.nupkg)
+    echo "Inspecting $package"
+    contents=$(unzip -Z1 "$package")
+    echo "$contents"
+    grep -qx "analyzers/dotnet/cs/ShiftSoftware.ShiftEntity.Analyzers.dll" <<< "$contents" || { echo "##vso[task.logissue type=error]$package is missing analyzers/dotnet/cs/ShiftSoftware.ShiftEntity.Analyzers.dll — SHENT001 would not reach consumers. Check the None item in ShiftEntity.Core.csproj that packs the analyzer's build output."; exit 1; }
+   condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')))
+   displayName: 'Verify the ShiftEntity package carries the analyzer'
 
  - script: dotnet pack ../ShiftEntity/ShiftEntity.CosmosDbReplication --configuration Release --output $(Build.ArtifactStagingDirectory)/Framework
    condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')))
