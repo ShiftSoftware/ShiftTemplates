@@ -11,10 +11,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ShiftSoftware.ShiftEntity.CosmosDbReplication" Version="$(ShiftFrameworkVersion)" />
-		<PackageReference Include="ShiftSoftware.ShiftEntity.Model" Version="$(ShiftFrameworkVersion)" />
-		<PackageReference Include="ShiftSoftware.ShiftIdentity.Core" Version="$(ShiftFrameworkVersion)" />
-		<PackageReference Include="ShiftSoftware.TypeAuth.Core" Version="$(TypeAuthVersion)" />
+		<PackageReference Include="ShiftSoftware.ShiftEntity.CosmosDbReplication" Version="$(ShiftFrameworkVersion)" Condition="'$(ImportShiftFrameworkProjects)' != 'true' Or !Exists('..\..\..\..\ShiftEntity\ShiftEntity.CosmosDbReplication\ShiftEntity.CosmosDbReplication.csproj')" />
+		<PackageReference Include="ShiftSoftware.ShiftEntity.Model" Version="$(ShiftFrameworkVersion)" Condition="'$(ImportShiftFrameworkProjects)' != 'true' Or !Exists('..\..\..\..\ShiftEntity\ShiftEntity.Model\ShiftEntity.Model.csproj')" />
+		<PackageReference Include="ShiftSoftware.ShiftIdentity.Core" Version="$(ShiftFrameworkVersion)" Condition="'$(ImportShiftFrameworkProjects)' != 'true' Or !Exists('..\..\..\..\ShiftIdentity\ShiftIdentity.Core\ShiftIdentity.Core.csproj')" />
+		<PackageReference Include="ShiftSoftware.TypeAuth.Core" Version="$(TypeAuthVersion)" Condition="'$(ImportShiftFrameworkProjects)' != 'true' Or !Exists('..\..\..\..\TypeAuth\TypeAuth.Core\TypeAuth.Core.csproj')" />
 	</ItemGroup>
 
 	<ItemGroup>

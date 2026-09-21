@@ -6,6 +6,9 @@ dotnet sln add --solution-folder ShiftFramework\ShiftEntity ..\..\..\ShiftEntity
 dotnet sln add --solution-folder ShiftFramework\ShiftEntity ..\..\..\ShiftEntity\ShiftEntity.Print\ShiftEntity.Print.csproj
 
 dotnet sln add --solution-folder ShiftFramework\ShiftBlazor ..\..\..\ShiftBlazor\ShiftBlazor\ShiftBlazor.csproj
+dotnet sln add --solution-folder ShiftFramework\ShiftBlazor ..\..\..\ShiftBlazor\ShiftBlazor.Tests\ShiftBlazor.Tests.csproj
+dotnet sln add --solution-folder ShiftFramework\ShiftBlazor ..\..\..\ShiftBlazor\ShiftBlazor.Tests.Shared\ShiftBlazor.Tests.Shared.csproj
+dotnet sln add --solution-folder ShiftFramework\ShiftBlazor ..\..\..\ShiftBlazor\ShiftBlazor.Tests.Viewer\ShiftBlazor.Tests.Viewer.csproj
 
 dotnet sln add --solution-folder ShiftFramework\TypeAuth ..\..\..\TypeAuth\TypeAuth.Core\TypeAuth.Core.csproj
 dotnet sln add --solution-folder ShiftFramework\TypeAuth ..\..\..\TypeAuth\TypeAuth.Blazor\TypeAuth.Blazor.csproj

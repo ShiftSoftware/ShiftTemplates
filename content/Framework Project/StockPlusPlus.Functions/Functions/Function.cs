@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using ShiftSoftware.ShiftEntity.Functions.ReCaptcha;
-#if (includeSampleApp)
-using ShiftSoftware.UnifiedAttestation.Attributes;
-#endif
 using System.ComponentModel.DataAnnotations;
 
 namespace StockPlusPlus.Functions.Functions;
@@ -35,24 +32,6 @@ public class Function
         _logger.LogInformation("C# HTTP trigger function processed a request.");
         return new OkObjectResult(dto);
     }
-#if (includeSampleApp)
-    [Function(nameof(Attested))]
-    [ValidateAttestation]
-    public IActionResult Attested([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
-    {
-
-        _logger.LogInformation("C# HTTP trigger function processed a request.");
-        return new OkObjectResult("Welcome to Azure Functions!");
-    }
-
-    [Function(nameof(AttestedWithReplayProtection))]
-    [ValidateAttestation(true)]
-    public IActionResult AttestedWithReplayProtection([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
-    {
-        _logger.LogInformation("C# HTTP trigger function processed a request.");
-        return new OkObjectResult("Welcome to Azure Functions!");
-    }
-#endif
 }
 
 public class LoginDTO

@@ -13,7 +13,6 @@ using StockPlusPlus.Functions;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
 using ShiftSoftware.ShiftEntity.Functions.Services;
 #if (includeSampleApp)
-using ShiftSoftware.UnifiedAttestation.Functions.Extensions;
 using StockPlusPlus.Data.Repositories;
 
 #endif
@@ -30,15 +29,6 @@ var host = new HostBuilder()
 
         x.AddShiftIdentity(issuer, key);
         x.AddGoogleReCaptcha("");
-
-#if (includeSampleApp)
-        x.AddAttestationVerification(config =>
-        {
-            h.Configuration.GetSection("FirebaseAppCheck").Bind(config.Firebase);
-            h.Configuration.GetSection("HMS").Bind(config.HMS);
-            config.UseFakeServices = true;
-        });
-#endif
 
         x.RequireValidModels(true);
 

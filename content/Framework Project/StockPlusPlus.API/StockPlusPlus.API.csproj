@@ -42,17 +42,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MailKit" Version="4.17.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.10" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.10">
+		<PackageReference Include="MailKit" Version="4.18.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.12" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.12">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.14.0" />
+		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.14.1" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.Web" Version="$(ShiftFrameworkVersion)" />
 		<PackageReference Include="ShiftSoftware.ShiftEntity.Print" Version="$(ShiftFrameworkVersion)" />
 		<!--#if(internalShiftIdentityHosting)-->
@@ -62,10 +62,10 @@
 		<PackageReference Include="ShiftSoftware.ShiftIdentity.AspNetCore" Version="$(ShiftFrameworkVersion)" />
 		<!--#endif -->
 
-		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="5.6.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.6.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.6.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="5.6.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="5.9.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.9.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.9.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="5.9.0" />
 	</ItemGroup>
 
 	<ItemGroup>

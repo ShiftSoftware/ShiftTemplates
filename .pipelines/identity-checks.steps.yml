@@ -17,10 +17,7 @@ parameters:
   type: boolean
   default: false
 steps:
-- task: UseDotNet@2
-  inputs:
-    packageType: sdk
-    version: '10.0.x'
+# The parent pipeline selects the SDK for all release groups before including these checks.
 - pwsh: 'dotnet build "${{ parameters.templatesRoot }}/content/Framework Project/StockPlusPlus.API/StockPlusPlus.API.csproj" --configuration Debug -p:IdentityAdmissionPreview=true'
   displayName: Build opt-in StockPlusPlus admission preview
 # One Release build for the fast tier, so each gate below only runs its tests instead of restoring and building again.

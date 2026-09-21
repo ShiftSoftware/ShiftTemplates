@@ -16,6 +16,17 @@ steps:
    submodules: true
    persistCredentials: true
 
+ # The mapper generator and framework analyzer reference Roslyn 5.9. Select the verified SDK
+ # for every release group, including release-shiftmapper which does not run identity-checks.
+ - task: UseDotNet@2
+   displayName: 'Use verified framework build SDK'
+   inputs:
+    packageType: sdk
+    # Review this pin during every framework-wide NuGet upgrade, especially Roslyn updates.
+    # Change it when compiler/package requirements or SDK servicing warrant it, and verify
+    # the affected builds/tests with the selected SDK before updating the pin.
+    version: '10.0.401'
+
  - script: git clone https://github.com/ShiftSoftware/ShiftEntity.git ../ShiftEntity
    displayName: 'Clone ShiftEntity'
 

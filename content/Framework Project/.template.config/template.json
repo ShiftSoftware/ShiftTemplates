@@ -291,7 +291,7 @@
       "description": "Replace ShiftMapper Version",
       "replaces": "$(ShiftMapperVersion)",
       "parameters": {
-        "value": "0.2.0"
+        "value": "0.3.0"
       },
       "datatype": "string",
       "generator": "constant"
