@@ -58,6 +58,7 @@ public sealed class IdentityAdministratorConfirmationTests : IAsyncLifetime
             var actor = new User { Username = "confirmation-operator", FullName = "Synthetic Operator", IsActive = true, PasswordHash = hash.PasswordHash, Salt = hash.Salt,
                 AccessTree = "{\"ShiftIdentityActions\":{\"Users\":[\"r\",\"w\",\"d\"],\"DataLevelAccess\":{\"Countries\":[\"r\",\"w\",\"d\"],\"Regions\":[\"r\",\"w\",\"d\"],\"Companies\":[\"r\",\"w\",\"d\"],\"Branches\":[\"r\",\"w\",\"d\"]}}}" };
             var target = new User { Username = "confirmation-target", FullName = "Synthetic Target", IsActive = true, PasswordHash = hash.PasswordHash, Salt = hash.Salt, Phone = "+12025550140" };
+            SyntheticPlace.AssignTo(actor, target);
             db.Users.AddRange(actor, target); await db.SaveChangesAsync(TestContext.Current.CancellationToken);
             actorID = actor.ID; targetID = target.ID;
             var state = UserSecurityExpansion.CreateFor(actor);

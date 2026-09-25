@@ -47,6 +47,7 @@ public sealed class IdentityLoginPolishTests : IAsyncLifetime
             var hash = HashService.GenerateVersionedHash(Password);
             var user = new User { Username = Username, FullName = "Synthetic Login User", IsActive = true,
                 PasswordHash = hash.PasswordHash, Salt = hash.Salt, Email = "synthetic-login@example.invalid", EmailVerified = false };
+            SyntheticPlace.AssignTo(user);
             db.Users.Add(user); await db.SaveChangesAsync(TestContext.Current.CancellationToken);
             var state = UserSecurityExpansion.CreateFor(user);
             RecoveryContact.RecordOwnership(user, state, RecoveryEmailProvenance.TrustedAdminAssignment);
