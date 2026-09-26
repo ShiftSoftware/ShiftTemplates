@@ -233,7 +233,7 @@ steps:
    condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-typeauth')))
    inputs:
     command: 'custom'
-    arguments: 'push "$(Build.ArtifactStagingDirectory)/TypeAuth/**/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey $(ShiftSoftwareNugetApiKey)'
+    arguments: 'push "$(Build.ArtifactStagingDirectory)/TypeAuth/**/*.nupkg" -Source https://api.nuget.org/v3/index.json -ApiKey $(ShiftSoftwareNugetApiKey) -SkipDuplicate'
 
  - task: NuGetCommand@2
    displayName: 'Push Azure Functions AspNetCore Authorization' 
