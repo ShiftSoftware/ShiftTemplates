@@ -1,0 +1,33 @@
+@attribute [Route($"/{nameof(CarForm)}/{{Key?}}")]
+
+@using StockPlusPlus.Shared.DTOs.Car
+
+@* TypeAuthAction only shapes the UI (e.g. hides Save / Delete without Write / Delete). The API enforces the same action. *@
+<ShiftEntityForm T="CarDTO"
+                 AllowSaveAsNew
+                 Endpoint="Car"
+                 Title="Car"
+                 BaseUrlKey="StockPluPlus"
+                 @bind-Value="CarItem"
+                 TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Car"
+                 @bind-Key="@Key">
+    <MudTextFieldExtended Label="Make"
+                          @bind-Value="context.Item.Make"
+                          For="@(() => context.Item.Make)" />
+
+    <MudTextFieldExtended Label="Model"
+                          @bind-Value="context.Item.Model"
+                          For="@(() => context.Item.Model)" />
+
+    <MudNumericFieldExtended T="int"
+                             Label="Year"
+                             @bind-Value="context.Item.Year"
+                             For="@(() => context.Item.Year)" />
+</ShiftEntityForm>
+
+@code {
+    [Parameter]
+    public object? Key { get; set; }
+
+    private CarDTO CarItem = new CarDTO();
+}
