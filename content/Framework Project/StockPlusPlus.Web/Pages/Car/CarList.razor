@@ -1,0 +1,20 @@
+@attribute [Authorize]
+@attribute [Route($"/{nameof(CarList)}")]
+
+@using StockPlusPlus.Shared.DTOs.Car
+
+@* TypeAuthAction only shapes the UI (e.g. hides "Add" without Write). The API enforces the same action. *@
+<ShiftList EntitySet="Car"
+           Title="Car List"
+           T="CarListDTO"
+           Dense
+           DisableActionColumn
+           ComponentType="typeof(CarForm)"
+           ShowIDColumn="true"
+           HighlightSortedColumn
+           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Car"
+           EnableExport>
+    <PropertyColumn Property="x => x.Make" Title="Make" />
+    <PropertyColumn Property="x => x.Model" Title="Model" />
+    <PropertyColumn Property="x => x.Year" Title="Year" />
+</ShiftList>
