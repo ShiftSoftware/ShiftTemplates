@@ -1,5 +1,6 @@
 ﻿@*#if (includeSampleApp)*@
 @using ShiftSoftware.ShiftIdentity.Core
+@using StockPlusPlus.Web.Pages.Car
 @using StockPlusPlus.Web.Pages.Country
 @using StockPlusPlus.Web.Pages.Invoice
 @using StockPlusPlus.Web.Pages.InvoiceDeep
@@ -56,6 +57,11 @@
                           Match="NavLinkMatch.All"
                           Icon="@Icons.Material.Outlined.Newspaper"
                           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Invoice">Invoices <AttentionNavBadge EntitySet="Invoice" /></AuthorizedMudNavLink>
+
+    <AuthorizedMudNavLink Href="@($"/{nameof(CarList)}")"
+                          Match="NavLinkMatch.All"
+                          Icon="@Icons.Material.Outlined.DirectionsCar"
+                          TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Car">Cars</AuthorizedMudNavLink>
 
     <AuthorizedMudNavLink Href="@($"/{nameof(InvoiceDeepList)}")"
                           Match="NavLinkMatch.All"
