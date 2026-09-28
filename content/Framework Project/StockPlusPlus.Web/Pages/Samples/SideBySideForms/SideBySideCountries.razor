@@ -1,0 +1,45 @@
+@attribute [Route("/Samples/SideBySideCountries/{Left}/{Right}")]
+
+@using StockPlusPlus.Shared.DTOs
+
+@* FIXED — the same two panes without ShiftForm<,>. Each pane owns its record (@bind-Value to its own field),
+   and the shared body reads the pane's record from the form's context (FormChildContext<CountryDTO>), so a
+   pane can only ever show, edit and save its own record. See README.md. *@
+
+<MudGrid>
+    <MudItem xs="12" md="6">
+        <ShiftEntityForm @bind-Value="_left"
+                         Key="Left"
+                         Endpoint="Country"
+                         Title="Left pane"
+                         TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Country"
+                         ChildContent="FormBody" />
+    </MudItem>
+
+    <MudItem xs="12" md="6">
+        <ShiftEntityForm @bind-Value="_right"
+                         Key="Right"
+                         Endpoint="Country"
+                         Title="Right pane"
+                         TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Country"
+                         ChildContent="FormBody" />
+    </MudItem>
+</MudGrid>
+
+@code {
+    // Two country keys from the route (as shown in the ID column of /CountryList), e.g. /Samples/SideBySideCountries/abc/xyz.
+    // Route values, not query values: ShiftForm<,> drops every cascading parameter, and [SupplyParameterFromQuery]
+    // is delivered as one (see README.md), so both pages use the route to stay comparable.
+    [Parameter] public string? Left { get; set; }
+    [Parameter] public string? Right { get; set; }
+
+    private CountryDTO _left = new();
+    private CountryDTO _right = new();
+
+    // The same body for both panes. Each form renders it with ITS OWN context: its item, mode and read-only state.
+    private RenderFragment<FormChildContext<CountryDTO>> FormBody => context =>
+        @<MudTextFieldExtended Label="Name"
+                               ReadOnly="context.ReadOnly"
+                               @bind-Value="context.Item.Name"
+                               For="@(() => context.Item.Name)" />;
+}
