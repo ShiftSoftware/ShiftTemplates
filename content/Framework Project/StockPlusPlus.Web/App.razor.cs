@@ -22,8 +22,15 @@ public partial class App
     private ShiftIdentityHostingTypes shiftIdentityHostingTypes;
     private List<System.Reflection.Assembly> additionalAssemblies;
 
+    // Null keeps the framework's ShiftMainLayout.
+    private Type? mainLayout;
+
     public App()
     {
+#if (includeSampleApp)
+        // Sample: rule-driven banners above every page (Pages/Samples/Banners).
+        mainLayout = typeof(StockPlusPlus.Web.Pages.Samples.Banners.BannerLayout);
+#endif
 #if (internalShiftIdentityHosting)
     additionalAssemblies = new() { typeof(ShiftIdentityBlazorMaker).Assembly, typeof(ShiftIdentityDashboarBlazorMaker).Assembly };
     shiftIdentityHostingTypes = ShiftIdentityHostingTypes.Internal;
