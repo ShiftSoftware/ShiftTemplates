@@ -27,16 +27,12 @@ using ShiftSoftware.ShiftIdentity.Data.Entities;
 using ShiftSoftware.ShiftIdentity.Core.Models;
 using ShiftSoftware.ShiftEntity.Model.Enums;
 using StockPlusPlus.Shared.Localization;
-using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore;
 using ShiftSoftware.ShiftIdentity.Dashboard.AspNetCore.Replication;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Web.Explorer;
 using ShiftSoftware.ShiftEntity.Model.Replication;
 using Microsoft.AspNetCore.OData;
 using ShiftSoftware.TypeAuth.Core;
-#endif
-#if (externalShiftIdentityHosting)
-using ShiftSoftware.ShiftIdentity.Core.Models;
 #endif
 
 #if IDENTITY_DEVELOPMENT_APP
@@ -158,11 +154,6 @@ builder.Services.AddFileExplorer(x =>
 if (IsCosmosEnabled)
 {
 #if (internalShiftIdentityHosting)
-
-    var liveIdentitySQLServer = builder.Configuration.GetConnectionString("LiveIdentitySQLServer")!;
-    if (!string.IsNullOrWhiteSpace(liveIdentitySQLServer))
-        builder.Services.AddDbContext<LiveShiftIdentityDbContext>(options => options.UseSqlServer(liveIdentitySQLServer));
-
     builder.Services.AddShiftEntityCosmosDbReplicationTrigger<DB>(x =>
     {
         string databaseId = IdentityDatabaseAndContainerNames.DatabaseName;
@@ -312,53 +303,6 @@ mvcBuilder.AddShiftIdentityDashboard<DB>(
 //#endif
 //});
 
-#if (externalShiftIdentityHosting)
-if (builder.Environment.IsDevelopment())
-{
-    mvcBuilder.AddFakeIdentityEndPoints(
-        new TokenSettingsModel
-        {
-            Issuer = builder.Configuration.GetValue<string>("Settings:TokenSettings:Issuer")!,
-            RSAPrivateKeyBase64 = builder.Configuration.GetValue<string>("Settings:TokenSettings:PrivateKey")!,
-            ExpireSeconds = 10000000
-        }, new ShiftSoftware.ShiftIdentity.Core.DTOs.TokenUserDataDTO
-        {
-            FullName = "Test",
-            ID = "1",
-            Username = "test"
-        },
-        new ShiftSoftware.ShiftIdentity.Core.DTOs.App.AppDTO
-        {
-            AppId = "StockPlusPlus-Dev",
-            DisplayName = "StockPlusPlus Dev",
-            RedirectUri = "http://localhost:5069/Auth/Token"
-        },
-        "OneTwo",
-#if (includeSampleApp)
-        new string[]
-         {
-        """
-            {
-                "ShiftIdentityActions":[1,2,3,4],
-                "SystemActionTrees":[1,2,3,4],
-                "StockPlusPlusActionTree":[1,2,3,4]
-            }
-        """
-         }
-#else
-new string[]
-     {
-        """
-            {
-                "ShiftIdentityActions": ['r','w','d','m']
-            }
-        """
-     }
-#endif
-        );
-}
-#endif
-
 //builder.Services.AddSwaggerGen(c =>
 //{
 
@@ -386,12 +330,6 @@ builder.Services.AddAzureClients(clientBuilder =>
 
 var app = builder.Build();
 
-#if (externalShiftIdentityHosting)
-if (builder.Environment.IsDevelopment())
-{
-    app.AddFakeIdentityEndPoints();
-}
-#endif
 //if (builder.Environment.IsDevelopment())
 //{
 //    var scope = app.Services.CreateScope();
