@@ -18,6 +18,7 @@ using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
 #endif
 #if (includeSampleApp)
 using StockPlusPlus.Shared.ActionTrees;
+using ShiftSoftware.ShiftBlazor.Banners;
 #endif
 #if (includeSampleApp && internalShiftIdentityHosting)
 using System.Net.Http.Json;
@@ -164,6 +165,9 @@ builder.Services.AddShiftBlazorTagging<StockPlusPlusActionTree>(o =>
     o.BaseUrlKey = "StockPluPlus";
     o.TypeAuthAction = StockPlusPlusActionTree.Tags;
 });
+
+// Rule-driven warning banners from wwwroot/banners.json, shown by Pages/Samples/Banners/BannerLayout.
+builder.Services.AddShiftBlazorBanners();
 #endif
 
 var host = builder.Build();

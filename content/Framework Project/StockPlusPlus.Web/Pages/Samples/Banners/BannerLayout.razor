@@ -1,0 +1,26 @@
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+@using ShiftSoftware.TypeAuth.Core
+@using StockPlusPlus.Shared.ActionTrees
+
+@inherits LayoutComponentBase
+@layout ShiftSoftware.ShiftBlazor.Layouts.ShiftMainLayout
+
+@* Sample: shows the rule-driven banners from wwwroot/banners.json above every page. It sits inside the framework's
+   main layout (App.razor passes it as DefaultApp's MainLayout), so nothing of the framework layout is copied. *@
+<ShiftBanners IsConditionMet="IsConditionMet" />
+
+@Body
+
+@code {
+    [Inject] private ITypeAuthService TypeAuth { get; set; } = default!;
+    [Inject] private IWebAssemblyHostEnvironment Environment { get; set; } = default!;
+
+    // The condition names banners.json uses. The component never interprets them: this app decides what they mean.
+    private bool IsConditionMet(string condition) => condition switch
+    {
+        "can-write:Invoice" => TypeAuth.CanWrite(StockPlusPlusActionTree.Invoice),
+        "can-write:Product" => TypeAuth.CanWrite(StockPlusPlusActionTree.Product),
+        "development" => Environment.IsDevelopment(),
+        _ => false,
+    };
+}
