@@ -12,6 +12,15 @@
     <ShiftPiiField Label="Email" Endpoint="sample-contact" RecordKey="@(context.Item.ID)" Member="Email" @bind-Field="context.Item.Email" For="@(() => context.Item.Email)" />
     <ShiftPiiField Label="Address" Endpoint="sample-contact" RecordKey="@(context.Item.ID)" Member="Address" @bind-Field="context.Item.Address" For="@(() => context.Item.Address)" />
     <ShiftPiiField Label="Identifier" Endpoint="sample-contact" RecordKey="@(context.Item.ID)" Member="Identifier" AllowReveal="false" @bind-Field="context.Item.Identifier" For="@(() => context.Item.Identifier)" />
+    <MultiItemField Title="Additional phones" @bind-Value="context.Item.Phones" T="SampleContactPhoneDTO">
+        <FieldBody Context="phone">
+            <MudTextFieldExtended Label="Phone label" @bind-Value="phone.Label" For="() => phone.Label" />
+            <ShiftPiiField Label="Additional phone" Endpoint="sample-contact"
+                           RecordKey="@(string.IsNullOrWhiteSpace(phone.ID) ? null : context.Item.ID)"
+                           Member="@($"Phones[{phone.ID}].Number")"
+                           @bind-Field="phone.Number" For="() => phone.Number" />
+        </FieldBody>
+    </MultiItemField>
 </ShiftEntityForm>
 
 @code {

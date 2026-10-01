@@ -28,4 +28,5 @@ public class SampleContactDTO : SampleContactFieldsDTO
 {
     public override string? ID { get; set; }
     public string Label { get; set; } = default!;
+    public List<SampleContactPhoneDTO> Phones { get; set; } = new();
 }
