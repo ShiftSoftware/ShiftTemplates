@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using StockPlusPlus.API;
 using StockPlusPlus.Data.DbContext;
 
@@ -35,6 +36,7 @@ public class CustomWebApplicationFactory : ShiftCustomWebApplicationFactory<WebM
             {
                 // Framework tree: DataGridExport permits list GETs without a $top restriction.
                 typeof(ShiftSoftware.ShiftEntity.Core.GeneralActionTree),
+                typeof(ShiftSoftware.ShiftEntity.Core.PiiActionTree),
 #if (includeSampleApp)
                 typeof(StockPlusPlusActionTree),
                 typeof(ShiftIdentityActions)
@@ -50,6 +52,8 @@ public class CustomWebApplicationFactory : ShiftCustomWebApplicationFactory<WebM
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         base.ConfigureWebHost(builder);
+        // Integration tests run without permission to write the Windows Event Log.
+        builder.ConfigureLogging(logging => logging.ClearProviders().AddConsole());
         // WebApplicationFactory runs Program's app.Run() as soon as the host is built, concurrently with CreateHost,
         // and the identity authority readies its policy and client rows when the host starts. Its hosted services
         // therefore have to wait for the database this factory creates: this gate is registered before every other

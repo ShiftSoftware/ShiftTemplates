@@ -1,0 +1,20 @@
+@attribute [Route($"/{nameof(SampleContactForm)}/{{Key?}}")]
+@using StockPlusPlus.Shared.DTOs.SampleContact
+
+<ShiftEntityForm @bind-Value="item"
+                 Endpoint="sample-contact"
+                 Title="Synthetic Contact"
+                 TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.SampleContacts"
+                 @bind-Key="Key">
+    <MudTextFieldExtended Label="Label" @bind-Value="context.Item.Label" For="@(() => context.Item.Label)" />
+    <ShiftPiiField Label="Name" Endpoint="sample-contact" RecordKey="@(context.Item.ID)" Member="Name" @bind-Field="context.Item.Name" For="@(() => context.Item.Name)" />
+    <ShiftPiiField Label="Phone" Endpoint="sample-contact" RecordKey="@(context.Item.ID)" Member="Phone" @bind-Field="context.Item.Phone" For="@(() => context.Item.Phone)" />
+    <ShiftPiiField Label="Email" Endpoint="sample-contact" RecordKey="@(context.Item.ID)" Member="Email" @bind-Field="context.Item.Email" For="@(() => context.Item.Email)" />
+    <ShiftPiiField Label="Address" Endpoint="sample-contact" RecordKey="@(context.Item.ID)" Member="Address" @bind-Field="context.Item.Address" For="@(() => context.Item.Address)" />
+    <ShiftPiiField Label="Identifier" Endpoint="sample-contact" RecordKey="@(context.Item.ID)" Member="Identifier" AllowReveal="false" @bind-Field="context.Item.Identifier" For="@(() => context.Item.Identifier)" />
+</ShiftEntityForm>
+
+@code {
+    [Parameter] public object? Key { get; set; }
+    private SampleContactDTO item = new();
+}

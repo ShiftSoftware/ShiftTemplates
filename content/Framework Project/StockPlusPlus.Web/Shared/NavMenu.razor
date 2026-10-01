@@ -1,6 +1,7 @@
 ﻿@*#if (includeSampleApp)*@
 @using ShiftSoftware.ShiftIdentity.Core
 @using StockPlusPlus.Web.Pages.Country
+@using StockPlusPlus.Web.Pages.SampleContact
 @using StockPlusPlus.Web.Pages.Invoice
 @using StockPlusPlus.Web.Pages.InvoiceDeep
 @using StockPlusPlus.Web.Pages.NeedsAttention
@@ -66,6 +67,11 @@
                           Match="NavLinkMatch.All"
                           Icon="@Icons.Material.Outlined.Public"
                           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Country">Countries</AuthorizedMudNavLink>
+
+    <AuthorizedMudNavLink Href="@($"/{nameof(SampleContactList)}")"
+                          Match="NavLinkMatch.All"
+                          Icon="@Icons.Material.Outlined.Contacts"
+                          TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.SampleContacts">Synthetic Contacts</AuthorizedMudNavLink>
 
     <AuthorizedMudNavLink Href="@($"/{nameof(CountryMappedList)}")"
                           Match="NavLinkMatch.All"

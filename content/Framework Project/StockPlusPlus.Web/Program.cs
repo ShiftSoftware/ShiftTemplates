@@ -11,6 +11,7 @@ using StockPlusPlus.Web;
 using StockPlusPlus.Shared.Localization;
 using System.Globalization;
 using ShiftSoftware.ShiftEntity.Core.Extensions;
+using ShiftSoftware.ShiftEntity.Core.Pii;
 #if (internalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
 #endif
@@ -141,11 +142,14 @@ builder.Services.AddTypeAuth(x =>
     x
     .AddActionTree<ShiftSoftware.ShiftIdentity.Core.ShiftIdentityActions>()
     .AddActionTree<ShiftSoftware.ShiftEntity.Core.GeneralActionTree>()
+    .AddActionTree<ShiftSoftware.ShiftEntity.Core.PiiActionTree>()
     .AddActionTree<ShiftSoftware.ShiftEntity.Core.AzureStorageActionTree>()
 #if (includeSampleApp)
     .AddActionTree<StockPlusPlusActionTree>()
 #endif
 );
+
+builder.Services.AddShiftEntityPii();
 
 #if (includeSampleApp)
 // Shared config for the tag components (ShiftTagList / ShiftTagForm / ShiftTagPicker).

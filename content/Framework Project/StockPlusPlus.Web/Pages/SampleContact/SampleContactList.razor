@@ -1,0 +1,14 @@
+@attribute [Authorize]
+@attribute [Route($"/{nameof(SampleContactList)}")]
+@using StockPlusPlus.Shared.DTOs.SampleContact
+
+<ShiftList EntitySet="sample-contact"
+           Title="Synthetic Contacts"
+           T="SampleContactListDTO"
+           ComponentType="typeof(SampleContactForm)"
+           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.SampleContacts"
+           EnableExport>
+    <ButtonColumn Property="x => x.Label" Title="Label" />
+    <PropertyColumnExtended Property="x => x.Name!.Display" Title="Name" Sortable="false" />
+    <PropertyColumnExtended Property="x => x.Phone!.Display" Title="Phone" Sortable="false" />
+</ShiftList>

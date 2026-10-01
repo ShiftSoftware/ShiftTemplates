@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Azure;
 using ShiftSoftware.ShiftEntity.Core.Attention;
+using ShiftSoftware.ShiftEntity.Core.Pii;
 using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.ShiftEntity.EFCore.Tagging;
 using ShiftSoftware.ShiftEntity.Web.Attention;
@@ -64,6 +65,7 @@ Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
 // repository + DTO-map entry; the mapping itself comes from the source-generated mapper unless the attribute
 // names one. Map the routes below with app.MapShiftEntityEndpoints<DB>().
 builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
+builder.Services.AddShiftEntityPii();
 
 builder.Services.AddAttentionEvaluator<IHasDueDate, FrameworkOverdueEvaluator>();
 #if (includeSampleApp)
@@ -312,6 +314,7 @@ builder.Services.AddTypeAuth((o) =>
 {
     o.AddActionTree<ShiftIdentityActions>();
     o.AddActionTree<ShiftSoftware.ShiftEntity.Core.GeneralActionTree>();
+    o.AddActionTree<ShiftSoftware.ShiftEntity.Core.PiiActionTree>();
     o.AddActionTree<ShiftSoftware.ShiftEntity.Core.AzureStorageActionTree>();
 #if (includeSampleApp)
     o.AddActionTree<StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree>();
@@ -410,6 +413,7 @@ app.MapShiftTaggingEndpoints<DB>();
 // ShiftEntityCrudHandler — proves the refactor is lossless and demonstrates the
 // MapShiftEntitySecureCrud / RequireTypeAuth* extensions end-to-end.
 app.MapProductMinimalApi();
+app.MapSampleContactMinimalApi();
 #endif
 
 app.UseCors(x => x.WithOrigins("*").AllowAnyMethod().AllowAnyHeader());
