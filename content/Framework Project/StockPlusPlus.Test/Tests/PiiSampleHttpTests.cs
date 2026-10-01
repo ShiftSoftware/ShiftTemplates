@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
 using ShiftSoftware.ShiftEntity.Model;
@@ -184,6 +185,73 @@ public class PiiSampleHttpTests(CustomWebApplicationFactory factory)
             using var deniedSave = await ordinaryClient.PutAsJsonAsync($"api/{endpoint}/{key}", deniedEdit);
             await ExpectAsync(deniedSave, HttpStatusCode.Forbidden);
         }
+    }
+
+    [Fact]
+    public async Task Pii_annotations_validate_create_clear_and_retry_on_both_generated_routes()
+    {
+        var grant = JsonSerializer.Serialize(new Dictionary<string, object>
+        {
+            [nameof(PiiActionTree)] = new Dictionary<string, object>
+            {
+                [nameof(PiiActionTree.Reveal)] = new[] { Access.Maximum }
+            },
+            [nameof(StockPlusPlusActionTree)] = new Dictionary<string, object>
+            {
+                [nameof(StockPlusPlusActionTree.SampleContacts)] = new[] { Access.Read, Access.Write }
+            }
+        });
+        using var client = factory.CreateAuthenticatedClient(grant);
+        var validationLabel = "PII validation " + Guid.NewGuid().ToString("N");
+        try
+        {
+            foreach (var endpoint in new[] { "sample-contact", "sample-contact-minimal" })
+            {
+                using var missing = await client.PostAsJsonAsync($"api/{endpoint}", new SampleContactDTO { Label = validationLabel });
+                await ExpectAsync(missing, HttpStatusCode.BadRequest);
+                await AssertPhoneError(missing);
+
+                using var created = await client.PostAsJsonAsync($"api/{endpoint}", new SampleContactDTO
+                {
+                    Label = validationLabel, Phone = new() { Value = "synthetic-phone", Write = "replace" }
+                });
+                await ExpectAsync(created, HttpStatusCode.Created);
+                var dto = (await created.Content.ReadFromJsonAsync<ShiftEntityResponse<SampleContactDTO>>())!.Entity!;
+                var key = dto.ID;
+
+                foreach (var value in new string?[] { null, " ", new string('x', 41) })
+                {
+                    dto.Phone = new() { Value = value, Write = "replace" };
+                    using var invalid = await client.PutAsJsonAsync($"api/{endpoint}/{key}", dto);
+                    await ExpectAsync(invalid, HttpStatusCode.BadRequest);
+                    await AssertPhoneError(invalid);
+                }
+
+                dto.Phone = new() { Value = "synthetic-retry", Write = "replace" };
+                using var retry = await client.PutAsJsonAsync($"api/{endpoint}/{key}", dto);
+                var body = await ExpectAsync(retry, HttpStatusCode.OK);
+                Assert.DoesNotContain("synthetic-retry", body);
+                dto = (await retry.Content.ReadFromJsonAsync<ShiftEntityResponse<SampleContactDTO>>())!.Entity!;
+                Assert.Null(dto.Phone!.Value);
+
+                dto.Label = validationLabel + " edited";
+                using var kept = await client.PutAsJsonAsync($"api/{endpoint}/{key}", dto);
+                await ExpectAsync(kept, HttpStatusCode.OK);
+            }
+        }
+        finally
+        {
+            using var cleanupScope = factory.Services.CreateScope();
+            var db = cleanupScope.ServiceProvider.GetRequiredService<DB>();
+            await db.SampleContacts.Where(x => x.Label == validationLabel || x.Label == validationLabel + " edited")
+                .ExecuteDeleteAsync();
+        }
+    }
+
+    private static async Task AssertPhoneError(HttpResponseMessage response)
+    {
+        var body = (await response.Content.ReadFromJsonAsync<ShiftEntityResponse<SampleContactDTO>>())!;
+        Assert.Contains(body.Message!.SubMessages!, x => x.For == "Phone" && x.SubMessages!.Count > 0);
     }
 
     private static async Task<string> ExpectAsync(HttpResponseMessage response, HttpStatusCode status)

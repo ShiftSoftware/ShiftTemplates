@@ -1,4 +1,5 @@
 using ShiftSoftware.ShiftEntity.Model.Dtos;
+using System.ComponentModel.DataAnnotations;
 
 namespace StockPlusPlus.Shared.DTOs.SampleContact;
 
@@ -8,9 +9,12 @@ public abstract class SampleContactFieldsDTO : ShiftEntityViewAndUpsertDTO
     public PiiFieldDTO? Name { get; set; }
 
     [Pii(PiiKind.Phone)]
+    [Required(ErrorMessage = "Phone is required.")]
+    [StringLength(40, ErrorMessage = "Phone must be at most 40 characters.")]
     public PiiFieldDTO? Phone { get; set; }
 
     [Pii(PiiKind.Email)]
+    [EmailAddress(ErrorMessage = "Enter a valid email address.")]
     public PiiFieldDTO? Email { get; set; }
 
     [Pii(PiiKind.Address)]
