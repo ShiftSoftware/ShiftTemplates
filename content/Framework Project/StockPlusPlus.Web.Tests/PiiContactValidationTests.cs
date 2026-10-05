@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using ShiftSoftware.ShiftBlazor.Components;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.Core.Pii;
+using ShiftSoftware.ShiftEntity.Core.Phones;
 using ShiftSoftware.TypeAuth.Core;
 using StockPlusPlus.Shared.ActionTrees;
 using StockPlusPlus.Shared.DTOs.SampleContact;
@@ -19,6 +20,7 @@ public class PiiContactValidationTests : ShiftBlazorTestContext
     public async Task Sample_contact_form_shows_inherited_required_and_raw_value_errors()
     {
         Services.AddShiftEntityPii();
+        Services.AddShiftPhoneNumbers(o => o.DefaultRegion = "IQ");
         Services.RemoveAll<ITypeAuthService>();
         var grants = JsonSerializer.Serialize(new Dictionary<string, object>
         {
@@ -42,6 +44,9 @@ public class PiiContactValidationTests : ShiftBlazorTestContext
         Assert.False(await cut.InvokeAsync(() => form.Instance.Validate()));
         Assert.Contains("Phone must be at most 40 characters.", cut.Markup);
         fields[1].Find("input").Input("synthetic-phone");
+        Assert.False(await cut.InvokeAsync(() => form.Instance.Validate()));
+        Assert.Contains("Enter a valid complete phone number.", cut.Markup);
+        fields[1].Find("input").Input("0750-000-0088");
         fields[2].Find("input").Input("bad-email");
         Assert.False(await cut.InvokeAsync(() => form.Instance.Validate()));
         Assert.Contains("Enter a valid email address.", cut.Markup);

@@ -5,10 +5,15 @@
 <ShiftList EntitySet="sample-contact"
            Title="Synthetic Contacts"
            T="SampleContactListDTO"
+           Dense
            ComponentType="typeof(SampleContactForm)"
            TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.SampleContacts"
-           EnableExport>
-    <ButtonColumn Property="x => x.Label" Title="Label" />
-    <PropertyColumnExtended Property="x => x.Name!.Display" Title="Name" Sortable="false" />
-    <PropertyColumnExtended Property="x => x.Phone!.Display" Title="Phone" Sortable="false" />
+           EnableExport EnableFilterPanel>
+    <ChildContent>
+        <ButtonColumn Property="x => x.Label" Title="Label" />
+        <PropertyColumnExtended Property="x => x.Name!.Display" Title="Name" Sortable="false" />
+        <PropertyColumnExtended Property="x => x.Phone!.Display" Title="Phone" Sortable="false" />
+        <StringFilter T="SampleContactListDTO" TProperty="string" Property="x => x.Name!.Display" Label="Name" Operator="ODataOperator.Contains" />
+        <StringFilter T="SampleContactListDTO" TProperty="string" Property="x => x.Phone!.Display" Label="Phone" Operator="ODataOperator.Contains" />
+    </ChildContent>
 </ShiftList>

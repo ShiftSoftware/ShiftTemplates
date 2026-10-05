@@ -28,9 +28,9 @@ public class PiiNestedSampleHttpTests(CustomWebApplicationFactory factory)
         {
             using var created = await client.PostAsJsonAsync("api/" + endpoint, new SampleContactDTO
             {
-                Label = label, Phone = new() { Value = "synthetic-primary", Write = "replace" },
-                Phones = [new() { Label = "First", Number = new() { Value = "synthetic-first-1111", Write = "replace" } },
-                          new() { Label = "Second", Number = new() { Value = "synthetic-second-2222", Write = "replace" } }]
+                Label = label, Phone = new() { Value = "+964 750 000 0088", Write = "replace" },
+                Phones = [new() { Label = "First", Number = new() { Value = "+964 750 000 1111", Write = "replace" } },
+                          new() { Label = "Second", Number = new() { Value = "+964 750 000 2222", Write = "replace" } }]
             });
             var dto = await Expect(created, HttpStatusCode.Created);
             Assert.All(dto.Phones, x => Assert.Null(x.Number!.Value));
@@ -39,16 +39,16 @@ public class PiiNestedSampleHttpTests(CustomWebApplicationFactory factory)
             dto.Phones[0].Number!.Value = "tampered";
             using var kept = await ordinary.PutAsJsonAsync($"api/{endpoint}/{key}", dto);
             dto = await Expect(kept, HttpStatusCode.OK);
-            await AssertStorage(label, ("First", "synthetic-first-1111"), ("Second", "synthetic-second-2222"));
+            await AssertStorage(label, ("First", "+964 750 000 1111"), ("Second", "+964 750 000 2222"));
 
             using var reveal = await client.PostAsync($"api/{endpoint}/{key}/pii/Phones[{dto.Phones.Single(x => x.Label == "Second").ID}].Number/reveal", null);
             Assert.Equal(HttpStatusCode.OK, reveal.StatusCode);
-            Assert.Equal("synthetic-second-2222", (await reveal.Content.ReadFromJsonAsync<PiiRevealDTO>())!.Value);
+            Assert.Equal("+964 750 000 2222", (await reveal.Content.ReadFromJsonAsync<PiiRevealDTO>())!.Value);
             Assert.True(reveal.Headers.CacheControl!.NoStore);
             using var deniedReveal = await ordinary.PostAsync($"api/{endpoint}/{key}/pii/Phones[{dto.Phones[0].ID}].Number/reveal", null);
             Assert.Equal(HttpStatusCode.Forbidden, deniedReveal.StatusCode);
 
-            dto.Phones[0].Number = new() { Value = "synthetic-edited-3333", Write = "replace" };
+            dto.Phones[0].Number = new() { Value = "+964 750 000 3333", Write = "replace" };
             using var deniedSave = await ordinary.PutAsJsonAsync($"api/{endpoint}/{key}", dto);
             Assert.Equal(HttpStatusCode.Forbidden, deniedSave.StatusCode);
             dto.Phones[0].Number = new() { Value = null, Write = "replace" };
@@ -56,15 +56,15 @@ public class PiiNestedSampleHttpTests(CustomWebApplicationFactory factory)
             Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
             var error = (await invalid.Content.ReadFromJsonAsync<ShiftEntityResponse<SampleContactDTO>>())!.Message!;
             Assert.Contains(error.SubMessages!, x => x.For == "Phones[0].Number");
-            await AssertStorage(label, ("First", "synthetic-first-1111"), ("Second", "synthetic-second-2222"));
+            await AssertStorage(label, ("First", "+964 750 000 1111"), ("Second", "+964 750 000 2222"));
 
-            dto.Phones[0].Number = new() { Value = "synthetic-edited-3333", Write = "replace" };
+            dto.Phones[0].Number = new() { Value = "+964 750 000 3333", Write = "replace" };
             var retainedLabel = dto.Phones[0].Label;
             dto.Phones.RemoveAt(1);
-            dto.Phones.Add(new() { Label = "Added", Number = new() { Value = "synthetic-added-4444", Write = "replace" } });
+            dto.Phones.Add(new() { Label = "Added", Number = new() { Value = "+964 750 000 4444", Write = "replace" } });
             using var saved = await client.PutAsJsonAsync($"api/{endpoint}/{key}", dto);
             dto = await Expect(saved, HttpStatusCode.OK);
-            await AssertStorage(label, (retainedLabel, "synthetic-edited-3333"), ("Added", "synthetic-added-4444"));
+            await AssertStorage(label, (retainedLabel, "+964 750 000 3333"), ("Added", "+964 750 000 4444"));
             dto.Phones[0].ID = "999999";
             using var foreign = await client.PutAsJsonAsync($"api/{endpoint}/{key}", dto);
             Assert.Equal(HttpStatusCode.BadRequest, foreign.StatusCode);
@@ -91,7 +91,7 @@ public class PiiNestedSampleHttpTests(CustomWebApplicationFactory factory)
     {
         var body = await response.Content.ReadAsStringAsync();
         Assert.True(response.StatusCode == expected, body);
-        Assert.DoesNotContain("synthetic-", body);
+        Assert.DoesNotContain("+964", body);
         Assert.DoesNotContain("tampered", body);
         return JsonSerializer.Deserialize<ShiftEntityResponse<SampleContactDTO>>(body, new JsonSerializerOptions(JsonSerializerDefaults.Web))!.Entity!;
     }

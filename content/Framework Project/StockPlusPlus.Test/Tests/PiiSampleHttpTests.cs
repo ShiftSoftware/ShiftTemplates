@@ -27,7 +27,7 @@ public class PiiSampleHttpTests(CustomWebApplicationFactory factory)
         {
             Label = "PII synthetic contact",
             Name = "Ada Example",
-            Phone = "synthetic-phone-0088",
+            Phone = "+964 750 000 0088",
             Email = "ada@example.test",
             Address = "42 Example Street",
             Identifier = "synthetic-identifier"
@@ -71,7 +71,7 @@ public class PiiSampleHttpTests(CustomWebApplicationFactory factory)
                 new SelectStateDTO<SampleContactListDTO> { All = true });
             Assert.Single(selected);
             Assert.Null(selected[0].Phone?.Value);
-            Assert.Equal("••••", selected[0].Phone?.Display);
+            Assert.Equal("•••• 0088", selected[0].Phone?.Display);
         }
 
         foreach (var endpoint in new[] { "sample-contact", "sample-contact-minimal" })
@@ -88,8 +88,9 @@ public class PiiSampleHttpTests(CustomWebApplicationFactory factory)
             await ExpectAsync(normalSearch, HttpStatusCode.OK);
 
             using var protectedSearch = await client.GetAsync(
-                $"api/{endpoint}?$top=1&$filter=Phone/Value eq 'synthetic-phone-0088'");
-            await ExpectAsync(protectedSearch, HttpStatusCode.BadRequest);
+                $"api/{endpoint}?$top=1&$filter=Phone/Value eq '07500000088'");
+            var protectedBody = await ExpectAsync(protectedSearch, HttpStatusCode.OK);
+            Assert.DoesNotContain(contact.Phone, protectedBody);
         }
 
         foreach (var (endpoint, key) in new[]
@@ -105,7 +106,7 @@ public class PiiSampleHttpTests(CustomWebApplicationFactory factory)
 
             using var reveal = await client.PostAsync($"api/{endpoint}/{key}/pii/Phone/reveal", null);
             await ExpectAsync(reveal, HttpStatusCode.OK);
-            Assert.Equal("synthetic-phone-0088", (await reveal.Content.ReadFromJsonAsync<PiiRevealDTO>())?.Value);
+            Assert.Equal("+964 750 000 0088", (await reveal.Content.ReadFromJsonAsync<PiiRevealDTO>())?.Value);
             Assert.True(reveal.Headers.CacheControl?.NoStore);
 
             using var denied = await client.PostAsync($"api/{endpoint}/{key}/pii/Identifier/reveal", null);
@@ -123,14 +124,14 @@ public class PiiSampleHttpTests(CustomWebApplicationFactory factory)
         Assert.DoesNotContain("injected", keptBody);
 
         edit = (await kept.Content.ReadFromJsonAsync<ShiftEntityResponse<SampleContactDTO>>())!.Entity!;
-        edit.Phone = new PiiFieldDTO { Value = "synthetic-phone-0099", Write = "replace" };
+        edit.Phone = new PiiFieldDTO { Value = "+964 750 000 0099", Write = "replace" };
         using var replaced = await client.PutAsJsonAsync($"api/sample-contact/{controllerKey}", edit);
         var replacedBody = await ExpectAsync(replaced, HttpStatusCode.OK);
-        Assert.DoesNotContain("synthetic-phone-0099", replacedBody);
+        Assert.DoesNotContain("+964 750 000 0099", replacedBody);
 
         using var verifyScope = factory.Services.CreateScope();
         var verifyDb = verifyScope.ServiceProvider.GetRequiredService<DB>();
-        Assert.Equal("synthetic-phone-0099", (await verifyDb.SampleContacts.FindAsync(contact.ID))!.Phone);
+        Assert.Equal("+964 750 000 0099", (await verifyDb.SampleContacts.FindAsync(contact.ID))!.Phone);
 
         using var minimalLoaded = await client.GetAsync($"api/sample-contact-minimal/{minimalKey}");
         await ExpectAsync(minimalLoaded, HttpStatusCode.OK);
@@ -140,21 +141,21 @@ public class PiiSampleHttpTests(CustomWebApplicationFactory factory)
         using var minimalKept = await client.PutAsJsonAsync($"api/sample-contact-minimal/{minimalKey}", minimalEdit);
         await ExpectAsync(minimalKept, HttpStatusCode.OK);
         verifyDb.ChangeTracker.Clear();
-        Assert.Equal("synthetic-phone-0099", (await verifyDb.SampleContacts.FindAsync(contact.ID))!.Phone);
+        Assert.Equal("+964 750 000 0099", (await verifyDb.SampleContacts.FindAsync(contact.ID))!.Phone);
 
         minimalEdit = (await minimalKept.Content.ReadFromJsonAsync<ShiftEntityResponse<SampleContactMinimalDTO>>())!.Entity!;
-        minimalEdit.Phone = new PiiFieldDTO { Value = "synthetic-phone-0100", Write = "replace" };
+        minimalEdit.Phone = new PiiFieldDTO { Value = "+964 750 000 0100", Write = "replace" };
         using var minimalReplaced = await client.PutAsJsonAsync($"api/sample-contact-minimal/{minimalKey}", minimalEdit);
         var minimalReplacedBody = await ExpectAsync(minimalReplaced, HttpStatusCode.OK);
-        Assert.DoesNotContain("synthetic-phone-0100", minimalReplacedBody);
+        Assert.DoesNotContain("+964 750 000 0100", minimalReplacedBody);
         verifyDb.ChangeTracker.Clear();
-        Assert.Equal("synthetic-phone-0100", (await verifyDb.SampleContacts.FindAsync(contact.ID))!.Phone);
+        Assert.Equal("+964 750 000 0100", (await verifyDb.SampleContacts.FindAsync(contact.ID))!.Phone);
 
-        edit.Phone = new PiiFieldDTO { Value = "stale-attempt", Write = "replace" };
+        edit.Phone = new PiiFieldDTO { Value = "+964 750 000 0101", Write = "replace" };
         using var staleSave = await client.PutAsJsonAsync($"api/sample-contact/{controllerKey}", edit);
         await ExpectAsync(staleSave, HttpStatusCode.Conflict);
         verifyDb.ChangeTracker.Clear();
-        Assert.Equal("synthetic-phone-0100", (await verifyDb.SampleContacts.FindAsync(contact.ID))!.Phone);
+        Assert.Equal("+964 750 000 0100", (await verifyDb.SampleContacts.FindAsync(contact.ID))!.Phone);
 
         var readWriteOnly = JsonSerializer.Serialize(new Dictionary<string, object>
         {
@@ -175,13 +176,13 @@ public class PiiSampleHttpTests(CustomWebApplicationFactory factory)
         {
             using var ordinaryDetail = await ordinaryClient.GetAsync($"api/{endpoint}/{key}");
             var ordinaryBody = await ExpectAsync(ordinaryDetail, HttpStatusCode.OK);
-            Assert.DoesNotContain("synthetic-phone-0100", ordinaryBody);
+            Assert.DoesNotContain("+964 750 000 0100", ordinaryBody);
 
             using var deniedReveal = await ordinaryClient.PostAsync($"api/{endpoint}/{key}/pii/Phone/reveal", null);
             await ExpectAsync(deniedReveal, HttpStatusCode.Forbidden);
 
             var deniedEdit = (await ordinaryDetail.Content.ReadFromJsonAsync<ShiftEntityResponse<SampleContactDTO>>())!.Entity!;
-            deniedEdit.Phone = new PiiFieldDTO { Value = "unauthorized", Write = "replace" };
+            deniedEdit.Phone = new PiiFieldDTO { Value = "+964 750 000 0102", Write = "replace" };
             using var deniedSave = await ordinaryClient.PutAsJsonAsync($"api/{endpoint}/{key}", deniedEdit);
             await ExpectAsync(deniedSave, HttpStatusCode.Forbidden);
         }
@@ -213,7 +214,7 @@ public class PiiSampleHttpTests(CustomWebApplicationFactory factory)
 
                 using var created = await client.PostAsJsonAsync($"api/{endpoint}", new SampleContactDTO
                 {
-                    Label = validationLabel, Phone = new() { Value = "synthetic-phone", Write = "replace" }
+                    Label = validationLabel, Phone = new() { Value = "+964 750 000 0111", Write = "replace" }
                 });
                 await ExpectAsync(created, HttpStatusCode.Created);
                 var dto = (await created.Content.ReadFromJsonAsync<ShiftEntityResponse<SampleContactDTO>>())!.Entity!;
@@ -227,10 +228,10 @@ public class PiiSampleHttpTests(CustomWebApplicationFactory factory)
                     await AssertPhoneError(invalid);
                 }
 
-                dto.Phone = new() { Value = "synthetic-retry", Write = "replace" };
+                dto.Phone = new() { Value = "+964 750 000 0222", Write = "replace" };
                 using var retry = await client.PutAsJsonAsync($"api/{endpoint}/{key}", dto);
                 var body = await ExpectAsync(retry, HttpStatusCode.OK);
-                Assert.DoesNotContain("synthetic-retry", body);
+                Assert.DoesNotContain("+964 750 000 0222", body);
                 dto = (await retry.Content.ReadFromJsonAsync<ShiftEntityResponse<SampleContactDTO>>())!.Entity!;
                 Assert.Null(dto.Phone!.Value);
 

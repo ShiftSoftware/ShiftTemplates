@@ -8,6 +8,7 @@ using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Azure;
 using ShiftSoftware.ShiftEntity.Core.Attention;
 using ShiftSoftware.ShiftEntity.Core.Pii;
+using ShiftSoftware.ShiftEntity.Core.Phones;
 using ShiftSoftware.ShiftIdentity.Core;
 using ShiftSoftware.ShiftEntity.EFCore.Tagging;
 using ShiftSoftware.ShiftEntity.Web.Attention;
@@ -66,6 +67,7 @@ Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
 // names one. Map the routes below with app.MapShiftEntityEndpoints<DB>().
 builder.Services.RegisterShiftRepositories(typeof(StockPlusPlus.Data.Marker).Assembly);
 builder.Services.AddShiftEntityPii();
+builder.Services.AddShiftPhoneNumbers(o => o.DefaultRegion = "IQ");
 
 builder.Services.AddAttentionEvaluator<IHasDueDate, FrameworkOverdueEvaluator>();
 #if (includeSampleApp)

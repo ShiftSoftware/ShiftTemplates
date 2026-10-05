@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using ShiftSoftware.ShiftBlazor.Components;
 using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.Core.Pii;
+using ShiftSoftware.ShiftEntity.Core.Phones;
 using ShiftSoftware.ShiftEntity.Model;
 using ShiftSoftware.ShiftEntity.Model.Dtos;
 using ShiftSoftware.TypeAuth.Core;
@@ -22,6 +23,7 @@ public class PiiNestedContactFormTests : ShiftBlazorTestContext
     {
         var mock = Services.AddMockHttpClient();
         Services.AddShiftEntityPii();
+        Services.AddShiftPhoneNumbers(o => o.DefaultRegion = "IQ");
         Services.RemoveAll<ITypeAuthService>();
         var grants = JsonSerializer.Serialize(new Dictionary<string, object>
         {
@@ -40,7 +42,7 @@ public class PiiNestedContactFormTests : ShiftBlazorTestContext
     {
         Grant();
         var cut = Render<SampleContactForm>();
-        cut.FindComponents<ShiftPiiField>()[1].Find("input").Input("primary");
+        cut.FindComponents<ShiftPiiField>()[1].Find("input").Input("07500000088");
         var list = cut.FindComponent<MultiItemField<SampleContactPhoneDTO>>();
         await cut.InvokeAsync(() => list.Instance.CreateNew());
         var form = cut.FindComponent<ShiftEntityForm<SampleContactDTO>>();
@@ -49,7 +51,10 @@ public class PiiNestedContactFormTests : ShiftBlazorTestContext
         phone.Find("input").Input("x");
         phone.Find("input").Input("");
         Assert.Contains("Additional phone is required.", phone.Markup);
-        phone.Find("input").Input("additional");
+        phone.Find("input").Input("invalid");
+        Assert.Contains("Enter a valid complete phone number.", phone.Markup);
+        phone.Find("input").Input("+1 (202) 555-0123");
+        Assert.DoesNotContain("Enter a valid complete phone number.", phone.Markup);
         Assert.DoesNotContain("Additional phone is required.", phone.Markup);
         Assert.True(await cut.InvokeAsync(() => form.Instance.Validate()));
     }
@@ -75,7 +80,7 @@ public class PiiNestedContactFormTests : ShiftBlazorTestContext
         phone.WaitForAssertion(() => Assert.Equal("stored-phone", phone.Find("input").GetAttribute("value")));
         phone.Find("input").Input("");
         Assert.Contains("Additional phone is required.", phone.Markup);
-        phone.Find("input").Input("corrected");
+        phone.Find("input").Input("07500000099");
         Assert.DoesNotContain("Additional phone is required.", phone.Markup);
         Assert.True(await cut.InvokeAsync(() => form.Instance.Validate()));
     }

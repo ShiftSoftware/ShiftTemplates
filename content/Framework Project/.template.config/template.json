@@ -62,6 +62,7 @@
         "ShiftTemplates.Builder",
         "TestProject",
         "StockPlusPlus.Web.Tests/**/*",
+        "StockPlusPlus.Test.LongRunning/**/*",
         "StockPlusPlus.Test/Tests/IdentityConsumerContractTests.cs",
         "StockPlusPlus.API/Development/IdentityPreview/**/*",
         "StockPlusPlus.API/Development/IdentityApp/**/*",

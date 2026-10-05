@@ -12,6 +12,7 @@ using StockPlusPlus.Shared.Localization;
 using System.Globalization;
 using ShiftSoftware.ShiftEntity.Core.Extensions;
 using ShiftSoftware.ShiftEntity.Core.Pii;
+using ShiftSoftware.ShiftEntity.Core.Phones;
 #if (internalShiftIdentityHosting)
 using ShiftSoftware.ShiftIdentity.Dashboard.Blazor.Extensions;
 #endif
@@ -150,6 +151,7 @@ builder.Services.AddTypeAuth(x =>
 );
 
 builder.Services.AddShiftEntityPii();
+builder.Services.AddShiftPhoneNumbers(o => o.DefaultRegion = "IQ");
 
 #if (includeSampleApp)
 // Shared config for the tag components (ShiftTagList / ShiftTagForm / ShiftTagPicker).
