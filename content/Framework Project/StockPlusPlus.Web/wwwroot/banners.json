@@ -1,0 +1,36 @@
+{
+  // Rules for <ShiftBanners /> (see Pages/Samples/Banners/README.md). Paths are glob patterns matched against
+  // the page path; include/exclude are condition names that BannerLayout's IsConditionMet decides.
+  "rules": [
+    {
+      "id": "invoice-month-end",
+      "paths": [ "/InvoiceList", "/InvoiceForm/**" ],
+      "include": [ "can-write:Invoice" ],
+      "severity": "Warning",
+      "message": {
+        "en": "Month-end closing is in progress: invoices you save now are dated next month.",
+        "ar": "إغلاق نهاية الشهر قيد التنفيذ: الفواتير التي تحفظها الآن تُسجَّل بتاريخ الشهر القادم.",
+        "ku": "داخستنی کۆتایی مانگ لە ئارادایە: ئەو پسووڵانەی ئێستا پاشەکەوتیان دەکەیت بە ڕێکەوتی مانگی داهاتوو تۆمار دەکرێن."
+      }
+    },
+    {
+      "id": "product-prices",
+      "paths": [ "/ProductList", "/ProductForm/**" ],
+      "exclude": [ "can-write:Product" ],
+      "severity": "Info",
+      "message": {
+        "en": "Prices are shown without VAT.",
+        "ar": "الأسعار معروضة بدون ضريبة القيمة المضافة."
+      }
+    },
+    {
+      "id": "development-build",
+      "paths": [ "/**" ],
+      "include": [ "development" ],
+      "severity": "Normal",
+      "message": {
+        "en": "Development build: banners on this page come from wwwroot/banners.json."
+      }
+    }
+  ]
+}

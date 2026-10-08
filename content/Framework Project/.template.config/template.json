@@ -100,7 +100,8 @@
             "**/StockPlusPlus.Shared/Enums/*.cs",
             "**/StockPlusPlus.Test/Tests/*/**",
             "**/StockPlusPlus.Test/Tests/*.cs",
-            "**/StockPlusPlus.Web/Pages/*/**"
+            "**/StockPlusPlus.Web/Pages/*/**",
+            "**/StockPlusPlus.Web/wwwroot/banners.json"
           ],
           "condition": "(!includeSampleApp)"
         },
