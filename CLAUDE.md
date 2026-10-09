@@ -8,7 +8,9 @@ ShiftTemplates is a dual-purpose repository: it contains a **dotnet new** projec
 
 There are two solution files serving different purposes:
 - **`ShiftTemplates.sln`** — for template packaging and the Builder tool
-- **`content/Framework Project/StockPlusPlus.sln`** — the sample project / framework development
+- **`content/Framework Project/StockPlusPlus.sln`** — the one solution for framework development: the sample project plus every framework repo's projects, tests, tools and non-project files. The framework repos' own `.sln` files are not used.
+
+**Anything added to a framework repo goes into `StockPlusPlus.sln` in the same change.** That means projects, test projects, tools and hosts (for example `ShiftIdentity.DevHost`), and samples. Files that are not .NET projects, such as `eng/` scripts or `clients/javascript`, go in as solution items, in solution folders that mirror the disk. Put each entry under `ShiftFramework/<Repo>`, inside the `<!--#if shiftFrameworkDevelopmentMode-->` blocks, in all three places: the `Project` entry, its `ProjectConfigurationPlatforms` lines and its `NestedProjects` line. That keeps it out of generated projects. Solution items are a fixed list, so add each new file on disk to its folder too.
 
 ## Build & Run
 
@@ -16,8 +18,9 @@ There are two solution files serving different purposes:
 # Build entire solution (from repo root)
 dotnet build
 
-# Build sample project
-dotnet build "content/Framework Project/StockPlusPlus.sln"
+# StockPlusPlus.sln opens in Visual Studio. The command line cannot read it: its template comments
+# (<!--#if addFunctions-->) stop `dotnet build` with MSB5007. From the CLI, build the projects:
+dotnet build "content/Framework Project/StockPlusPlus.API"
 
 # Run the API
 dotnet run --project "content/Framework Project/StockPlusPlus.API"

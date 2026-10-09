@@ -22,7 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftFramework", "ShiftFram
 		..\..\ImportAndReferenceAll.bat = ..\..\ImportAndReferenceAll.bat
 		..\..\RemoveAll.bat = ..\..\RemoveAll.bat
 		..\..\ShiftFrameworkGlobalSettings.props = ..\..\ShiftFrameworkGlobalSettings.props
-		..\..\template-versions.ps1 = ..\..\template-versions.ps1
 	EndProjectSection
 EndProject
 
@@ -119,11 +118,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docs.Data", "..\..\..\Shift
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docs.SnippetGen", "..\..\..\ShiftFrameworkDocumentation\Docs.SnippetGen\Docs.SnippetGen.csproj", "{CB1FE0CF-4EC6-ECDE-6452-CBE8F1415654}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{ECA9B174-291C-48BE-8C9D-1EF77628A1CD}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\..\ShiftEntity\docs\mapping-abstraction-plan.md = ..\..\..\ShiftEntity\docs\mapping-abstraction-plan.md
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftIdentity.Tests", "..\..\..\ShiftIdentity\ShiftIdentity.Tests\ShiftIdentity.Tests.csproj", "{BF484050-C3F7-09CE-5083-845A53FE39BC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftIdentity.Data.Tests", "..\..\..\ShiftIdentity\ShiftIdentity.Data.Tests\ShiftIdentity.Data.Tests.csproj", "{CA5B9378-926D-7E15-DDF7-CD621F9E4152}"
@@ -147,6 +141,52 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftMapper.Generator.Tests", "..\..\..\ShiftMapper\ShiftMapper.Generator.Tests\ShiftMapper.Generator.Tests.csproj", "{EA322330-4586-41B4-9512-8112F5AB43C3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contoso.Platform", "..\..\..\ShiftMapper\Contoso.Platform\Contoso.Platform.csproj", "{A871A2DC-CDF1-4B04-BF7C-90A7F1FDB2BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftIdentity.Blazor.Tests", "..\..\..\ShiftIdentity\ShiftIdentity.Blazor.Tests\ShiftIdentity.Blazor.Tests.csproj", "{FFFACA96-BED4-4155-A9B0-F0B11A20DCED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftIdentity.DevHost", "..\..\..\ShiftIdentity\ShiftIdentity.DevHost\ShiftIdentity.DevHost.csproj", "{25C8E92C-E4E7-4F4A-A85D-A9FAE573E953}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftIdentity.DevHost.Client", "..\..\..\ShiftIdentity\ShiftIdentity.DevHost.Client\ShiftIdentity.DevHost.Client.csproj", "{789B8ACF-6575-4782-80EA-50C21E795FB2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{035284D5-4F37-4893-AE9C-340E37B0E86F}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\eng\Start-DevHost.ps1 = ..\..\..\ShiftIdentity\eng\Start-DevHost.ps1
+		..\..\..\ShiftIdentity\eng\Start-IdentitySql.ps1 = ..\..\..\ShiftIdentity\eng\Start-IdentitySql.ps1
+		..\..\..\ShiftIdentity\eng\Stop-IdentitySql.ps1 = ..\..\..\ShiftIdentity\eng\Stop-IdentitySql.ps1
+		..\..\..\ShiftIdentity\eng\Test-IdentitySuite.ps1 = ..\..\..\ShiftIdentity\eng\Test-IdentitySuite.ps1
+		..\..\..\ShiftIdentity\eng\WorktreeReferences.targets = ..\..\..\ShiftIdentity\eng\WorktreeReferences.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "clients", "clients", "{BDE105A7-F626-48B5-ABEB-782E4C492CF5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "javascript", "javascript", "{2D91CD8B-4BB9-478C-B194-EB3F719927E0}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\javascript\README.md = ..\..\..\ShiftIdentity\clients\javascript\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1EE3352D-3B0D-41CA-A463-487235989C05}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\javascript\src\shiftidentity-tokenclient.js = ..\..\..\ShiftIdentity\clients\javascript\src\shiftidentity-tokenclient.js
+		..\..\..\ShiftIdentity\clients\javascript\src\shiftidentity-tokenclient-issuer-v2.js = ..\..\..\ShiftIdentity\clients\javascript\src\shiftidentity-tokenclient-issuer-v2.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0E9E4FEE-B104-456C-B60C-EF53536A693D}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\javascript\test\es5-syntax.test.js = ..\..\..\ShiftIdentity\clients\javascript\test\es5-syntax.test.js
+		..\..\..\ShiftIdentity\clients\javascript\test\issuer-v2.test.js = ..\..\..\ShiftIdentity\clients\javascript\test\issuer-v2.test.js
+		..\..\..\ShiftIdentity\clients\javascript\test\localstorage-store.test.js = ..\..\..\ShiftIdentity\clients\javascript\test\localstorage-store.test.js
+		..\..\..\ShiftIdentity\clients\javascript\test\tokenclient.test.js = ..\..\..\ShiftIdentity\clients\javascript\test\tokenclient.test.js
+		..\..\..\ShiftIdentity\clients\javascript\test\xhr-transport.test.js = ..\..\..\ShiftIdentity\clients\javascript\test\xhr-transport.test.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fixtures", "fixtures", "{42D2329E-B7D0-49F6-AC58-332997A5C19D}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\javascript\test\fixtures\v2-refresh-responses.json = ..\..\..\ShiftIdentity\clients\javascript\test\fixtures\v2-refresh-responses.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{E77B62F9-2E6D-437B-82B4-60688FFF4537}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftIdentity.ReverseAccess.Benchmarks", "..\..\..\ShiftIdentity\benchmarks\ShiftIdentity.ReverseAccess.Benchmarks\ShiftIdentity.ReverseAccess.Benchmarks.csproj", "{0DA43496-4FF8-474B-A455-13B0D15A9899}"
 EndProject
 <!--#endif -->
 Global
@@ -360,6 +400,22 @@ Global
 		{A871A2DC-CDF1-4B04-BF7C-90A7F1FDB2BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A871A2DC-CDF1-4B04-BF7C-90A7F1FDB2BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A871A2DC-CDF1-4B04-BF7C-90A7F1FDB2BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFFACA96-BED4-4155-A9B0-F0B11A20DCED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFFACA96-BED4-4155-A9B0-F0B11A20DCED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFFACA96-BED4-4155-A9B0-F0B11A20DCED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFFACA96-BED4-4155-A9B0-F0B11A20DCED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25C8E92C-E4E7-4F4A-A85D-A9FAE573E953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25C8E92C-E4E7-4F4A-A85D-A9FAE573E953}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25C8E92C-E4E7-4F4A-A85D-A9FAE573E953}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25C8E92C-E4E7-4F4A-A85D-A9FAE573E953}.Release|Any CPU.Build.0 = Release|Any CPU
+		{789B8ACF-6575-4782-80EA-50C21E795FB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{789B8ACF-6575-4782-80EA-50C21E795FB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{789B8ACF-6575-4782-80EA-50C21E795FB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{789B8ACF-6575-4782-80EA-50C21E795FB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DA43496-4FF8-474B-A455-13B0D15A9899}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DA43496-4FF8-474B-A455-13B0D15A9899}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DA43496-4FF8-474B-A455-13B0D15A9899}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DA43496-4FF8-474B-A455-13B0D15A9899}.Release|Any CPU.Build.0 = Release|Any CPU
 		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
@@ -418,6 +474,17 @@ Global
 		{F64C41CB-1E96-4999-A03D-2CC6DFC688F8} = {9E913C84-F40B-415B-876D-126C334E4CE7}
 		{EA322330-4586-41B4-9512-8112F5AB43C3} = {9E913C84-F40B-415B-876D-126C334E4CE7}
 		{A871A2DC-CDF1-4B04-BF7C-90A7F1FDB2BF} = {9E913C84-F40B-415B-876D-126C334E4CE7}
+		{FFFACA96-BED4-4155-A9B0-F0B11A20DCED} = {628E8BC1-C04D-4681-90A3-5CD4DF6A4003}
+		{25C8E92C-E4E7-4F4A-A85D-A9FAE573E953} = {628E8BC1-C04D-4681-90A3-5CD4DF6A4003}
+		{789B8ACF-6575-4782-80EA-50C21E795FB2} = {628E8BC1-C04D-4681-90A3-5CD4DF6A4003}
+		{035284D5-4F37-4893-AE9C-340E37B0E86F} = {628E8BC1-C04D-4681-90A3-5CD4DF6A4003}
+		{BDE105A7-F626-48B5-ABEB-782E4C492CF5} = {628E8BC1-C04D-4681-90A3-5CD4DF6A4003}
+		{2D91CD8B-4BB9-478C-B194-EB3F719927E0} = {BDE105A7-F626-48B5-ABEB-782E4C492CF5}
+		{1EE3352D-3B0D-41CA-A463-487235989C05} = {2D91CD8B-4BB9-478C-B194-EB3F719927E0}
+		{0E9E4FEE-B104-456C-B60C-EF53536A693D} = {2D91CD8B-4BB9-478C-B194-EB3F719927E0}
+		{42D2329E-B7D0-49F6-AC58-332997A5C19D} = {0E9E4FEE-B104-456C-B60C-EF53536A693D}
+		{E77B62F9-2E6D-437B-82B4-60688FFF4537} = {628E8BC1-C04D-4681-90A3-5CD4DF6A4003}
+		{0DA43496-4FF8-474B-A455-13B0D15A9899} = {E77B62F9-2E6D-437B-82B4-60688FFF4537}
 		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
