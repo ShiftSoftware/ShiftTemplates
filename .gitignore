@@ -397,3 +397,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /TestProject
+content/Framework Project/.claude/settings.local.json
