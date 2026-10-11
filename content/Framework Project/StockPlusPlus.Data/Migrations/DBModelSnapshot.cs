@@ -436,6 +436,95 @@ namespace StockPlusPlus.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Data.Authentication.DeviceAuthorization", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ApprovedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Audience")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTimeOffset?>("AuthenticatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ClientID")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("DeviceCodeDigest")
+                        .HasMaxLength(32)
+                        .HasColumnType("varbinary(32)");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("FactorGeneration")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Interval")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("LastPolledAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool?>("MfaSatisfied")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("PolicyRevision")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<long?>("SecurityVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("SessionProvider")
+                        .HasColumnType("int");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("UserCodeDigest")
+                        .HasMaxLength(32)
+                        .HasColumnType("varbinary(32)");
+
+                    b.Property<long?>("UserID")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UserCodeDigest")
+                        .IsUnique()
+                        .HasFilter("[UserCodeDigest] IS NOT NULL");
+
+                    b.HasIndex("UserID");
+
+                    b.HasIndex("ExpiresAt", "State");
+
+                    b.ToTable("DeviceAuthorizations", "ShiftIdentity", t =>
+                        {
+                            t.HasCheckConstraint("CK_DeviceAuthorization_Account", "([State] = 1 AND [UserID] IS NULL AND [ApprovedAt] IS NULL) OR ([State] IN (2,4) AND [UserID] IS NOT NULL AND [SecurityVersion] >= 1 AND [PolicyRevision] >= 1 AND [FactorGeneration] >= 1 AND [MfaSatisfied] IS NOT NULL AND [AuthenticatedAt] IS NOT NULL AND [ApprovedAt] IS NOT NULL) OR [State] IN (3,5)");
+
+                            t.HasCheckConstraint("CK_DeviceAuthorization_Codes", "([State] IN (1,2) AND DATALENGTH([DeviceCodeDigest]) = 32 AND DATALENGTH([UserCodeDigest]) = 32) OR ([State] IN (4,5) AND [DeviceCodeDigest] IS NULL AND [UserCodeDigest] IS NULL) OR ([State] = 3 AND ((DATALENGTH([DeviceCodeDigest]) = 32 AND DATALENGTH([UserCodeDigest]) = 32) OR ([DeviceCodeDigest] IS NULL AND [UserCodeDigest] IS NULL)))");
+
+                            t.HasCheckConstraint("CK_DeviceAuthorization_State", "[State] IN (1,2,3,4,5) AND [ExpiresAt] > [CreatedAt] AND [Interval] BETWEEN 1 AND 3600 AND ([SessionProvider] IS NULL OR [SessionProvider] IN (1, 2))");
+                        });
+                });
+
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Data.Authentication.UserProviderLink", b =>
                 {
                     b.Property<Guid>("ID")
@@ -1970,6 +2059,9 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<string>("AccessTree")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("AllowDeviceSignIn")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("BirthDate")
                         .HasColumnType("datetime2");
 
@@ -2899,6 +2991,14 @@ namespace StockPlusPlus.Data.Migrations
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Data.Authentication.DeviceAuthorization", b =>
+                {
+                    b.HasOne("ShiftSoftware.ShiftIdentity.Data.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("ShiftSoftware.ShiftIdentity.Data.Authentication.UserProviderLink", b =>
