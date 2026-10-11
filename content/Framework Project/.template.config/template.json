@@ -106,7 +106,8 @@
         },
         {
           "exclude": [
-            "**/StockPlusPlus.API/Services/SendEmailService.cs"
+            "**/StockPlusPlus.API/Services/SendEmailService.cs",
+            "**/StockPlusPlus.Web/Development/DevelopmentTools.razor"
           ],
           "condition": "(!internalShiftIdentityHosting)"
         },

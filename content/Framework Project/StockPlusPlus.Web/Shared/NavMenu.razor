@@ -1,5 +1,5 @@
-﻿@*#if (includeSampleApp)*@
-@using ShiftSoftware.ShiftIdentity.Core
+﻿@using ShiftSoftware.ShiftIdentity.Core
+@*#if (includeSampleApp)*@
 @using StockPlusPlus.Web.Pages.Country
 @using StockPlusPlus.Web.Pages.SampleContact
 @using StockPlusPlus.Web.Pages.Invoice
@@ -20,7 +20,9 @@
         {
             <MudNavLink Href="Identity/UserList" Icon="@Icons.Material.Filled.People">Users</MudNavLink>
         }
+        @*#if (internalShiftIdentityHosting)*@
         <MudNavLink Href="development/tools" Target="_blank" Icon="@Icons.Material.Filled.Science">Development tools</MudNavLink>
+        @*#endif*@
     }
     else
     {
