@@ -1,6 +1,7 @@
 ﻿@page "/"
 @attribute [Authorize]
 
+@*#if (shiftFrameworkDevelopmentMode)*@
 @if (AdmissionContext is not null)
 {
     <MudText Typo="Typo.h4">StockPlusPlus</MudText>
@@ -9,10 +10,13 @@
     <MudButton Href="development/tools" Target="_blank">Synthetic accounts and authenticator codes</MudButton>
 }
 
+@*#endif*@
 <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Start" Reverse>
     <DateBig/>
 </MudStack>
+@*#if (shiftFrameworkDevelopmentMode)*@
 
 @code {
     [CascadingParameter] public ShiftSoftware.ShiftIdentity.Blazor.Services.AdmissionUiContext? AdmissionContext { get; set; }
 }
+@*#endif*@

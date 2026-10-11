@@ -48,10 +48,12 @@ if (!args.Contains("--identity-preview", StringComparer.Ordinal))
 await StockPlusPlus.API.Development.IdentityPreview.IdentityPreviewHost.RunAsync();
 return;
 #else
+#if shiftFrameworkDevelopmentMode
 if (args.Contains("--identity-development", StringComparer.Ordinal))
     throw new InvalidOperationException("Build with eng/Start-IdentityDevelopmentApp.ps1 before using --identity-development.");
 if (args.Contains("--identity-preview", StringComparer.Ordinal))
     throw new InvalidOperationException("Build the local admission preview with eng/Start-IdentityPreview.ps1 before using --identity-preview.");
+#endif
 
 var builder = WebApplication.CreateBuilder(args);
 

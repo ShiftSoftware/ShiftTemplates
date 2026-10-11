@@ -8,6 +8,7 @@ namespace StockPlusPlus.Web;
 
 public partial class App
 {
+#if shiftFrameworkDevelopmentMode
     [Microsoft.AspNetCore.Components.Inject] private IServiceProvider Services { get; set; } = null!;
     [Microsoft.AspNetCore.Components.Inject] private Microsoft.AspNetCore.Components.NavigationManager Navigation { get; set; } = null!;
     private ShiftSoftware.ShiftIdentity.Blazor.Services.AdmissionUiContext? AdmissionContext =>
@@ -19,6 +20,7 @@ public partial class App
         if (!Development.IdentityDevelopmentRoutes.IsAllowed(navigation.Path))
             Navigation.NavigateTo("development/unavailable", replace: true);
     }
+#endif
     private ShiftIdentityHostingTypes shiftIdentityHostingTypes;
     private List<System.Reflection.Assembly> additionalAssemblies;
 
