@@ -18,7 +18,7 @@ public class Function
     }
 
     [Function("ReCaptcha")]
-    [CheckReCaptcha(6)]
+    [CheckReCaptcha(0.7, LogResult = true)]
     public IActionResult ReCaptcha([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
     {
         _logger.LogInformation("C# HTTP trigger function processed a request.");
