@@ -11,8 +11,8 @@
            EnableExport EnableFilterPanel>
     <ChildContent>
         <ButtonColumn Property="x => x.Label" Title="Label" />
-        <PropertyColumnExtended Property="x => x.Name!.Display" Title="Name" Sortable="false" />
-        <PropertyColumnExtended Property="x => x.Phone!.Display" Title="Phone" Sortable="false" />
+        <ShiftPiiColumn T="SampleContactListDTO" Property="x => x.Name!.Display" Title="Name" />
+        <ShiftPiiColumn T="SampleContactListDTO" Property="x => x.Phone!.Display" Title="Phone" />
         <StringFilter T="SampleContactListDTO" TProperty="string" Property="x => x.Name!.Display" Label="Name" Operator="ODataOperator.Contains" />
         <StringFilter T="SampleContactListDTO" TProperty="string" Property="x => x.Phone!.Display" Label="Phone" Operator="ODataOperator.Contains" />
     </ChildContent>
