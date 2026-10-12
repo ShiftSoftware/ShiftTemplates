@@ -21,6 +21,14 @@ public partial class App
             Navigation.NavigateTo("development/unavailable", replace: true);
     }
 #endif
+    // A template #if cannot sit inside the <DefaultApp> tag in App.razor (Razor reads the comment
+    // as a parameter name), so the development-only navigation hook is chosen here instead.
+    private Microsoft.AspNetCore.Components.EventCallback<Microsoft.AspNetCore.Components.Routing.NavigationContext> onNavigateAsync =>
+#if shiftFrameworkDevelopmentMode
+        Microsoft.AspNetCore.Components.EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Routing.NavigationContext>(this, CheckDevelopmentRoute);
+#else
+        default;
+#endif
     private ShiftIdentityHostingTypes shiftIdentityHostingTypes;
     private List<System.Reflection.Assembly> additionalAssemblies;
 

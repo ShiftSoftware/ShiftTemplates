@@ -12,9 +12,7 @@
     <DefaultApp AppTitle="StockPlusPlus"
                 AppAssembly="@typeof(App).Assembly"
                 IdentityHostingType="shiftIdentityHostingTypes"
-                @*#if (shiftFrameworkDevelopmentMode)*@
-                OnNavigateAsync="CheckDevelopmentRoute"
-                @*#endif*@
+                OnNavigateAsync="onNavigateAsync"
                 AdditionalAssemblies="additionalAssemblies">
 
         <NavMenuTemplate>
