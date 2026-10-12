@@ -3,18 +3,29 @@
 
 <CascadingAuthenticationState>
     @*#if (shiftFrameworkDevelopmentMode)*@
-    <CascadingValue Value="AdmissionContext" IsFixed="true">
+    @* A template condition cannot sit inside a component's start tag (Razor reads it as a parameter name), so the development app gets its own DefaultApp. *@
     @if (AdmissionContext is not null)
     {
-        <StockPlusPlus.Web.Development.DevelopmentSessionLifetime />
+        <CascadingValue Value="AdmissionContext" IsFixed="true">
+            <StockPlusPlus.Web.Development.DevelopmentSessionLifetime />
+            <DefaultApp AppTitle="StockPlusPlus"
+                        AppAssembly="@typeof(App).Assembly"
+                        IdentityHostingType="shiftIdentityHostingTypes"
+                        AdditionalAssemblies="additionalAssemblies"
+                        OnNavigateAsync="CheckDevelopmentRoute">
+
+                <NavMenuTemplate>
+                    <NavMenu isDrawerOpen="@context.IsDrawerOpen" />
+                </NavMenuTemplate>
+            </DefaultApp>
+        </CascadingValue>
     }
+    else
+    {
     @*#endif*@
     <DefaultApp AppTitle="StockPlusPlus"
                 AppAssembly="@typeof(App).Assembly"
                 IdentityHostingType="shiftIdentityHostingTypes"
-                @*#if (shiftFrameworkDevelopmentMode)*@
-                OnNavigateAsync="CheckDevelopmentRoute"
-                @*#endif*@
                 AdditionalAssemblies="additionalAssemblies">
 
         <NavMenuTemplate>
@@ -22,6 +33,6 @@
         </NavMenuTemplate>
     </DefaultApp>
     @*#if (shiftFrameworkDevelopmentMode)*@
-    </CascadingValue>
+    }
     @*#endif*@
 </CascadingAuthenticationState>
