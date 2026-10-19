@@ -12,6 +12,7 @@
                         AppAssembly="@typeof(App).Assembly"
                         IdentityHostingType="shiftIdentityHostingTypes"
                         AdditionalAssemblies="additionalAssemblies"
+                        MainLayout="mainLayout"
                         OnNavigateAsync="CheckDevelopmentRoute">
 
                 <NavMenuTemplate>
@@ -26,7 +27,8 @@
     <DefaultApp AppTitle="StockPlusPlus"
                 AppAssembly="@typeof(App).Assembly"
                 IdentityHostingType="shiftIdentityHostingTypes"
-                AdditionalAssemblies="additionalAssemblies">
+                AdditionalAssemblies="additionalAssemblies"
+                MainLayout="mainLayout">
 
         <NavMenuTemplate>
             <NavMenu isDrawerOpen="@context.IsDrawerOpen" />
