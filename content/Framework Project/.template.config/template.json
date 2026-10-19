@@ -64,6 +64,7 @@
         "StockPlusPlus.Web.Tests/**/*",
         "StockPlusPlus.Test.LongRunning/**/*",
         "StockPlusPlus.E2ETests/**/*",
+        "StockPlusPlus.Web/Pages/Samples/**/*",
         "StockPlusPlus.Test/Tests/IdentityConsumerContractTests.cs",
         "StockPlusPlus.API/Development/IdentityPreview/**/*",
         "StockPlusPlus.API/Development/IdentityApp/**/*",

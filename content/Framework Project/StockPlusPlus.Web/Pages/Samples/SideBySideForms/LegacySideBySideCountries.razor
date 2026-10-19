@@ -1,0 +1,49 @@
+@attribute [Route("/Samples/LegacySideBySideCountries/{Left}/{Right}")]
+
+@using StockPlusPlus.Shared.DTOs
+
+@* LEGACY — kept on purpose to show the bug explained in README.md. Do not copy this pattern.
+   The page inherits ShiftForm<,>, so TheItem, Mode and FormContainer belong to the PAGE: there is one of each,
+   and both panes below are bound to them. The build reports CS0618 (ShiftForm<,> is obsolete) for this line:
+   that warning is the point of the sample. *@
+@inherits ShiftForm<LegacySideBySideCountries, CountryDTO>
+
+<MudGrid>
+    <MudItem xs="12" md="6">
+        <ShiftEntityForm @bind-Value="TheItem"
+                         @bind-Mode="Mode"
+                         @ref="FormContainer"
+                         Key="Left"
+                         Endpoint="Country"
+                         Title="Left pane"
+                         TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Country">
+            @FormBody
+        </ShiftEntityForm>
+    </MudItem>
+
+    <MudItem xs="12" md="6">
+        <ShiftEntityForm @bind-Value="TheItem"
+                         @bind-Mode="Mode"
+                         @ref="FormContainer"
+                         Key="Right"
+                         Endpoint="Country"
+                         Title="Right pane"
+                         TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Country">
+            @FormBody
+        </ShiftEntityForm>
+    </MudItem>
+</MudGrid>
+
+@code {
+    // Two country keys from the route (as shown in the ID column of /CountryList), e.g. /Samples/LegacySideBySideCountries/abc/xyz.
+    // Route values, not query values: ShiftForm<,> drops every cascading parameter, and [SupplyParameterFromQuery]
+    // is delivered as one (see README.md), so both pages use the route to stay comparable.
+    [Parameter] public string? Left { get; set; }
+    [Parameter] public string? Right { get; set; }
+
+    // The same body for both panes. It reads the PAGE's TheItem, not the pane's own record.
+    private RenderFragment FormBody => @<MudTextFieldExtended Label="Name"
+                                                             ReadOnly="ReadOnly"
+                                                             @bind-Value="TheItem.Name"
+                                                             For="@(() => TheItem.Name)" />;
+}
