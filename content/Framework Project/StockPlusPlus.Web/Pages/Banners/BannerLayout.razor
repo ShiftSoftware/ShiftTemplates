@@ -1,0 +1,43 @@
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+@using ShiftSoftware.TypeAuth.Core
+@using StockPlusPlus.Shared.ActionTrees
+
+@inherits LayoutComponentBase
+@layout ShiftSoftware.ShiftBlazor.Layouts.ShiftMainLayout
+
+@* Sample: shows the rule-driven banners from wwwroot/banners.json above every page. It sits inside the framework's
+   main layout (App.razor passes it as DefaultApp's MainLayout), so nothing of the framework layout is copied. *@
+<ShiftBanners IsConditionMet="IsConditionMet" />
+
+@Body
+
+@code {
+    [Inject] private ITypeAuthService TypeAuth { get; set; } = default!;
+    [Inject] private IWebAssemblyHostEnvironment Environment { get; set; } = default!;
+    [Inject] private ILogger<BannerLayout> Logger { get; set; } = default!;
+
+    private Dictionary<string, Func<bool>> conditions = default!;
+    private readonly HashSet<string> reportedUnknown = new();
+
+    // The condition names banners.json may use. The component never interprets them: this app decides what they mean.
+    protected override void OnInitialized() => conditions = new()
+    {
+        ["can-write:Invoice"] = () => TypeAuth.CanWrite(StockPlusPlusActionTree.Invoice),
+        ["can-write:Product"] = () => TypeAuth.CanWrite(StockPlusPlusActionTree.Product),
+        ["development"] = () => Environment.IsDevelopment(),
+    };
+
+    // An unknown name (e.g. a typo in banners.json) is not met, but it is logged once so the rule doesn't just
+    // silently never show.
+    private bool IsConditionMet(string condition)
+    {
+        if (conditions.TryGetValue(condition, out var isMet))
+            return isMet();
+
+        if (reportedUnknown.Add(condition))
+            Logger.LogWarning("banners.json uses the unknown condition '{Condition}'; it is treated as not met. Known conditions: {Known}.",
+                condition, string.Join(", ", conditions.Keys));
+
+        return false;
+    }
+}

@@ -6,7 +6,7 @@ Warning banners above every page, driven by a rules file instead of code.
 |---|---|
 | Rules | `wwwroot/banners.json` |
 | Registration | `Program.cs`: `builder.Services.AddShiftBlazorBanners();` |
-| Placement + condition predicate | `Pages/Samples/Banners/BannerLayout.razor` |
+| Placement + condition predicate | `Pages/Banners/BannerLayout.razor` |
 | Wiring the layout | `App.razor` (`MainLayout="mainLayout"`) and `App.razor.cs` (sample only) |
 
 `BannerLayout` is a nested layout: it renders `<ShiftBanners />` and then the page, inside the framework's
@@ -16,8 +16,8 @@ Warning banners above every page, driven by a rules file instead of code.
 
 | Rule | Pages | Shown when | Languages |
 |---|---|---|---|
-| `invoice-month-end` | `/InvoiceList`, `/InvoiceForm/**` | the user can write invoices (`include`) | en, ar, ku |
-| `product-prices` | `/ProductList`, `/ProductForm/**` | the user can **not** write products (`exclude`) | en, ar — Kurdish users see English |
+| `invoice-editors` | `/InvoiceList`, `/InvoiceForm/**` | the user can write invoices (`include`) | en, ar, ku |
+| `product-viewers` | `/ProductList`, `/ProductForm/**` | the user can **not** write products (`exclude`) | en, ar — Kurdish users see English |
 | `development-build` | every page (`/**`) | running in Development (`include`) | en |
 
 ## How a rule is decided
@@ -28,6 +28,8 @@ Warning banners above every page, driven by a rules file instead of code.
 2. **Conditions.** `include` / `exclude` are just names. `ShiftBanners` asks the `IsConditionMet` predicate the app
    passes in (here: TypeAuth and the host environment). With `include`, at least one must be met; any met `exclude`
    hides the rule.
+   A name `BannerLayout` doesn't know (for example a typo) counts as not met and is logged once as a warning in the
+   browser console, with the list of known names.
 3. **Language.** The text for the user's culture (`ar-IQ`), else its language (`ar`), else `en`; a rule with neither
    is not shown.
 

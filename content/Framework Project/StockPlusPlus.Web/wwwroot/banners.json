@@ -1,26 +1,26 @@
 {
-  // Rules for <ShiftBanners /> (see Pages/Samples/Banners/README.md). Paths are glob patterns matched against
+  // Rules for <ShiftBanners /> (see Pages/Banners/README.md). Paths are glob patterns matched against
   // the page path; include/exclude are condition names that BannerLayout's IsConditionMet decides.
   "rules": [
     {
-      "id": "invoice-month-end",
+      "id": "invoice-editors",
       "paths": [ "/InvoiceList", "/InvoiceForm/**" ],
       "include": [ "can-write:Invoice" ],
       "severity": "Warning",
       "message": {
-        "en": "Month-end closing is in progress: invoices you save now are dated next month.",
-        "ar": "إغلاق نهاية الشهر قيد التنفيذ: الفواتير التي تحفظها الآن تُسجَّل بتاريخ الشهر القادم.",
-        "ku": "داخستنی کۆتایی مانگ لە ئارادایە: ئەو پسووڵانەی ئێستا پاشەکەوتیان دەکەیت بە ڕێکەوتی مانگی داهاتوو تۆمار دەکرێن."
+        "en": "Sample banner (wwwroot/banners.json): shown on the invoice pages to users who can edit invoices.",
+        "ar": "شريط تنبيه تجريبي (wwwroot/banners.json): يظهر في صفحات الفواتير للمستخدمين الذين يمكنهم تعديل الفواتير.",
+        "ku": "بانەری نموونە (wwwroot/banners.json): لە پەڕەکانی پسووڵەدا بۆ ئەو بەکارهێنەرانە پیشان دەدرێت کە دەتوانن دەستکاری پسووڵە بکەن."
       }
     },
     {
-      "id": "product-prices",
+      "id": "product-viewers",
       "paths": [ "/ProductList", "/ProductForm/**" ],
       "exclude": [ "can-write:Product" ],
       "severity": "Info",
       "message": {
-        "en": "Prices are shown without VAT.",
-        "ar": "الأسعار معروضة بدون ضريبة القيمة المضافة."
+        "en": "Sample banner (wwwroot/banners.json): shown on the product pages only to users who cannot edit products.",
+        "ar": "شريط تنبيه تجريبي (wwwroot/banners.json): يظهر في صفحات المنتجات فقط للمستخدمين الذين لا يمكنهم تعديل المنتجات."
       }
     },
     {

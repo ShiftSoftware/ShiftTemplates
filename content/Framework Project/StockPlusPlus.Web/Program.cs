@@ -166,7 +166,7 @@ builder.Services.AddShiftBlazorTagging<StockPlusPlusActionTree>(o =>
     o.TypeAuthAction = StockPlusPlusActionTree.Tags;
 });
 
-// Rule-driven warning banners from wwwroot/banners.json, shown by Pages/Samples/Banners/BannerLayout.
+// Rule-driven warning banners from wwwroot/banners.json, shown by Pages/Banners/BannerLayout.
 builder.Services.AddShiftBlazorBanners();
 #endif
 

@@ -30,8 +30,8 @@ public partial class App
     public App()
     {
 #if (includeSampleApp)
-        // Sample: rule-driven banners above every page (Pages/Samples/Banners).
-        mainLayout = typeof(StockPlusPlus.Web.Pages.Samples.Banners.BannerLayout);
+        // Sample: rule-driven banners above every page (Pages/Banners).
+        mainLayout = typeof(StockPlusPlus.Web.Pages.Banners.BannerLayout);
 #endif
 #if (internalShiftIdentityHosting)
     additionalAssemblies = new() { typeof(ShiftIdentityBlazorMaker).Assembly, typeof(ShiftIdentityDashboarBlazorMaker).Assembly };
