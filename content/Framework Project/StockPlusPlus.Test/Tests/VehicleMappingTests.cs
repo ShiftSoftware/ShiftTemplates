@@ -7,10 +7,11 @@ using StockPlusPlus.Shared.DTOs.Vehicle;
 namespace StockPlusPlus.Test.Tests;
 
 /// <summary>
-/// Pins Vehicle's mapping through the repository's public MapToView / MapToEntity / MapToList / CopyEntity,
-/// so the same assertions hold whichever door the repository uses (hand-written overrides or ShiftMapper's
-/// automatic maps). The repository comes from the API host, so it maps with the host's IMapper exactly as a
-/// request would; nothing here is saved.
+/// Pins Vehicle's mapping through the repository's public MapToView / MapToEntity / MapToList / CopyEntity.
+/// The repository has no overrides: ShiftMapper's automatic maps plus the write map in StockPlusPlusMapper do the
+/// work. The assertions were first run against the old hand-written overrides, so they pin the same behaviour.
+/// The repository comes from the API host, so it maps with the host's IMapper exactly as a request would;
+/// nothing here is saved.
 /// </summary>
 [Collection("API Collection")]
 public class VehicleMappingTests : IDisposable
@@ -74,10 +75,10 @@ public class VehicleMappingTests : IDisposable
         Assert.Null(existing.IntermediaryCompanyID);
     }
 
-    // Generated MapToEntity writes the audit fields from the DTO by default, and on UPDATE the AuditStamper only
-    // refreshes LastSaveDate / LastSavedByUserID — so a request body could rewrite CreateDate / CreatedByUserID.
-    // The hand-written Vehicle mapping never wrote them; the repository keeps that with IgnoreEntity (automapper
-    // removal plan, Q7 / gap C-3: "the guard belongs in the repository or an explicit IgnoreEntity").
+    // ShiftMapper's automatic write map copies the audit members from the DTO, and on UPDATE the repository only
+    // re-stamps LastSaveDate / LastSavedByUserID — so a request body could rewrite CreateDate / CreatedByUserID.
+    // The hand-written Vehicle mapping never wrote them; StockPlusPlusMapper keeps that by ignoring all four in
+    // Vehicle's write map (automapper removal plan, Q7 / gap C-3).
     [Fact]
     public void MapToEntity_LeavesServerControlledAuditFieldsAlone()
     {
