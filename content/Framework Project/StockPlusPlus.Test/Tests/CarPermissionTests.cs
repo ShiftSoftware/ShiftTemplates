@@ -87,6 +87,36 @@ public class CarPermissionTests
     }
 
     [Fact]
+    public async Task ReadWriteUser_CanCreateAndUpdate_ButTheApiRefusesDelete()
+    {
+        using var admin = ClientWithCarAccess(Access.Read, Access.Write, Access.Delete);
+        using var readWrite = ClientWithCarAccess(Access.Read, Access.Write);
+        var make = UniqueMake();
+
+        // Allowed: Read and Write.
+        var created = await CreateAsync(readWrite, new CarDTO { Make = make, Model = "Polo", Year = 2017 });
+
+        created.Model = "Passat";
+        using (var update = await readWrite.PutAsJsonAsync($"api/Car/{created.ID}", created))
+            Assert.Equal("Passat", ResponseEntity<CarDTO>(await ExpectStatusAsync(update, HttpStatusCode.OK)).Model);
+
+        // Refused: Delete. Write access does not include it.
+        using (var delete = await readWrite.DeleteAsync($"api/Car/{created.ID}"))
+            await ExpectStatusAsync(delete, HttpStatusCode.Forbidden);
+
+        // The refusal had no effect: the car is still listed and not deleted.
+        using (var list = await admin.GetAsync(ListUrl(make)))
+            Assert.Equal([created.ID], ListedIds(await ExpectStatusAsync(list, HttpStatusCode.OK)));
+
+        using (var view = await admin.GetAsync($"api/Car/{created.ID}"))
+        {
+            var stored = ResponseEntity<CarDTO>(await ExpectStatusAsync(view, HttpStatusCode.OK));
+            Assert.Equal("Passat", stored.Model);
+            Assert.False(stored.IsDeleted);
+        }
+    }
+
+    [Fact]
     public async Task UserWithoutCarAccess_IsRefusedEvenForReading()
     {
         using var admin = ClientWithCarAccess(Access.Read, Access.Write, Access.Delete);
