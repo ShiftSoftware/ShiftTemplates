@@ -53,6 +53,7 @@
         "**/.git/**",
         "**/.github/**",
         "**/.vs/**",
+        "**/.claude/**",
         "**/.gitignore",
         "**/.gitattributes",
         "ImportAndReferenceAll.bat",
