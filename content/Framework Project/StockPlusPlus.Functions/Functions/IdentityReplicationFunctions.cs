@@ -53,14 +53,6 @@ public class IdentityReplicationFunctions
     public Task ReplicateServicesTimer([TimerTrigger(HourlySchedule)] TimerInfo timer)
         => RunTimerAsync((c, conn, db) => c.ReplicateServiceAsync<DB>(conn, db));
 
-    [Function(nameof(ReplicateCompanyBranchServicesTimer))]
-    public Task ReplicateCompanyBranchServicesTimer([TimerTrigger(HourlySchedule)] TimerInfo timer)
-        => RunTimerAsync((c, conn, db) => c.ReplicateCompanyBranchServiceAsync<DB>(conn, db));
-
-    [Function(nameof(ReplicateCompanyBranchDepartmentsTimer))]
-    public Task ReplicateCompanyBranchDepartmentsTimer([TimerTrigger(HourlySchedule)] TimerInfo timer)
-        => RunTimerAsync((c, conn, db) => c.ReplicateCompanyBranchDepartmentAsync<DB>(conn, db));
-
     [Function(nameof(ReplicateDepartmentsTimer))]
     public Task ReplicateDepartmentsTimer([TimerTrigger(HourlySchedule)] TimerInfo timer)
         => RunTimerAsync((c, conn, db) => c.ReplicateDepartmentAsync<DB>(conn, db));
@@ -68,10 +60,6 @@ public class IdentityReplicationFunctions
     [Function(nameof(ReplicateBrandsTimer))]
     public Task ReplicateBrandsTimer([TimerTrigger(HourlySchedule)] TimerInfo timer)
         => RunTimerAsync((c, conn, db) => c.ReplicateBrandAsync<DB>(conn, db));
-
-    [Function(nameof(ReplicateCompanyBranchBrandsTimer))]
-    public Task ReplicateCompanyBranchBrandsTimer([TimerTrigger(HourlySchedule)] TimerInfo timer)
-        => RunTimerAsync((c, conn, db) => c.ReplicateCompanyBranchBrandAsync<DB>(conn, db));
 
     [Function(nameof(ReplicateRegionsTimer))]
     public Task ReplicateRegionsTimer([TimerTrigger(HourlySchedule)] TimerInfo timer)
@@ -85,6 +73,8 @@ public class IdentityReplicationFunctions
     public Task ReplicateCitiesTimer([TimerTrigger(HourlySchedule)] TimerInfo timer)
         => RunTimerAsync((c, conn, db) => c.ReplicateCityAsync<DB>(conn, db));
 
+    // A branch's document is rebuilt from its tree, so this timer also catches up the branches a change of a link, a
+    // service, a department, a brand, a city, a region, a country or a company left marked.
     [Function(nameof(ReplicateCompanyBranchesTimer))]
     public Task ReplicateCompanyBranchesTimer([TimerTrigger(HourlySchedule)] TimerInfo timer)
         => RunTimerAsync((c, conn, db) => c.ReplicateCompanyBranchAsync<DB>(conn, db));
@@ -110,11 +100,13 @@ public class IdentityReplicationFunctions
         if (!TryGetCosmos(out var connectionString, out var databaseId))
             return new OkObjectResult(new { replicated = false, reason = "CosmosDb replication is disabled or unconfigured." });
 
+        // Every step runs even when one fails. Rows that failed stay dirty for the hourly timers and are in the report;
+        // a step that threw makes ReplicateAllAsync throw once the others have run, so the call fails.
         logger.LogInformation("Identity full replication started at {start}.", DateTime.UtcNow);
-        await cosmos.ReplicateAllAsync<DB>(connectionString, databaseId, updateAll: true);
-        logger.LogInformation("Identity full replication finished at {end}.", DateTime.UtcNow);
+        var report = await cosmos.ReplicateAllAsync<DB>(connectionString, databaseId, updateAll: true);
+        logger.LogInformation("Identity full replication finished at {end}. {report}", DateTime.UtcNow, report);
 
-        return new OkObjectResult(new { replicated = true });
+        return new OkObjectResult(new { replicated = report.Succeeded, report = report.ToString() });
     }
 
     // ─────────────────────────── helpers ───────────────────────────

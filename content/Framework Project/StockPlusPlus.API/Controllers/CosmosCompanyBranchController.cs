@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Azure.Cosmos;
 using ShiftSoftware.ShiftEntity.Core;
+using ShiftSoftware.ShiftEntity.Model.Replication;
 using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
 using ShiftSoftware.ShiftEntity.Web.Services;
 using ShiftSoftware.ShiftIdentity.Core;
@@ -31,7 +32,7 @@ public class CosmosCompanyBranchController : ControllerBase
     [TypeAuth<ShiftIdentityActions>(nameof(ShiftIdentityActions.CompanyBranches), Access.Read)]
     public async Task<IActionResult> Get(ODataQueryOptions<CompanyBranchListDTO> oDataQueryOptions)
     {
-        var container = client.GetContainer("Identity", "CompanyBranches");
+        var container = client.GetContainer("Identity", IdentityDatabaseAndContainerNames.BranchContainerName);
 
         var query = container
             .GetItemLinqQueryable<CompanyBranchModel>(true)

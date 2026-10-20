@@ -83,14 +83,8 @@ public class IdentityReplicationMapperRegistrationTests
     private static readonly (Type Source, Type Destination)[] ExpectedPairs =
     [
         (typeof(Brand), typeof(BrandModel)),
-        (typeof(Brand), typeof(CompanyBranchSubItemModel)),
         (typeof(Service), typeof(ServiceModel)),
-        (typeof(Service), typeof(CompanyBranchSubItemModel)),
         (typeof(Department), typeof(DepartmentModel)),
-        (typeof(Department), typeof(CompanyBranchSubItemModel)),
-        (typeof(CompanyBranchService), typeof(CompanyBranchSubItemModel)),
-        (typeof(CompanyBranchDepartment), typeof(CompanyBranchSubItemModel)),
-        (typeof(CompanyBranchBrand), typeof(CompanyBranchSubItemModel)),
         (typeof(TeamCompanyBranch), typeof(CompanyBranchSubItemModel)),
         (typeof(Country), typeof(CountryModel)),
         (typeof(Region), typeof(RegionModel)),
@@ -98,7 +92,7 @@ public class IdentityReplicationMapperRegistrationTests
         (typeof(City), typeof(CityModel)),
         (typeof(City), typeof(CityCompanyBranchModel)),
         (typeof(Company), typeof(CompanyModel)),
-        (typeof(CompanyBranch), typeof(CompanyBranchModel)),
+        (typeof(CompanyBranch), typeof(BranchModel)),
         (typeof(Team), typeof(TeamModel)),
         (typeof(User), typeof(UserModel)),
     ];

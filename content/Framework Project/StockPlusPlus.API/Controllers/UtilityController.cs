@@ -115,11 +115,11 @@ public class UtilityController : ControllerBase
             }),
 
             Task.Run(async () => {
-                await RemoveItemsFromContainer<CompanyBranchModel>(
+                await RemoveItemsFromContainer<BranchModel>(
                     identityDatabase,
-                    IdentityDatabaseAndContainerNames.CompanyBranchContainerName,
+                    IdentityDatabaseAndContainerNames.BranchContainerName,
                     x => x.id,
-                    x =>  new PartitionKeyBuilder().Add(x.BranchID).Add(x.ItemType).Build()
+                    x =>  new PartitionKeyBuilder().Add(x.id).Build()
                 );
             }),
 
@@ -217,21 +217,11 @@ public class UtilityController : ControllerBase
             .Replicate<CompanyModel>(IdentityDatabaseAndContainerNames.CompanyContainerName)
             .RunAsync(true);
 
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.CompanyBranch>(client, databaseId,
-            q => q.Include(x => x.City).ThenInclude(x => x.Region).Include(x => x.Company))
-            .Replicate<CompanyBranchModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName)
-            .RunAsync(true);
-
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.CompanyBranchDepartment>(client, databaseId, x => x.Include(i => i.Department))
-            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName)
-            .RunAsync(true);
-
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.CompanyBranchService>(client, databaseId, x => x.Include(i => i.Service))
-            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName)
-            .RunAsync(true);
-
-        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.CompanyBranchBrand>(client, databaseId, x => x.Include(i => i.Brand))
-            .Replicate<CompanyBranchSubItemModel>(IdentityDatabaseAndContainerNames.CompanyBranchContainerName)
+        // The branch's one document, in Branches, from the branch loaded with its replication tree: its city, region,
+        // country and company, and the services, departments and brands it offers. Nothing is written to
+        // CompanyBranches any more.
+        await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.CompanyBranch>(client, databaseId)
+            .ReplicateTree<BranchModel>(IdentityDatabaseAndContainerNames.BranchContainerName)
             .RunAsync(true);
 
         await replication.SetUp<DB, ShiftSoftware.ShiftIdentity.Data.Entities.Department>(client, databaseId)

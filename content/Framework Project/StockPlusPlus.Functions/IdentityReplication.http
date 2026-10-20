@@ -15,12 +15,16 @@
 # 1) ON-DEMAND FULL RE-SYNC  (updateAll: true — re-syncs EVERY identity row)
 #    ✅ Works in Development. This is the main way to test replication locally.
 #    Requires CosmosDb:Enabled=true + a reachable Cosmos (emulator on :8081).
-#    Returns { "replicated": true }  — or { "replicated": false, "reason": … }
-#    when Cosmos is disabled/unconfigured.
+#    Returns { "replicated": true, "report": … }. "replicated" is false when a
+#    row failed (it stays dirty for the hourly timers), and the report names
+#    each step. A step that throws fails the call once the other steps have
+#    run. Returns { "replicated": false, "reason": … } when Cosmos is
+#    disabled/unconfigured.
 ###############################################################################
 
 ### Replicate ALL identity entities now (Services, Departments, Brands, Regions,
-### Countries, Cities, CompanyBranches, Companies, Teams, Users + the M:N joins)
+### Countries, Cities, Branches with their services, departments and brands,
+### Companies, Teams, Users + the authorization documents)
 POST {{host}}/api/replicate-all
 # Deployed: add ?code={{functionKey}}  — or the header:  x-functions-key: {{functionKey}}
 
@@ -43,18 +47,6 @@ Content-Type: application/json
 
 { "input": "" }
 
-### CompanyBranch ↔ Service joins  (branch sub-items)
-POST {{host}}/admin/functions/ReplicateCompanyBranchServicesTimer
-Content-Type: application/json
-
-{ "input": "" }
-
-### CompanyBranch ↔ Department joins  (branch sub-items)
-POST {{host}}/admin/functions/ReplicateCompanyBranchDepartmentsTimer
-Content-Type: application/json
-
-{ "input": "" }
-
 ### Departments
 POST {{host}}/admin/functions/ReplicateDepartmentsTimer
 Content-Type: application/json
@@ -63,12 +55,6 @@ Content-Type: application/json
 
 ### Brands
 POST {{host}}/admin/functions/ReplicateBrandsTimer
-Content-Type: application/json
-
-{ "input": "" }
-
-### CompanyBranch ↔ Brand joins  (branch sub-items)
-POST {{host}}/admin/functions/ReplicateCompanyBranchBrandsTimer
 Content-Type: application/json
 
 { "input": "" }
@@ -91,7 +77,7 @@ Content-Type: application/json
 
 { "input": "" }
 
-### CompanyBranches
+### Branches  (one document per branch, in the Branches container)
 POST {{host}}/admin/functions/ReplicateCompanyBranchesTimer
 Content-Type: application/json
 

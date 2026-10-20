@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using ShiftSoftware.ShiftEntity.Core;
-using ShiftSoftware.ShiftEntity.Model.Replication.IdentityModels;
 using ShiftSoftware.ShiftIdentity.Data.Entities;
 
 namespace StockPlusPlus.Test.Tests.Parity;
@@ -129,40 +128,4 @@ public sealed class ReplicationFixtures
         t.TeamCompanyBranches = new List<TeamCompanyBranch> { tcb };
         return t;
     }
-
-    // ── M:N join rows. withNav:false is THE runtime case: the join is inserted carrying only its FK, so the
-    // Service/Department/Brand navigation is null and the mapping must null-propagate to a null name rather
-    // than throw. A non-null-safe map NREs here and silently kills replication.
-
-    public CompanyBranchService BranchService(bool withNav = true)
-    {
-        var j = new CompanyBranchService { CompanyBranchID = 88, ServiceID = 20 };
-        if (withNav) j.Service = Service();
-        Id(j, 100); Audit(j);
-        return j;
-    }
-
-    public CompanyBranchDepartment BranchDepartment(bool withNav = true)
-    {
-        var j = new CompanyBranchDepartment { CompanyBranchID = 88, DepartmentID = 30 };
-        if (withNav) j.Department = Department();
-        Id(j, 101); Audit(j);
-        return j;
-    }
-
-    public CompanyBranchBrand BranchBrand(bool withNav = true)
-    {
-        var j = new CompanyBranchBrand { CompanyBranchID = 88, BrandID = 10 };
-        if (withNav) j.Brand = Brand();
-        Id(j, 102); Audit(j);
-        return j;
-    }
-
-    /// <summary>
-    /// A POPULATED destination for the apply-onto (UpdateReference) cases. Populated on purpose: the question
-    /// those cases answer is which members get OVERWRITTEN and which survive, and an empty destination cannot
-    /// tell the difference. <c>BranchID</c> is the Cosmos partition key and is deliberately never rewritten.
-    /// </summary>
-    public CompanyBranchSubItemModel ExistingSubItem() =>
-        new() { BranchID = "88", id = "999", Name = "old", ItemType = "old" };
 }

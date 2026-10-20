@@ -37,7 +37,7 @@ public class IdentityCosmosSetupTests
         {
             (IdentityDatabaseAndContainerNames.CountryContainerName, new[] { "/CountryID", "/RegionID", "/ItemType" }),
             (IdentityDatabaseAndContainerNames.CompanyContainerName, new[] { "/id" }),
-            (IdentityDatabaseAndContainerNames.CompanyBranchContainerName, new[] { "/BranchID", "/ItemType" }),
+            (IdentityDatabaseAndContainerNames.BranchContainerName, new[] { "/id" }),
             (IdentityDatabaseAndContainerNames.ServiceContainerName, new[] { "/id" }),
             (IdentityDatabaseAndContainerNames.DepartmentContainerName, new[] { "/id" }),
             (IdentityDatabaseAndContainerNames.TeamContainerName, new[] { "/id" }),
