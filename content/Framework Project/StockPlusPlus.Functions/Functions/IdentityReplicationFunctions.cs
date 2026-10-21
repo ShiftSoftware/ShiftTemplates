@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ShiftSoftware.ShiftEntity.CosmosDbReplication.Services;
 using ShiftSoftware.ShiftEntity.Model.Replication;
-using ShiftSoftware.ShiftIdentity.AzureFunctions.Replication;
+using ShiftSoftware.ShiftIdentity.Data.Replication;
 using StockPlusPlus.Data.DbContext;
 using System;
 using System.Runtime.CompilerServices;
