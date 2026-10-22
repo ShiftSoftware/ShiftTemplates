@@ -11,7 +11,7 @@ using Xunit;
 namespace StockPlusPlus.Test.Tests;
 
 /// <summary>
-/// Correctness guard for the Cosmos replication mappings of the ShiftIdentity domain — the 19 pairs
+/// Correctness guard for the Cosmos replication mappings of the ShiftIdentity domain — the 20 pairs
 /// <see cref="ShiftIdentityReplicationMapper"/> (ShiftIdentity.Data/Replication) declares, which both the save trigger
 /// (Dashboard.AspNetCore/Replication) and the catch-up sweep (AzureFunctions/Replication) map through. Each fact maps
 /// a fixture through that mapper — <c>Map&lt;XModel&gt;(entity)</c>
@@ -47,13 +47,13 @@ public class ReplicationMappingParityTests
     private static readonly ReplicationFixtures F = new();
 
     // One instance for the class: the mapper is stateless apart from its compiled-customization cache, and
-    // building it per fact would only re-run the mapper class's constructor 24 times.
+    // building it per fact would only re-run the mapper class's constructor 25 times.
     private static readonly IMapper M = Mapper.Create(typeof(ShiftIdentityReplicationMapper).Assembly);
 
     // The SAME options the goldens were captured with. Do not "make this more realistic" — with no
     // IHashIdService in scope the hash-id converters short-circuit and IDs serialize raw. That was harmless
     // when both arms shared one serializer and cancelled out; against a frozen constant it does not cancel,
-    // and changing it would shift all 24 goldens at once for a reason unrelated to mapping.
+    // and changing it would shift all 25 goldens at once for a reason unrelated to mapping.
     private static readonly JsonSerializerOptions Opts = new() { WriteIndented = false };
 
     /// <summary>
@@ -112,11 +112,21 @@ public class ReplicationMappingParityTests
     private const string CompanyBranchGolden =
         "{\"Name\":\"Main\",\"Phone\":\"555\",\"Phones\":[],\"ShortPhone\":\"5\",\"Email\":\"b@x.com\",\"Emails\":[],\"Address\":\"Addr\",\"IntegrationId\":\"BR-1\",\"ShortCode\":\"MB\",\"TerminationDate\":null,\"Location\":{\"Coordinates\":[44.1,36.2],\"Type\":\"Point\"},\"Photos\":\"p\",\"MobilePhotos\":\"mp\",\"WorkingHours\":\"9-5\",\"WorkingDays\":\"Mon-Fri\",\"IsProtected\":true,\"City\":{\"Name\":\"Erbil\",\"IntegrationId\":\"CT-1\",\"IsProtected\":true,\"DisplayOrder\":1,\"Region\":{\"CountryID\":\"40\",\"RegionID\":\"50\",\"Name\":\"KRG\",\"IntegrationId\":\"R-1\",\"ShortCode\":\"KRG\",\"IsProtected\":true,\"Flag\":\"krg.png\",\"DisplayOrder\":2,\"Country\":{\"CountryID\":40,\"RegionID\":null,\"ItemType\":\"Country\",\"Name\":\"Iraq\",\"IntegrationId\":\"C-1\",\"ShortCode\":\"IQ\",\"CallingCode\":\"\\u002B964\",\"IsProtected\":true,\"Flag\":\"iq.png\",\"DisplayOrder\":3,\"id\":\"40\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false},\"id\":\"50\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false},\"id\":\"60\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false},\"Company\":{\"Name\":\"Shift\",\"LegalName\":\"Shift LLC\",\"IntegrationId\":\"CO-1\",\"ShortCode\":\"SFT\",\"CompanyType\":0,\"Logo\":\"logo.png\",\"HQPhone\":\"123\",\"HQEmail\":\"hq@x.com\",\"HQAddress\":\"St 1\",\"Website\":\"x.com\",\"IsProtected\":true,\"TerminationDate\":null,\"CustomFields\":{},\"ParentCompanyID\":5,\"CompanyID\":70,\"DisplayOrder\":4,\"id\":\"70\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false},\"BranchID\":\"80\",\"ItemType\":\"Branch\",\"CustomFields\":{},\"RegionID\":50,\"CityID\":60,\"CompanyID\":70,\"CountryID\":40,\"CompanyBranchID\":88,\"DisplayOrder\":6,\"DisplayName\":\"Main Branch\",\"Description\":\"desc\",\"WebsiteURL\":null,\"PublishTargets\":[],\"id\":\"80\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}";
 
+    // Changed on purpose by R1 of the reverse-access plan (2026-10-10). It adds IsActive and AccessTree, which the
+    // authorization replication added to the document on 2026-10-04 without changing this golden. It also adds the
+    // assigned trees (AccessTreeIDs) and the two verified flags: the assignments stopped having documents of their own.
+    // The trees are in assignment order, the order sign-in adds them (changed on 2026-10-10).
     private const string UserGolden =
-        "{\"FullName\":\"Aza\",\"Username\":\"aza\",\"Phone\":\"999\",\"Email\":\"aza@x.com\",\"IntegrationId\":\"U-1\",\"IsProtected\":true,\"CompanyID\":70,\"CompanyBranchID\":88,\"RegionID\":50,\"CountryID\":40,\"id\":\"90\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}";
+        "{\"FullName\":\"Aza\",\"Username\":\"aza\",\"Phone\":\"999\",\"Email\":\"aza@x.com\",\"EmailVerified\":true,\"PhoneVerified\":true,\"IntegrationId\":\"U-1\",\"IsActive\":true,\"AccessTree\":\"direct-tree\",\"AccessTreeIDs\":[31,7,19],\"IsProtected\":true,\"CompanyID\":70,\"CompanyBranchID\":88,\"RegionID\":50,\"CountryID\":40,\"id\":\"90\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}";
 
+    // Changed on purpose by R1 (2026-10-10): the members as an ascending list (UserIDs), when the memberships stopped
+    // having documents of their own.
     private const string TeamGolden =
-        "{\"Name\":\"Ops\",\"IntegrationId\":\"T-1\",\"Tags\":[\"a\",\"b\"],\"CompanyID\":70,\"TeamID\":5,\"CompanyBranches\":[{\"Name\":\"Main\",\"IntegrationId\":\"BR-1\",\"BranchID\":\"80\",\"ItemType\":\"Branch\",\"id\":\"300\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}],\"id\":\"200\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}";
+        "{\"Name\":\"Ops\",\"IntegrationId\":\"T-1\",\"Tags\":[\"a\",\"b\"],\"CompanyID\":70,\"TeamID\":5,\"CompanyBranches\":[{\"Name\":\"Main\",\"IntegrationId\":\"BR-1\",\"BranchID\":\"80\",\"ItemType\":\"Branch\",\"id\":\"300\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}],\"UserIDs\":[90,91,93],\"id\":\"200\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}";
+
+    // Added by R1 (2026-10-10). The named tree document, unchanged since the authorization replication added it.
+    private const string AccessTreeGolden =
+        "{\"Name\":\"Scope\",\"Tree\":\"named-tree\",\"id\":\"400\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}";
 
     private const string CompanyBranchService_SubItemGolden =
         "{\"Name\":\"Wash\",\"IntegrationId\":\"S-1\",\"BranchID\":\"88\",\"ItemType\":\"Service\",\"id\":\"20\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}";
@@ -136,8 +146,9 @@ public class ReplicationMappingParityTests
     private const string CompanyBranchBrand_NullNavGolden =
         "{\"Name\":null,\"IntegrationId\":null,\"BranchID\":\"88\",\"ItemType\":\"Brand\",\"id\":\"10\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}";
 
+    // Changed on purpose by R1 (2026-10-10): UserIDs, as in TeamGolden.
     private const string Team_NullBranchNavGolden =
-        "{\"Name\":\"Ops\",\"IntegrationId\":\"T-1\",\"Tags\":[],\"CompanyID\":70,\"TeamID\":5,\"CompanyBranches\":[{\"Name\":null,\"IntegrationId\":null,\"BranchID\":\"0\",\"ItemType\":\"Branch\",\"id\":\"300\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}],\"id\":\"200\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}";
+        "{\"Name\":\"Ops\",\"IntegrationId\":\"T-1\",\"Tags\":[],\"CompanyID\":70,\"TeamID\":5,\"CompanyBranches\":[{\"Name\":null,\"IntegrationId\":null,\"BranchID\":\"0\",\"ItemType\":\"Branch\",\"id\":\"300\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}],\"UserIDs\":[90,91,93],\"id\":\"200\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}";
 
     private const string Brand_ApplyToSubItemGolden =
         "{\"Name\":\"Acme\",\"IntegrationId\":\"B-1\",\"BranchID\":\"88\",\"ItemType\":\"Brand\",\"id\":\"10\",\"CreateDate\":\"2026-01-02T03:04:05+00:00\",\"LastSaveDate\":\"2026-06-07T08:09:10+00:00\",\"CreatedByUserID\":\"111\",\"LastSavedByUserID\":\"222\",\"IsDeleted\":false}";
@@ -166,6 +177,7 @@ public class ReplicationMappingParityTests
     [Fact] public void CompanyBranch() => AssertGolden(M.Map<CompanyBranchModel>(F.CompanyBranch()), CompanyBranchGolden);
     [Fact] public void User() => AssertGolden(M.Map<UserModel>(F.User()), UserGolden);
     [Fact] public void Team() => AssertGolden(M.Map<TeamModel>(F.Team()), TeamGolden);
+    [Fact] public void AccessTree() => AssertGolden(M.Map<AccessTreeModel>(F.AccessTree()), AccessTreeGolden);
     [Fact] public void BranchService_AsSubItem() => AssertGolden(M.Map<CompanyBranchSubItemModel>(F.BranchService()), CompanyBranchService_SubItemGolden);
     [Fact] public void BranchDepartment_AsSubItem() => AssertGolden(M.Map<CompanyBranchSubItemModel>(F.BranchDepartment()), CompanyBranchDepartment_SubItemGolden);
     [Fact] public void BranchBrand_AsSubItem() => AssertGolden(M.Map<CompanyBranchSubItemModel>(F.BranchBrand()), CompanyBranchBrand_SubItemGolden);

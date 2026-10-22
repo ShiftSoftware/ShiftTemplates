@@ -107,6 +107,15 @@ public sealed class ReplicationFixtures
         {
             FullName = "Aza", Username = "aza", Phone = "999", Email = "aza@x.com", IntegrationId = "U-1",
             IsProtected = true, CompanyID = 70, CompanyBranchID = 88, RegionID = 50, CountryID = 40,
+            IsActive = true, AccessTree = "direct-tree", EmailVerified = true, PhoneVerified = true,
+            // Three different orders on purpose: the list here, the assignment IDs and the tree IDs. The document lists
+            // the trees in the order of the assignments (401, 402, 403), the order sign-in adds them.
+            AccessTrees = new List<UserAccessTree>
+            {
+                new() { ID = 403, UserID = 90, AccessTreeID = 19 },
+                new() { ID = 401, UserID = 90, AccessTreeID = 31 },
+                new() { ID = 402, UserID = 90, AccessTreeID = 7 },
+            },
         };
         Id(u, 90); Audit(u, deleted);
         return u;
@@ -119,6 +128,13 @@ public sealed class ReplicationFixtures
             Name = "Ops", IntegrationId = "T-1",
             Tags = withBranchNav ? new List<string> { "a", "b" } : new List<string>(),
             CompanyID = 70, TeamID = 5,
+            // Out of order on purpose: the document lists the members in ascending order.
+            TeamUsers = new List<TeamUser>
+            {
+                new() { ID = 501, UserID = 93, TeamID = 200 },
+                new() { ID = 502, UserID = 90, TeamID = 200 },
+                new() { ID = 503, UserID = 91, TeamID = 200 },
+            },
         };
         Id(t, 200); Audit(t, deleted);
 
@@ -127,6 +143,13 @@ public sealed class ReplicationFixtures
         Id(tcb, 300); Audit(tcb);
 
         t.TeamCompanyBranches = new List<TeamCompanyBranch> { tcb };
+        return t;
+    }
+
+    public AccessTree AccessTree(bool deleted = false)
+    {
+        var t = new AccessTree { Name = "Scope", Tree = "named-tree" };
+        Id(t, 400); Audit(t, deleted);
         return t;
     }
 

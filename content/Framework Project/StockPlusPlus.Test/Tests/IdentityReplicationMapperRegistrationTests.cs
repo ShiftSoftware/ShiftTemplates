@@ -101,6 +101,7 @@ public class IdentityReplicationMapperRegistrationTests
         (typeof(CompanyBranch), typeof(CompanyBranchModel)),
         (typeof(Team), typeof(TeamModel)),
         (typeof(User), typeof(UserModel)),
+        (typeof(AccessTree), typeof(AccessTreeModel)),
     ];
 
     private static ServiceProvider Host() =>
