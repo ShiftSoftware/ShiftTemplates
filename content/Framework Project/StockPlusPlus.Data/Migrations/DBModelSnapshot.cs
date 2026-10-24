@@ -17,7 +17,7 @@ namespace StockPlusPlus.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.12")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ShiftEntity:HistoryIndexedTables", "ShiftIdentity|AccessTreesHistory|ID;ShiftIdentity|AppsHistory|ID;ShiftIdentity|BrandsHistory|ID;ShiftIdentity|CitiesHistory|ID;ShiftIdentity|CompaniesHistory|ID;ShiftIdentity|CompanyBranchBrandsHistory|ID;ShiftIdentity|CompanyBranchDepartmentsHistory|ID;ShiftIdentity|CompanyBranchServicesHistory|ID;ShiftIdentity|CompanyBranchesHistory|ID;ShiftIdentity|CompanyCalendarsHistory|ID;ShiftIdentity|CountriesHistory|ID;ShiftIdentity|DepartmentsHistory|ID;ShiftIdentity|RegionsHistory|ID;ShiftIdentity|ServicesHistory|ID;ShiftIdentity|TeamBranchesHistory|ID;ShiftIdentity|TeamUsersHistory|ID;ShiftIdentity|TeamsHistory|ID;ShiftIdentity|UserAccessTreesHistory|ID;ShiftIdentity|UsersHistory|ID;dbo|BrandsHistory|ID;dbo|CountriesHistory|ID;dbo|InvoicesHistory|ID;dbo|ProductCategoriesHistory|ID;dbo|ProductsHistory|ID;dbo|VehiclesHistory|ID");
 
@@ -335,6 +335,10 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<int?>("SessionProvider")
                         .HasColumnType("int");
 
+                    b.Property<string>("SessionTenant")
+                        .HasMaxLength(36)
+                        .HasColumnType("nvarchar(36)");
+
                     b.Property<byte[]>("SourceSessionDigest")
                         .HasMaxLength(32)
                         .HasColumnType("varbinary(32)");
@@ -379,7 +383,7 @@ namespace StockPlusPlus.Data.Migrations
 
                             t.HasCheckConstraint("CK_AuthenticationOperation_Password", "([PasswordChangeOrigin] IS NULL OR [PasswordChangeOrigin] IN (1,2)) AND (([PendingPasswordHash] IS NULL AND [PendingPasswordSalt] IS NULL) OR ([Purpose] = 4 AND [State] IN (1,7) AND [PendingPasswordHash] IS NOT NULL AND [PendingPasswordSalt] IS NOT NULL))");
 
-                            t.HasCheckConstraint("CK_AuthenticationOperation_Provider", "([SessionProvider] IS NULL OR ([SessionProvider] IN (1, 2) AND [Purpose] IN (1,3,10,14))) AND ([State] <> 12 OR ([Purpose] = 14 AND [SessionProvider] IS NOT NULL)) AND ([Purpose] <> 14 OR [State] IN (2,3,6,12))");
+                            t.HasCheckConstraint("CK_AuthenticationOperation_Provider", "([SessionProvider] IS NULL OR ([SessionProvider] IN (1, 2) AND [Purpose] IN (1,3,10,13,14))) AND ([State] <> 12 OR ([Purpose] = 14 AND [SessionProvider] IS NOT NULL) OR [Purpose] = 13) AND ([Purpose] <> 14 OR [State] IN (2,3,6,12)) AND ([SessionTenant] IS NULL OR [SessionProvider] = 1)");
 
                             t.HasCheckConstraint("CK_AuthenticationOperation_Recovery", "([RecoveryCodeDigest] IS NULL OR ([Purpose] = 6 AND [State] = 8 AND [ParentID] IS NULL)) AND ([OutstandingRecoveryUserID] IS NULL OR ([Purpose] = 6 AND [ParentID] IS NULL AND [OutstandingRecoveryUserID] = [UserID]))");
 
