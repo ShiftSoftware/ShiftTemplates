@@ -17,7 +17,8 @@ namespace StockPlusPlus.Test.Tests;
 /// Pins Identity's replication documents as the replication mapper writes them, for the cases the replication
 /// aggregates plan keeps:
 /// <list type="bullet">
-/// <item>users, teams and the three authorization documents, which the plan leaves as they are;</item>
+/// <item>users, teams and the three authorization documents. Users and teams gained their assignment and member lists
+/// with R1 of the reverse-access plan;</item>
 /// <item>a branch whose region has no country: its document in Branches carries a null country, as its document in
 /// CompanyBranches did.</item>
 /// </list>
@@ -79,17 +80,17 @@ public class IdentityDocumentPinTests
 
     [Fact]
     public void User_IsAsToday() => Assert(Cases["User"](), """
-        {"FullName":"Aza","Username":"aza","Phone":"999","Email":"aza@x.com","IntegrationId":"U-1","IsActive":false,"AccessTree":null,"IsProtected":true,"CompanyID":70,"CompanyBranchID":88,"RegionID":50,"CountryID":40,"id":"90","CreateDate":"2026-01-02T03:04:05+00:00","LastSaveDate":"2026-06-07T08:09:10+00:00","CreatedByUserID":"111","LastSavedByUserID":"222","IsDeleted":false}
+        {"FullName":"Aza","Username":"aza","Phone":"999","Email":"aza@x.com","EmailVerified":true,"PhoneVerified":true,"IntegrationId":"U-1","IsActive":true,"AccessTree":"direct-tree","AccessTreeIDs":[31,7,19],"IsProtected":true,"CompanyID":70,"CompanyBranchID":88,"RegionID":50,"CountryID":40,"id":"90","CreateDate":"2026-01-02T03:04:05+00:00","LastSaveDate":"2026-06-07T08:09:10+00:00","CreatedByUserID":"111","LastSavedByUserID":"222","IsDeleted":false}
         """);
 
     [Fact]
     public void User_Deleted_IsAsToday() => Assert(Cases["User_Deleted"](), """
-        {"FullName":"Aza","Username":"aza","Phone":"999","Email":"aza@x.com","IntegrationId":"U-1","IsActive":false,"AccessTree":null,"IsProtected":true,"CompanyID":70,"CompanyBranchID":88,"RegionID":50,"CountryID":40,"id":"90","CreateDate":"2026-01-02T03:04:05+00:00","LastSaveDate":"2026-06-07T08:09:10+00:00","CreatedByUserID":"111","LastSavedByUserID":"222","IsDeleted":true}
+        {"FullName":"Aza","Username":"aza","Phone":"999","Email":"aza@x.com","EmailVerified":true,"PhoneVerified":true,"IntegrationId":"U-1","IsActive":true,"AccessTree":"direct-tree","AccessTreeIDs":[31,7,19],"IsProtected":true,"CompanyID":70,"CompanyBranchID":88,"RegionID":50,"CountryID":40,"id":"90","CreateDate":"2026-01-02T03:04:05+00:00","LastSaveDate":"2026-06-07T08:09:10+00:00","CreatedByUserID":"111","LastSavedByUserID":"222","IsDeleted":true}
         """);
 
     [Fact]
     public void Team_IsAsToday() => Assert(Cases["Team"](), """
-        {"Name":"Ops","IntegrationId":"T-1","Tags":["a","b"],"CompanyID":70,"TeamID":5,"CompanyBranches":[{"Name":"Main","IntegrationId":"BR-1","BranchID":"80","ItemType":"Branch","id":"300","CreateDate":"2026-01-02T03:04:05+00:00","LastSaveDate":"2026-06-07T08:09:10+00:00","CreatedByUserID":"111","LastSavedByUserID":"222","IsDeleted":false}],"id":"200","CreateDate":"2026-01-02T03:04:05+00:00","LastSaveDate":"2026-06-07T08:09:10+00:00","CreatedByUserID":"111","LastSavedByUserID":"222","IsDeleted":false}
+        {"Name":"Ops","IntegrationId":"T-1","Tags":["a","b"],"CompanyID":70,"TeamID":5,"CompanyBranches":[{"Name":"Main","IntegrationId":"BR-1","BranchID":"80","ItemType":"Branch","id":"300","CreateDate":"2026-01-02T03:04:05+00:00","LastSaveDate":"2026-06-07T08:09:10+00:00","CreatedByUserID":"111","LastSavedByUserID":"222","IsDeleted":false}],"UserIDs":[90,91,93],"id":"200","CreateDate":"2026-01-02T03:04:05+00:00","LastSaveDate":"2026-06-07T08:09:10+00:00","CreatedByUserID":"111","LastSavedByUserID":"222","IsDeleted":false}
         """);
 
     [Fact]
