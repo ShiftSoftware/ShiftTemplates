@@ -17,8 +17,8 @@ namespace StockPlusPlus.Test.Tests;
 /// Pins Identity's replication documents as the replication mapper writes them, for the cases the replication
 /// aggregates plan keeps:
 /// <list type="bullet">
-/// <item>users, teams and the three authorization documents. Users and teams gained their assignment and member lists
-/// with R1 of the reverse-access plan;</item>
+/// <item>users, teams and the named trees. Users and teams gained their assignment and member lists, and the assignment
+/// and membership documents were removed, with R1 and R2 of the reverse-access plan;</item>
 /// <item>a branch whose region has no country: its document in Branches carries a null country, as its document in
 /// CompanyBranches did.</item>
 /// </list>
@@ -57,8 +57,6 @@ public class IdentityDocumentPinTests
     }
 
     private static AccessTree Tree() => Audited(new AccessTree { Name = "Shared", Tree = "{\"grant\":true}" }, 400);
-    private static UserAccessTree Assignment() => Audited(new UserAccessTree { UserID = 90, AccessTreeID = 400 }, 401);
-    private static TeamUser Membership() => Audited(new TeamUser { UserID = 90, TeamID = 200 }, 402);
 
     /// <summary>Every case, by name, with the document today's mapper produces for it.</summary>
     internal static IReadOnlyDictionary<string, Func<object>> Cases { get; } = new Dictionary<string, Func<object>>
@@ -67,8 +65,6 @@ public class IdentityDocumentPinTests
         ["User_Deleted"] = () => M.Map<UserModel>(F.User(deleted: true)),
         ["Team"] = () => M.Map<TeamModel>(F.Team()),
         ["AccessTree"] = () => M.Map<AccessTreeModel>(Tree()),
-        ["UserAccessTree"] = () => M.Map<UserAccessTreeModel>(Assignment()),
-        ["TeamUser"] = () => M.Map<TeamUserModel>(Membership()),
 
         ["CompanyBranch_RegionWithoutCountry"] = () =>
         {
@@ -96,16 +92,6 @@ public class IdentityDocumentPinTests
     [Fact]
     public void AccessTree_IsAsToday() => Assert(Cases["AccessTree"](), """
         {"Name":"Shared","Tree":"{\u0022grant\u0022:true}","id":"400","CreateDate":"2026-01-02T03:04:05+00:00","LastSaveDate":"2026-06-07T08:09:10+00:00","CreatedByUserID":"111","LastSavedByUserID":"222","IsDeleted":false}
-        """);
-
-    [Fact]
-    public void UserAccessTree_IsAsToday() => Assert(Cases["UserAccessTree"](), """
-        {"UserID":90,"AccessTreeID":400,"id":"401","CreateDate":"2026-01-02T03:04:05+00:00","LastSaveDate":"2026-06-07T08:09:10+00:00","CreatedByUserID":"111","LastSavedByUserID":"222","IsDeleted":false}
-        """);
-
-    [Fact]
-    public void TeamUser_IsAsToday() => Assert(Cases["TeamUser"](), """
-        {"UserID":90,"TeamID":200,"id":"402","CreateDate":"2026-01-02T03:04:05+00:00","LastSaveDate":"2026-06-07T08:09:10+00:00","CreatedByUserID":"111","LastSavedByUserID":"222","IsDeleted":false}
         """);
 
     // Without the three lists BranchModel adds, which BranchDocumentTests pins.

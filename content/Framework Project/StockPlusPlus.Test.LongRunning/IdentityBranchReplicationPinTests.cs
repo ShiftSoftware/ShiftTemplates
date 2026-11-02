@@ -44,9 +44,7 @@ public sealed class IdentityReplicationPinFactory : CustomWebApplicationFactory
         .Container(IdentityDatabaseAndContainerNames.BrandContainerName, "/id")
         .Container(IdentityDatabaseAndContainerNames.TeamContainerName, "/id")
         .Container(IdentityDatabaseAndContainerNames.UserContainerName, "/id")
-        .Container(IdentityDatabaseAndContainerNames.AccessTreeContainerName, "/id")
-        .Container(IdentityDatabaseAndContainerNames.UserAccessTreeContainerName, "/id")
-        .Container(IdentityDatabaseAndContainerNames.TeamUserContainerName, "/id");
+        .Container(IdentityDatabaseAndContainerNames.AccessTreeContainerName, "/id");
 
     public ReplicationSyncLog Log { get; } = new();
 

@@ -96,9 +96,6 @@ public class IdentityReplicationMapperRegistrationTests
         (typeof(Team), typeof(TeamModel)),
         (typeof(User), typeof(UserModel)),
         (typeof(AccessTree), typeof(AccessTreeModel)),
-        // The join documents the old reverse-access lookup reads; R2 of the reverse-access plan removes both.
-        (typeof(UserAccessTree), typeof(UserAccessTreeModel)),
-        (typeof(TeamUser), typeof(TeamUserModel)),
     ];
 
     private static ServiceProvider Host() =>

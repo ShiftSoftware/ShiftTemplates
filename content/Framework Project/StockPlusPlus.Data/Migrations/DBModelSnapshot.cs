@@ -2003,12 +2003,6 @@ namespace StockPlusPlus.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<DateTimeOffset?>("LastReplicationDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationStamp")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
 
@@ -2234,12 +2228,6 @@ namespace StockPlusPlus.Data.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LastReplicationDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastReplicationStamp")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastSaveDate")
                         .HasColumnType("datetimeoffset");
