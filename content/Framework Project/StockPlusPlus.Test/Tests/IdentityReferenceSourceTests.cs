@@ -22,6 +22,9 @@ public class IdentityReferenceSourceTests
         if (setup is null)
             return;
 
+        // The containers this reads are created by IdentityCosmosSetupTests, which xUnit may run after this test.
+        await new IdentityCosmosSetupTests(output).Create_Identity_Database_And_Containers();
+
         using var scope = setup;
         var rows = new List<TimingRow>();
 
