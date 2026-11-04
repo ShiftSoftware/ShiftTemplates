@@ -17,6 +17,7 @@
     <LocalizedTextField @bind-Value="context.Item.Name"
                         For="() => context.Item.Name"
                         Languages="@([new () { CultureName = "en-US", Label = "English" }, new () { CultureName = "tr-TR", Label = "Turkish" } ])"
+                        ShowAsDropDown="true"
                         Label="Name" />
 
     <MudTextFieldExtended OnlyValidateIfDirty="true"
