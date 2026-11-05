@@ -1,3 +1,4 @@
+using ShiftIdentity.Tests.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using ShiftSoftware.ShiftEntity.Model;
@@ -79,11 +80,11 @@ public class AuthEndpointTests
         var client = factory.CreateClient();
         await EnsureSeededAsync();
 
-        var resp = await client.PostAsJsonAsync("api/Auth/Login", new { Username = "SuperUser", Password = "OneTwo" });
+        var resp = await client.PostAsJsonAsync("api/identity/v2/login", new PasswordLoginRequest("SuperUser", "OneTwo", IdentityHttpHost.Pkce().Challenge));
 
         Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
         using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
-        var entity = Prop(doc.RootElement, "Entity");
+        var entity = Prop(doc.RootElement, "Session");
         Assert.False(string.IsNullOrEmpty(Prop(entity, "Token").GetString()));
         Assert.False(string.IsNullOrEmpty(Prop(entity, "RefreshToken").GetString()));
     }
@@ -97,8 +98,8 @@ public class AuthEndpointTests
     {
         using var client = factory.CreateClient();
         await EnsureSeededAsync();
-        using var login = await client.PostAsJsonAsync("api/Auth/Login", new { Username = "SuperUser", Password = "OneTwo" });
-        var token = Prop(Prop(await login.Content.ReadFromJsonAsync<JsonElement>(), "Entity"), "Token").GetString();
+        using var login = await client.PostAsJsonAsync("api/identity/v2/login", new PasswordLoginRequest("SuperUser", "OneTwo", IdentityHttpHost.Pkce().Challenge));
+        var token = Prop(Prop(await login.Content.ReadFromJsonAsync<JsonElement>(), "Session"), "Token").GetString();
         client.DefaultRequestHeaders.Authorization = new("Bearer", token);
         var username = "link-host-" + Guid.NewGuid().ToString("N");
         string branch;
@@ -170,7 +171,7 @@ public class AuthEndpointTests
         var client = factory.CreateClient();
         await EnsureSeededAsync();
 
-        var resp = await client.PostAsJsonAsync("api/Auth/Login", new { Username = "SuperUser", Password = "definitely-wrong" });
+        var resp = await client.PostAsJsonAsync("api/identity/v2/login", new PasswordLoginRequest("SuperUser", "definitely-wrong", IdentityHttpHost.Pkce().Challenge));
 
         Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
     }
@@ -181,10 +182,10 @@ public class AuthEndpointTests
         var client = factory.CreateClient();
         await EnsureSeededAsync();
 
-        var login = await client.PostAsJsonAsync("api/Auth/Login", new { Username = "SuperUser", Password = "OneTwo" });
+        var login = await client.PostAsJsonAsync("api/identity/v2/login", new PasswordLoginRequest("SuperUser", "OneTwo", IdentityHttpHost.Pkce().Challenge));
         login.EnsureSuccessStatusCode();
         using var loginDoc = JsonDocument.Parse(await login.Content.ReadAsStringAsync());
-        var refreshToken = Prop(Prop(loginDoc.RootElement, "Entity"), "RefreshToken").GetString();
+        var refreshToken = Prop(Prop(loginDoc.RootElement, "Session"), "RefreshToken").GetString();
 
         var resp = await client.PostAsJsonAsync("api/Auth/Refresh", new { RefreshToken = refreshToken });
 
@@ -206,13 +207,13 @@ public class AuthEndpointTests
     // The MFA endpoint is gated by [StepUp(Mfa, allowAccessToken:false)] — a normal access token (which the test
     // client carries) must NOT satisfy it. Proves the step-up policy is enforced (i.e. not an open endpoint).
     [Fact]
-    public async Task LoginMfa_WithPlainAccessToken_IsRejected()
+    public async Task LoginMfa_old_route_is_gone()
     {
         var client = factory.CreateClient();
 
         var resp = await client.PostAsJsonAsync("api/Auth/Login/mfa", new { Code = "000000" });
 
-        Assert.NotEqual(HttpStatusCode.OK, resp.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, resp.StatusCode);
     }
 
     // AuthCode requires a signed-in identity session (under the authority the factory's synthetic bearer is not one and
@@ -224,11 +225,11 @@ public class AuthEndpointTests
         var client = factory.CreateClient();
         await EnsureSeededAsync();
 
-        var login = await client.PostAsJsonAsync("api/Auth/Login", new { Username = "SuperUser", Password = "OneTwo" });
+        var login = await client.PostAsJsonAsync("api/identity/v2/login", new PasswordLoginRequest("SuperUser", "OneTwo", IdentityHttpHost.Pkce().Challenge));
         login.EnsureSuccessStatusCode();
         using var loginDoc = JsonDocument.Parse(await login.Content.ReadAsStringAsync());
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",
-            Prop(Prop(loginDoc.RootElement, "Entity"), "Token").GetString());
+            Prop(Prop(loginDoc.RootElement, "Session"), "Token").GetString());
 
         var resp = await client.PostAsJsonAsync("api/Auth/AuthCode", new { AppId = "no-such-app", CodeChallenge = "abc", ReturnUrl = "http://localhost/back" });
 
@@ -255,10 +256,10 @@ public class AuthEndpointTests
         var client = factory.CreateClient();
         await EnsureSeededAsync();
 
-        var login = await client.PostAsJsonAsync("api/Auth/Login", new { Username = "SuperUser", Password = "OneTwo" });
+        var login = await client.PostAsJsonAsync("api/identity/v2/login", new PasswordLoginRequest("SuperUser", "OneTwo", IdentityHttpHost.Pkce().Challenge));
         login.EnsureSuccessStatusCode();
         using var loginDoc = JsonDocument.Parse(await login.Content.ReadAsStringAsync());
-        var access = Prop(Prop(loginDoc.RootElement, "Entity"), "Token").GetString()!;
+        var access = Prop(Prop(loginDoc.RootElement, "Session"), "Token").GetString()!;
         var token = new JsonWebToken(access);
         Assert.Equal("2", token.GetPayloadValue<string>("shift_schema"));
         Assert.Equal("StockPlusPlus-Dev", token.GetPayloadValue<string>("shift_client"));

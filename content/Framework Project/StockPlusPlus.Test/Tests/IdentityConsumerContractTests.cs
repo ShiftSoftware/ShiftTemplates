@@ -53,16 +53,13 @@ public sealed class IdentityConsumerContractTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Consumer_existing_routes_keep_the_legacy_envelope_and_staged_routes_remain_absent()
+    public async Task A_consumer_without_the_authority_keeps_direct_sign_in_and_refresh_and_has_no_password_routes()
     {
         await fixture.ResetAsync();
         using var host = new LegacyIdentityHttpHost<ConsumerIdentityContext>(fixture);
-        using var response = await host.Client.PostAsJsonAsync("/api/Auth/Login",
-            new LoginDTO { Username = fixture.Username, Password = fixture.Password });
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        var legacy = await response.Content.ReadFromJsonAsync<ShiftEntityResponse<TokenDTO>>();
-        Assert.False(string.IsNullOrEmpty(legacy!.Entity!.RefreshToken));
-        using var refresh = await host.Client.PostAsJsonAsync("/api/Auth/Refresh", new { legacy.Entity.RefreshToken });
+        var signedIn = await host.DirectSignInAsync(fixture.Username, fixture.Password);
+        Assert.False(string.IsNullOrEmpty(signedIn!.RefreshToken));
+        using var refresh = await host.Client.PostAsJsonAsync("/api/Auth/Refresh", new { signedIn.RefreshToken });
         Assert.Equal(HttpStatusCode.OK, refresh.StatusCode);
         using var staged = await host.Client.PostAsJsonAsync("/api/identity/v2/login",
             new PasswordLoginRequest(fixture.Username, fixture.Password, IdentityHttpHost.Pkce().Challenge));
@@ -206,8 +203,7 @@ public sealed class IdentityConsumerContractTests : IAsyncLifetime
             await db.SaveChangesAsync();
         }
         using var host = new LegacyIdentityHttpHost<ConsumerIdentityContext>(fixture, authority: true);
-        using var login = await host.Client.PostAsJsonAsync("api/Auth/Login", new LoginDTO { Username = admin, Password = fixture.Password });
-        var session = (await login.Content.ReadFromJsonAsync<ShiftEntityResponse<TokenDTO>>())!.Entity!;
+        var session = await IdentityHttpHost.SignInAsync(host.Client, admin, fixture.Password);
         host.Client.DefaultRequestHeaders.Authorization = new("Bearer", session.Token);
         using var response = await host.Client.PostAsJsonAsync("api/IdentityUser/VerifyEmails",
             new SelectStateDTO<UserListDTO> { Items = [new() { ID = fixture.UserID.ToString() }] });

@@ -35,9 +35,9 @@ public sealed class IdentityLoginPolishTests : IAsyncLifetime
     }
 
     [Theory]
-    [InlineData(false, "Synthetic  Login")]
-    [InlineData(true, "synthetic-login@example.invalid")]
-    public async Task Normal_combined_host_trims_login_and_only_explicit_reset_submission_requests_email(bool staged, string resetIdentifier)
+    [InlineData("Synthetic  Login")]
+    [InlineData("synthetic-login@example.invalid")]
+    public async Task Normal_combined_host_trims_login_and_only_explicit_reset_submission_requests_email(string resetIdentifier)
     {
         using var client = factory!.CreateClient(); client.DefaultRequestHeaders.Authorization = null;
         using (var scope = factory.Services.CreateScope())
@@ -66,17 +66,10 @@ public sealed class IdentityLoginPolishTests : IAsyncLifetime
 
         async Task<bool> Login(string username, string password)
         {
-            if (staged)
-            {
-                using var response = await client.PostAsJsonAsync("api/identity/v2/login", new PasswordLoginRequest(username, password, IdentityHttpHost.Pkce().Challenge), TestContext.Current.CancellationToken);
-                var result = await response.Content.ReadFromJsonAsync<AuthOutcome>(TestContext.Current.CancellationToken);
-                Assert.True(result is SessionIssued or AuthenticationRefused);
-                return result is SessionIssued;
-            }
-            using var responseLegacy = await client.PostAsJsonAsync("api/Auth/Login", new LoginDTO { Username = username, Password = password }, TestContext.Current.CancellationToken);
-            var envelope = await responseLegacy.Content.ReadFromJsonAsync<ShiftEntityResponse<TokenDTO>>(TestContext.Current.CancellationToken);
-            Assert.Equal(responseLegacy.IsSuccessStatusCode, envelope?.Entity is not null);
-            return responseLegacy.IsSuccessStatusCode;
+            using var response = await client.PostAsJsonAsync("api/identity/v2/login", new PasswordLoginRequest(username, password, IdentityHttpHost.Pkce().Challenge), TestContext.Current.CancellationToken);
+            var result = await response.Content.ReadFromJsonAsync<AuthOutcome>(TestContext.Current.CancellationToken);
+            Assert.True(result is SessionIssued or AuthenticationRefused);
+            return result is SessionIssued;
         }
     }
 
