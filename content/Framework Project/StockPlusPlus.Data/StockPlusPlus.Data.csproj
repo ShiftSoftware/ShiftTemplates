@@ -39,4 +39,9 @@
 		<PackageReference Include="ShiftSoftware.ShiftIdentity.Core" Version="$(ShiftFrameworkVersion)" />
 		<!--#endif -->
 	</ItemGroup>
+	<!-- The subscribers list, read when the host starts. The Condition keeps a project generated without the sample building. -->
+	<ItemGroup Condition="Exists('Notifications\notification-subscribers.json')">
+		<EmbeddedResource Include="Notifications\notification-subscribers.json" LogicalName="StockPlusPlus.Data.Notifications.notification-subscribers.json" />
+	</ItemGroup>
+
 </Project>

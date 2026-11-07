@@ -1,0 +1,25 @@
+{
+  // Who hears about each topic. A topic has one entry per "where", and each environment has its own section.
+  // Changing this file goes through review and a deploy, so nothing here needs a permission.
+  "Development": [
+    {
+      "topic": "StockPlusPlus.Invoice.Created",
+      "where": "all",
+      "emails": {
+        "to": [ "sales-team@example.com" ],
+        "cc": [ "sales-manager@example.com" ]
+      }
+    }
+  ],
+  "Test": [
+    {
+      "topic": "StockPlusPlus.Invoice.Created",
+      "where": "all",
+      "emails": {
+        "to": [ "sales-team@example.com" ],
+        "cc": [ "sales-manager@example.com" ]
+      }
+    }
+  ],
+  "Production": []
+}

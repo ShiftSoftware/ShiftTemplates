@@ -100,6 +100,22 @@ builder.Services.AddShiftEntityAction<StockPlusPlus.Data.Entities.Invoice>(Stock
 builder.Services.AddShiftTagging<DB, StockPlusPlusActionTree>(StockPlusPlusActionTree.Tags);
 #endif
 
+#if (includeSampleApp)
+// Notifications are opt-in. This names the host, its topics and the email's footer. The subscribers list is a JSON file
+// embedded in the data project, with one section per environment. The sample sender sends nothing: it keeps each email
+// in memory. Users and teams need AddIdentityNotificationDirectory, which reads the replicated Identity documents, so this
+// sample uses addresses.
+builder.Services.AddNotifications<DB>("StockPlusPlus", options =>
+{
+    options.AddTopics<StockPlusPlus.Data.Notifications.StockPlusPlusTopics>();
+    options.Email.Footer = "StockPlusPlus sample, Example Street, Example City";
+});
+builder.Services.AddNotificationSubscribersJson(StockPlusPlus.Data.Notifications.StockPlusPlusTopics.OpenSubscribersFile, builder.Environment.EnvironmentName);
+builder.Services.AddSingleton<StockPlusPlus.Data.Notifications.SampleNotificationOutbox>();
+builder.Services.AddSingleton<ShiftSoftware.ShiftEntity.Core.Notifications.INotificationEmailSender>(sp => sp.GetRequiredService<StockPlusPlus.Data.Notifications.SampleNotificationOutbox>());
+builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.Notifications.INotificationEmailContent<StockPlusPlus.Data.Entities.Invoice>, StockPlusPlus.Data.Notifications.InvoiceEmailContent>();
+#endif
+
 // Phase 2 emission: once a save that raised attention signals commits, the framework
 // publishes one AttentionRaised event per new signal to the registered consumers (on a
 // background drain loop — consumer latency never affects the save). This sample consumer
