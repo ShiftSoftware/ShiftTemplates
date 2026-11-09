@@ -1,18 +1,15 @@
 # AutoMapper Removal — Plan
 
 **Created:** 2026-08-19
-**Mirrored:** 2026-08-21
 
 > **This is the primary working copy of this plan.** It lives in `ShiftTemplates/docs/plans/automapper-removal/`
-> and is the one to read and update. A mirror is kept in the private `.shift` repo
-> (`.shift/repos/shift-entity/automapper-removal/`) for cross-repo visibility; both are updated together.
-> Two passages carry more detail in the `.shift` mirror than here — Q7 and gap C-3 — because this repo is
-> public and the change they describe has not shipped yet. Everything else is identical.
+> and is the one to read and update. Two passages — Q7 and gap C-3 — leave out reproduction detail
+> because this repo is public and the change they describe has not shipped yet.
 
 **Goal:** delete the AutoMapper dependency from Shift Framework. Make an explicit mapper (source-generated or hand-written) **required** instead of falling back to AutoMapper. Cover Cosmos replication too — where, since 2026-09-15, the fallback for a call site without a delegate is a ShiftMapper map, resolved and checked before any row is written.
 
 This folder is the working plan. It supersedes the "AutoMapper Removal Path" bullet at the bottom of
-the mapping-abstraction plan (`.shift/repos/shift-entity/mapping-abstraction-plan.md`), which stays the source of truth for the
+the mapping-abstraction plan, which stays the source of truth for the
 *mapping abstraction itself* (what shipped, how mappers work). **Removal** work is tracked here.
 
 | Doc | What it holds |

@@ -1,7 +1,7 @@
 # Repository mapping on ShiftMapper — Status
 
-**Last updated:** 2026-09-20 — **Stage 5 done: the plan is complete, pending the release.** The `.shift` plans are
-refreshed (5.2), ShiftFrameworkDocs has a *Mapping* page and a *Migrating to ShiftMapper* page written from this
+**Last updated:** 2026-09-20 — **Stage 5 done: the plan is complete, pending the release.**
+ShiftFrameworkDocs has a *Mapping* page and a *Migrating to ShiftMapper* page written from this
 plan's README and migration guide (5.3, 5.5), and the pipeline verifies the ShiftEntity package carries the SHENT001
 analyzer where the generator used to be (5.4). What remains is not a step of this plan: the first `release-all`
 (ShiftMapper 0.3.0 is still unreleased) and, after it, the Builder run that 3.3 owes. Earlier the same day —
@@ -94,8 +94,8 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
 | Step | Status | Notes |
 |------|--------|-------|
 | 5.1 CLAUDE.md | ✅ | **2026-09-20**, with Stage 4 — the old-generator sections ("Active Work" strategies, build-time baked mapping, SHENGEN diagnostics, SHENGEN006) rewritten as what the code is now; the tagging notes no longer mention `SelectWithTags`. |
-| 5.2 `.shift` plans | ✅ | **2026-09-20.** `.shift/repos/shift-entity/mapping-abstraction-plan.md` rewritten as the current state (it still described the 2026-05 POC era: `MappingStrategy` switches, Mapperly/Mapster mappers, `AutoMapperShiftEntityMapper` — none of which exists), pointing at the two in-repo plans for history; `automapper-removal/STATUS.md` (both copies, content identical) got the log entry saying what replaced the generator its Stage F built on, and its B2 row is ➖; `.shift/repos/shift-mapper/plan.md` got a 0.3.0 note (the six features, contract 3, the release-order constraint, the unused surface half). |
-| 5.3 ShiftFrameworkDocs page | ✅ | **2026-09-20.** *Data Project › Mapping* (`docs/project-setup/data-project/mappers.md`) rewritten from README §5–§6: the automatic default and what convention covers, the one mapper class and its rules (replace, reverse write map, ignore, one class per pair, plain statements, services from `Services`, flattening), depth in the repository, the two unchanged doors, the resolution order and startup check, the maps anywhere, the diagnostics table. The page it replaces (uncommitted since the AutoMapper removal) still taught `UseGeneratedMapper` and `SHENGEN`. `dependencies.md` notes ShiftMapper comes with EFCore. `mkdocs build --strict` passes. **And the live site** (docs.shift.software, the Blazor `ShiftFrameworkDocumentation` repo, which the plan text did not name but is the maintained one — `.shift/repos/shift-framework-documentation/PLAN.md`): `Pages/Concepts/MappingAbstraction.razor` (527 lines on `UseGeneratedMapper`, the four strategies and the SHENGEN table) rewritten to the same content in that site's conventions, `Repositories.razor` and `ProjectTour.razor` cross-references fixed; `Docs.Web` builds. |
+| 5.2 Plan notes | ✅ | **2026-09-20.** `automapper-removal/STATUS.md` got the log entry saying what replaced the generator its Stage F built on, and its B2 row is ➖. |
+| 5.3 ShiftFrameworkDocs page | ✅ | **2026-09-20.** *Data Project › Mapping* (`docs/project-setup/data-project/mappers.md`) rewritten from README §5–§6: the automatic default and what convention covers, the one mapper class and its rules (replace, reverse write map, ignore, one class per pair, plain statements, services from `Services`, flattening), depth in the repository, the two unchanged doors, the resolution order and startup check, the maps anywhere, the diagnostics table. The page it replaces (uncommitted since the AutoMapper removal) still taught `UseGeneratedMapper` and `SHENGEN`. `dependencies.md` notes ShiftMapper comes with EFCore. `mkdocs build --strict` passes. **And the live site** (docs.shift.software, the Blazor `ShiftFrameworkDocumentation` repo, which the plan text did not name but is the maintained one): `Pages/Concepts/MappingAbstraction.razor` (527 lines on `UseGeneratedMapper`, the four strategies and the SHENGEN table) rewritten to the same content in that site's conventions, `Repositories.razor` and `ProjectTour.razor` cross-references fixed; `Docs.Web` builds. |
 | 5.4 Pipeline notes | ✅ | **2026-09-20.** Nothing structural, as planned, plus one guard: after `pack ShiftEntity.Core` the pipeline unzips `ShiftSoftware.ShiftEntity.*.nupkg` and fails unless `analyzers/dotnet/cs/ShiftSoftware.ShiftEntity.Analyzers.dll` is inside — the None item that packs the analyzer's build output would otherwise miss silently, and SHENT001 would never reach a consumer (the ShiftMapper package has had the same check since 0.2.0). The comment above it records the release-order rule (`release-all`, or `release-shiftmapper` first). `ShiftMapper.Generator.Tests` stays long-running-only. |
 | 5.5 Migration guide published | ✅ | **2026-09-20.** *Data Project › Migrating to ShiftMapper* (`migrating-to-shiftmapper.md`) on ShiftFrameworkDocs, replacing the uncommitted *Migrating off AutoMapper* page: one procedure for both origins (AutoMapper profiles; the retired generator's `UseGeneratedMapper`/`[ShiftEntityMapper]`), the snapshot-first ordering that the no-transition-release decision (Q7) forces, the line-by-line table from [`04-migration-guide.md`](04-migration-guide.md) with the four "different, not renamed" points, the `SM` table, the expected divergences, the two hard shapes (collection reconciliation; replication through ShiftMapper with the two transcription traps). `04-migration-guide.md` stays here as the source; the page is what ADP/Menu read. |
 
@@ -126,8 +126,7 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
   the `SHENGEN` table, "stay pinned and opt in per repository") — so both were rewritten rather than patched, and
   the migration page changed its premise: with no transition release there is nothing to opt into on the pinned
   version, so the oracle is a JSON snapshot of the current mapping taken BEFORE the upgrade, and the upgrade's
-  compile errors are the to-do list. The `.shift` mapping plan was further out of date than expected (a 2026-05
-  POC state) and was rewritten whole. The pipeline gained the analyzer-in-package check; it does not run
+  compile errors are the to-do list. The pipeline gained the analyzer-in-package check; it does not run
   `ShiftEntity.Tests` (never did) — worth adding to the fast tier some day, 416 tests in a second, but that is a
   pipeline change outside this plan. Not done and not doable yet: the `dotnet new shift` / `dotnet new shiftentity`
   Builder run (needs the packages on nuget.org), which is the one end-to-end check still owed after the first
@@ -234,7 +233,7 @@ Coverage: [`03-coverage.md`](03-coverage.md) · Consumer guide: [`04-migration-g
   local for reporting purposes, so its maps get the full diagnostics at the closing declaration; the write side of
   an element convention is SM0002 (two types nothing converts between), which is the honest statement and never
   SM0011. The declaration contract is 3 — a 0.2 package is refused whole by a 0.3 consumer, so the first framework
-  release after Stage 2 must be `release-all`, as CLAUDE.md already requires.
+  release after Stage 2 must be `release-all`, as AGENTS.md already requires.
 - **2026-09-18 (Stage 0)** — Goldens captured through the running host rather than from the registry, so a
   repository's `UseGeneratedMapper(map => …)` configuration and a repository's overrides are what is pinned (the
   `Arm` field in each file says which). Fixtures are built by reflection, deterministically, with string members

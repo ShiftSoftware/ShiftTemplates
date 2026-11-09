@@ -584,10 +584,8 @@ nest, and everything else about a map is a mapper class. See [`STATUS.md`](STATU
 - **5.1** `ShiftTemplates/CLAUDE.md`: rewrite "Active Work: Mapping Abstraction", the SHENGEN section, the
   build-time-baked section and the tagging notes that mention `SelectWithTags` / mapper-does-not-handle-Tags.
   **Done 2026-09-20 with Stage 4.**
-- **5.2** `.shift/repos/shift-entity/mapping-abstraction-plan.md`: refresh "What's Done"; `automapper-removal/STATUS.md`
-  gets a log line (the removal plan's Stage F assumed the ShiftEntity generator; say what replaced it).
-  **Done 2026-09-20** — the plan was rewritten whole (it described the 2026-05 POC state); the log line is in both
-  STATUS copies; the ShiftMapper plan in `.shift` got a 0.3.0 note.
+- **5.2** `automapper-removal/STATUS.md` gets a log line (the removal plan's Stage F assumed the ShiftEntity
+  generator; say what replaced it). **Done 2026-09-20.**
 - **5.3** `ShiftFrameworkDocs`: one page "Mapping in a repository" written from the README's before/after samples,
   including §6 "the maps work anywhere". **Done 2026-09-20** — `docs/project-setup/data-project/mappers.md`
   (*Data Project › Mapping*), replacing an uncommitted page that taught the retired generator.

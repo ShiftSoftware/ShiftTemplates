@@ -16,10 +16,8 @@ has now closed — see below).
 `ADP.SyncAgent`, `Menu`) are out of scope — see [`README.md`](README.md#scope--framework-only).
 
 > **This is the primary working copy of this plan.** It lives in `ShiftTemplates/docs/plans/automapper-removal/`
-> and is the one to read and update. A mirror is kept in the private `.shift` repo
-> (`.shift/repos/shift-entity/automapper-removal/`) for cross-repo visibility; both are updated together.
-> Two passages carry more detail in the `.shift` mirror than here — Q7 and gap C-3 — because this repo is
-> public. Everything else is identical.
+> and is the one to read and update. Two passages — Q7 and gap C-3 — leave out reproduction detail
+> because this repo is public.
 
 Update this file as steps land. Keep it factual: what shipped, what it changed, what surprised you.
 Plan: [`01-steps.md`](01-steps.md) · Evidence: [`00-gap-register.md`](00-gap-register.md) · Decisions: [`02-open-decisions.md`](02-open-decisions.md)
@@ -268,7 +266,7 @@ Verified: `ShiftIdentity.Data`, `ShiftEntity.Tests`, `StockPlusPlus.Test`, `.API
 clean; `ReplicationMapperTests` 5/5; `IdentityReplicationMapperRegistrationTests` + `ReplicationMappingParityTests`
 30/30.
 
-**2026-09-15** — **Replication mapping: the delegate is optional again, and the fallback is ShiftMapper.** (This entry was first drafted on 2026-09-14 in the `.shift` mirror only, ahead of any code; the code landed on 2026-09-15 and the entry was checked against it line by line. When the two disagree, the code repos are the record.)
+**2026-09-15** — **Replication mapping: the delegate is optional again, and the fallback is ShiftMapper.** (This entry was first drafted on 2026-09-14, ahead of any code; the code landed on 2026-09-15 and the entry was checked against it line by line. When the two disagree, the code repos are the record.)
 
 E3's compile break is reversed on purpose. `Replicate` / `UpdateReference` / `UpdatePropertyReference` on both pipelines
 (`ShiftEntity.CosmosDbReplication` — catch-up `Services/CosmosDBReplication.cs`, trigger `ShiftEntityCosmosDbOptions.cs`)
@@ -404,7 +402,7 @@ what Q7 decided for the *generated* mapper. The self-service profile PUT (`Updat
 `EmailVerified` / `PhoneVerified`. `ApplyProfileEdits` writes only the six fields a user may change about
 themselves. Q7 said the *mapper* maps everything and the repository guards; this is not the mapper, it is a
 single hand-written endpoint mapping, which is exactly the "unless ignored explicitly by the programmer" case.
-🔒 Detail in the `.shift` copy (gap C-3).
+🔒 Reproduction detail is not recorded in this public copy (gap C-3).
 
 **Verification.** ShiftEntity 480/480 · StockPlusPlus.Test 198/198 · ShiftIdentity solution, StockPlusPlus
 API / Functions / Test / Web.Tests all build clean. `grep` for AutoMapper across all three repos returns only
@@ -905,9 +903,3 @@ projection into the WHERE and cannot translate it. Anyone tempted to `IgnoreList
 engine, `TryGetElement`, `IsPairable`, `BuildViewBody`). It was recovered from the `Stage B complete` commit and
 the A11 work re-applied on top; the full suite confirms nothing was lost. The lesson is narrow but real: slicing
 a file between two anchors deletes whatever else happens to live between them.
-
-**Mirror note (2026-08-22).** The `.shift` copy had drifted well behind this one and was re-synced from it.
-The two passages that used to be deliberately fuller in the private mirror — Q7 and gap C-3 — no longer are:
-Q7 is answered ("the mapper writes all properties; guard in the repository or with an explicit Ignore") and the
-`IsDeleted` case is resolved by a repository policy, so there is no unshipped narrowing left to keep private.
-The copies are now identical apart from the banner naming which one is primary. **This copy is primary.**

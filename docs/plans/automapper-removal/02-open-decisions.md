@@ -94,7 +94,7 @@ exceptions, and it shrinks Step B8's residual cases.
 
 This is a genuine choice between two silent failures:
 
-- **Opt-in** re-opens the bug fixed on 2026-08-06 (`../mapping-abstraction-plan.md` §23): JSON-owned
+- **Opt-in** re-opens the bug fixed on 2026-08-06: JSON-owned
   grandchildren read back fine and were silently emptied on save. That fix is pinned by
   `GeneratedDeepWriteTests`.
 - **Default-on with no diagnostic** corrupts link tables: *(downstream)* the generated `MenuVariant` mapper

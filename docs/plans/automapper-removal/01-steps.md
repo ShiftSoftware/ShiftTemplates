@@ -317,7 +317,7 @@ silently. The generated `MenuVariant` mapper composes all four collections that 
 deliberately ignores and merges by business key.
 
 Keeping the default is correct: reverting it re-opens the silent-empty-on-save bug fixed on 2026-08-06
-(`../mapping-abstraction-plan.md` §23, pinned by `GeneratedDeepWriteTests`). The fix is to make the dangerous
+(pinned by `GeneratedDeepWriteTests`). The fix is to make the dangerous
 case *visible and overridable*, not to turn the feature off.
 
 **What this step does.** Three additions:

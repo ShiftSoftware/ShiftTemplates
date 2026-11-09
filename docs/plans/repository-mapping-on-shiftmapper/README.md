@@ -9,11 +9,10 @@
 > repository at run time (Q3 is moot). See `02-open-decisions.md` Q16 and the STATUS log.
 
 **Created:** 2026-09-18 · **Revised:** 2026-09-18 (no programmer attributes; configuration in the repository; mapper class overrides)
-**Status:** Stages 0 (the frozen oracle), 1 (the ShiftMapper features, unreleased), 2 (the ShiftEntity side, additive), 3 (the flip and the migration — ShiftMapper is the repository's mapper, the sample and ShiftIdentity are migrated, all 23 goldens passed through it; the harness was deleted on 2026-09-20 once the comparison closed) and 4 (the old generator, its attributes, `UseGeneratedMapper`, the registry and `SelectWithTags` deleted on 2026-09-20; SHENGEN006 re-homed as SHENT001 in `ShiftEntity.Analyzers`) are done. Stage 5: CLAUDE.md done; the `.shift` plans, the docs page and the guide's publication open. See [`STATUS.md`](STATUS.md).
+**Status:** Stages 0 (the frozen oracle), 1 (the ShiftMapper features, unreleased), 2 (the ShiftEntity side, additive), 3 (the flip and the migration — ShiftMapper is the repository's mapper, the sample and ShiftIdentity are migrated, all 23 goldens passed through it; the harness was deleted on 2026-09-20 once the comparison closed) and 4 (the old generator, its attributes, `UseGeneratedMapper`, the registry and `SelectWithTags` deleted on 2026-09-20; SHENGEN006 re-homed as SHENT001 in `ShiftEntity.Analyzers`) are done. Stage 5: CLAUDE.md done; the docs page and the guide's publication open. See [`STATUS.md`](STATUS.md).
 
 > **This is the primary working copy of this plan.** It lives in
-> `ShiftTemplates/docs/plans/repository-mapping-on-shiftmapper/`. The `.shift` mapping plan
-> (`.shift/repos/shift-entity/mapping-abstraction-plan.md`) points here. When work lands, update
+> `ShiftTemplates/docs/plans/repository-mapping-on-shiftmapper/`. When work lands, update
 > [`STATUS.md`](STATUS.md) here.
 
 **Goal in one sentence:** the mapping between a repository's entity and its DTOs — nested children included —
