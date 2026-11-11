@@ -1,0 +1,97 @@
+@attribute [Route($"/{nameof(LocalizedFieldsForm)}")]
+@using System.ComponentModel.DataAnnotations
+@inject ISnackbar Snackbar
+
+<ShiftFormBasic Value="Item" Title="Localized fields" OnValidSubmit="Saved">
+    <MudText Typo="Typo.subtitle2">Content languages</MudText>
+    <MudChipSet T="string"
+                SelectionMode="SelectionMode.MultiSelection"
+                CheckMark
+                Variant="Variant.Outlined"
+                Color="Color.Primary"
+                SelectedValues="SelectedCultures"
+                SelectedValuesChanged="LanguagesChanged">
+        @foreach (var language in AllLanguages)
+        {
+            <MudChip Value="@language.CultureName" Text="@language.Label" />
+        }
+    </MudChipSet>
+
+    <MudStack Spacing="6" Class="mt-6">
+        <LocalizedTextField Label="Grid" @bind-Value="context.Item.Grid" For="() => context.Item.Grid"
+                            Languages="Languages" />
+
+        <LocalizedTextField Label="Row" @bind-Value="context.Item.Row" For="() => context.Item.Row"
+                            Languages="Languages" LanguageLayout="LanguageLayout.Row" />
+
+        <LocalizedTextField Label="Stacked" @bind-Value="context.Item.Stacked" For="() => context.Item.Stacked"
+                            Languages="Languages" LanguageLayout="LanguageLayout.Stacked" Lines="2" MaxLines="4" AutoGrow />
+
+        <LocalizedTextField Label="Dropdown" @bind-Value="context.Item.Dropdown" For="() => context.Item.Dropdown"
+                            Languages="Languages" LanguageLayout="LanguageLayout.Dropdown" />
+
+        <LocalizedTextField Label="Tabs" @bind-Value="context.Item.Tabs" For="() => context.Item.Tabs"
+                            Languages="Languages" LanguageLayout="LanguageLayout.Tabs" />
+
+        <LocalizedTextField Label="Expandable" @bind-Value="context.Item.Expandable" For="() => context.Item.Expandable"
+                            Languages="Languages" LanguageLayout="LanguageLayout.Expandable" />
+    </MudStack>
+
+    <MudText Typo="Typo.subtitle2" Class="mt-8">Stored values</MudText>
+    <MudSimpleTable Dense Elevation="0" Bordered>
+        <tbody>
+            @foreach (var (name, value) in StoredValues(context.Item))
+            {
+                <tr>
+                    <td style="width: 120px;">@name</td>
+                    <td><code>@value</code></td>
+                </tr>
+            }
+        </tbody>
+    </MudSimpleTable>
+</ShiftFormBasic>
+
+@code {
+    private static readonly List<LanguageInfo> AllLanguages =
+    [
+        new() { CultureName = "en-US", Label = "English" },
+        new() { CultureName = "ar-IQ", Label = "Arabic", RTL = true },
+        new() { CultureName = "ku-IQ", Label = "Kurdish", RTL = true },
+        new() { CultureName = "fr-FR", Label = "French" },
+        new() { CultureName = "tr-TR", Label = "Turkish" },
+    ];
+
+    private LocalizedFieldsSample Item = new();
+    private IReadOnlyCollection<string> SelectedCultures = ["en-US", "ar-IQ"];
+    private List<LanguageInfo> Languages = [];
+
+    protected override void OnInitialized() => LanguagesChanged(SelectedCultures);
+
+    private void LanguagesChanged(IReadOnlyCollection<string> cultures)
+    {
+        SelectedCultures = cultures;
+        Languages = AllLanguages.Where(x => cultures.Contains(x.CultureName)).ToList();
+    }
+
+    private void Saved() => Snackbar.Add("Every required language is filled in.", Severity.Success);
+
+    private static IEnumerable<(string, string?)> StoredValues(LocalizedFieldsSample item) =>
+    [
+        ("Grid", item.Grid),
+        ("Row", item.Row),
+        ("Stacked", item.Stacked),
+        ("Dropdown", item.Dropdown),
+        ("Tabs", item.Tabs),
+        ("Expandable", item.Expandable),
+    ];
+
+    public class LocalizedFieldsSample
+    {
+        [Required] public string? Grid { get; set; }
+        [Required] public string? Row { get; set; }
+        [Required] public string? Stacked { get; set; }
+        [Required] public string? Dropdown { get; set; }
+        [Required] public string? Tabs { get; set; }
+        [Required] public string? Expandable { get; set; }
+    }
+}
