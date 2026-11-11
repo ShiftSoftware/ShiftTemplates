@@ -3,56 +3,30 @@
 @inject ISnackbar Snackbar
 
 <ShiftFormBasic Value="Item" Title="Localized fields" OnValidSubmit="Saved">
-    <MudText Typo="Typo.subtitle2">Content languages</MudText>
-    <MudChipSet T="string"
-                SelectionMode="SelectionMode.MultiSelection"
-                CheckMark
-                Variant="Variant.Outlined"
-                Color="Color.Primary"
-                SelectedValues="SelectedCultures"
-                SelectedValuesChanged="LanguagesChanged">
-        @foreach (var language in AllLanguages)
+    <MudTabsExtended Elevation="0" ApplyEffectsToContainer TabPanelsClass="pt-6">
+        @foreach (var sample in Samples)
         {
-            <MudChip Value="@language.CultureName" Text="@language.Label" />
+            <MudTabPanel Text="@sample.Layout.ToString()">
+                <FormSection For="@sample.Layout.ToString()">
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary mb-4">@sample.Description</MudText>
+
+                    <LocalizedTextField Label="@sample.Layout.ToString()"
+                                        Value="@sample.Get(context.Item)"
+                                        ValueChanged="@(value => sample.Set(context.Item, value))"
+                                        For="@sample.For(context.Item)"
+                                        Languages="Languages"
+                                        LanguageLayout="sample.Layout" />
+
+                    <MudText Typo="Typo.caption" Class="d-block mt-6">Stored value</MudText>
+                    <code style="word-break: break-all;">@(sample.Get(context.Item) ?? "—")</code>
+                </FormSection>
+            </MudTabPanel>
         }
-    </MudChipSet>
-
-    <MudStack Spacing="6" Class="mt-6">
-        <LocalizedTextField Label="Grid" @bind-Value="context.Item.Grid" For="() => context.Item.Grid"
-                            Languages="Languages" />
-
-        <LocalizedTextField Label="Row" @bind-Value="context.Item.Row" For="() => context.Item.Row"
-                            Languages="Languages" LanguageLayout="LanguageLayout.Row" />
-
-        <LocalizedTextField Label="Stacked" @bind-Value="context.Item.Stacked" For="() => context.Item.Stacked"
-                            Languages="Languages" LanguageLayout="LanguageLayout.Stacked" Lines="2" MaxLines="4" AutoGrow />
-
-        <LocalizedTextField Label="Dropdown" @bind-Value="context.Item.Dropdown" For="() => context.Item.Dropdown"
-                            Languages="Languages" LanguageLayout="LanguageLayout.Dropdown" />
-
-        <LocalizedTextField Label="Tabs" @bind-Value="context.Item.Tabs" For="() => context.Item.Tabs"
-                            Languages="Languages" LanguageLayout="LanguageLayout.Tabs" />
-
-        <LocalizedTextField Label="Expandable" @bind-Value="context.Item.Expandable" For="() => context.Item.Expandable"
-                            Languages="Languages" LanguageLayout="LanguageLayout.Expandable" />
-    </MudStack>
-
-    <MudText Typo="Typo.subtitle2" Class="mt-8">Stored values</MudText>
-    <MudSimpleTable Dense Elevation="0" Bordered>
-        <tbody>
-            @foreach (var (name, value) in StoredValues(context.Item))
-            {
-                <tr>
-                    <td style="width: 120px;">@name</td>
-                    <td><code>@value</code></td>
-                </tr>
-            }
-        </tbody>
-    </MudSimpleTable>
+    </MudTabsExtended>
 </ShiftFormBasic>
 
 @code {
-    private static readonly List<LanguageInfo> AllLanguages =
+    private static readonly List<LanguageInfo> Languages =
     [
         new() { CultureName = "en-US", Label = "English" },
         new() { CultureName = "ar-IQ", Label = "Arabic", RTL = true },
@@ -61,29 +35,32 @@
         new() { CultureName = "tr-TR", Label = "Turkish" },
     ];
 
-    private LocalizedFieldsSample Item = new();
-    private IReadOnlyCollection<string> SelectedCultures = ["en-US", "ar-IQ"];
-    private List<LanguageInfo> Languages = [];
-
-    protected override void OnInitialized() => LanguagesChanged(SelectedCultures);
-
-    private void LanguagesChanged(IReadOnlyCollection<string> cultures)
-    {
-        SelectedCultures = cultures;
-        Languages = AllLanguages.Where(x => cultures.Contains(x.CultureName)).ToList();
-    }
-
-    private void Saved() => Snackbar.Add("Every required language is filled in.", Severity.Success);
-
-    private static IEnumerable<(string, string?)> StoredValues(LocalizedFieldsSample item) =>
+    private static readonly List<LayoutSample> Samples =
     [
-        ("Grid", item.Grid),
-        ("Row", item.Row),
-        ("Stacked", item.Stacked),
-        ("Dropdown", item.Dropdown),
-        ("Tabs", item.Tabs),
-        ("Expandable", item.Expandable),
+        new(LanguageLayout.Grid, "The default: one input per language in a grid that wraps onto new rows.",
+            x => x.Grid, (x, v) => x.Grid = v, x => () => x.Grid),
+        new(LanguageLayout.Row, "One input per language on a single row. It scrolls sideways when the inputs don't fit.",
+            x => x.Row, (x, v) => x.Row = v, x => () => x.Row),
+        new(LanguageLayout.Stacked, "One full-width input per language, one under the other.",
+            x => x.Stacked, (x, v) => x.Stacked = v, x => () => x.Stacked),
+        new(LanguageLayout.Dropdown, "One input with a language dropdown. The dropdown marks languages with text or errors.",
+            x => x.Dropdown, (x, v) => x.Dropdown = v, x => () => x.Dropdown),
+        new(LanguageLayout.Tabs, "One input with a tab per language. Each tab marks text or errors.",
+            x => x.Tabs, (x, v) => x.Tabs = v, x => () => x.Tabs),
+        new(LanguageLayout.Expandable, "The first language's input, with the other languages behind the +N button.",
+            x => x.Expandable, (x, v) => x.Expandable = v, x => () => x.Expandable),
     ];
+
+    private LocalizedFieldsSample Item = new();
+
+    private void Saved() => Snackbar.Add("Every language is filled in.", Severity.Success);
+
+    private record LayoutSample(
+        LanguageLayout Layout,
+        string Description,
+        Func<LocalizedFieldsSample, string?> Get,
+        Action<LocalizedFieldsSample, string> Set,
+        Func<LocalizedFieldsSample, System.Linq.Expressions.Expression<Func<string?>>> For);
 
     public class LocalizedFieldsSample
     {
