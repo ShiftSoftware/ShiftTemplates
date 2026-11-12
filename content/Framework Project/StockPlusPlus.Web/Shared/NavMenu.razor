@@ -3,7 +3,6 @@
 @using StockPlusPlus.Web.Pages.Country
 @using StockPlusPlus.Web.Pages.SampleContact
 @using StockPlusPlus.Web.Pages.Invoice
-@using StockPlusPlus.Web.Pages.LocalizedFields
 @using StockPlusPlus.Web.Pages.InvoiceDeep
 @using StockPlusPlus.Web.Pages.NeedsAttention
 @using StockPlusPlus.Web.Pages.Product
@@ -92,10 +91,6 @@
                           Match="NavLinkMatch.All"
                           Icon="@Icons.Material.Outlined.Label"
                           TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.Tags">Tags</AuthorizedMudNavLink>
-
-    <MudNavLink Href="@($"/{nameof(LocalizedFieldsForm)}")"
-                Match="NavLinkMatch.All"
-                Icon="@Icons.Material.Outlined.Translate">Localized Fields</MudNavLink>
 
     <AuthorizedMudNavLink Href="@($"{nameof(CosmosCompanyBranchList)}")"
                           Match="NavLinkMatch.All"

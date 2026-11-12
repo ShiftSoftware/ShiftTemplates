@@ -14,9 +14,19 @@
                  TypeAuthAction="StockPlusPlus.Shared.ActionTrees.StockPlusPlusActionTree.ProductBrand"
                  @bind-Key="@Key">
     @*#if (includeItemTemplateContent)*@
-    <LocalizedTextField @bind-Value="context.Item.Name"
+    <MudTabs Elevation="0" ApplyEffectsToContainer @bind-ActivePanelIndex="NameLayoutIndex">
+        @foreach (var option in Enum.GetValues<LanguageLayout>())
+        {
+            <MudTabPanel Text="@option.ToString()" />
+        }
+    </MudTabs>
+
+    @* Re-created on each layout change so the new layout loads the current Name. *@
+    <LocalizedTextField @key="NameLayout"
+                        @bind-Value="context.Item.Name"
                         For="() => context.Item.Name"
-                        Languages="@([new () { CultureName = "en-US", Label = "English" }, new () { CultureName = "tr-TR", Label = "Turkish" } ])"
+                        Languages="NameLanguages"
+                        LanguageLayout="NameLayout"
                         Label="Name" />
 
     <MudTextFieldExtended OnlyValidateIfDirty="true"
@@ -52,6 +62,18 @@
     [Parameter]
     [SupplyParameterFromQuery]
     public string? BrandName { get; set; }
+
+    private static readonly List<LanguageInfo> NameLanguages =
+    [
+        new() { CultureName = "en-US", Label = "English" },
+        new() { CultureName = "ar-IQ", Label = "Arabic", RTL = true },
+        new() { CultureName = "ku-IQ", Label = "Kurdish", RTL = true },
+        new() { CultureName = "fr-FR", Label = "French" },
+        new() { CultureName = "tr-TR", Label = "Turkish" },
+    ];
+
+    private int NameLayoutIndex;
+    private LanguageLayout NameLayout => (LanguageLayout)NameLayoutIndex;
 
     protected override void OnInitialized()
     {
