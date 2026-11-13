@@ -188,6 +188,100 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fixtures", "fixtures", "{42
 		..\..\..\ShiftIdentity\clients\javascript\test\fixtures\v2-refresh-responses.json = ..\..\..\ShiftIdentity\clients\javascript\test\fixtures\v2-refresh-responses.json
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dart", "dart", "{4BF092C6-8068-4B66-9B14-FC7E6C7CEE0E}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\.gitignore = ..\..\..\ShiftIdentity\clients\dart\.gitignore
+		..\..\..\ShiftIdentity\clients\dart\README.md = ..\..\..\ShiftIdentity\clients\dart\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shift_identity_token_client", "shift_identity_token_client", "{C817CAE0-B455-46C3-AEFA-E84CDC071B07}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\analysis_options.yaml = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\analysis_options.yaml
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\CHANGELOG.md = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\CHANGELOG.md
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\LICENSE = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\LICENSE
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\pubspec.yaml = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\pubspec.yaml
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\README.md = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{4FB5782D-DA91-4E21-895C-CD0BCAB06810}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\example\main.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\example\main.dart
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{D7F6CB6F-D65C-41B4-B642-93491CF39FE0}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\shift_identity_token_client.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\shift_identity_token_client.dart
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{43D88706-BD07-44ED-91AB-6729A3050815}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\credential_store.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\credential_store.dart
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\session_credentials.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\session_credentials.dart
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\token_client.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\token_client.dart
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\token_http_client.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\token_http_client.dart
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\token_issuer.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\token_issuer.dart
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\token_outcome.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\token_outcome.dart
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\transport.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\transport.dart
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "issuers", "issuers", "{1E694ABE-5739-4A7E-91E3-CFD81339F8B4}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\issuers\shift_identity_v2.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\lib\src\issuers\shift_identity_v2.dart
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{A2B8CB18-FD45-4797-A74E-C4497A5C1AD2}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\credential_store_test.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\credential_store_test.dart
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\http_server_test.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\http_server_test.dart
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\http_test.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\http_test.dart
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\shift_identity_v2_test.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\shift_identity_v2_test.dart
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\support.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\support.dart
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\token_client_test.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\token_client_test.dart
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fixtures", "fixtures", "{7CC67DF3-B963-41CE-86E2-D5746A0604CD}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\fixtures\v2-refresh-responses.json = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\test\fixtures\v2-refresh-responses.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shift_identity_token_client_flutter", "shift_identity_token_client_flutter", "{371D1633-5243-4AC4-A827-1A936E90FC4B}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\.pubignore = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\.pubignore
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\analysis_options.yaml = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\analysis_options.yaml
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\CHANGELOG.md = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\CHANGELOG.md
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\LICENSE = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\LICENSE
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\pubspec.yaml = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\pubspec.yaml
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\pubspec_overrides.yaml = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\pubspec_overrides.yaml
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\README.md = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{6D3D808C-70B3-41FC-BBE6-11B9936FEDE0}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\example\analysis_options.yaml = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\example\analysis_options.yaml
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\example\pubspec.yaml = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\example\pubspec.yaml
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\example\pubspec_overrides.yaml = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\example\pubspec_overrides.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{24E21917-CBBD-4F11-BA39-15D2C3089CE5}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\example\lib\main.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\example\lib\main.dart
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{A6CE0620-23A4-4525-95E5-C73A5DE14B5A}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\lib\shift_identity_token_client_flutter.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\lib\shift_identity_token_client_flutter.dart
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{32A5C228-8ACD-4AB4-A0ED-625C75B28DA0}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\lib\src\secure_credential_store.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\lib\src\secure_credential_store.dart
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{80E7316E-5D36-4EEB-8C33-B4CB7C9FB562}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\test\secure_credential_store_test.dart = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\test\secure_credential_store_test.dart
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{E77B62F9-2E6D-437B-82B4-60688FFF4537}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftIdentity.ReverseAccess.Benchmarks", "..\..\..\ShiftIdentity\benchmarks\ShiftIdentity.ReverseAccess.Benchmarks\ShiftIdentity.ReverseAccess.Benchmarks.csproj", "{0DA43496-4FF8-474B-A455-13B0D15A9899}"
@@ -497,6 +591,20 @@ Global
 		{1EE3352D-3B0D-41CA-A463-487235989C05} = {2D91CD8B-4BB9-478C-B194-EB3F719927E0}
 		{0E9E4FEE-B104-456C-B60C-EF53536A693D} = {2D91CD8B-4BB9-478C-B194-EB3F719927E0}
 		{42D2329E-B7D0-49F6-AC58-332997A5C19D} = {0E9E4FEE-B104-456C-B60C-EF53536A693D}
+		{4BF092C6-8068-4B66-9B14-FC7E6C7CEE0E} = {BDE105A7-F626-48B5-ABEB-782E4C492CF5}
+		{C817CAE0-B455-46C3-AEFA-E84CDC071B07} = {4BF092C6-8068-4B66-9B14-FC7E6C7CEE0E}
+		{4FB5782D-DA91-4E21-895C-CD0BCAB06810} = {C817CAE0-B455-46C3-AEFA-E84CDC071B07}
+		{D7F6CB6F-D65C-41B4-B642-93491CF39FE0} = {C817CAE0-B455-46C3-AEFA-E84CDC071B07}
+		{43D88706-BD07-44ED-91AB-6729A3050815} = {D7F6CB6F-D65C-41B4-B642-93491CF39FE0}
+		{1E694ABE-5739-4A7E-91E3-CFD81339F8B4} = {43D88706-BD07-44ED-91AB-6729A3050815}
+		{A2B8CB18-FD45-4797-A74E-C4497A5C1AD2} = {C817CAE0-B455-46C3-AEFA-E84CDC071B07}
+		{7CC67DF3-B963-41CE-86E2-D5746A0604CD} = {A2B8CB18-FD45-4797-A74E-C4497A5C1AD2}
+		{371D1633-5243-4AC4-A827-1A936E90FC4B} = {4BF092C6-8068-4B66-9B14-FC7E6C7CEE0E}
+		{6D3D808C-70B3-41FC-BBE6-11B9936FEDE0} = {371D1633-5243-4AC4-A827-1A936E90FC4B}
+		{24E21917-CBBD-4F11-BA39-15D2C3089CE5} = {6D3D808C-70B3-41FC-BBE6-11B9936FEDE0}
+		{A6CE0620-23A4-4525-95E5-C73A5DE14B5A} = {371D1633-5243-4AC4-A827-1A936E90FC4B}
+		{32A5C228-8ACD-4AB4-A0ED-625C75B28DA0} = {A6CE0620-23A4-4525-95E5-C73A5DE14B5A}
+		{80E7316E-5D36-4EEB-8C33-B4CB7C9FB562} = {371D1633-5243-4AC4-A827-1A936E90FC4B}
 		{E77B62F9-2E6D-437B-82B4-60688FFF4537} = {628E8BC1-C04D-4681-90A3-5CD4DF6A4003}
 		{0DA43496-4FF8-474B-A455-13B0D15A9899} = {E77B62F9-2E6D-437B-82B4-60688FFF4537}
 		<!--#endif -->
