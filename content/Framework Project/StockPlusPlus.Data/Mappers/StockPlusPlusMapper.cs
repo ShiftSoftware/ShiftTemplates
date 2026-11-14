@@ -62,5 +62,18 @@ public class StockPlusPlusMapper : ShiftMapperBase
         // api/countrymapped (CountryMapper) are untouched — maps are keyed by DTO type.
         CreateMap<Country, CountryGeneratedDTO>()
             .ForMember(d => d.Name, opt => opt.MapFrom(e => e.Name + " (via StockPlusPlusMapper)"));
+
+        // ── Vehicle ──────────────────────────────────────────────────────────────────────────────────────────
+        // WRITE — the framework's pack maps the audit members both ways, and on UPDATE the repository re-stamps
+        // only LastSaveDate / LastSavedByUserID, so a request body could rewrite CreateDate / CreatedByUserID.
+        // The server owns all four, so the write map leaves them alone; everything else stays by convention.
+        // (IsDeleted is already restored by the repository on update.) The write map is the view map's
+        // ReverseMap, so entity-only columns stay the quiet SM0006 as they are in the automatic maps.
+        CreateMap<Vehicle, Shared.DTOs.Vehicle.VehicleDTO>()
+            .ReverseMap()
+            .ForMember(e => e.CreateDate, opt => opt.Ignore())
+            .ForMember(e => e.CreatedByUserID, opt => opt.Ignore())
+            .ForMember(e => e.LastSaveDate, opt => opt.Ignore())
+            .ForMember(e => e.LastSavedByUserID, opt => opt.Ignore());
     }
 }
