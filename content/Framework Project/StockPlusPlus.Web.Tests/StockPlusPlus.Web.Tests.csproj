@@ -30,4 +30,9 @@
 		<ProjectReference Include="..\StockPlusPlus.Web\StockPlusPlus.Web.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<!-- BannerLayoutTests checks the sample's real rules file. -->
+		<None Include="..\StockPlusPlus.Web\wwwroot\banners.json" Link="banners.json" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
 </Project>
