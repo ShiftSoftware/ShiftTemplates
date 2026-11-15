@@ -114,35 +114,93 @@ a, .btn-link {
         content: "An error has occurred."
     }
 
+/* Boot screen inside #app, replaced when Blazor renders. blazor.webassembly.js sets the --blazor-load-* variables. */
+.app-loading {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: #fff;
+    color: #424242;
+    font-family: Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    opacity: 0;
+    animation: app-loading-in 0.3s ease-out 0.2s forwards;
+}
+
+.app-loading-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
 .loading-progress {
     position: relative;
-    display: block;
-    width: 8rem;
-    height: 8rem;
-    margin: 20vh auto 1rem auto;
+    width: min(16rem, 70vw);
+    height: 4px;
+    border-radius: 2px;
+    background: #e0e0e0;
+    overflow: hidden;
+    direction: ltr;
 }
 
-    .loading-progress circle {
-        fill: none;
-        stroke: #e0e0e0;
-        stroke-width: 0.6rem;
-        transform-origin: 50% 50%;
-        transform: rotate(-90deg);
+    .loading-progress::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+        transform: translateX(-100%);
+        animation: app-loading-shimmer 1.4s ease-in-out infinite;
     }
 
-        .loading-progress circle:last-child {
-            stroke: #1b6ec2;
-            stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
-            transition: stroke-dasharray 0.05s ease-in-out;
-        }
+    .loading-progress::after {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: var(--blazor-load-percentage, 0%);
+        border-radius: inherit;
+        background: var(--mud-palette-primary, #594ae2);
+        transition: width 0.2s ease-out;
+    }
 
 .loading-progress-text {
-    position: absolute;
-    text-align: center;
-    font-weight: bold;
-    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+    min-height: 1.25rem;
+    font-size: 0.875rem;
+    color: #757575;
+    font-variant-numeric: tabular-nums;
 }
 
-    .loading-progress-text:after {
+    .loading-progress-text::after {
         content: var(--blazor-load-percentage-text, "Loading");
     }
+
+@keyframes app-loading-in {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes app-loading-shimmer {
+    to {
+        transform: translateX(100%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-loading {
+        animation: none;
+        opacity: 1;
+    }
+
+    .loading-progress::before {
+        animation: none;
+        display: none;
+    }
+
+    .loading-progress::after {
+        transition: none;
+    }
+}
