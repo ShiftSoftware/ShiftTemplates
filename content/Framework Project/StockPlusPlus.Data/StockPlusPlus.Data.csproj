@@ -14,6 +14,7 @@
 		<ProjectReference Include="..\StockPlusPlus.Shared\StockPlusPlus.Shared.csproj" />
 		<!--#if shiftFrameworkDevelopmentMode-->
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.EFCore\ShiftEntity.EFCore.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.EFCore\ShiftEntity.EFCore.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
+		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.CosmosDbReplication\ShiftEntity.CosmosDbReplication.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.CosmosDbReplication\ShiftEntity.CosmosDbReplication.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<!-- Dev-mode analyzer reference (SHENT001); in package mode the analyzer ships inside the ShiftSoftware.ShiftEntity package. -->
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Analyzers\ShiftEntity.Analyzers.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.Analyzers\ShiftEntity.Analyzers.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 		<ProjectReference Include="..\..\..\..\ShiftEntity\ShiftEntity.Print\ShiftEntity.Print.csproj" Condition="Exists('..\..\..\..\ShiftEntity\ShiftEntity.Print\ShiftEntity.Print.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
@@ -26,6 +27,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!-- Server-only: brings in Cosmos DB, EF Core and SQL Server. It lives here, not in Shared, so it stays out of the Web (WebAssembly) download. -->
+		<PackageReference Include="ShiftSoftware.ShiftEntity.CosmosDbReplication" Version="$(ShiftFrameworkVersion)" Condition="'$(ImportShiftFrameworkProjects)' != 'true' Or !Exists('..\..\..\..\ShiftEntity\ShiftEntity.CosmosDbReplication\ShiftEntity.CosmosDbReplication.csproj')" />
 		<PackageReference Include="Azure.Storage.Queues" Version="12.28.1" />
 		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.14.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
