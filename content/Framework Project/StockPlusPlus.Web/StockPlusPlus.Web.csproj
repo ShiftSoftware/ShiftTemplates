@@ -7,6 +7,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+		<!-- Publish without libphonenumber's geocoding, carrier, timezone and locale data (about 2.3 MB). Validation and formatting keep working. Remove this line if the app needs that data. -->
+		<ShiftTrimPhoneNumberData>true</ShiftTrimPhoneNumberData>
 	</PropertyGroup>
 
 	<!--#if shiftFrameworkDevelopmentMode-->
@@ -38,5 +40,10 @@
 		<ProjectReference Include="..\..\..\..\ShiftBlazor\ShiftBlazor\ShiftBlazor.csproj" Condition="Exists('..\..\..\..\ShiftBlazor\ShiftBlazor\ShiftBlazor.csproj') And '$(ImportShiftFrameworkProjects)'=='true'" />
 		<!--#endif -->
 	</ItemGroup>
+
+	<!--#if shiftFrameworkDevelopmentMode-->
+	<!-- Framework development references ShiftBlazor as a project, so the build files in its package are not imported automatically. -->
+	<Import Project="..\..\..\..\ShiftBlazor\ShiftBlazor\buildTransitive\ShiftSoftware.ShiftBlazor.targets" Condition="Exists('..\..\..\..\ShiftBlazor\ShiftBlazor\buildTransitive\ShiftSoftware.ShiftBlazor.targets') And '$(ImportShiftFrameworkProjects)'=='true'" />
+	<!--#endif -->
 
 </Project>
