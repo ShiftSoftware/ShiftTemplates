@@ -22,8 +22,10 @@ internal static class IdentityPreviewHost
 {
     public static async Task RunAsync()
     {
+        // A SQLite database in memory: nothing to install, and it ends with the process.
         await using var fixture = new SqlIdentityFixture
         {
+            Database = IdentityTestDatabase.SqliteInMemory,
             ContextFactory = options => new PreviewDb(new DbContextOptions<DB>(options.Extensions.ToDictionary(x => x.GetType())))
         };
         await fixture.InitializeAsync();
@@ -114,7 +116,7 @@ internal static class IdentityPreviewHost
         await app.StartAsync();
         preview.Origin = app.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>()!.Addresses.Single();
         Console.WriteLine($"IDENTITY_PREVIEW_URL={preview.Origin}/");
-        Console.WriteLine("Synthetic preview only. The owned database is removed on graceful shutdown.");
+        Console.WriteLine("Synthetic preview only, in a SQLite database in memory that ends with the process.");
         await app.WaitForShutdownAsync();
     }
 

@@ -24,6 +24,7 @@ public sealed partial class IdentityDevelopmentAppTests : IAsyncLifetime
 {
     private readonly SqlIdentityFixture fixture = new()
     {
+        Database = IdentityTestDatabase.SqliteInMemory,
         ContextFactory = o => new ConsumerDb(new DbContextOptions<DB>(o.Extensions.ToDictionary(x => x.GetType())))
     };
     private TestServer server = null!;

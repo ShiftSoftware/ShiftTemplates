@@ -398,3 +398,5 @@ FodyWeavers.xsd
 *.sln.iml
 /TestProject
 content/Framework Project/.claude/settings.local.json
+# The sample API's SQLite database in framework development (Settings:Database = SqliteFile)
+stockplusplus.db*

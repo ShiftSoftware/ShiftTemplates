@@ -21,8 +21,10 @@ public static class IdentityDevelopmentHost
     public static readonly string[] Accounts = ["dev-basic", "dev-mfa", "dev-mandatory", "dev-restricted", "dev-required-mfa", "dev-recovery", "dev-admin", "dev-legacy", "dev-no-email"];
     public static async Task RunAsync()
     {
+        // A SQLite database in memory: nothing to install, and it ends with the process.
         await using var fixture = new SqlIdentityFixture
         {
+            Database = IdentityTestDatabase.SqliteInMemory,
             ContextFactory = options => new DevelopmentDb(new DbContextOptions<DB>(options.Extensions.ToDictionary(x => x.GetType())))
         };
         await fixture.InitializeAsync();
@@ -79,7 +81,7 @@ public static class IdentityDevelopmentHost
         await app.StartAsync();
         origin = app.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>()!.Addresses.Single();
         Console.WriteLine($"IDENTITY_DEVELOPMENT_URL={origin}/");
-        Console.WriteLine("Normal StockPlusPlus WebAssembly shell; owned synthetic SQL only. Graceful shutdown removes the database.");
+        Console.WriteLine("Normal StockPlusPlus WebAssembly shell; synthetic data only, in a SQLite database in memory that ends with the process.");
         await app.WaitForShutdownAsync();
     }
 

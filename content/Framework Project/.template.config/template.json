@@ -69,7 +69,9 @@
         "StockPlusPlus.API/Development/IdentityApp/**/*",
         "StockPlusPlus.Web/Development/**/*",
         "StockPlusPlus.Test/Tests/IdentityDevelopmentAppTests.cs",
-        "StockPlusPlus.Test/Tests/IdentityDevelopmentSecurityLinksTests.cs"
+        "StockPlusPlus.Test/Tests/IdentityDevelopmentSecurityLinksTests.cs",
+        "StockPlusPlus.API/identity-seed.development.json",
+        "**/stockplusplus.db*"
       ],
       "modifiers": [
         {

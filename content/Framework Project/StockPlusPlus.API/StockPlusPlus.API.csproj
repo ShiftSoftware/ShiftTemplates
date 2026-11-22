@@ -35,6 +35,10 @@
 	<Target Name="RefuseIdentityPreviewPublication" BeforeTargets="Publish;Pack" Condition="'$(IdentityAdmissionPreview)' == 'true'">
 		<Error Text="The disposable identity preview cannot be published or packed." />
 	</Target>
+	<!-- Framework development only: Settings:Database = SqliteInMemory or SqliteFile runs the sample on SQLite (Program.cs). -->
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.14" />
+	</ItemGroup>
 	<ItemGroup Condition="'$(IdentityAdmissionPreview)' != 'true'">
 		<RazorComponent Remove="Development\IdentityPreview\**\*.razor" />
 		<Content Remove="Development\IdentityPreview\**\*.razor" />

@@ -1,0 +1,17 @@
+{
+  "countries": [ { "key": "iq", "name": "Iraq", "shortCode": "IQ", "callingCode": "+964", "integrationId": "1" } ],
+  "regions": [ { "key": "krg", "name": "Kurdistan", "shortCode": "KRG", "country": "iq", "integrationId": "1" } ],
+  "cities": [ { "key": "erbil", "name": "Erbil", "region": "krg" } ],
+  "companies": [ { "key": "shift", "name": "Shift Software", "shortCode": "SFT", "integrationId": "-1", "companyType": "NotSpecified" } ],
+  "brands": [ { "key": "toyota", "name": "Toyota" }, { "key": "lexus", "name": "Lexus" } ],
+  "companyBranches": [
+    { "key": "erbil-hq", "name": "Erbil HQ", "shortCode": "SFT-EBL", "integrationId": "-11", "company": "shift", "city": "erbil", "brands": [ "toyota", "lexus" ] }
+  ],
+  "teams": [ { "key": "support", "name": "Support", "company": "shift", "companyBranches": [ "erbil-hq" ] } ],
+  "accessTrees": [ { "key": "admin", "name": "Admin", "fullAccess": true } ],
+  "users": [
+    { "username": "SuperUser", "password": "OneTwo", "fullName": "Super User", "isProtected": true, "companyBranch": "erbil-hq", "accessTrees": [ "admin" ] },
+    { "username": "t1", "password": "OneTwo", "fullName": "Test User 1", "email": "t1@example.com", "emailVerified": true, "companyBranch": "erbil-hq", "accessTrees": [ "admin" ], "teams": [ "support" ] },
+    { "username": "t3", "password": "OneTwo", "fullName": "Test User 3", "companyBranch": "erbil-hq", "accessTrees": [ "admin" ] }
+  ]
+}

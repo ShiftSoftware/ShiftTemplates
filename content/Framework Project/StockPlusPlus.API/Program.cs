@@ -57,8 +57,33 @@ if (args.Contains("--identity-preview", StringComparer.Ordinal))
 
 var builder = WebApplication.CreateBuilder(args);
 
+#if shiftFrameworkDevelopmentMode
+// Framework development only; a generated project always uses SQL Server. Settings:Database picks the database
+// (for example the environment variable Settings__Database=SqliteInMemory):
+//   SqlServer (the default) - the SQLServer connection string, temporal tables, migrations and SeedDBAsync below.
+//   SqliteInMemory          - a shared SQLite database in memory: it lives as long as the app and starts empty.
+//   SqliteFile              - a SQLite file (stockplusplus.db in the working directory): the data survives restarts.
+// SQLite is created with EnsureCreated and seeded with SeedShiftIdentitySqliteAsync after the app is built.
+var database = builder.Configuration.GetValue<string>("Settings:Database") ?? "SqlServer";
+var sqliteConnection = database switch
+{
+    "SqlServer" => null,
+    "SqliteInMemory" => builder.Configuration.GetConnectionString("SqliteInMemory") ?? "Data Source=StockPlusPlus;Mode=Memory;Cache=Shared",
+    "SqliteFile" => builder.Configuration.GetConnectionString("SqliteFile") ?? "Data Source=stockplusplus.db",
+    _ => throw new InvalidOperationException($"Settings:Database is '{database}'. Use SqlServer, SqliteInMemory or SqliteFile."),
+};
+#endif
+
 Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
 {
+#if shiftFrameworkDevelopmentMode
+    // SQLite has no temporal tables, so UseTemporal is left out: entity history (revisions) is SQL Server only.
+    if (sqliteConnection is not null)
+    {
+        x.UseSqlite(sqliteConnection);
+        return;
+    }
+#endif
     x.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer")!)
     .UseTemporal(true);
 };
@@ -365,6 +390,26 @@ var app = builder.Build();
 if (app.Environment.EnvironmentName != "Test")
 {
 #if (internalShiftIdentityHosting)
+#if shiftFrameworkDevelopmentMode
+    if (sqliteConnection is not null)
+    {
+        // SQLite: the app creates the schema itself (SQL Server migrations are never applied to SQLite), then seeds it.
+        await using (var scope = app.Services.CreateAsyncScope())
+            await scope.ServiceProvider.GetRequiredService<DB>().Database.EnsureCreatedAsync();
+
+        // The JSON overload: the sample's company, branch, brands and users (SuperUser / OneTwo has full access).
+        await app.SeedShiftIdentitySqliteAsync(await File.ReadAllTextAsync(Path.Combine(app.Environment.ContentRootPath, "identity-seed.development.json")));
+
+        // The object overload: rows written in code. A second seed cannot use the first one's keys, so these need none.
+        await app.SeedShiftIdentitySqliteAsync(new ShiftSoftware.ShiftIdentity.Data.Seeding.IdentitySeedData
+        {
+            Departments = [new() { Name = "Sales" }, new() { Name = "After Sales" }],
+            Services = [new() { Name = "Repair" }, new() { Name = "Maintenance" }],
+        });
+    }
+    else
+    {
+#endif
     await app.SeedDBAsync("SuperUser", "OneTwo", new ShiftSoftware.ShiftIdentity.Data.DBSeedOptions
     {
         CountryExternalId = "1",
@@ -384,6 +429,9 @@ if (app.Environment.EnvironmentName != "Test")
     });
 
     await app.SetFullAccessAsync("t1", "t3");
+#if shiftFrameworkDevelopmentMode
+    }
+#endif
 #endif
 }
 
