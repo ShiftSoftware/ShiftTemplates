@@ -18,6 +18,10 @@ public class StockPlusPlusActionTree
     public readonly static ReadWriteDeleteAction Country = new("Country");
     public readonly static ReadWriteDeleteAction Tags = new("Tags");
 
+    // A text action: the warehouse codes a user works in, comma-separated ("*" is every warehouse). A user's trees are
+    // combined as a union, and the reverse lookup finds whoever holds every code searched for.
+    public readonly static TextAction Warehouses = new("Warehouses", TextCombine.UnionList(","), "Warehouse codes, comma-separated (* for all)", maximumAccess: "*");
+
     [ActionTree("Data Level Access", "Data Level or Row-Level Access")]
     public class DataLevelAccess
     {
