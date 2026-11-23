@@ -126,13 +126,16 @@ builder.Services.AddShiftTagging<DB, StockPlusPlusActionTree>(StockPlusPlusActio
 #endif
 
 #if (includeSampleApp)
-// Notifications are opt-in. This names the host, its topics and the email's footer. The subscribers list is a JSON file
-// embedded in the data project, with one section per environment. The sample sender sends nothing: it keeps each email
-// in memory. Users and teams need AddIdentityNotificationDirectory, which reads the replicated Identity documents, so this
-// sample uses addresses.
+// Notifications are opt-in. This names the host, its topics, when a topic is raised and the email's footer. The
+// subscribers list is a JSON file embedded in the data project, with one section per environment. The sample sender sends
+// nothing: it keeps each email in memory. Users and teams need AddIdentityNotificationDirectory, which reads the
+// replicated Identity documents, so this sample uses addresses.
 builder.Services.AddNotifications<DB>("StockPlusPlus", options =>
 {
     options.AddTopics<StockPlusPlus.Data.Notifications.StockPlusPlusTopics>();
+    // One line in place of a trigger. A moment only the entity knows, such as "became paid", goes on the entity
+    // (IHasNotificationRules), and a rule that needs services goes in a class (options.AddRule).
+    options.RaiseWhenCreated<StockPlusPlus.Data.Entities.Invoice>(StockPlusPlus.Data.Notifications.StockPlusPlusTopics.InvoiceCreated);
     options.Email.Footer = "StockPlusPlus sample, Example Street, Example City";
 });
 builder.Services.AddNotificationSubscribersJson(StockPlusPlus.Data.Notifications.StockPlusPlusTopics.OpenSubscribersFile, builder.Environment.EnvironmentName);

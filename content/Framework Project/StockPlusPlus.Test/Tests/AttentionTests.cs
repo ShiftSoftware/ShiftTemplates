@@ -299,7 +299,7 @@ public class AttentionTests
     }
 
     [Fact]
-    public async Task ClearThenReSave_RaisesNewSignal()
+    public async Task ClearThenReSave_KeepsOverdueCleared_UntilTheDueDateMoves()
     {
         using var scope = factory.Services.CreateScope();
         var repo = scope.ServiceProvider.GetRequiredService<InvoiceRepository>();
@@ -334,23 +334,27 @@ public class AttentionTests
         await db.Entry(invoice).ReloadAsync();
         Assert.False(invoice.HasActiveAttention);
 
+        // Saved again with the same due date: the overdue signal someone cleared stays cleared.
         invoice.ManualReference = "ATT-CLEAR-RERAISE-V2";
         await repo.SaveChangesAsync();
 
-        await db.Entry(invoice).ReloadAsync();
+        var afterReSave = await ActiveSignalsOf(db, invoice);
 
-        output.WriteLine($"After re-save: HasActiveAttention={invoice.HasActiveAttention}, " +
-                         $"ActiveSignalCount={invoice.ActiveSignalCount}");
+        output.WriteLine($"After re-save: active signals={afterReSave.Count}");
 
-        Assert.True(invoice.HasActiveAttention);
+        Assert.DoesNotContain(afterReSave, s => s.Category == "Overdue");
 
-        var activeSignals = await db.Set<AttentionSignalEntry>()
+        // A new due date that has passed raises it again.
+        invoice.DueDate = DateTimeOffset.UtcNow;
+        await repo.SaveChangesAsync();
+
+        Assert.Contains(await ActiveSignalsOf(db, invoice), s => s.Category == "Overdue");
+    }
+
+    private static Task<List<AttentionSignalEntry>> ActiveSignalsOf(DB db, Invoice invoice)
+        => db.Set<AttentionSignalEntry>()
             .Where(x => x.EntityType == "Invoice" && x.EntityId == invoice.ID && x.ClearedAt == null)
             .ToListAsync();
-
-        Assert.NotEmpty(activeSignals);
-        Assert.Contains(activeSignals, s => s.Category == "Overdue");
-    }
 
     [Fact]
     public async Task ClearEndpoint_ReturnsFreshStamp_SoSubsequentPutDoesNotConflict()

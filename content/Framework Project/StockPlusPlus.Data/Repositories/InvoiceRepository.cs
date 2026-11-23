@@ -4,13 +4,11 @@ using ShiftSoftware.ShiftEntity.Core;
 using ShiftSoftware.ShiftEntity.EFCore;
 using StockPlusPlus.Data.DbContext;
 using StockPlusPlus.Data.Entities;
-using ShiftSoftware.ShiftEntity.Core.Notifications;
-using StockPlusPlus.Data.Notifications;
 using StockPlusPlus.Shared.DTOs.Invoice;
 
 namespace StockPlusPlus.Data.Repositories;
 
-public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceListDTO, InvoiceDTO>, IShiftEntityHasAfterSaveHook<Entities.Invoice>
+public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceListDTO, InvoiceDTO>
 {
     // Invoice demonstrates the automatic maps with DEEP (child collection) mapping AND a customization — and
     // that the two live in different places:
@@ -34,19 +32,10 @@ public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceLi
             option.IncludeRelatedEntitiesWithFindAsync(x => x.Include(entity => entity.InvoiceLines));
         };
 
-    private readonly INotificationRaiser notifications;
-
-    public InvoiceRepository(DB db, INotificationRaiser notifications) : base(db, IncludeOptions)
+    // The "invoice created" email needs nothing here: Program.cs raises it with one line, RaiseWhenCreated<Invoice>, after
+    // any save that creates an invoice.
+    public InvoiceRepository(DB db) : base(db, IncludeOptions)
     {
-        this.notifications = notifications;
-    }
-
-    // The decision stays here, in the host. An event joins the queue only after the save has committed, and a rolled-back
-    // save sends nothing, so raising from this hook is safe although it runs inside the save.
-    public async ValueTask AfterSaveAsync(Invoice entity, ActionTypes action)
-    {
-        if (action == ActionTypes.Insert)
-            await notifications.RaiseAsync(StockPlusPlusTopics.InvoiceCreated, entity);
     }
 
     public override async ValueTask<Invoice> UpsertAsync(Invoice entity, InvoiceDTO dto, ActionTypes actionType, long? userId, Guid? idempotencyKey, bool disableDefaultDataLevelAccess, bool disableGlobalFilters)
