@@ -1,0 +1,8 @@
+<Project>
+	<!-- Licence metadata of every package in this repository. -->
+	<!-- Only the template package. The sample under content/ is not part of it and takes none of this. -->
+	<PropertyGroup Condition="'$(MSBuildProjectName)' == 'ShiftTemplates'">
+		<Copyright>Copyright 2024-2026 Shift Software Company for General Trading and Information Technology Ltd</Copyright>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+	</PropertyGroup>
+</Project>

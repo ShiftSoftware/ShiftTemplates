@@ -19,7 +19,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftFramework", "ShiftFram
 		..\..\.pipelines\identity-checks.steps.yml = ..\..\.pipelines\identity-checks.steps.yml
 		..\..\azure-pipeline.yml = ..\..\azure-pipeline.yml
 		..\..\AGENTS.md = ..\..\AGENTS.md
+		..\..\Directory.Build.props = ..\..\Directory.Build.props
+		..\..\Directory.Build.targets = ..\..\Directory.Build.targets
 		..\..\ImportAndReferenceAll.bat = ..\..\ImportAndReferenceAll.bat
+		..\..\LICENSE = ..\..\LICENSE
+		..\..\LICENSING.md = ..\..\LICENSING.md
+		..\..\NOTICE = ..\..\NOTICE
 		..\..\RemoveAll.bat = ..\..\RemoveAll.bat
 		..\..\ShiftFrameworkGlobalSettings.props = ..\..\ShiftFrameworkGlobalSettings.props
 	EndProjectSection
@@ -39,6 +44,15 @@ EndProject
 
 <!--#if shiftFrameworkDevelopmentMode-->
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftEntity", "ShiftEntity", "{221AA4A6-F48E-4605-90FC-ACCE31C9397D}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftEntity\Directory.Build.props = ..\..\..\ShiftEntity\Directory.Build.props
+		..\..\..\ShiftEntity\Directory.Build.targets = ..\..\..\ShiftEntity\Directory.Build.targets
+		..\..\..\ShiftEntity\LICENSE = ..\..\..\ShiftEntity\LICENSE
+		..\..\..\ShiftEntity\LICENSING.md = ..\..\..\ShiftEntity\LICENSING.md
+		..\..\..\ShiftEntity\NOTICE = ..\..\..\ShiftEntity\NOTICE
+		..\..\..\ShiftEntity\README.md = ..\..\..\ShiftEntity\README.md
+		..\..\..\ShiftEntity\THIRD-PARTY-NOTICES.txt = ..\..\..\ShiftEntity\THIRD-PARTY-NOTICES.txt
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftEntity.Model", "..\..\..\ShiftEntity\ShiftEntity.Model\ShiftEntity.Model.csproj", "{B0353BF9-2018-48B0-AEA5-4FC3A5225F93}"
 EndProject
@@ -61,6 +75,15 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftEntity.Benchmarks", "..\..\..\ShiftEntity\ShiftEntity.Benchmarks\ShiftEntity.Benchmarks.csproj", "{5C0F3D5B-6E1A-4D0E-9B8F-2A7C41D9E6B3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftBlazor", "ShiftBlazor", "{1910940D-D140-4B3F-A2F5-6D322EFAC152}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftBlazor\Directory.Build.props = ..\..\..\ShiftBlazor\Directory.Build.props
+		..\..\..\ShiftBlazor\Directory.Build.targets = ..\..\..\ShiftBlazor\Directory.Build.targets
+		..\..\..\ShiftBlazor\LICENSE = ..\..\..\ShiftBlazor\LICENSE
+		..\..\..\ShiftBlazor\LICENSING.md = ..\..\..\ShiftBlazor\LICENSING.md
+		..\..\..\ShiftBlazor\NOTICE = ..\..\..\ShiftBlazor\NOTICE
+		..\..\..\ShiftBlazor\README.md = ..\..\..\ShiftBlazor\README.md
+		..\..\..\ShiftBlazor\THIRD-PARTY-NOTICES.txt = ..\..\..\ShiftBlazor\THIRD-PARTY-NOTICES.txt
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftBlazor", "..\..\..\ShiftBlazor\ShiftBlazor\ShiftBlazor.csproj", "{744DA0F0-87B2-438A-A729-BAED65C9B780}"
 EndProject
@@ -71,6 +94,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftBlazor.Tests.Viewer", "..\..\..\ShiftBlazor\ShiftBlazor.Tests.Viewer\ShiftBlazor.Tests.Viewer.csproj", "{E08B61F0-F227-446F-B669-E63C63818661}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TypeAuth", "TypeAuth", "{40E199E8-B4F0-4E38-9431-BAAD775F1FCD}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\TypeAuth\Directory.Build.props = ..\..\..\TypeAuth\Directory.Build.props
+		..\..\..\TypeAuth\Directory.Build.targets = ..\..\..\TypeAuth\Directory.Build.targets
+		..\..\..\TypeAuth\LICENSE = ..\..\..\TypeAuth\LICENSE
+		..\..\..\TypeAuth\LICENSING.md = ..\..\..\TypeAuth\LICENSING.md
+		..\..\..\TypeAuth\NOTICE = ..\..\..\TypeAuth\NOTICE
+		..\..\..\TypeAuth\README.md = ..\..\..\TypeAuth\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuth.Core", "..\..\..\TypeAuth\TypeAuth.Core\TypeAuth.Core.csproj", "{F048C862-4F52-456A-8162-6C18695D6BEB}"
 EndProject
@@ -81,6 +112,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeAuth.Shared", "..\..\..\TypeAuth\TypeAuth.Shared\TypeAuth.Shared.csproj", "{B94F7EB9-3D1D-4D19-9F9C-8C8D92E6C76C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftIdentity", "ShiftIdentity", "{628E8BC1-C04D-4681-90A3-5CD4DF6A4003}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftIdentity\Directory.Build.props = ..\..\..\ShiftIdentity\Directory.Build.props
+		..\..\..\ShiftIdentity\Directory.Build.targets = ..\..\..\ShiftIdentity\Directory.Build.targets
+		..\..\..\ShiftIdentity\LICENSE = ..\..\..\ShiftIdentity\LICENSE
+		..\..\..\ShiftIdentity\LICENSING.md = ..\..\..\ShiftIdentity\LICENSING.md
+		..\..\..\ShiftIdentity\NOTICE = ..\..\..\ShiftIdentity\NOTICE
+		..\..\..\ShiftIdentity\README.md = ..\..\..\ShiftIdentity\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftIdentity.Core", "..\..\..\ShiftIdentity\ShiftIdentity.Core\ShiftIdentity.Core.csproj", "{0268A80E-1AFF-4726-AF95-E09A08A497AD}"
 EndProject
@@ -95,16 +134,40 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftIdentity.Dashboard.Blazor", "..\..\..\ShiftIdentity\ShiftIdentity.Dashboard.Blazor\ShiftIdentity.Dashboard.Blazor.csproj", "{67BCA632-8340-4F22-902F-C8AB66B62EB2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestingTools", "TestingTools", "{CCFF169C-5913-4709-B3A9-CC543DB7E1FD}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftFrameworkTestingTools\Directory.Build.props = ..\..\..\ShiftFrameworkTestingTools\Directory.Build.props
+		..\..\..\ShiftFrameworkTestingTools\Directory.Build.targets = ..\..\..\ShiftFrameworkTestingTools\Directory.Build.targets
+		..\..\..\ShiftFrameworkTestingTools\LICENSE = ..\..\..\ShiftFrameworkTestingTools\LICENSE
+		..\..\..\ShiftFrameworkTestingTools\LICENSING.md = ..\..\..\ShiftFrameworkTestingTools\LICENSING.md
+		..\..\..\ShiftFrameworkTestingTools\NOTICE = ..\..\..\ShiftFrameworkTestingTools\NOTICE
+		..\..\..\ShiftFrameworkTestingTools\README.md = ..\..\..\ShiftFrameworkTestingTools\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftFrameworkTestingTools", "..\..\..\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools\ShiftFrameworkTestingTools.csproj", "{0F5B91B4-C98B-4A74-BDE1-1CE7B84D4693}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzureFunctionsAspNetCoreAuthorization", "AzureFunctionsAspNetCoreAuthorization", "{271A2AA2-3F44-4050-8A2C-92B2E4D6D1FF}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\AzureFunctionsAspNetCoreAuthorization\Directory.Build.props = ..\..\..\AzureFunctionsAspNetCoreAuthorization\Directory.Build.props
+		..\..\..\AzureFunctionsAspNetCoreAuthorization\Directory.Build.targets = ..\..\..\AzureFunctionsAspNetCoreAuthorization\Directory.Build.targets
+		..\..\..\AzureFunctionsAspNetCoreAuthorization\LICENSE = ..\..\..\AzureFunctionsAspNetCoreAuthorization\LICENSE
+		..\..\..\AzureFunctionsAspNetCoreAuthorization\LICENSING.md = ..\..\..\AzureFunctionsAspNetCoreAuthorization\LICENSING.md
+		..\..\..\AzureFunctionsAspNetCoreAuthorization\NOTICE = ..\..\..\AzureFunctionsAspNetCoreAuthorization\NOTICE
+		..\..\..\AzureFunctionsAspNetCoreAuthorization\README.md = ..\..\..\AzureFunctionsAspNetCoreAuthorization\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftSoftware.Azure.Functions.AspNetCore.Authorization", "..\..\..\AzureFunctionsAspNetCoreAuthorization\ShiftSoftware.Azure.Functions.AspNetCore.Authorization\ShiftSoftware.Azure.Functions.AspNetCore.Authorization.csproj", "{5C7A1141-89EB-473A-8595-C6C8DBF7F233}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftEntity.Functions", "..\..\..\ShiftEntity\ShiftEntity.Functions\ShiftEntity.Functions.csproj", "{5B117C1F-88F6-4B06-9ADE-C39A47EFAF58}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Localization", "Localization", "{4D85A86A-821A-4F93-B525-E3C22360EFC1}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftFrameworkLocalization\Directory.Build.props = ..\..\..\ShiftFrameworkLocalization\Directory.Build.props
+		..\..\..\ShiftFrameworkLocalization\Directory.Build.targets = ..\..\..\ShiftFrameworkLocalization\Directory.Build.targets
+		..\..\..\ShiftFrameworkLocalization\LICENSE = ..\..\..\ShiftFrameworkLocalization\LICENSE
+		..\..\..\ShiftFrameworkLocalization\LICENSING.md = ..\..\..\ShiftFrameworkLocalization\LICENSING.md
+		..\..\..\ShiftFrameworkLocalization\NOTICE = ..\..\..\ShiftFrameworkLocalization\NOTICE
+		..\..\..\ShiftFrameworkLocalization\README.md = ..\..\..\ShiftFrameworkLocalization\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShiftSoftwareLocalization", "..\..\..\ShiftFrameworkLocalization\ShiftSoftwareLocalization\ShiftSoftwareLocalization.csproj", "{AF49ADB4-B36C-476B-AF0C-BC9277FFA8AF}"
 EndProject
@@ -113,6 +176,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftIdentity.AzureFunctions", "..\..\..\ShiftIdentity\ShiftIdentity.AzureFunctions\ShiftIdentity.AzureFunctions.csproj", "{E828868F-585A-4B86-0785-F837CCC32C36}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftFrameworkDocumentation\LICENSE = ..\..\..\ShiftFrameworkDocumentation\LICENSE
+		..\..\..\ShiftFrameworkDocumentation\LICENSING.md = ..\..\..\ShiftFrameworkDocumentation\LICENSING.md
+		..\..\..\ShiftFrameworkDocumentation\NOTICE = ..\..\..\ShiftFrameworkDocumentation\NOTICE
+		..\..\..\ShiftFrameworkDocumentation\README.md = ..\..\..\ShiftFrameworkDocumentation\README.md
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docs.Shared", "..\..\..\ShiftFrameworkDocumentation\Docs.Shared\Docs.Shared.csproj", "{01CBDF8F-848E-DBF6-D306-25B98DC4211E}"
 EndProject
@@ -135,6 +204,13 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeAuthTests", "..\..\..\TypeAuth\TypeAuth.Core.Tests\TypeAuthTests.csproj", "{F2F000F4-360B-4356-ACAB-6F13400568CC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftMapper", "ShiftMapper", "{9E913C84-F40B-415B-876D-126C334E4CE7}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\ShiftMapper\Directory.Build.props = ..\..\..\ShiftMapper\Directory.Build.props
+		..\..\..\ShiftMapper\LICENSE = ..\..\..\ShiftMapper\LICENSE
+		..\..\..\ShiftMapper\LICENSING.md = ..\..\..\ShiftMapper\LICENSING.md
+		..\..\..\ShiftMapper\NOTICE = ..\..\..\ShiftMapper\NOTICE
+		..\..\..\ShiftMapper\README.md = ..\..\..\ShiftMapper\README.md
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShiftMapper", "..\..\..\ShiftMapper\ShiftMapper\ShiftMapper.csproj", "{D0543A79-0A5B-4428-8ACA-89BD86B27E4F}"
 EndProject
@@ -201,6 +277,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shift_identity_token_client
 		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\analysis_options.yaml = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\analysis_options.yaml
 		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\CHANGELOG.md = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\CHANGELOG.md
 		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\LICENSE = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\LICENSE
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\NOTICE = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\NOTICE
 		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\pubspec.yaml = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\pubspec.yaml
 		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\README.md = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client\README.md
 	EndProjectSection
@@ -252,6 +329,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shift_identity_token_client
 		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\analysis_options.yaml = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\analysis_options.yaml
 		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\CHANGELOG.md = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\CHANGELOG.md
 		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\LICENSE = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\LICENSE
+		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\NOTICE = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\NOTICE
 		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\pubspec.yaml = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\pubspec.yaml
 		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\pubspec_overrides.yaml = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\pubspec_overrides.yaml
 		..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\README.md = ..\..\..\ShiftIdentity\clients\dart\shift_identity_token_client_flutter\README.md
