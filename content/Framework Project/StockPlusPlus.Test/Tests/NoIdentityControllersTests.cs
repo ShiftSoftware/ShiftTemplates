@@ -5,11 +5,11 @@ using Xunit;
 
 namespace StockPlusPlus.Test.Tests;
 
-// Phase 6 end-state guard for the Phase-5 migration: ShiftIdentity was moved entirely off MVC controllers to
-// attribute-driven CRUD + hand-written minimal-API endpoint groups. This test fails if ANY ControllerBase subclass
-// reappears in the two ShiftIdentity assemblies that used to host controllers. There is deliberately NO allow-list —
-// the migration left exactly zero; if a view-rendering controller ever has to be kept, add it here explicitly with a
-// comment (see the plan's §1 end-state caveat). DB-free (pure reflection).
+// Guards the end state of moving ShiftIdentity entirely off MVC controllers, to attribute-driven CRUD and hand-written
+// minimal-API endpoint groups. This test fails if ANY ControllerBase subclass reappears in the two ShiftIdentity
+// assemblies that used to host controllers. There is deliberately NO allow-list — the move left exactly zero; if a
+// view-rendering controller ever has to be kept, add it here explicitly, with a comment that says why. DB-free (pure
+// reflection).
 public class NoIdentityControllersTests
 {
     // Marker types force the two assemblies to load. ShiftIdentity.AspNetCore held the API + MVC Auth controllers;

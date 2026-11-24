@@ -7,10 +7,14 @@ namespace StockPlusPlus.Test.Tests;
 
 [TestCaseOrderer(typeof(PriorityOrderer))]
 [Collection("API Collection")]
-public class Repositories
+public class Repositories : IDisposable
 {
     private readonly CustomWebApplicationFactory factory;
     private readonly ITestOutputHelper output;
+
+    // The repositories come from a scope, as they do in a request. Resolved from the host's root provider, the context
+    // behind them would live as long as the host, and a save handler it creates would have no scope to be created in.
+    private readonly IServiceScope scope;
 
     private readonly ProductBrandRepository brandRepository;
     private readonly ProductCategoryRepository productCategoryRepository;
@@ -21,10 +25,14 @@ public class Repositories
         this.factory = factory;
         this.output = output;
 
-        this.brandRepository = factory.Services.GetRequiredService<ProductBrandRepository>();
-        this.productCategoryRepository = factory.Services.GetRequiredService<ProductCategoryRepository>();
-        this.productRepository = factory.Services.GetRequiredService<ProductRepository>();
+        this.scope = factory.Services.CreateScope();
+
+        this.brandRepository = scope.ServiceProvider.GetRequiredService<ProductBrandRepository>();
+        this.productCategoryRepository = scope.ServiceProvider.GetRequiredService<ProductCategoryRepository>();
+        this.productRepository = scope.ServiceProvider.GetRequiredService<ProductRepository>();
     }
+
+    public void Dispose() => scope.Dispose();
 
     [Fact]
     public async Task ProductRepository()

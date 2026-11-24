@@ -14,16 +14,15 @@ using Xunit;
 namespace StockPlusPlus.Test.Tests;
 
 /// <summary>
-/// Pins Identity's replication documents as the replication mapper writes them, for the cases the replication
-/// aggregates plan keeps:
+/// Pins Identity's replication documents as the replication mapper writes them, for these cases:
 /// <list type="bullet">
-/// <item>users, teams and the named trees. Users and teams gained their assignment and member lists, and the assignment
-/// and membership documents were removed, with R1 and R2 of the reverse-access plan;</item>
+/// <item>users, teams and the named trees. Users and teams carry their assignment and member lists, and the separate
+/// assignment and membership documents are no longer written;</item>
 /// <item>a branch whose region has no country: its document in Branches carries a null country, as its document in
 /// CompanyBranches did.</item>
 /// </list>
-/// The branch link documents of deleted links and deleted items were pinned here too, as the input to the plan's
-/// decision about deleted items. Nothing writes those documents any more; <see cref="BranchDocumentTests"/> pins what
+/// The branch link documents of deleted links and deleted items were pinned here too, while it was being decided
+/// what to do about deleted items. Nothing writes those documents any more; <see cref="BranchDocumentTests"/> pins what
 /// a branch's document lists instead. The frozen goldens in <see cref="ReplicationMappingParityTests"/> cover the other
 /// documents. They are not touched here.
 /// </summary>

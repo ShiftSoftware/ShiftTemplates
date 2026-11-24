@@ -17,6 +17,11 @@
 	<PropertyGroup Condition="'$(IdentityDevelopmentApp)' == 'true'">
 		<DefineConstants>$(DefineConstants);IDENTITY_DEVELOPMENT_APP</DefineConstants>
 	</PropertyGroup>
+	<ItemGroup>
+		<!-- Only for Tests/TriggerLibraryCheckTests.cs: a host that still registers a trigger of this library does not
+		     start. The framework no longer references the library, and nothing else here may use it. -->
+		<PackageReference Include="EntityFrameworkCore.Triggered" Version="3.2.2" />
+	</ItemGroup>
 	<!--#endif -->
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />

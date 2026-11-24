@@ -133,8 +133,8 @@ builder.Services.AddShiftTagging<DB, StockPlusPlusActionTree>(StockPlusPlusActio
 builder.Services.AddNotifications<DB>("StockPlusPlus", options =>
 {
     options.AddTopics<StockPlusPlus.Data.Notifications.StockPlusPlusTopics>();
-    // One line in place of a trigger. A moment only the entity knows, such as "became paid", goes on the entity
-    // (IHasNotificationRules), and a rule that needs services goes in a class (options.AddRule).
+    // One line in place of an after-commit handler. A moment only the entity knows, such as "became paid", goes on the
+    // entity (IHasNotificationRules), and a rule that needs services goes in a class (options.AddRule).
     options.RaiseWhenCreated<StockPlusPlus.Data.Entities.Invoice>(StockPlusPlus.Data.Notifications.StockPlusPlusTopics.InvoiceCreated);
     options.Email.Footer = "StockPlusPlus sample, Example Street, Example City";
 });
@@ -142,6 +142,14 @@ builder.Services.AddNotificationSubscribersJson(StockPlusPlus.Data.Notifications
 builder.Services.AddSingleton<StockPlusPlus.Data.Notifications.SampleNotificationOutbox>();
 builder.Services.AddSingleton<ShiftSoftware.ShiftEntity.Core.Notifications.INotificationEmailSender>(sp => sp.GetRequiredService<StockPlusPlus.Data.Notifications.SampleNotificationOutbox>());
 builder.Services.AddScoped<ShiftSoftware.ShiftEntity.Core.Notifications.INotificationEmailContent<StockPlusPlus.Data.Entities.Invoice>, StockPlusPlus.Data.Notifications.InvoiceEmailContent>();
+
+// Save handlers: app code that runs at a stage of every save (before save, after save, before commit, after commit).
+// The ones that belong to the data are declared with the context (DB.ConfigureSaveHandlers) and need nothing here.
+// This one tells another system about price changes once they are committed. That system is the host's, so the host
+// declares the handler. The sample feed tells nobody: it keeps each change in memory.
+builder.Services.AddSingleton<StockPlusPlus.Data.SaveHandlers.SamplePriceFeed>();
+builder.Services.AddSingleton<StockPlusPlus.Data.SaveHandlers.IPriceFeed>(sp => sp.GetRequiredService<StockPlusPlus.Data.SaveHandlers.SamplePriceFeed>());
+builder.Services.AddSaveHandler<StockPlusPlus.Data.SaveHandlers.ProductPriceFeed>();
 #endif
 
 // Phase 2 emission: once a save that raised attention signals commits, the framework
@@ -204,7 +212,7 @@ builder.Services.AddFileExplorer(x =>
 if (IsCosmosEnabled)
 {
 #if (internalShiftIdentityHosting)
-    builder.Services.AddShiftEntityCosmosDbReplicationTrigger<DB>(x =>
+    builder.Services.AddShiftEntityCosmosDbReplicationOnSave<DB>(x =>
     {
         string databaseId = IdentityDatabaseAndContainerNames.DatabaseName;
         var client = x.Services.GetRequiredService<CosmosClient>();

@@ -38,6 +38,9 @@ public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceLi
     {
     }
 
+    // The invoice number is not given here. Reading the last number here and writing it later is two steps, and two
+    // requests can read the same last number. SaveHandlers/InvoiceNumbering.cs gives it inside the save, under a
+    // lock, for every new invoice, whoever saves it.
     public override async ValueTask<Invoice> UpsertAsync(Invoice entity, InvoiceDTO dto, ActionTypes actionType, long? userId, Guid? idempotencyKey, bool disableDefaultDataLevelAccess, bool disableGlobalFilters)
     {
 
@@ -46,20 +49,6 @@ public class InvoiceRepository : ShiftRepository<DB, Entities.Invoice, InvoiceLi
             db.InvoiceLines.RemoveRange(entity.InvoiceLines.ToList());
         }
 
-        var upserted = await base.UpsertAsync(entity, dto, actionType, userId, idempotencyKey, disableDefaultDataLevelAccess, disableGlobalFilters);
-
-        if (actionType == ActionTypes.Insert)
-        {
-
-            var companyId = base.identityClaimProvider.GetCompanyID();
-
-            var maxInvoiceNo = await db.Invoices
-                .Where(x => x.CompanyID == companyId && !x.IsDeleted)
-                .MaxAsync(x => (long?)x.InvoiceNo) ?? 1;
-
-            upserted.InvoiceNo = maxInvoiceNo + 1;
-        }
-
-        return upserted;
+        return await base.UpsertAsync(entity, dto, actionType, userId, idempotencyKey, disableDefaultDataLevelAccess, disableGlobalFilters);
     }
 }

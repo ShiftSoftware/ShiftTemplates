@@ -70,6 +70,7 @@
         "StockPlusPlus.Web/Development/**/*",
         "StockPlusPlus.Test/Tests/IdentityDevelopmentAppTests.cs",
         "StockPlusPlus.Test/Tests/IdentityDevelopmentSecurityLinksTests.cs",
+        "StockPlusPlus.Test/Tests/TriggerLibraryCheckTests.cs",
         "StockPlusPlus.API/identity-seed.development.json",
         "**/stockplusplus.db*"
       ],
@@ -97,6 +98,8 @@
             "**/StockPlusPlus.Data/ReplicationModels/*.cs",
             "**/StockPlusPlus.Data/Repositories/*/**",
             "**/StockPlusPlus.Data/Repositories/*.cs",
+            "**/StockPlusPlus.Data/SaveHandlers/*/**",
+            "**/StockPlusPlus.Data/SaveHandlers/*.cs",
             "**/StockPlusPlus.Functions/Functions/*/**",
             "**/StockPlusPlus.Functions/Functions/*.cs",
             "**/StockPlusPlus.Shared/ActionTrees/SystemActionTrees.cs",
