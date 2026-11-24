@@ -80,7 +80,9 @@ Action<DbContextOptionsBuilder> dbOptionBuilder = x =>
     // SQLite has no temporal tables, so UseTemporal is left out: entity history (revisions) is SQL Server only.
     if (sqliteConnection is not null)
     {
-        x.UseSqlite(sqliteConnection);
+        // SQLite compares text with case; UseCaseInsensitiveText (ShiftEntity) opts in to comparing it without case,
+        // as SQL Server does, so a username signs in in any case here too. Leave it out to keep SQLite's default.
+        x.UseSqlite(sqliteConnection, sqlite => sqlite.UseCaseInsensitiveText());
         return;
     }
 #endif
