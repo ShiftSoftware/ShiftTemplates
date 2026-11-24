@@ -50,6 +50,7 @@
         "**/*.filelist",
         "**/*.user",
         "**/*.lock.json",
+        "**/.claude/**",
         "**/.git/**",
         "**/.github/**",
         "**/.vs/**",
@@ -64,7 +65,12 @@
         "StockPlusPlus.Web.Tests/**/*",
         "StockPlusPlus.Test.LongRunning/**/*",
         "StockPlusPlus.E2ETests/**/*",
+        "StockPlusPlus.Test/Tests/AuthEndpointTests.cs",
+        "StockPlusPlus.Test/Tests/IdentityAdministratorConfirmationTests.cs",
         "StockPlusPlus.Test/Tests/IdentityConsumerContractTests.cs",
+        "StockPlusPlus.Test/Tests/IdentityLoginPolishTests.cs",
+        "StockPlusPlus.Test/Tests/IdentitySmtpDeliveryTests.cs",
+        "StockPlusPlus.Test/Tests/SyntheticPlace.cs",
         "StockPlusPlus.API/Development/IdentityPreview/**/*",
         "StockPlusPlus.API/Development/IdentityApp/**/*",
         "StockPlusPlus.Web/Development/**/*",
@@ -115,7 +121,12 @@
         },
         {
           "exclude": [
-            "**/StockPlusPlus.API/Services/SendEmailService.cs"
+            "**/StockPlusPlus.API/Services/SendEmailService.cs",
+            "**/StockPlusPlus.Functions/Functions/IdentityReplicationFunctions.cs",
+            "**/StockPlusPlus.Test/Tests/CompanyBranchListTranslationTests.cs",
+            "**/StockPlusPlus.Test/Tests/IdentityReplicationMapperRegistrationTests.cs",
+            "**/StockPlusPlus.Test/Tests/NoIdentityControllersTests.cs",
+            "**/StockPlusPlus.Test/Tests/UserListTranslationTests.cs"
           ],
           "condition": "(!internalShiftIdentityHosting)"
         },

@@ -97,6 +97,7 @@ public class DeepListTranslationTests
         Assert.Equal(1, Occurrences(sql, RootSoftDelete));
     }
 
+#if (internalShiftIdentityHosting)
     /// <summary>
     /// <c>api/IdentityCompany</c> — <c>Brands</c> is a two-hop aggregation across the branch M:N
     /// (<c>CompanyBranches.SelectMany(CompanyBranchBrands)</c>, distinct). The riskiest list shape in
@@ -120,6 +121,7 @@ public class DeepListTranslationTests
         Assert.Contains("[CompanyBranchBrands]", sql);
         Assert.Equal(1, Occurrences(sql, RootSoftDelete));
     }
+#endif
 
     /// <summary>
     /// The Product list — <c>Tags</c> is a binding <c>ProductRepository.MapToList</c> writes by hand. Not an
