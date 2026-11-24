@@ -224,6 +224,14 @@ steps:
    condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-shiftmapper')))
    displayName: 'Verify the ShiftMapper package carries the library and the generator'
 
+ # The template and the packages together, as a new project uses them: nothing above generates a project, and a file that
+ # only builds inside this repository would go out in every new one. After the last pack step and not right after the
+ # template's, because on release-all a new project also needs the TypeAuth, Azure Functions and ShiftMapper packages
+ # packed since (on release-framework they come from nuget.org).
+ - pwsh: '& "$(Build.SourcesDirectory)/eng/Test-NewProjects.ps1" -PackagesPath "$(Build.ArtifactStagingDirectory)" -TemplatePackage "$(Build.ArtifactStagingDirectory)/Framework/ShiftSoftware.ShiftTemplates.*.nupkg" -WorkPath "$(Agent.TempDirectory)"'
+   condition: and(succeeded(), or(contains(variables['Build.SourceBranch'], 'refs/tags/release-all'), contains(variables['Build.SourceBranch'], 'refs/tags/release-framework')))
+   displayName: 'Build new projects from the packed template'
+
  - task: NuGetToolInstaller@1
    inputs:
     versionSpec: '6.9.1'

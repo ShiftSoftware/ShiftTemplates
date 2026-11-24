@@ -29,6 +29,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShiftFramework", "ShiftFram
 		..\..\ShiftFrameworkGlobalSettings.props = ..\..\ShiftFrameworkGlobalSettings.props
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{26254CA2-F24B-42AF-92EB-EC445CDB5E02}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\eng\Test-NewProjects.ps1 = ..\..\eng\Test-NewProjects.ps1
+	EndProjectSection
+EndProject
 
 <!--#endif -->
 
@@ -692,6 +697,7 @@ Global
 		{80E7316E-5D36-4EEB-8C33-B4CB7C9FB562} = {371D1633-5243-4AC4-A827-1A936E90FC4B}
 		{E77B62F9-2E6D-437B-82B4-60688FFF4537} = {628E8BC1-C04D-4681-90A3-5CD4DF6A4003}
 		{0DA43496-4FF8-474B-A455-13B0D15A9899} = {E77B62F9-2E6D-437B-82B4-60688FFF4537}
+		{26254CA2-F24B-42AF-92EB-EC445CDB5E02} = {6B5137B3-F21C-483E-B131-54706EE91D55}
 		<!--#endif -->
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
