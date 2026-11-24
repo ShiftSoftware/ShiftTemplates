@@ -1,11 +1,12 @@
 #requires -Version 7
-# Generates new projects from a packed template and builds them against packed packages. The release pipeline runs this
-# on what it has just packed, so that a template that gives a broken project stops the release before it is published.
+# Generates new projects from a packed template and builds them against packed packages. Run it before a release, on
+# packages packed for that, so that a template that gives a broken project is found before it is published. The release
+# pipeline does not run it: it takes minutes and gigabytes of disk.
 #
 # The projects are generated outside the repository, with the template in a hive of its own and the packages in a folder
 # of their own, so nothing under test reaches the machine's installed templates or its NuGet cache.
 #
-# On a developer machine: pack the framework packages and the template into a folder, then run
+# Pack the framework packages and the template into a folder, then run
 #   eng/Test-NewProjects.ps1 -PackagesPath <folder> -TemplatePackage <folder>/ShiftSoftware.ShiftTemplates.*.nupkg
 # Pack from a clean export with Linux line endings (git -c core.autocrlf=false -c core.eol=lf archive HEAD). The release
 # is packed on Linux, and with Windows line endings the template engine can remove less of an #if region than it should.
@@ -103,14 +104,12 @@ $problems = @(foreach ($kind in $kinds) {
     $found
     $result = if ($found.Count -eq 0) { 'passed' } else { 'failed' }
     Write-Host "$name $result in $([int]$watch.Elapsed.TotalSeconds) seconds."
-    # One project on disk at a time. All of them together could be too large for a hosted agent.
+    # One project on disk at a time.
     if ($found.Count -eq 0) { Remove-Item -LiteralPath $project -Recurse -Force -ErrorAction SilentlyContinue }
 })
 
 if ($problems.Count -gt 0) {
-    # The pipeline's summary page lists what is logged as an issue.
-    $prefix = if ($env:TF_BUILD) { '##vso[task.logissue type=error]' } else { '' }
-    foreach ($problem in $problems) { Write-Host "$prefix$problem" }
+    foreach ($problem in $problems) { Write-Host $problem }
     throw "The template gives broken projects. The ones that failed are in $work."
 }
 Remove-Item -LiteralPath $work -Recurse -Force -ErrorAction SilentlyContinue
