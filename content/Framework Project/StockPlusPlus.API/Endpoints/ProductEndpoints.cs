@@ -56,10 +56,12 @@ public static class ProductEndpoints
                 var handler = new ShiftSoftware.ShiftEntity.Web.ShiftEntityCrudHandler<
                     ProductRepository, Data.Entities.Product, ProductListDTO, ProductDTO>();
 
-                var items = await handler.GetSelectedEntitiesAsync(ctx, selectedItems);
-
                 try
                 {
+                    // The ForBulkWrite variant refuses a selection over the user's
+                    // GeneralActionTree.DataGridBulkWriteMaxTop, with a 400.
+                    var items = await handler.GetSelectedEntitiesForBulkWriteAsync(ctx, selectedItems);
+
                     await repo.BulkDeleteAsync(items);
 
                     return Results.Ok(new ShiftEntityResponse<IEnumerable<ProductListDTO>>()
