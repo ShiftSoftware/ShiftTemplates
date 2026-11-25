@@ -21,13 +21,11 @@ public class ProductController(ProductRepository productRepository) :
     public async Task<IActionResult> BulkDelete([FromBody] ShiftSoftware.ShiftEntity.Model.Dtos.SelectStateDTO<ProductListDTO> selectedItems)
     {
         productRepository.IncludeProductCategoryOnGetIquery = true;
+        
+        var items = await this.GetSelectedEntitiesAsync(selectedItems);
 
         try
         {
-            // The ForBulkWrite variant refuses a selection over the user's
-            // GeneralActionTree.DataGridBulkWriteMaxTop, with a 400.
-            var items = await this.GetSelectedEntitiesForBulkWriteAsync(selectedItems);
-
             await productRepository.BulkDeleteAsync(items);
 
             return Ok(new ShiftEntityResponse<IEnumerable<ProductListDTO>>()
